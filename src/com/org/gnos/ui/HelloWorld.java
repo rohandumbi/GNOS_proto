@@ -26,7 +26,7 @@ public class HelloWorld extends ApplicationWindow{
 		Composite container = new Composite(parent, SWT.NONE);
 		//container.setLayout(new GridLayout(1, true));
 		container.setLayout(new FillLayout());
-		Image backgroundImage = new Image (Display.getCurrent(), "resources/bg.jpg");
+		Image backgroundImage = new Image (Display.getCurrent(), "resources/white.jpg");
 		container.setBackgroundImage(backgroundImage);
 		container.setBackgroundMode(SWT.INHERIT_FORCE);
 		container.setBounds(0, 0, backgroundImage.getBounds().width, backgroundImage.getBounds().height);
