@@ -2,7 +2,7 @@ package com.org.gnos.application;
 
 import org.eclipse.swt.widgets.Display;
 
-import com.org.gnos.ui.HelloWorld;
+import com.org.gnos.ui.screens.HelloWorld;
 
 public class Application {
 
