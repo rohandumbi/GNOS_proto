@@ -26,7 +26,7 @@ public final class HomeScreen implements ChildScreenEventGenerator{
 	public void createContent(){
 		//Basic layout setup
 		homeScreen = new Composite(parent, SWT.NONE);
-		homeScreen.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_BACKGROUND_GRADIENT));
+		//homeScreen.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_BACKGROUND_GRADIENT));
 		homeScreen.setLayout(null);
 		
 		//Create new project button

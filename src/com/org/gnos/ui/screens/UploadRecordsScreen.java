@@ -27,7 +27,7 @@ public final class UploadRecordsScreen implements ChildScreenEventGenerator{
 	public void createContent(){
 		uploadRecordsScreen = new Composite(parent, SWT.NONE);
 		uploadRecordsScreen.setBackgroundMode(SWT.INHERIT_DEFAULT);
-		uploadRecordsScreen.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_BACKGROUND_GRADIENT));
+		//uploadRecordsScreen.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_BACKGROUND_GRADIENT));
 		uploadRecordsScreen.setLayout(null);
 		
 		Label selectFileLabel = new Label(uploadRecordsScreen, SWT.NONE);

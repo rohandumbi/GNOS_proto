@@ -28,12 +28,12 @@ public final class CreateNewProjectScreen implements ChildScreenEventGenerator{
 	public void createContent(){
 		//Basic layout setup
 		createNewProjectScreen = new Composite(parent, SWT.NONE);
-		createNewProjectScreen.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_BACKGROUND_GRADIENT));
+		//createNewProjectScreen.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_BACKGROUND_GRADIENT));
 		createNewProjectScreen.setLayout(null);
 		
 		//Name label
 		Label newProjectNameLabel = new Label(createNewProjectScreen, SWT.NONE);
-		newProjectNameLabel.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_BACKGROUND_GRADIENT));
+		//newProjectNameLabel.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_BACKGROUND_GRADIENT));
 		newProjectNameLabel.setBounds(44, 42, 91, 15);
 		newProjectNameLabel.setText("Name:");
 		
@@ -43,7 +43,7 @@ public final class CreateNewProjectScreen implements ChildScreenEventGenerator{
 		
 		//Project Description label
 		Label projectDescriptionLabel = new Label(createNewProjectScreen, SWT.NONE);
-		projectDescriptionLabel.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_BACKGROUND_GRADIENT));
+		//projectDescriptionLabel.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_BACKGROUND_GRADIENT));
 		projectDescriptionLabel.setBounds(44, 96, 91, 15);
 		projectDescriptionLabel.setText("Description:");
 		

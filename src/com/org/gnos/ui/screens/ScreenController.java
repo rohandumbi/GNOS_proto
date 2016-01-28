@@ -8,10 +8,12 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -21,7 +23,7 @@ import com.org.gnos.events.interfaces.ChildScreenEventListener;
 import com.org.gnos.utilities.SWTResourceManager;
 
 public class ScreenController extends ApplicationWindow implements ChildScreenEventListener{
-	
+
 	private StackLayout stackLayout;
 	private HomeScreen oHomeScreen;
 	private CreateNewProjectScreen oCreateNewProjectScreen;
@@ -30,7 +32,7 @@ public class ScreenController extends ApplicationWindow implements ChildScreenEv
 	private Composite homeScreen;
 	private Composite createNewProjectScreen;
 	private Composite uploadRecordsScreen;
-	
+
 	/**
 	 * Create the application window.
 	 */
@@ -49,24 +51,33 @@ public class ScreenController extends ApplicationWindow implements ChildScreenEv
 	protected Control createContents(Composite parent) {
 		parent.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_BACKGROUND_GRADIENT));
 		container = new Composite(parent, SWT.NONE);
-		container.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_BACKGROUND_GRADIENT));
+		//container.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_BACKGROUND_GRADIENT));
 		stackLayout = new StackLayout();
 		container.setLayout(stackLayout);
-		
+
+		Image backgroundImage = new Image (Display.getCurrent(), "resources/bg.jpg");
+		container.setBackgroundImage(backgroundImage);
+		container.setBackgroundMode(SWT.INHERIT_FORCE);
+		container.setBounds(0, 0, backgroundImage.getBounds().width, backgroundImage.getBounds().height);
+
 		oHomeScreen = new HomeScreen(container);
 		oHomeScreen.registerEventListener(this);
 		homeScreen = oHomeScreen.render();
-		
+
 		oCreateNewProjectScreen = new CreateNewProjectScreen(container);
 		oCreateNewProjectScreen.registerEventListener(this);
 		createNewProjectScreen = oCreateNewProjectScreen.render();
-		
+
 		oUploadRecordsScreen = new UploadRecordsScreen(container);
 		oUploadRecordsScreen.registerEventListener(this);
 		uploadRecordsScreen = oUploadRecordsScreen.render();
-		
+
 		stackLayout.topControl = homeScreen;
 		container.layout();
+
+		parent.getShell().setMinimumSize(1200, 700);
+		//parent.getShell().setMaximized(false);
+		parent.pack();
 
 		return container;
 	}
