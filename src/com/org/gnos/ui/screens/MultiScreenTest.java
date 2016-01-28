@@ -41,16 +41,23 @@ public class MultiScreenTest extends ApplicationWindow {
 	 */
 	protected Control createContents(Composite parent) {
 		parent.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_BACKGROUND_GRADIENT));
-		Composite container = new Composite(parent, SWT.NONE);
+		final Composite container = new Composite(parent, SWT.NONE);
 		container.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_BACKGROUND_GRADIENT));
 		final StackLayout stackLayout = new StackLayout();
 		container.setLayout(stackLayout);
 		
-		Composite homeScreen = new Composite(container, SWT.NONE);
+		final Composite homeScreen = new Composite(container, SWT.NONE);
 		homeScreen.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_BACKGROUND_GRADIENT));
 		homeScreen.setLayout(null);
 		
 		Button createNewProjectButton = new Button(homeScreen, SWT.NONE);
+		/*createNewProjectButton.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				stackLayout.topControl = homeScreen;
+				//homeScreen.setVisible(true);
+				container.layout();
+			}
+		});*/
 		createNewProjectButton.setGrayed(true);
 		createNewProjectButton.setBounds(115, 38, 195, 50);
 		createNewProjectButton.setText("Create New Project");
@@ -59,7 +66,7 @@ public class MultiScreenTest extends ApplicationWindow {
 		oprnExisitingProjectButton.setBounds(115, 110, 195, 50);
 		oprnExisitingProjectButton.setText("Open Exisitn Project");
 		
-		Composite createNewProjectScreen = new Composite(container, SWT.NONE);
+		final Composite createNewProjectScreen = new Composite(container, SWT.NONE);
 		createNewProjectScreen.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_BACKGROUND_GRADIENT));
 		createNewProjectScreen.setLayout(null);
 		
@@ -80,20 +87,26 @@ public class MultiScreenTest extends ApplicationWindow {
 		text_1.setBounds(44, 117, 331, 82);
 		
 		Button btnSubmit = new Button(createNewProjectScreen, SWT.NONE);
+		/*btnSubmit.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				//fileUploadScreen.
+				stackLayout.topControl = fileUploadScreen;
+			}
+		});*/
 		btnSubmit.setBounds(300, 205, 75, 25);
 		btnSubmit.setText("Submit");
 		
-		Composite fileUploadScreen = new Composite(container, SWT.NONE);
+		final Composite fileUploadScreen = new Composite(container, SWT.NONE);
 		fileUploadScreen.setBackgroundMode(SWT.INHERIT_DEFAULT);
 		fileUploadScreen.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_BACKGROUND_GRADIENT));
 		fileUploadScreen.setLayout(null);
 		
 		Label lblSelectFile = new Label(fileUploadScreen, SWT.NONE);
-		lblSelectFile.setBounds(22, 28, 77, 15);
+		lblSelectFile.setBounds(22, 28, 60, 15);
 		lblSelectFile.setText("Select File:");
 		
 		text_2 = new Text(fileUploadScreen, SWT.BORDER);
-		text_2.setBounds(80, 22, 272, 21);
+		text_2.setBounds(88, 22, 264, 21);
 		
 		Button fileBrowserButton = new Button(fileUploadScreen, SWT.NONE);
 		fileBrowserButton.setBounds(358, 23, 75, 20);
@@ -104,10 +117,25 @@ public class MultiScreenTest extends ApplicationWindow {
 			public void widgetSelected(SelectionEvent e) {
 			}
 		});
+		btnSubmit.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				//fileUploadScreen.setVisible(true);
+				stackLayout.topControl = fileUploadScreen;
+				container.layout();
+			}
+		});
+		createNewProjectButton.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				stackLayout.topControl = createNewProjectScreen;
+				//homeScreen.setVisible(true);
+				container.layout();
+			}
+		});
 		fileSubmitButton.setBounds(120, 141, 199, 25);
 		fileSubmitButton.setText("Submit");
 		
 		stackLayout.topControl = homeScreen;
+		container.layout();
 
 		return container;
 	}
