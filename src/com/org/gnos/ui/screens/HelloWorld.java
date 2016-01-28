@@ -1,4 +1,4 @@
-package com.org.gnos.ui;
+package com.org.gnos.ui.screens;
 
 import org.eclipse.jface.window.ApplicationWindow;
 import org.eclipse.swt.SWT;
@@ -24,16 +24,16 @@ public class HelloWorld extends ApplicationWindow{
 	
 	protected Control createContents(Composite parent) {
 		Composite container = new Composite(parent, SWT.NONE);
-		//container.setLayout(new GridLayout(1, true));
-		container.setLayout(new FillLayout());
-		Image backgroundImage = new Image (Display.getCurrent(), "resources/white.jpg");
+		container.setLayout(new GridLayout(1, true));
+		//container.setLayout(new FillLayout());
+		Image backgroundImage = new Image (Display.getCurrent(), "resources/bg.jpg");
 		container.setBackgroundImage(backgroundImage);
 		container.setBackgroundMode(SWT.INHERIT_FORCE);
 		container.setBounds(0, 0, backgroundImage.getBounds().width, backgroundImage.getBounds().height);
 		
 		
 		Label label = new Label(container, SWT.NONE);
-		label.setText("Hello, world!");
+		label.setText("Hello, world!!!!!");
 		
 		// Set the minimum size
         parent.getShell().setMinimumSize(1200, 700);
