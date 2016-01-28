@@ -16,9 +16,21 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import com.org.gnos.events.ChildScreenEvent;
+import com.org.gnos.events.interfaces.ChildScreenEventListener;
 import com.org.gnos.utilities.SWTResourceManager;
 
-public class ScreenController extends ApplicationWindow {
+public class ScreenController extends ApplicationWindow implements ChildScreenEventListener{
+	
+	private StackLayout stackLayout;
+	private HomeScreen oHomeScreen;
+	private CreateNewProjectScreen oCreateNewProjectScreen;
+	private UploadRecordsScreen oUploadRecordsScreen;
+	private Composite container;
+	private Composite homeScreen;
+	private Composite createNewProjectScreen;
+	private Composite uploadRecordsScreen;
+	
 	/**
 	 * Create the application window.
 	 */
@@ -36,19 +48,22 @@ public class ScreenController extends ApplicationWindow {
 	 */
 	protected Control createContents(Composite parent) {
 		parent.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_BACKGROUND_GRADIENT));
-		final Composite container = new Composite(parent, SWT.NONE);
+		container = new Composite(parent, SWT.NONE);
 		container.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_BACKGROUND_GRADIENT));
-		final StackLayout stackLayout = new StackLayout();
+		stackLayout = new StackLayout();
 		container.setLayout(stackLayout);
 		
-		HomeScreen oHomeScreen = new HomeScreen(container);
-		Composite homeScreen = oHomeScreen.render();
+		oHomeScreen = new HomeScreen(container);
+		oHomeScreen.registerEventListener(this);
+		homeScreen = oHomeScreen.render();
 		
-		CreateNewProjectScreen oCreateNewProjectScreen = new CreateNewProjectScreen(container);
-		Composite createNewProjectScreen = oCreateNewProjectScreen.render();
+		oCreateNewProjectScreen = new CreateNewProjectScreen(container);
+		oCreateNewProjectScreen.registerEventListener(this);
+		createNewProjectScreen = oCreateNewProjectScreen.render();
 		
-		UploadRecords oUploadRecordsScreen = new UploadRecords(container);
-		Composite uploadRecordsScreen = oUploadRecordsScreen.render();
+		oUploadRecordsScreen = new UploadRecordsScreen(container);
+		oUploadRecordsScreen.registerEventListener(this);
+		uploadRecordsScreen = oUploadRecordsScreen.render();
 		
 		stackLayout.topControl = homeScreen;
 		container.layout();
@@ -90,20 +105,6 @@ public class ScreenController extends ApplicationWindow {
 		return statusLineManager;
 	}
 
-	/**
-	 * Launch the application.
-	 * @param args
-	 */
-	/*public static void main(String args[]) {
-		try {
-			MultiScreenTest window = new MultiScreenTest();
-			window.setBlockOnOpen(true);
-			window.open();
-			Display.getCurrent().dispose();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}*/
 
 	/**
 	 * Configure the shell.
@@ -111,7 +112,7 @@ public class ScreenController extends ApplicationWindow {
 	 */
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
-		newShell.setText("New Application");
+		newShell.setText("GNOS - New Age Mining Software");
 	}
 
 	/**
@@ -119,5 +120,20 @@ public class ScreenController extends ApplicationWindow {
 	 */
 	protected Point getInitialSize() {
 		return new Point(450, 300);
+	}
+
+	@Override
+	public void onChildScreenEventFired(ChildScreenEvent e) {
+		// TODO Auto-generated method stub
+		if(e.eventName == "homeScreen:create-new-project"){
+			stackLayout.topControl = createNewProjectScreen;
+			container.layout();
+		}else if(e.eventName == "createNewProjectScreen:upload-records"){
+			stackLayout.topControl = uploadRecordsScreen;
+			container.layout();
+		}else if(e.eventName == "uploadScreen:upload-records"){
+			//TODO
+			System.out.println("Upload file to DB after processing");
+		}
 	}
 }

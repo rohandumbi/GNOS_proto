@@ -1,17 +1,23 @@
 package com.org.gnos.ui.screens;
 
+import java.util.ArrayList;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
+import com.org.gnos.events.ChildScreenEvent;
+import com.org.gnos.events.interfaces.ChildScreenEventGenerator;
+import com.org.gnos.events.interfaces.ChildScreenEventListener;
 import com.org.gnos.utilities.SWTResourceManager;
 
-public final class HomeScreen {
+public final class HomeScreen implements ChildScreenEventGenerator{
 
 	private Composite homeScreen;
 	private Composite parent;
+	private ArrayList<ChildScreenEventListener> listeners = new ArrayList<ChildScreenEventListener>();
 
 	public HomeScreen(Composite parent){
 		this.parent = parent;
@@ -30,7 +36,8 @@ public final class HomeScreen {
 		createNewProjectButton.setText("Create New Project");
 		createNewProjectButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				//TO DO
+				ChildScreenEvent event = new ChildScreenEvent(this, "homeScreen:create-new-project");
+				fireChildEvent(event);
 			}
 		});
 		
@@ -40,7 +47,8 @@ public final class HomeScreen {
 		openExisitingProjectButton.setText("Open Existing Project");
 		openExisitingProjectButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				//TO DO
+				ChildScreenEvent event = new ChildScreenEvent(this, "homeScreen:open-existing-project");
+				fireChildEvent(event);
 			}
 		});
 	}
@@ -48,5 +56,18 @@ public final class HomeScreen {
 	public Composite render(){
 		createContent();
 		return homeScreen;
+	}
+	
+	private void fireChildEvent(ChildScreenEvent event){
+		int j = listeners.size();
+		int i = 0;
+		for(i=0; i<j; i++){
+			listeners.get(i).onChildScreenEventFired(event);
+		}
+	}
+
+	@Override
+	public void registerEventListener(ChildScreenEventListener listener) {
+		listeners.add(listener);
 	}
 }

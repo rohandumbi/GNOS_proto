@@ -1,5 +1,7 @@
 package com.org.gnos.ui.screens;
 
+import java.util.ArrayList;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -8,12 +10,16 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import com.org.gnos.events.ChildScreenEvent;
+import com.org.gnos.events.interfaces.ChildScreenEventGenerator;
+import com.org.gnos.events.interfaces.ChildScreenEventListener;
 import com.org.gnos.utilities.SWTResourceManager;
 
-public final class CreateNewProjectScreen {
+public final class CreateNewProjectScreen implements ChildScreenEventGenerator{
 
 	private Composite createNewProjectScreen;
 	private Composite parent;
+	private ArrayList<ChildScreenEventListener> listeners = new ArrayList<ChildScreenEventListener>();
 	
 	public CreateNewProjectScreen(Composite parent){
 		this.parent = parent;
@@ -49,7 +55,8 @@ public final class CreateNewProjectScreen {
 		Button finishNewProjectSetupButton = new Button(createNewProjectScreen, SWT.NONE);
 		finishNewProjectSetupButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				//TO DO
+				ChildScreenEvent event = new ChildScreenEvent(this, "createNewProjectScreen:upload-records");
+				fireChildEvent(event);
 			}
 		});
 		finishNewProjectSetupButton.setBounds(300, 205, 75, 25);
@@ -60,5 +67,19 @@ public final class CreateNewProjectScreen {
 	public Composite render(){
 		createContent();
 		return createNewProjectScreen;
+	}
+	
+	private void fireChildEvent(ChildScreenEvent event){
+		int j = listeners.size();
+		int i = 0;
+		for(i=0; i<j; i++){
+			listeners.get(i).onChildScreenEventFired(event);
+		}
+	}
+
+	@Override
+	public void registerEventListener(ChildScreenEventListener listener) {
+		// TODO Auto-generated method stub
+		listeners.add(listener);
 	}
 }
