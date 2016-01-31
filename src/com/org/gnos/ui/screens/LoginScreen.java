@@ -2,15 +2,17 @@ package com.org.gnos.ui.screens;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Text;
-
-import com.org.gnos.utilities.SWTResourceManager;
+import org.eclipse.wb.swt.SWTResourceManager;
 
 
 public class LoginScreen extends Composite {
@@ -25,7 +27,8 @@ public class LoginScreen extends Composite {
 	public LoginScreen(Composite parent, int style) {
 		super(parent, style);
 		setFont(SWTResourceManager.getFont("Calibri", 12, SWT.NORMAL));
-		setLayout(new FormLayout());
+		Layout formLayout = new FormLayout();
+		setLayout(formLayout);
 		
 		Label lblUsername = new Label(this, SWT.NONE);
 		lblUsername.setFont(SWTResourceManager.getFont("Segoe UI", 14, SWT.NORMAL));
@@ -71,7 +74,22 @@ public class LoginScreen extends Composite {
 		fd_loginButton.left = new FormAttachment(textPassword, -20, SWT.LEFT);
 		loginButton.setLayoutData(fd_loginButton);
 		loginButton.setText("Login");
-
+		
+		Label labelLogo = new Label(this, SWT.NONE);
+		labelLogo.setImage(SWTResourceManager.getImage(LoginScreen.class, "/com/org/gnos/resources/logo.png"));
+		//labelLogo.setImage(logoImage);
+		//FormData fd_lblNewLabel = new FormData(SWT.CENTER, SWT.CENTER);
+		int offset = -labelLogo.computeSize(SWT.DEFAULT, SWT.DEFAULT).x / 2;
+		
+		FormData fd_logo = new FormData();
+		/*fd_lblNewLabel.bottom = new FormAttachment(0, 170);
+		fd_lblNewLabel.right = new FormAttachment(0, 604);
+		fd_lblNewLabel.top = new FormAttachment(0, 74);*/
+		/*fd_lblNewLabel.top = new FormAttachment(10);
+		fd_lblNewLabel.left = new FormAttachment(lblUsername, 40, SWT.LEFT);*/
+		fd_logo.left = new FormAttachment(50,offset);
+		fd_logo.bottom = new FormAttachment(textUserName, -10, SWT.TOP);
+		labelLogo.setLayoutData(fd_logo);
 
 	}
 
