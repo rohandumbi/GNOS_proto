@@ -67,7 +67,7 @@ public class CreateNewProjectScreen extends Composite {
 		Label labelProjectLocation = new Label(composite, SWT.NONE);
 		labelProjectLocation.setFont(SWTResourceManager.getFont("Arial", 12, SWT.NORMAL));
 		labelProjectLocation.setBounds(10, 103, 143, 24);
-		labelProjectLocation.setText("Project Location:");
+		labelProjectLocation.setText("Data Location:");
 		
 		textLocation = new Text(composite, SWT.BORDER);
 		textLocation.setFont(SWTResourceManager.getFont("Arial", 12, SWT.NORMAL));
