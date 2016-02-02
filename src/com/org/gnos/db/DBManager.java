@@ -4,20 +4,18 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+import com.org.gnos.application.GNOSConfig;
+
 public class DBManager {
 
 	private static Connection conn;
-	private static String url = "jdbc:mysql://localhost:3306/gnos";
-	private static String userName = "arpan";
-	private static String pwd = "arpan";
-	
-
 	
 	public static Connection getConnection(){
 		
 		if(conn == null) {
 			try {
-				conn = DriverManager.getConnection(url, userName, pwd);
+				String url = "jdbc:mysql://"+GNOSConfig.get("db.host")+":"+GNOSConfig.get("db.port")+"/"+GNOSConfig.get("db.schema");
+				conn = DriverManager.getConnection(url, GNOSConfig.get("db.user"), GNOSConfig.get("db.password"));
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}

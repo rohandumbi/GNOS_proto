@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import com.org.gnos.application.GNOSConfig;
 import com.org.gnos.db.DBManager;
 
 public class DumpCSV {
@@ -125,6 +126,7 @@ public class DumpCSV {
 	}
 	
 	public static void main(String[] args) {
+		GNOSConfig.load();
 		DumpCSV dumper = new DumpCSV();
 		dumper.dump("C:\\Arpan\\Workspace\\personal\\workspace\\GNOS_proto\\data\\GNOS_Test_data.csv");
 	}
