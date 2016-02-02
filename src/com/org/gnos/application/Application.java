@@ -2,9 +2,9 @@ package com.org.gnos.application;
 
 import org.eclipse.swt.widgets.Display;
 
-import com.org.gnos.ui.screens.HelloWorld;
-import com.org.gnos.ui.screens.MultiScreenTest;
-import com.org.gnos.ui.screens.ScreenController;
+import com.org.gnos.ui.screens.prototypes.HelloWorld;
+import com.org.gnos.ui.screens.prototypes.MultiScreenTest;
+import com.org.gnos.ui.screens.prototypes.ScreenController;
 
 public class Application {
 

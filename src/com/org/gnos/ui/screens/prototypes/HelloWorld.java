@@ -1,4 +1,4 @@
-package com.org.gnos.ui.screens;
+package com.org.gnos.ui.screens.prototypes;
 
 import org.eclipse.jface.window.ApplicationWindow;
 import org.eclipse.swt.SWT;
