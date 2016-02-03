@@ -1,4 +1,4 @@
-package com.org.gnos.ui.screems.v1;
+package com.org.gnos.ui.screens.v1;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.layout.FormLayout;
