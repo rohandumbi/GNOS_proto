@@ -82,14 +82,14 @@ public class HomeScreen extends Composite {
 		fd_compositePageHeader.right = new FormAttachment(0, 227);
 		compositePageHeader.setLayoutData(fd_compositePageHeader);
 		
-		Label homeIcon = new Label(compositePageHeader, SWT.NONE);
+		/*Label homeIcon = new Label(compositePageHeader, SWT.NONE);
 		homeIcon.setImage(SWTResourceManager.getImage(HomeScreen.class, "/com/org/gnos/resources/home24.png"));
-		homeIcon.setBounds(10, 0, 30, 33);
+		homeIcon.setBounds(10, 0, 30, 33);*/
 		
-		Label labelHome = new Label(compositePageHeader, SWT.NONE);
+		/*Label labelHome = new Label(compositePageHeader, SWT.NONE);
 		labelHome.setFont(SWTResourceManager.getFont("Arial", 12, SWT.NORMAL));
 		labelHome.setBounds(46, 10, 55, 15);
-		labelHome.setText("Home");
+		labelHome.setText("Home");*/
 
 	}
 
