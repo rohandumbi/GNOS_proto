@@ -1,5 +1,7 @@
 package com.org.gnos.ui.screens.v1;
 
+import java.util.ArrayList;
+
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.wb.swt.SWTResourceManager;
@@ -11,8 +13,13 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 
-public class HomeScreen extends Composite {
+import com.org.gnos.events.ChildScreenEvent;
+import com.org.gnos.events.interfaces.ChildScreenEventGenerator;
+import com.org.gnos.events.interfaces.ChildScreenEventListener;
 
+public class HomeScreen extends Composite implements ChildScreenEventGenerator{
+
+	private ArrayList<ChildScreenEventListener> listeners = new ArrayList<ChildScreenEventListener>();
 	/**
 	 * Create the composite.
 	 * @param parent
@@ -56,6 +63,8 @@ public class HomeScreen extends Composite {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				//TODO create new project action
+				ChildScreenEvent event = new ChildScreenEvent(this, "homeScreen:create-new-project");
+				fireChildEvent(event);
 			}
 		});
 		buttonCreateNew.setText("Create New Project");
@@ -95,5 +104,19 @@ public class HomeScreen extends Composite {
 
 	protected void checkSubclass() {
 		// Disable the check that prevents subclassing of SWT components
+	}
+	
+	private void fireChildEvent(ChildScreenEvent event){
+		int j = listeners.size();
+		int i = 0;
+		for(i=0; i<j; i++){
+			listeners.get(i).onChildScreenEventFired(event);
+		}
+	}
+
+	@Override
+	public void registerEventListener(ChildScreenEventListener listener) {
+		// TODO Auto-generated method stub
+		listeners.add(listener);
 	}
 }

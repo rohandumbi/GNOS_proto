@@ -19,9 +19,17 @@ import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.application.GNOSApplicationWindow;
+import com.org.gnos.application.GNOSConfig;
+import com.org.gnos.events.ChildScreenEvent;
+import com.org.gnos.events.interfaces.ChildScreenEventListener;
 
-public class GNOSApplication extends ApplicationWindow {
+public class GNOSApplication extends ApplicationWindow implements ChildScreenEventListener{
 
+	private StackLayout homeTabLayout;
+	private Composite container;
+	private HomeScreen homeScreen;
+	private CreateNewProjectScreen createNewProjectScreen;
+	private Composite homeComposite;
 	/**
 	 * Create the application window.
 	 */
@@ -39,7 +47,7 @@ public class GNOSApplication extends ApplicationWindow {
 	 */
 	@Override
 	protected Control createContents(Composite parent) {
-		Composite container = new Composite(parent, SWT.NONE);
+		container = new Composite(parent, SWT.NONE);
 		container.setLayout(new FormLayout());
 		
 		TabFolder tabFolder = new TabFolder(container, SWT.NONE);
@@ -54,17 +62,17 @@ public class GNOSApplication extends ApplicationWindow {
 		tbtmHome.setImage(SWTResourceManager.getImage(GNOSApplicationWindow.class, "/com/org/gnos/resources/home24.png"));
 		tbtmHome.setText("HOME");
 		
-		Composite homeComposite = new Composite(tabFolder, SWT.NONE);
+		homeComposite = new Composite(tabFolder, SWT.NONE);
 		tbtmHome.setControl(homeComposite);
-		StackLayout homeTabLayout = new StackLayout();
+		homeTabLayout = new StackLayout();
 		homeComposite.setLayout(homeTabLayout);
 		
-		//Composite homeScreen = new Composite(homeComposite, SWT.NONE);
-		//Composite createNewPageScreen = new Composite(homeComposite, SWT.NONE);
-		Composite createNewPageScreen = new CreateNewProjectScreen(homeComposite, SWT.NONE);
-		Composite homeScreen = new HomeScreen(homeComposite, SWT.NONE);
+		homeScreen = new HomeScreen(homeComposite, SWT.NONE);
+		homeScreen.registerEventListener(this);
+		createNewProjectScreen = new CreateNewProjectScreen(homeComposite, SWT.NONE);
 		
-		homeTabLayout.topControl = createNewPageScreen;
+		
+		homeTabLayout.topControl = homeScreen;
 		homeComposite.layout();
 		
 		parent.getShell().setMinimumSize(814, 511);
@@ -115,6 +123,7 @@ public class GNOSApplication extends ApplicationWindow {
 	 */
 	public static void main(String args[]) {
 		try {
+			GNOSConfig.load();
 			GNOSApplication window = new GNOSApplication();
 			window.setBlockOnOpen(true);
 			window.open();
@@ -131,7 +140,7 @@ public class GNOSApplication extends ApplicationWindow {
 	@Override
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
-		newShell.setText("New Application");
+		newShell.setText("GNOS - New age mining");
 	}
 
 	/**
@@ -140,6 +149,22 @@ public class GNOSApplication extends ApplicationWindow {
 	@Override
 	protected Point getInitialSize() {
 		return new Point(814, 511);
+	}
+
+	@Override
+	public void onChildScreenEventFired(ChildScreenEvent e) {
+		// TODO Auto-generated method stub
+		if(e.eventName == "homeScreen:create-new-project"){
+			homeTabLayout.topControl = createNewProjectScreen;
+			homeComposite.layout();
+		}/*else if(e.eventName == "createNewProjectScreen:upload-records"){
+			homeTabLayout.topControl = uploadRecordsScreen;
+			container.layout();
+		}*/else if(e.eventName == "uploadScreen:upload-records"){
+			//TODO
+			System.out.println("Upload file to DB after processing");
+		}
+		
 	}
 
 }

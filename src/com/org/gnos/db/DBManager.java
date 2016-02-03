@@ -11,7 +11,6 @@ public class DBManager {
 	private static Connection conn;
 	
 	public static Connection getConnection(){
-		
 		if(conn == null) {
 			try {
 				String url = "jdbc:mysql://"+GNOSConfig.get("db.host")+":"+GNOSConfig.get("db.port")+"/"+GNOSConfig.get("db.schema");
