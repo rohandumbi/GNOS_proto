@@ -1,5 +1,7 @@
 package com.org.gnos.ui.screens.v1;
 
+import java.util.ArrayList;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -13,12 +15,16 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import com.org.gnos.events.ChildScreenEvent;
+import com.org.gnos.events.interfaces.ChildScreenEventGenerator;
+import com.org.gnos.events.interfaces.ChildScreenEventListener;
 import com.org.gnos.services.DumpCSV;
 
-public class CreateNewProjectScreen extends Composite {
+public class CreateNewProjectScreen extends Composite implements ChildScreenEventGenerator{
 	private Text textProjectName;
 	private Text textLocation;
 	private Text textDescription;
+	private ArrayList<ChildScreenEventListener> listeners = new ArrayList<ChildScreenEventListener>();
 
 	/**
 	 * Create the composite.
@@ -69,8 +75,10 @@ public class CreateNewProjectScreen extends Composite {
 				dialog.setFilterPath("c:\\");
 				String result = dialog.open();
 				System.out.println("Selected file" + result);
-				textLocation.setText(result);
-				uploadFileToDB(result);
+				if(result != null){
+					textLocation.setText(result);
+					uploadFileToDB(result);
+				}
 			}
 		});
 		btnBrowseFile.setBounds(601, 172, 29, 33);
@@ -85,15 +93,17 @@ public class CreateNewProjectScreen extends Composite {
 		textDescription.setFont(SWTResourceManager.getFont("Arial", 12, SWT.NORMAL));
 		textDescription.setBounds(10, 241, 589, 162);
 
-		Button btnNewButton = new Button(composite, SWT.NONE);
-		btnNewButton.addSelectionListener(new SelectionAdapter() {
+		Button btnSubmit = new Button(composite, SWT.NONE);
+		btnSubmit.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				//TO Create New Project
+				ChildScreenEvent event = new ChildScreenEvent(this, "createNewProjectScreen:upload-records");
+				fireChildEvent(event);
 			}
 		});
-		btnNewButton.setFont(SWTResourceManager.getFont("Arial", 12, SWT.NORMAL));
-		btnNewButton.setBounds(230, 409, 181, 33);
-		btnNewButton.setText("Create");
+		btnSubmit.setFont(SWTResourceManager.getFont("Arial", 12, SWT.NORMAL));
+		btnSubmit.setBounds(230, 409, 181, 33);
+		btnSubmit.setText("Create");
 
 		/*fd_composite.bottom = new FormAttachment(labelCreateNew, 467, SWT.BOTTOM);
 		fd_composite.top = new FormAttachment(labelCreateNew, 32);
@@ -126,5 +136,19 @@ public class CreateNewProjectScreen extends Composite {
 
 	protected void checkSubclass() {
 		// Disable the check that prevents subclassing of SWT components
+	}
+	
+	private void fireChildEvent(ChildScreenEvent event){
+		int j = listeners.size();
+		int i = 0;
+		for(i=0; i<j; i++){
+			listeners.get(i).onChildScreenEventFired(event);
+		}
+	}
+
+	@Override
+	public void registerEventListener(ChildScreenEventListener listener) {
+		// TODO Auto-generated method stub
+		listeners.add(listener);
 	}
 }

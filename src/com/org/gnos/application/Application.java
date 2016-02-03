@@ -5,6 +5,7 @@ import org.eclipse.swt.widgets.Display;
 import com.org.gnos.ui.screens.prototypes.HelloWorld;
 import com.org.gnos.ui.screens.prototypes.MultiScreenTest;
 import com.org.gnos.ui.screens.prototypes.ScreenController;
+import com.org.gnos.ui.screens.v1.GNOSApplication;
 
 public class Application {
 
@@ -20,7 +21,11 @@ public class Application {
 		
 		ScreenController oScreenController = new ScreenController();
 		oScreenController.setBlockOnOpen(true);
-		oScreenController.open();
+		//oScreenController.open();
+		
+		GNOSApplication oGnosApplication = new GNOSApplication();
+		oGnosApplication.setBlockOnOpen(true);
+		oGnosApplication.open();
 
 		Display.getCurrent().dispose();
 	}

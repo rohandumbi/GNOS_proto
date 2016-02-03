@@ -55,7 +55,7 @@ public final class CreateNewProjectScreen implements ChildScreenEventGenerator{
 		Button finishNewProjectSetupButton = new Button(createNewProjectScreen, SWT.NONE);
 		finishNewProjectSetupButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				ChildScreenEvent event = new ChildScreenEvent(this, "createNewProjectScreen:upload-records");
+				ChildScreenEvent event = new ChildScreenEvent(this, "createNewProjectScreen:upload-records-complete");
 				fireChildEvent(event);
 			}
 		});

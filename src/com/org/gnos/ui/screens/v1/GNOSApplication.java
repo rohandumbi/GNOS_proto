@@ -30,6 +30,7 @@ public class GNOSApplication extends ApplicationWindow implements ChildScreenEve
 	private HomeScreen homeScreen;
 	private CreateNewProjectScreen createNewProjectScreen;
 	private Composite homeComposite;
+	private TabFolder tabFolder;
 	/**
 	 * Create the application window.
 	 */
@@ -50,7 +51,7 @@ public class GNOSApplication extends ApplicationWindow implements ChildScreenEve
 		container = new Composite(parent, SWT.NONE);
 		container.setLayout(new FormLayout());
 		
-		TabFolder tabFolder = new TabFolder(container, SWT.NONE);
+		tabFolder = new TabFolder(container, SWT.NONE);
 		FormData fd_tabFolder = new FormData();
 		fd_tabFolder.bottom = new FormAttachment(100, -10);
 		fd_tabFolder.left = new FormAttachment(0, 10);
@@ -157,13 +158,18 @@ public class GNOSApplication extends ApplicationWindow implements ChildScreenEve
 		if(e.eventName == "homeScreen:create-new-project"){
 			homeTabLayout.topControl = createNewProjectScreen;
 			homeComposite.layout();
-		}/*else if(e.eventName == "createNewProjectScreen:upload-records"){
-			homeTabLayout.topControl = uploadRecordsScreen;
-			container.layout();
-		}*/else if(e.eventName == "uploadScreen:upload-records"){
+		}else if(e.eventName == "createNewProjectScreen:upload-records-complete"){
+			/*homeTabLayout.topControl = uploadRecordsScreen;
+			container.layout();*/
+			openPitControlsTab();
+		}else if(e.eventName == "uploadScreen:upload-records"){
 			//TODO
 			System.out.println("Upload file to DB after processing");
 		}
+		
+	}
+	
+	private void openPitControlsTab(){
 		
 	}
 
