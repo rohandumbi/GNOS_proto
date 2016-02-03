@@ -8,6 +8,6 @@
 	<classpathentry kind="lib" path="lib/org.eclipse.jface_3.9.1.v20130725-1141.jar"/>
 	<classpathentry kind="lib" path="lib/org.eclipse.osgi_3.9.1.v20130814-1242.jar"/>
 	<classpathentry kind="lib" path="lib/org.eclipse.ui.workbench_3.105.1.v20130821-1411.jar"/>
-	<classpathentry kind="lib" path="C:/Program Files (x86)/MySQL/Connector.J 5.1/mysql-connector-java-5.1.37-bin.jar"/>
+	<classpathentry kind="lib" path="lib/mysql-connector-java-5.1.37-bin.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
