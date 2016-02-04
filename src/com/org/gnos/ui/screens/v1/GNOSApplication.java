@@ -70,7 +70,9 @@ public class GNOSApplication extends ApplicationWindow implements ChildScreenEve
 		
 		homeScreen = new HomeScreen(homeComposite, SWT.NONE);
 		homeScreen.registerEventListener(this);
+		
 		createNewProjectScreen = new CreateNewProjectScreen(homeComposite, SWT.NONE);
+		createNewProjectScreen.registerEventListener(this);
 		
 		
 		homeTabLayout.topControl = homeScreen;
@@ -170,7 +172,7 @@ public class GNOSApplication extends ApplicationWindow implements ChildScreenEve
 	}
 	
 	private void openPitControlsTab(){
-		
+		System.out.println("Opening pit controls tab");
 	}
 
 }

@@ -25,6 +25,7 @@ public class CreateNewProjectScreen extends Composite implements ChildScreenEven
 	private Text textLocation;
 	private Text textDescription;
 	private ArrayList<ChildScreenEventListener> listeners = new ArrayList<ChildScreenEventListener>();
+	private String csvFileName;
 
 	/**
 	 * Create the composite.
@@ -73,11 +74,10 @@ public class CreateNewProjectScreen extends Composite implements ChildScreenEven
 				FileDialog dialog = new FileDialog(parent.getShell(), SWT.OPEN);
 				dialog.setFilterExtensions(new String [] {"*.csv"});
 				dialog.setFilterPath("c:\\");
-				String result = dialog.open();
-				System.out.println("Selected file" + result);
-				if(result != null){
-					textLocation.setText(result);
-					uploadFileToDB(result);
+				csvFileName = dialog.open();
+				System.out.println("Selected file" + csvFileName);
+				if(csvFileName != null){
+					textLocation.setText(csvFileName);
 				}
 			}
 		});
@@ -97,7 +97,10 @@ public class CreateNewProjectScreen extends Composite implements ChildScreenEven
 		btnSubmit.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				//TO Create New Project
-				ChildScreenEvent event = new ChildScreenEvent(this, "createNewProjectScreen:upload-records");
+				ChildScreenEvent event = new ChildScreenEvent(this, "createNewProjectScreen:upload-records-complete");
+				if(csvFileName != null){
+					uploadFileToDB(csvFileName);
+				}
 				fireChildEvent(event);
 			}
 		});
