@@ -20,20 +20,18 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.application.GNOSApplicationWindow;
 import com.org.gnos.application.GNOSConfig;
-import com.org.gnos.events.BasicScreenEvent;
-import com.org.gnos.events.ScreenEventWithAttributeMap;
-import com.org.gnos.events.interfaces.ChildScreenEventListener;
+import com.org.gnos.events.GnosEvent;
+import com.org.gnos.events.GnosEventWithAttributeMap;
+import com.org.gnos.events.interfaces.GnosEventListener;
+import com.org.gnos.tabitems.HomeTabItem;
+import com.org.gnos.tabitems.ProjectTabItem;
 
-public class GNOSApplication extends ApplicationWindow implements ChildScreenEventListener{
+public class GNOSApplication extends ApplicationWindow implements GnosEventListener{
 
-	private StackLayout homeTabLayout;
 	private Composite container;
-	private HomeScreen homeScreen;
-	private CreateNewProjectScreen createNewProjectScreen;
-	private Composite homeComposite;
 	private TabFolder tabFolder;
-	private TabItem tbtmHome;
-	private TabItem tbtmPitControls;
+	private HomeTabItem homeTabItem;
+	private ProjectTabItem projectTabItem;
 	/**
 	 * Create the application window.
 	 */
@@ -61,24 +59,8 @@ public class GNOSApplication extends ApplicationWindow implements ChildScreenEve
 		fd_tabFolder.right = new FormAttachment(100, -10);
 		tabFolder.setLayoutData(fd_tabFolder);
 		
-		tbtmHome = new TabItem(tabFolder, SWT.NONE);
-		tbtmHome.setImage(SWTResourceManager.getImage(GNOSApplicationWindow.class, "/com/org/gnos/resources/home24.png"));
-		tbtmHome.setText("HOME");
-		
-		homeComposite = new Composite(tabFolder, SWT.NONE);
-		tbtmHome.setControl(homeComposite);
-		homeTabLayout = new StackLayout();
-		homeComposite.setLayout(homeTabLayout);
-		
-		homeScreen = new HomeScreen(homeComposite, SWT.NONE);
-		homeScreen.registerEventListener(this);
-		
-		createNewProjectScreen = new CreateNewProjectScreen(homeComposite, SWT.NONE);
-		createNewProjectScreen.registerEventListener(this);
-		
-		
-		homeTabLayout.topControl = homeScreen;
-		homeComposite.layout();
+		homeTabItem = new HomeTabItem(tabFolder, SWT.NONE);
+		homeTabItem.registerEventListener(this);
 		
 		parent.getShell().setMinimumSize(814, 511);
 		//parent.getShell().setMaximized(false);
@@ -157,30 +139,20 @@ public class GNOSApplication extends ApplicationWindow implements ChildScreenEve
 	}
 
 	@Override
-	public void onChildScreenEventFired(BasicScreenEvent e) {
+	public void onGnosEventFired(GnosEvent e) {
 		// TODO Auto-generated method stub
-		if(e.eventName == "homeScreen:create-new-project"){
-			homeTabLayout.topControl = createNewProjectScreen;
-			homeComposite.layout();
-		}else if(e.eventName == "createNewProjectScreen:upload-records-complete"){
-			/*homeTabLayout.topControl = uploadRecordsScreen;
-			container.layout();*/
-			ScreenEventWithAttributeMap event = (ScreenEventWithAttributeMap)e;
+		if(e.eventName == "homeTab:new-project-created"){
+			GnosEventWithAttributeMap event = (GnosEventWithAttributeMap)e;
 			openPitControlsTab(event);
-		}else if(e.eventName == "uploadScreen:upload-records"){
-			//TODO
-			System.out.println("Upload file to DB after processing");
 		}
 		
 	}
 	
-	private void openPitControlsTab(ScreenEventWithAttributeMap event){
+	private void openPitControlsTab(GnosEventWithAttributeMap event){
 		System.out.println("Opening pit controls tab");
-		tbtmPitControls = new TabItem(tabFolder, SWT.CLOSE);
-		tabFolder.setSelection(tbtmPitControls);
-		tbtmPitControls.setImage(SWTResourceManager.getImage(GNOSApplicationWindow.class, "/com/org/gnos/resources/controls24.png"));
-		tbtmPitControls.setText(event.attributes.get("projectName").toUpperCase());
-		tbtmPitControls.setControl(new ControlsScreen(tabFolder, SWT.NONE));
+		projectTabItem = new ProjectTabItem(tabFolder, SWT.NONE, event.attributes.get("projectName"));
+		projectTabItem.registerEventListener(this);
+		tabFolder.setSelection(projectTabItem);
 	}
 
 }

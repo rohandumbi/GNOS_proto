@@ -11,16 +11,16 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import com.org.gnos.events.BasicScreenEvent;
-import com.org.gnos.events.interfaces.ChildScreenEventGenerator;
-import com.org.gnos.events.interfaces.ChildScreenEventListener;
+import com.org.gnos.events.GnosEvent;
+import com.org.gnos.events.interfaces.GnosEventGenerator;
+import com.org.gnos.events.interfaces.GnosEventListener;
 import com.org.gnos.utilities.SWTResourceManager;
 
-public final class CreateNewProjectScreen implements ChildScreenEventGenerator{
+public final class CreateNewProjectScreen implements GnosEventGenerator{
 
 	private Composite createNewProjectScreen;
 	private Composite parent;
-	private ArrayList<ChildScreenEventListener> listeners = new ArrayList<ChildScreenEventListener>();
+	private ArrayList<GnosEventListener> listeners = new ArrayList<GnosEventListener>();
 	
 	public CreateNewProjectScreen(Composite parent){
 		this.parent = parent;
@@ -57,7 +57,7 @@ public final class CreateNewProjectScreen implements ChildScreenEventGenerator{
 		finishNewProjectSetupButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				//HashMap<String, String> attributes = new HashMap<String, String>();
-				BasicScreenEvent event = new BasicScreenEvent(this, "createNewProjectScreen:upload-records-complete");
+				GnosEvent event = new GnosEvent(this, "createNewProjectScreen:upload-records-complete");
 				
 				fireChildEvent(event);
 			}
@@ -72,16 +72,16 @@ public final class CreateNewProjectScreen implements ChildScreenEventGenerator{
 		return createNewProjectScreen;
 	}
 	
-	private void fireChildEvent(BasicScreenEvent event){
+	private void fireChildEvent(GnosEvent event){
 		int j = listeners.size();
 		int i = 0;
 		for(i=0; i<j; i++){
-			listeners.get(i).onChildScreenEventFired(event);
+			listeners.get(i).onGnosEventFired(event);
 		}
 	}
 
 	@Override
-	public void registerEventListener(ChildScreenEventListener listener) {
+	public void registerEventListener(GnosEventListener listener) {
 		// TODO Auto-generated method stub
 		listeners.add(listener);
 	}

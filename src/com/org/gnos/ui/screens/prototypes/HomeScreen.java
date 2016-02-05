@@ -9,16 +9,16 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
-import com.org.gnos.events.BasicScreenEvent;
-import com.org.gnos.events.interfaces.ChildScreenEventGenerator;
-import com.org.gnos.events.interfaces.ChildScreenEventListener;
+import com.org.gnos.events.GnosEvent;
+import com.org.gnos.events.interfaces.GnosEventGenerator;
+import com.org.gnos.events.interfaces.GnosEventListener;
 import com.org.gnos.utilities.SWTResourceManager;
 
-public final class HomeScreen implements ChildScreenEventGenerator{
+public final class HomeScreen implements GnosEventGenerator{
 
 	private Composite homeScreen;
 	private Composite parent;
-	private ArrayList<ChildScreenEventListener> listeners = new ArrayList<ChildScreenEventListener>();
+	private ArrayList<GnosEventListener> listeners = new ArrayList<GnosEventListener>();
 
 	public HomeScreen(Composite parent){
 		this.parent = parent;
@@ -37,7 +37,7 @@ public final class HomeScreen implements ChildScreenEventGenerator{
 		createNewProjectButton.setText("Create New Project");
 		createNewProjectButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				BasicScreenEvent event = new BasicScreenEvent(this, "homeScreen:create-new-project");
+				GnosEvent event = new GnosEvent(this, "homeScreen:create-new-project");
 				fireChildEvent(event);
 			}
 		});
@@ -48,7 +48,7 @@ public final class HomeScreen implements ChildScreenEventGenerator{
 		openExisitingProjectButton.setText("Open Existing Project");
 		openExisitingProjectButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				BasicScreenEvent event = new BasicScreenEvent(this, "homeScreen:open-existing-project");
+				GnosEvent event = new GnosEvent(this, "homeScreen:open-existing-project");
 				fireChildEvent(event);
 			}
 		});
@@ -59,16 +59,16 @@ public final class HomeScreen implements ChildScreenEventGenerator{
 		return homeScreen;
 	}
 	
-	private void fireChildEvent(BasicScreenEvent event){
+	private void fireChildEvent(GnosEvent event){
 		int j = listeners.size();
 		int i = 0;
 		for(i=0; i<j; i++){
-			listeners.get(i).onChildScreenEventFired(event);
+			listeners.get(i).onGnosEventFired(event);
 		}
 	}
 
 	@Override
-	public void registerEventListener(ChildScreenEventListener listener) {
+	public void registerEventListener(GnosEventListener listener) {
 		listeners.add(listener);
 	}
 }

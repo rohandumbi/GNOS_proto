@@ -14,13 +14,13 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 
-import com.org.gnos.events.BasicScreenEvent;
-import com.org.gnos.events.interfaces.ChildScreenEventGenerator;
-import com.org.gnos.events.interfaces.ChildScreenEventListener;
+import com.org.gnos.events.GnosEvent;
+import com.org.gnos.events.interfaces.GnosEventGenerator;
+import com.org.gnos.events.interfaces.GnosEventListener;
 
-public class HomeScreen extends Composite implements ChildScreenEventGenerator{
+public class HomeScreen extends Composite implements GnosEventGenerator{
 
-	private ArrayList<ChildScreenEventListener> listeners = new ArrayList<ChildScreenEventListener>();
+	private ArrayList<GnosEventListener> listeners = new ArrayList<GnosEventListener>();
 	/**
 	 * Create the composite.
 	 * @param parent
@@ -64,7 +64,7 @@ public class HomeScreen extends Composite implements ChildScreenEventGenerator{
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				//TODO create new project action
-				BasicScreenEvent event = new BasicScreenEvent(this, "homeScreen:create-new-project");
+				GnosEvent event = new GnosEvent(this, "homeScreen:create-new-project");
 				fireChildEvent(event);
 			}
 		});
@@ -107,16 +107,16 @@ public class HomeScreen extends Composite implements ChildScreenEventGenerator{
 		// Disable the check that prevents subclassing of SWT components
 	}
 	
-	private void fireChildEvent(BasicScreenEvent event){
+	private void fireChildEvent(GnosEvent event){
 		int j = listeners.size();
 		int i = 0;
 		for(i=0; i<j; i++){
-			listeners.get(i).onChildScreenEventFired(event);
+			listeners.get(i).onGnosEventFired(event);
 		}
 	}
 
 	@Override
-	public void registerEventListener(ChildScreenEventListener listener) {
+	public void registerEventListener(GnosEventListener listener) {
 		// TODO Auto-generated method stub
 		listeners.add(listener);
 	}

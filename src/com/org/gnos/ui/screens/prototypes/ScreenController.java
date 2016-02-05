@@ -18,11 +18,11 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import com.org.gnos.events.BasicScreenEvent;
-import com.org.gnos.events.interfaces.ChildScreenEventListener;
+import com.org.gnos.events.GnosEvent;
+import com.org.gnos.events.interfaces.GnosEventListener;
 import com.org.gnos.utilities.SWTResourceManager;
 
-public class ScreenController extends ApplicationWindow implements ChildScreenEventListener{
+public class ScreenController extends ApplicationWindow implements GnosEventListener{
 
 	private StackLayout stackLayout;
 	private HomeScreen oHomeScreen;
@@ -134,7 +134,7 @@ public class ScreenController extends ApplicationWindow implements ChildScreenEv
 	}
 
 	@Override
-	public void onChildScreenEventFired(BasicScreenEvent e) {
+	public void onGnosEventFired(GnosEvent e) {
 		// TODO Auto-generated method stub
 		if(e.eventName == "homeScreen:create-new-project"){
 			stackLayout.topControl = createNewProjectScreen;

@@ -16,17 +16,17 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import com.org.gnos.events.BasicScreenEvent;
-import com.org.gnos.events.ScreenEventWithAttributeMap;
-import com.org.gnos.events.interfaces.ChildScreenEventGenerator;
-import com.org.gnos.events.interfaces.ChildScreenEventListener;
+import com.org.gnos.events.GnosEvent;
+import com.org.gnos.events.GnosEventWithAttributeMap;
+import com.org.gnos.events.interfaces.GnosEventGenerator;
+import com.org.gnos.events.interfaces.GnosEventListener;
 import com.org.gnos.services.DumpCSV;
 
-public class CreateNewProjectScreen extends Composite implements ChildScreenEventGenerator{
+public class CreateNewProjectScreen extends Composite implements GnosEventGenerator{
 	private Text textProjectName;
 	private Text textLocation;
 	private Text textDescription;
-	private ArrayList<ChildScreenEventListener> listeners = new ArrayList<ChildScreenEventListener>();
+	private ArrayList<GnosEventListener> listeners = new ArrayList<GnosEventListener>();
 	private String csvFileName;
 
 	/**
@@ -104,7 +104,7 @@ public class CreateNewProjectScreen extends Composite implements ChildScreenEven
 				attributes.put("projectName", textProjectName.getText());
 				attributes.put("projectDescription", textDescription.getText());
 				
-				ScreenEventWithAttributeMap event = new ScreenEventWithAttributeMap(this, "createNewProjectScreen:upload-records-complete", attributes);
+				GnosEventWithAttributeMap event = new GnosEventWithAttributeMap(this, "createNewProjectScreen:upload-records-complete", attributes);
 				if(csvFileName != null){
 					uploadFileToDB(csvFileName);
 				}
@@ -148,16 +148,16 @@ public class CreateNewProjectScreen extends Composite implements ChildScreenEven
 		// Disable the check that prevents subclassing of SWT components
 	}
 	
-	private void fireChildEvent(BasicScreenEvent event){
+	private void fireChildEvent(GnosEvent event){
 		int j = listeners.size();
 		int i = 0;
 		for(i=0; i<j; i++){
-			listeners.get(i).onChildScreenEventFired(event);
+			listeners.get(i).onGnosEventFired(event);
 		}
 	}
 
 	@Override
-	public void registerEventListener(ChildScreenEventListener listener) {
+	public void registerEventListener(GnosEventListener listener) {
 		// TODO Auto-generated method stub
 		listeners.add(listener);
 	}

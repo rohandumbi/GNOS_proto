@@ -11,15 +11,15 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import com.org.gnos.events.BasicScreenEvent;
-import com.org.gnos.events.interfaces.ChildScreenEventGenerator;
-import com.org.gnos.events.interfaces.ChildScreenEventListener;
+import com.org.gnos.events.GnosEvent;
+import com.org.gnos.events.interfaces.GnosEventGenerator;
+import com.org.gnos.events.interfaces.GnosEventListener;
 import com.org.gnos.utilities.SWTResourceManager;
 
-public final class UploadRecordsScreen implements ChildScreenEventGenerator{
+public final class UploadRecordsScreen implements GnosEventGenerator{
 	private Composite uploadRecordsScreen;
 	private Composite parent;
-	private ArrayList<ChildScreenEventListener> listeners = new ArrayList<ChildScreenEventListener>();
+	private ArrayList<GnosEventListener> listeners = new ArrayList<GnosEventListener>();
 	
 	public UploadRecordsScreen(Composite parent){
 		this.parent = parent;
@@ -47,7 +47,7 @@ public final class UploadRecordsScreen implements ChildScreenEventGenerator{
 		fileSubmitButton.setText("Submit");
 		fileSubmitButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				BasicScreenEvent event = new BasicScreenEvent(this, "uploadScreen:upload-records");
+				GnosEvent event = new GnosEvent(this, "uploadScreen:upload-records");
 				fireChildEvent(event);
 			}
 		});
@@ -57,16 +57,16 @@ public final class UploadRecordsScreen implements ChildScreenEventGenerator{
 		createContent();
 		return uploadRecordsScreen;
 	}
-	private void fireChildEvent(BasicScreenEvent event){
+	private void fireChildEvent(GnosEvent event){
 		int j = listeners.size();
 		int i = 0;
 		for(i=0; i<j; i++){
-			listeners.get(i).onChildScreenEventFired(event);
+			listeners.get(i).onGnosEventFired(event);
 		}
 	}
 
 	@Override
-	public void registerEventListener(ChildScreenEventListener listener) {
+	public void registerEventListener(GnosEventListener listener) {
 		listeners.add(listener);
 	}
 }
