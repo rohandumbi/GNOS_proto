@@ -32,6 +32,8 @@ public class GNOSApplication extends ApplicationWindow implements ChildScreenEve
 	private CreateNewProjectScreen createNewProjectScreen;
 	private Composite homeComposite;
 	private TabFolder tabFolder;
+	private TabItem tbtmHome;
+	private TabItem tbtmPitControls;
 	/**
 	 * Create the application window.
 	 */
@@ -51,7 +53,6 @@ public class GNOSApplication extends ApplicationWindow implements ChildScreenEve
 	protected Control createContents(Composite parent) {
 		container = new Composite(parent, SWT.NONE);
 		container.setLayout(new FormLayout());
-		
 		tabFolder = new TabFolder(container, SWT.NONE);
 		FormData fd_tabFolder = new FormData();
 		fd_tabFolder.bottom = new FormAttachment(100, -10);
@@ -60,7 +61,7 @@ public class GNOSApplication extends ApplicationWindow implements ChildScreenEve
 		fd_tabFolder.right = new FormAttachment(100, -10);
 		tabFolder.setLayoutData(fd_tabFolder);
 		
-		TabItem tbtmHome = new TabItem(tabFolder, SWT.NONE);
+		tbtmHome = new TabItem(tabFolder, SWT.NONE);
 		tbtmHome.setImage(SWTResourceManager.getImage(GNOSApplicationWindow.class, "/com/org/gnos/resources/home24.png"));
 		tbtmHome.setText("HOME");
 		
@@ -175,9 +176,11 @@ public class GNOSApplication extends ApplicationWindow implements ChildScreenEve
 	
 	private void openPitControlsTab(ScreenEventWithAttributeMap event){
 		System.out.println("Opening pit controls tab");
-		TabItem tbtmControls = new TabItem(tabFolder, SWT.CLOSE);
-		tbtmControls.setImage(SWTResourceManager.getImage(GNOSApplicationWindow.class, "/com/org/gnos/resources/controls24.png"));
-		tbtmControls.setText(event.attributes.get("projectName").toUpperCase());
+		tbtmPitControls = new TabItem(tabFolder, SWT.CLOSE);
+		tabFolder.setSelection(tbtmPitControls);
+		tbtmPitControls.setImage(SWTResourceManager.getImage(GNOSApplicationWindow.class, "/com/org/gnos/resources/controls24.png"));
+		tbtmPitControls.setText(event.attributes.get("projectName").toUpperCase());
+		tbtmPitControls.setControl(new ControlsScreen(tabFolder, SWT.NONE));
 	}
 
 }

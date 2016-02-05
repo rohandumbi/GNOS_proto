@@ -104,7 +104,6 @@ public class CreateNewProjectScreen extends Composite implements ChildScreenEven
 				attributes.put("projectName", textProjectName.getText());
 				attributes.put("projectDescription", textDescription.getText());
 				
-				//BasicScreenEvent event = new BasicScreenEvent(this, "createNewProjectScreen:upload-records-complete", attributes);
 				ScreenEventWithAttributeMap event = new ScreenEventWithAttributeMap(this, "createNewProjectScreen:upload-records-complete", attributes);
 				if(csvFileName != null){
 					uploadFileToDB(csvFileName);
