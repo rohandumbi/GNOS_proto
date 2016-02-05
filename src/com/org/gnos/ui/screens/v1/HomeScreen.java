@@ -1,6 +1,7 @@
 package com.org.gnos.ui.screens.v1;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.layout.FormLayout;
@@ -13,7 +14,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 
-import com.org.gnos.events.ChildScreenEvent;
+import com.org.gnos.events.BasicScreenEvent;
 import com.org.gnos.events.interfaces.ChildScreenEventGenerator;
 import com.org.gnos.events.interfaces.ChildScreenEventListener;
 
@@ -63,7 +64,7 @@ public class HomeScreen extends Composite implements ChildScreenEventGenerator{
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				//TODO create new project action
-				ChildScreenEvent event = new ChildScreenEvent(this, "homeScreen:create-new-project");
+				BasicScreenEvent event = new BasicScreenEvent(this, "homeScreen:create-new-project");
 				fireChildEvent(event);
 			}
 		});
@@ -106,7 +107,7 @@ public class HomeScreen extends Composite implements ChildScreenEventGenerator{
 		// Disable the check that prevents subclassing of SWT components
 	}
 	
-	private void fireChildEvent(ChildScreenEvent event){
+	private void fireChildEvent(BasicScreenEvent event){
 		int j = listeners.size();
 		int i = 0;
 		for(i=0; i<j; i++){

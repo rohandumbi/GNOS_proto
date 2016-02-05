@@ -1,6 +1,7 @@
 package com.org.gnos.ui.screens.prototypes;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -10,7 +11,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import com.org.gnos.events.ChildScreenEvent;
+import com.org.gnos.events.BasicScreenEvent;
 import com.org.gnos.events.interfaces.ChildScreenEventGenerator;
 import com.org.gnos.events.interfaces.ChildScreenEventListener;
 import com.org.gnos.utilities.SWTResourceManager;
@@ -55,7 +56,9 @@ public final class CreateNewProjectScreen implements ChildScreenEventGenerator{
 		Button finishNewProjectSetupButton = new Button(createNewProjectScreen, SWT.NONE);
 		finishNewProjectSetupButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				ChildScreenEvent event = new ChildScreenEvent(this, "createNewProjectScreen:upload-records-complete");
+				//HashMap<String, String> attributes = new HashMap<String, String>();
+				BasicScreenEvent event = new BasicScreenEvent(this, "createNewProjectScreen:upload-records-complete");
+				
 				fireChildEvent(event);
 			}
 		});
@@ -69,7 +72,7 @@ public final class CreateNewProjectScreen implements ChildScreenEventGenerator{
 		return createNewProjectScreen;
 	}
 	
-	private void fireChildEvent(ChildScreenEvent event){
+	private void fireChildEvent(BasicScreenEvent event){
 		int j = listeners.size();
 		int i = 0;
 		for(i=0; i<j; i++){

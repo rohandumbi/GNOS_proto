@@ -1,6 +1,7 @@
 package com.org.gnos.ui.screens.prototypes;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -8,7 +9,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
-import com.org.gnos.events.ChildScreenEvent;
+import com.org.gnos.events.BasicScreenEvent;
 import com.org.gnos.events.interfaces.ChildScreenEventGenerator;
 import com.org.gnos.events.interfaces.ChildScreenEventListener;
 import com.org.gnos.utilities.SWTResourceManager;
@@ -36,7 +37,7 @@ public final class HomeScreen implements ChildScreenEventGenerator{
 		createNewProjectButton.setText("Create New Project");
 		createNewProjectButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				ChildScreenEvent event = new ChildScreenEvent(this, "homeScreen:create-new-project");
+				BasicScreenEvent event = new BasicScreenEvent(this, "homeScreen:create-new-project");
 				fireChildEvent(event);
 			}
 		});
@@ -47,7 +48,7 @@ public final class HomeScreen implements ChildScreenEventGenerator{
 		openExisitingProjectButton.setText("Open Existing Project");
 		openExisitingProjectButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				ChildScreenEvent event = new ChildScreenEvent(this, "homeScreen:open-existing-project");
+				BasicScreenEvent event = new BasicScreenEvent(this, "homeScreen:open-existing-project");
 				fireChildEvent(event);
 			}
 		});
@@ -58,7 +59,7 @@ public final class HomeScreen implements ChildScreenEventGenerator{
 		return homeScreen;
 	}
 	
-	private void fireChildEvent(ChildScreenEvent event){
+	private void fireChildEvent(BasicScreenEvent event){
 		int j = listeners.size();
 		int i = 0;
 		for(i=0; i<j; i++){

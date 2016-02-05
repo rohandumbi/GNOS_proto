@@ -20,7 +20,8 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.application.GNOSApplicationWindow;
 import com.org.gnos.application.GNOSConfig;
-import com.org.gnos.events.ChildScreenEvent;
+import com.org.gnos.events.BasicScreenEvent;
+import com.org.gnos.events.ScreenEventWithAttributeMap;
 import com.org.gnos.events.interfaces.ChildScreenEventListener;
 
 public class GNOSApplication extends ApplicationWindow implements ChildScreenEventListener{
@@ -155,7 +156,7 @@ public class GNOSApplication extends ApplicationWindow implements ChildScreenEve
 	}
 
 	@Override
-	public void onChildScreenEventFired(ChildScreenEvent e) {
+	public void onChildScreenEventFired(BasicScreenEvent e) {
 		// TODO Auto-generated method stub
 		if(e.eventName == "homeScreen:create-new-project"){
 			homeTabLayout.topControl = createNewProjectScreen;
@@ -163,7 +164,8 @@ public class GNOSApplication extends ApplicationWindow implements ChildScreenEve
 		}else if(e.eventName == "createNewProjectScreen:upload-records-complete"){
 			/*homeTabLayout.topControl = uploadRecordsScreen;
 			container.layout();*/
-			openPitControlsTab();
+			ScreenEventWithAttributeMap event = (ScreenEventWithAttributeMap)e;
+			openPitControlsTab(event);
 		}else if(e.eventName == "uploadScreen:upload-records"){
 			//TODO
 			System.out.println("Upload file to DB after processing");
@@ -171,8 +173,11 @@ public class GNOSApplication extends ApplicationWindow implements ChildScreenEve
 		
 	}
 	
-	private void openPitControlsTab(){
+	private void openPitControlsTab(ScreenEventWithAttributeMap event){
 		System.out.println("Opening pit controls tab");
+		TabItem tbtmControls = new TabItem(tabFolder, SWT.CLOSE);
+		tbtmControls.setImage(SWTResourceManager.getImage(GNOSApplicationWindow.class, "/com/org/gnos/resources/controls24.png"));
+		tbtmControls.setText(event.attributes.get("projectName").toUpperCase());
 	}
 
 }
