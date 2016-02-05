@@ -32,7 +32,7 @@ public class HomeTabItem extends GnosTabItem implements GnosEventGenerator, Gnos
 	}
 	
 	@Override
-	protected void createContent(TabFolder parent){
+	public void createContent(TabFolder parent){
 		this.setImage(SWTResourceManager.getImage(HomeTabItem.class, "/com/org/gnos/resources/home24.png"));
 		this.setText("HOME");
 		mainComposite = new Composite(parent, SWT.NONE);

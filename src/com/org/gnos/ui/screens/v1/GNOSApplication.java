@@ -153,6 +153,8 @@ public class GNOSApplication extends ApplicationWindow implements GnosEventListe
 		projectTabItem = new ProjectTabItem(tabFolder, SWT.NONE, event.attributes.get("projectName"));
 		projectTabItem.registerEventListener(this);
 		tabFolder.setSelection(projectTabItem);
+		
+		homeTabItem.createContent(tabFolder);
 	}
 
 }

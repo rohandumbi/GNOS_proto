@@ -21,7 +21,7 @@ public class ProjectTabItem extends GnosTabItem implements GnosEventGenerator,Gn
 	}
 
 	@Override
-	protected void createContent(TabFolder parent) {
+	public void createContent(TabFolder parent) {
 		// TODO Auto-generated method stub
 		this.setImage(SWTResourceManager.getImage(ProjectTabItem.class, "/com/org/gnos/resources/controls24.png"));
 		this.setText(this.projectName.toUpperCase());

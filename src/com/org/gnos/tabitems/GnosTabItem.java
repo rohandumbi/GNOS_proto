@@ -9,6 +9,6 @@ public abstract class GnosTabItem extends TabItem{
 		super(parent, style);
 		// TODO Auto-generated constructor stub
 	}
-	protected abstract void createContent(TabFolder parent);
+	public abstract void createContent(TabFolder parent);
 
 }
