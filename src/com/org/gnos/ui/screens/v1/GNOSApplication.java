@@ -5,7 +5,7 @@ import org.eclipse.jface.action.StatusLineManager;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.window.ApplicationWindow;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.StackLayout;
+import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -15,10 +15,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
-import org.eclipse.wb.swt.SWTResourceManager;
 
-import com.org.gnos.application.GNOSApplicationWindow;
 import com.org.gnos.application.GNOSConfig;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.events.GnosEventWithAttributeMap;
@@ -30,6 +27,7 @@ public class GNOSApplication extends ApplicationWindow implements GnosEventListe
 
 	private Composite container;
 	private TabFolder tabFolder;
+	private CTabFolder cTabFolder;
 	private HomeTabItem homeTabItem;
 	private ProjectTabItem projectTabItem;
 	/**
@@ -51,15 +49,16 @@ public class GNOSApplication extends ApplicationWindow implements GnosEventListe
 	protected Control createContents(Composite parent) {
 		container = new Composite(parent, SWT.NONE);
 		container.setLayout(new FormLayout());
-		tabFolder = new TabFolder(container, SWT.NONE);
+		cTabFolder = new CTabFolder(container, SWT.NONE);
 		FormData fd_tabFolder = new FormData();
 		fd_tabFolder.bottom = new FormAttachment(100, -10);
 		fd_tabFolder.left = new FormAttachment(0, 10);
 		fd_tabFolder.top = new FormAttachment(0, 23);
 		fd_tabFolder.right = new FormAttachment(100, -10);
-		tabFolder.setLayoutData(fd_tabFolder);
+		//tabFolder.setLayoutData(fd_tabFolder);
+		cTabFolder.setLayoutData(fd_tabFolder);
 		
-		homeTabItem = new HomeTabItem(tabFolder, SWT.NONE);
+		homeTabItem = new HomeTabItem(cTabFolder, SWT.NONE);
 		homeTabItem.registerEventListener(this);
 		
 		parent.getShell().setMinimumSize(814, 511);
@@ -150,11 +149,11 @@ public class GNOSApplication extends ApplicationWindow implements GnosEventListe
 	
 	private void openPitControlsTab(GnosEventWithAttributeMap event){
 		System.out.println("Opening pit controls tab");
-		projectTabItem = new ProjectTabItem(tabFolder, SWT.NONE, event.attributes.get("projectName"));
+		projectTabItem = new ProjectTabItem(cTabFolder, SWT.CLOSE, event.attributes.get("projectName"));
 		projectTabItem.registerEventListener(this);
-		tabFolder.setSelection(projectTabItem);
+		cTabFolder.setSelection(projectTabItem);
 		
-		homeTabItem.createContent(tabFolder);
+		homeTabItem.createContent(cTabFolder);
 	}
 
 }

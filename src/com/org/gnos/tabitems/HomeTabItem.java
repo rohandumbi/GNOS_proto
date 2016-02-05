@@ -3,13 +3,11 @@ package com.org.gnos.tabitems;
 import java.util.ArrayList;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import com.org.gnos.application.GNOSApplicationWindow;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.events.GnosEventWithAttributeMap;
 import com.org.gnos.events.interfaces.GnosEventGenerator;
@@ -17,7 +15,7 @@ import com.org.gnos.events.interfaces.GnosEventListener;
 import com.org.gnos.ui.screens.v1.CreateNewProjectScreen;
 import com.org.gnos.ui.screens.v1.HomeScreen;
 
-public class HomeTabItem extends GnosTabItem implements GnosEventGenerator, GnosEventListener{
+public class HomeTabItem extends GnosCTabItem implements GnosEventGenerator, GnosEventListener{
 
 	private ArrayList<GnosEventListener> listeners = new ArrayList<GnosEventListener>();
 	private Composite mainComposite;
@@ -25,14 +23,14 @@ public class HomeTabItem extends GnosTabItem implements GnosEventGenerator, Gnos
 	private HomeScreen homeScreen;
 	private CreateNewProjectScreen createNewProjectScreen;
 	
-	public HomeTabItem(TabFolder parent, int style) {
+	public HomeTabItem(CTabFolder parent, int style) {
 		super(parent, style);
 		// TODO Auto-generated constructor stub
 		createContent(parent);
 	}
 	
 	@Override
-	public void createContent(TabFolder parent){
+	public void createContent(CTabFolder parent){
 		this.setImage(SWTResourceManager.getImage(HomeTabItem.class, "/com/org/gnos/resources/home24.png"));
 		this.setText("HOME");
 		mainComposite = new Composite(parent, SWT.NONE);
