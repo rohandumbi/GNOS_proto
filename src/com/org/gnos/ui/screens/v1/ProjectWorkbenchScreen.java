@@ -12,6 +12,8 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 
 public class ProjectWorkbenchScreen extends Composite {
 
@@ -25,6 +27,12 @@ public class ProjectWorkbenchScreen extends Composite {
 		setLayout(new FormLayout());
 		
 		Button buttonModelDefinition = new Button(this, SWT.NONE);
+		buttonModelDefinition.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				//TODO model definition button selected
+			}
+		});
 		buttonModelDefinition.setAlignment(SWT.LEFT);
 		buttonModelDefinition.setImage(SWTResourceManager.getImage(ProjectWorkbenchScreen.class, "/com/org/gnos/resources/models_icon.png"));
 		buttonModelDefinition.setFont(SWTResourceManager.getFont("Arial", 12, SWT.NORMAL));
@@ -37,6 +45,12 @@ public class ProjectWorkbenchScreen extends Composite {
 		buttonModelDefinition.setText("Model Definition");
 		
 		Button buttonProcessRoutes = new Button(this, SWT.NONE);
+		buttonProcessRoutes.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				//TODO model definition button selected
+			}
+		});
 		buttonProcessRoutes.setImage(SWTResourceManager.getImage(ProjectWorkbenchScreen.class, "/com/org/gnos/resources/process_icon.png"));
 		buttonProcessRoutes.setFont(SWTResourceManager.getFont("Arial", 12, SWT.NORMAL));
 		FormData fd_buttonProcessRoutes = new FormData();
