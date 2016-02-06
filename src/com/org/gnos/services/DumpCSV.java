@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Date;
 
 import com.org.gnos.application.GNOSConfig;
 import com.org.gnos.db.DBManager;
@@ -14,12 +15,16 @@ import com.org.gnos.db.DBManager;
 public class DumpCSV {
 	
 	
-	public boolean dump(String fileName){
+	public boolean dump(String fileName) {
+		System.out.println("Start Time:"+new Date());
 		BufferedReader br = null;
 		String line = "";
 		int count = 0;
 		
+		Connection conn = DBManager.getConnection();
+		
 		try {
+			conn.setAutoCommit(false);
 			br = new BufferedReader(new FileReader(fileName));		
 			while ((line = br.readLine()) != null) {				
 				if(count == 0){
@@ -29,6 +34,7 @@ public class DumpCSV {
 				}			
 				count++;
 			}
+			conn.commit();
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -45,7 +51,7 @@ public class DumpCSV {
 				}
 			}
 		}
-		
+		System.out.println("End Time:"+new Date());
 		return true;
 	}
 
@@ -128,6 +134,7 @@ public class DumpCSV {
 	public static void main(String[] args) {
 		GNOSConfig.load();
 		DumpCSV dumper = new DumpCSV();
-		dumper.dump("C:\\Arpan\\Workspace\\personal\\workspace\\GNOS_proto\\data\\GNOS_Test_data.csv");
+			dumper.dump("C:\\Arpan\\Workspace\\personal\\workspace\\GNOS_proto\\data\\GNOS_Test_data.csv");
+	
 	}
 }

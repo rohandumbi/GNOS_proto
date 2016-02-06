@@ -8,18 +8,17 @@ import com.org.gnos.application.GNOSConfig;
 
 public class DBManager {
 
-	private static Connection conn;
+	private static IConnectionPool pool;
 	
 	public static Connection getConnection(){
-		if(conn == null) {
-			try {
-				String url = "jdbc:mysql://"+GNOSConfig.get("db.host")+":"+GNOSConfig.get("db.port")+"/"+GNOSConfig.get("db.schema");
-				conn = DriverManager.getConnection(url, GNOSConfig.get("db.user"), GNOSConfig.get("db.password"));
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
+		if(pool == null) initializePool();
 		
-		return conn;		
+		return pool.getConnection();
+	}
+	
+	
+	private static void initializePool(){
+		pool = new DBConnectionPool();
+		pool.init();
 	}
 }
