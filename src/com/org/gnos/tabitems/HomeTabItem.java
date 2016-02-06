@@ -33,6 +33,7 @@ public class HomeTabItem extends GnosCTabItem implements GnosEventGenerator, Gno
 	public void createContent(CTabFolder parent){
 		this.setImage(SWTResourceManager.getImage(HomeTabItem.class, "/com/org/gnos/resources/home24.png"));
 		this.setText("HOME");
+		this.setFont(SWTResourceManager.getFont("Arial", 12, SWT.NORMAL));
 		mainComposite = new Composite(parent, SWT.NONE);
 		mainLayout = new StackLayout();
 		mainComposite.setLayout(mainLayout);

@@ -50,6 +50,7 @@ public class GNOSApplication extends ApplicationWindow implements GnosEventListe
 		container = new Composite(parent, SWT.NONE);
 		container.setLayout(new FormLayout());
 		cTabFolder = new CTabFolder(container, SWT.NONE);
+		cTabFolder.setSelectionBackground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT));
 		FormData fd_tabFolder = new FormData();
 		fd_tabFolder.bottom = new FormAttachment(100, -10);
 		fd_tabFolder.left = new FormAttachment(0, 10);
