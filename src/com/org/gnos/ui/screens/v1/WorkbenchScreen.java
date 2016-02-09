@@ -8,12 +8,14 @@ import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.wb.swt.SWTResourceManager;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 
 import com.org.gnos.customsontrols.GnosConfigurationStepLabel;
-import org.eclipse.swt.layout.FillLayout;
+import com.org.gnos.customsontrols.GnosScreen;
+import com.org.gnos.events.GnosEvent;
+import com.org.gnos.events.interfaces.GnosEventListener;
 
-public class WorkbenchScreen extends Composite {
+
+public class WorkbenchScreen extends GnosScreen {
 
 	/**
 	 * Create the composite.
@@ -84,7 +86,10 @@ public class WorkbenchScreen extends Composite {
 		gnosStepProcessRouteDefinitionLabel.setLayoutData(fd_gnosStepProcessRouteDefinitionLabel);
 		
 		MainConfigurationViewPort mainConfigurationViewport = new MainConfigurationViewPort(this, SWT.NONE);
-		mainConfigurationViewport.setLayout(new FillLayout(SWT.HORIZONTAL));
+		mainConfigurationViewport.loadMapRequiredFieldsScreen();
+		//mainConfigurationViewport.setLayout(new FillLayout(SWT.HORIZONTAL));
+		
+		
 		FormData fd_mainConfigurationViewport = new FormData();
 		fd_mainConfigurationViewport.right = new FormAttachment(labelWorkbenchHeader, -6, SWT.RIGHT);
 		fd_mainConfigurationViewport.bottom = new FormAttachment(100, -6);
@@ -97,5 +102,17 @@ public class WorkbenchScreen extends Composite {
 	@Override
 	protected void checkSubclass() {
 		// Disable the check that prevents subclassing of SWT components
+	}
+
+	@Override
+	public void registerEventListener(GnosEventListener listener) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onGnosEventFired(GnosEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 }
