@@ -8,6 +8,7 @@ import com.org.gnos.events.GnosEvent;
 import com.org.gnos.events.interfaces.GnosEventGenerator;
 import com.org.gnos.events.interfaces.GnosEventListener;
 import com.org.gnos.ui.screens.v1.ProjectWorkbenchScreen;
+import com.org.gnos.ui.screens.v1.WorkbenchScreen;
 import com.org.gnos.utilities.SWTResourceManager;
 
 public class ProjectTabItem extends GnosCTabItem implements GnosEventGenerator,GnosEventListener{
@@ -27,7 +28,8 @@ public class ProjectTabItem extends GnosCTabItem implements GnosEventGenerator,G
 		this.setImage(SWTResourceManager.getImage(ProjectTabItem.class, "/com/org/gnos/resources/controls24.png"));
 		this.setFont(SWTResourceManager.getFont("Arial", 12, SWT.NORMAL));
 		this.setText(this.projectName.toUpperCase());
-		this.setControl(new ProjectWorkbenchScreen(parent, SWT.NONE));
+		//this.setControl(new ProjectWorkbenchScreen(parent, SWT.NONE));
+		this.setControl(new WorkbenchScreen(parent, SWT.NONE));
 	}
 	protected void checkSubclass() {
 		// Disable the check that prevents subclassing of SWT components
