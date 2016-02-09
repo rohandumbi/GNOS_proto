@@ -83,7 +83,7 @@ public class WorkbenchScreen extends Composite {
 		fd_gnosStepProcessRouteDefinitionLabel.left = new FormAttachment(gnosStepMapRequiredFieldsLabel, 0, SWT.LEFT);
 		gnosStepProcessRouteDefinitionLabel.setLayoutData(fd_gnosStepProcessRouteDefinitionLabel);
 		
-		Composite mainConfigurationViewport = new Composite(this, SWT.NONE);
+		MainConfigurationViewPort mainConfigurationViewport = new MainConfigurationViewPort(this, SWT.NONE);
 		mainConfigurationViewport.setLayout(new FillLayout(SWT.HORIZONTAL));
 		FormData fd_mainConfigurationViewport = new FormData();
 		fd_mainConfigurationViewport.right = new FormAttachment(labelWorkbenchHeader, -6, SWT.RIGHT);
