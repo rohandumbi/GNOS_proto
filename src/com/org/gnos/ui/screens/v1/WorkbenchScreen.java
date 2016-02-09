@@ -49,38 +49,38 @@ public class WorkbenchScreen extends Composite {
 		label.setLayoutData(fd_label);
 		
 		
-		GnosConfigurationStepLabel compositeMapRequiredFields = new GnosConfigurationStepLabel(this, SWT.NONE, "Map Required Fields");
-		FormData fd_compositeMapRequiredFields = new FormData();
-		fd_compositeMapRequiredFields.bottom = new FormAttachment(labelWorkbenchHeader, 40, SWT.BOTTOM);
-		fd_compositeMapRequiredFields.right = new FormAttachment(label, -6);
-		fd_compositeMapRequiredFields.top = new FormAttachment(labelWorkbenchHeader, 6);
-		fd_compositeMapRequiredFields.left = new FormAttachment(labelWorkbenchHeader, 10, SWT.LEFT);
-		compositeMapRequiredFields.setLayoutData(fd_compositeMapRequiredFields);
-		compositeMapRequiredFields.setSelectedState();
+		GnosConfigurationStepLabel gnosStepMapRequiredFieldsLabel = new GnosConfigurationStepLabel(this, SWT.NONE, "Map Required Fields");
+		FormData fd_gnosStepMapRequiredFieldsLabel = new FormData();
+		fd_gnosStepMapRequiredFieldsLabel.bottom = new FormAttachment(labelWorkbenchHeader, 40, SWT.BOTTOM);
+		fd_gnosStepMapRequiredFieldsLabel.right = new FormAttachment(label, -6);
+		fd_gnosStepMapRequiredFieldsLabel.top = new FormAttachment(labelWorkbenchHeader, 6);
+		fd_gnosStepMapRequiredFieldsLabel.left = new FormAttachment(labelWorkbenchHeader, 10, SWT.LEFT);
+		gnosStepMapRequiredFieldsLabel.setLayoutData(fd_gnosStepMapRequiredFieldsLabel);
+		gnosStepMapRequiredFieldsLabel.setSelectedState();
 		
-		GnosConfigurationStepLabel compositeDefineFields = new GnosConfigurationStepLabel(this, SWT.NONE, "Define System Fields");
-		FormData fd_compositeDefineFields = new FormData();
-		fd_compositeDefineFields.bottom = new FormAttachment(compositeMapRequiredFields, 40, SWT.BOTTOM);
-		fd_compositeDefineFields.right = new FormAttachment(label, -6);
-		fd_compositeDefineFields.top = new FormAttachment(compositeMapRequiredFields);
-		fd_compositeDefineFields.left = new FormAttachment(0, 10);
-		compositeDefineFields.setLayoutData(fd_compositeDefineFields);
+		GnosConfigurationStepLabel gnosStepDefineExpressionsLabel = new GnosConfigurationStepLabel(this, SWT.NONE, "Expression Definition");
+		FormData fd_gnosStepDefineExpressionsLabel = new FormData();
+		fd_gnosStepDefineExpressionsLabel.bottom = new FormAttachment(gnosStepMapRequiredFieldsLabel, 40, SWT.BOTTOM);
+		fd_gnosStepDefineExpressionsLabel.right = new FormAttachment(label, -6);
+		fd_gnosStepDefineExpressionsLabel.top = new FormAttachment(gnosStepMapRequiredFieldsLabel);
+		fd_gnosStepDefineExpressionsLabel.left = new FormAttachment(0, 10);
+		gnosStepDefineExpressionsLabel.setLayoutData(fd_gnosStepDefineExpressionsLabel);
 		
-		GnosConfigurationStepLabel compositeModelDefinition = new GnosConfigurationStepLabel(this, SWT.NONE, "Model Definition");
-		FormData fd_compositeModelDefinition = new FormData();
-		fd_compositeModelDefinition.bottom = new FormAttachment(compositeDefineFields, 40, SWT.BOTTOM);
-		fd_compositeModelDefinition.right = new FormAttachment(label, -6);
-		fd_compositeModelDefinition.top = new FormAttachment(compositeDefineFields);
-		fd_compositeModelDefinition.left = new FormAttachment(compositeMapRequiredFields, 0, SWT.LEFT);
-		compositeModelDefinition.setLayoutData(fd_compositeModelDefinition);
+		GnosConfigurationStepLabel gnosStepModelDefinitionLabel = new GnosConfigurationStepLabel(this, SWT.NONE, "Model Definition");
+		FormData fd_gnosStepModelDefinitionLabel = new FormData();
+		fd_gnosStepModelDefinitionLabel.bottom = new FormAttachment(gnosStepDefineExpressionsLabel, 40, SWT.BOTTOM);
+		fd_gnosStepModelDefinitionLabel.right = new FormAttachment(label, -6);
+		fd_gnosStepModelDefinitionLabel.top = new FormAttachment(gnosStepDefineExpressionsLabel);
+		fd_gnosStepModelDefinitionLabel.left = new FormAttachment(gnosStepMapRequiredFieldsLabel, 0, SWT.LEFT);
+		gnosStepModelDefinitionLabel.setLayoutData(fd_gnosStepModelDefinitionLabel);
 		
-		GnosConfigurationStepLabel compositeProcessRouteDefinition = new GnosConfigurationStepLabel(this, SWT.NONE, "Process Route Definition");
-		FormData fd_compositeProcessRouteDefinition = new FormData();
-		fd_compositeProcessRouteDefinition.bottom = new FormAttachment(compositeDefineFields, 80, SWT.BOTTOM);
-		fd_compositeProcessRouteDefinition.right = new FormAttachment(label, -6);
-		fd_compositeProcessRouteDefinition.top = new FormAttachment(compositeDefineFields, 40);
-		fd_compositeProcessRouteDefinition.left = new FormAttachment(compositeMapRequiredFields, 0, SWT.LEFT);
-		compositeProcessRouteDefinition.setLayoutData(fd_compositeProcessRouteDefinition);
+		GnosConfigurationStepLabel gnosStepProcessRouteDefinitionLabel = new GnosConfigurationStepLabel(this, SWT.NONE, "Process Route Definition");
+		FormData fd_gnosStepProcessRouteDefinitionLabel = new FormData();
+		fd_gnosStepProcessRouteDefinitionLabel.bottom = new FormAttachment(gnosStepDefineExpressionsLabel, 80, SWT.BOTTOM);
+		fd_gnosStepProcessRouteDefinitionLabel.right = new FormAttachment(label, -6);
+		fd_gnosStepProcessRouteDefinitionLabel.top = new FormAttachment(gnosStepDefineExpressionsLabel, 40);
+		fd_gnosStepProcessRouteDefinitionLabel.left = new FormAttachment(gnosStepMapRequiredFieldsLabel, 0, SWT.LEFT);
+		gnosStepProcessRouteDefinitionLabel.setLayoutData(fd_gnosStepProcessRouteDefinitionLabel);
 
 	}
 
