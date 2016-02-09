@@ -11,6 +11,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import com.org.gnos.customsontrols.GnosConfigurationStepLabel;
+import org.eclipse.swt.layout.FillLayout;
 
 public class WorkbenchScreen extends Composite {
 
@@ -81,6 +82,15 @@ public class WorkbenchScreen extends Composite {
 		fd_gnosStepProcessRouteDefinitionLabel.top = new FormAttachment(gnosStepDefineExpressionsLabel, 40);
 		fd_gnosStepProcessRouteDefinitionLabel.left = new FormAttachment(gnosStepMapRequiredFieldsLabel, 0, SWT.LEFT);
 		gnosStepProcessRouteDefinitionLabel.setLayoutData(fd_gnosStepProcessRouteDefinitionLabel);
+		
+		Composite mainConfigurationViewport = new Composite(this, SWT.NONE);
+		mainConfigurationViewport.setLayout(new FillLayout(SWT.HORIZONTAL));
+		FormData fd_mainConfigurationViewport = new FormData();
+		fd_mainConfigurationViewport.right = new FormAttachment(labelWorkbenchHeader, -6, SWT.RIGHT);
+		fd_mainConfigurationViewport.bottom = new FormAttachment(100, -6);
+		fd_mainConfigurationViewport.top = new FormAttachment(labelWorkbenchHeader, 6);
+		fd_mainConfigurationViewport.left = new FormAttachment(label, 6);
+		mainConfigurationViewport.setLayoutData(fd_mainConfigurationViewport);
 
 	}
 
