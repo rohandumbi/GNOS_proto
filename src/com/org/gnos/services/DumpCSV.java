@@ -14,6 +14,7 @@ import com.org.gnos.db.DBManager;
 
 public class DumpCSV {
 	
+	Connection conn = null;
 	
 	public boolean dump(String fileName) {
 		System.out.println("Start Time:"+new Date());
@@ -21,9 +22,8 @@ public class DumpCSV {
 		String line = "";
 		int count = 0;
 		
-		Connection conn = DBManager.getConnection();
-		
 		try {
+			conn = DBManager.getConnection();
 			conn.setAutoCommit(false);
 			br = new BufferedReader(new FileReader(fileName));		
 			while ((line = br.readLine()) != null) {				
@@ -31,11 +31,15 @@ public class DumpCSV {
 					parseHeader(line);
 				} else {
 					parseRecord(line);
-				}			
+				}
+				if(count % 1000 == 0){
+					conn.commit();
+					System.out.println("Commit called at count "+count);
+				}
 				count++;
 			}
 			conn.commit();
-
+			DBManager.releaseConnection(conn);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -78,7 +82,6 @@ public class DumpCSV {
 		sql += ");";
 		
 		try {
-			Connection conn = DBManager.getConnection();
 			stmt = conn.createStatement();
 			stmt.executeUpdate(sql);
 		} finally {
@@ -98,7 +101,6 @@ public class DumpCSV {
 		String  sql = "DROP TABLE IF EXISTS gnos_data;";
 		
 		try {
-			Connection conn = DBManager.getConnection();
 			stmt = conn.createStatement();
 			stmt.executeUpdate(sql);
 		} finally {
@@ -121,7 +123,6 @@ public class DumpCSV {
 		sql += ");";
 
 		try {
-			Connection conn = DBManager.getConnection();
 			stmt = conn.createStatement();
 			stmt.executeUpdate(sql);
 		} finally {
@@ -133,8 +134,9 @@ public class DumpCSV {
 	
 	public static void main(String[] args) {
 		GNOSConfig.load();
+		
 		DumpCSV dumper = new DumpCSV();
-			dumper.dump("C:\\Arpan\\Workspace\\personal\\workspace\\GNOS_proto\\data\\GNOS_Test_data.csv");
+		dumper.dump("C:\\Arpan\\Workspace\\personal\\workspace\\GNOS_proto\\data\\GNOS_Test_data.csv");
 	
 	}
 }

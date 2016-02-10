@@ -11,11 +11,15 @@ public class DBManager {
 	private static IConnectionPool pool;
 	
 	public static Connection getConnection(){
-		if(pool == null) initializePool();
-		
+		if(pool == null) initializePool();		
 		return pool.getConnection();
 	}
 	
+	public static void releaseConnection(Connection conn){
+		if(pool != null){
+			pool.releaseConnection(conn);
+		}	
+	}
 	
 	private static void initializePool(){
 		pool = new DBConnectionPool();

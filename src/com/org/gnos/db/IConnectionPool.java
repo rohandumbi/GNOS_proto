@@ -10,6 +10,6 @@ public interface IConnectionPool {
 	
 	public Connection getConnection();
 	
-	public void releaseConnection();
+	public void releaseConnection(Connection conn);
 	
 }
