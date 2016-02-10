@@ -1,4 +1,4 @@
-package com.org.gnos.customsontrols;
+package com.org.gnos.custom.controls;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;

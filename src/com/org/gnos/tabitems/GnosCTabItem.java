@@ -10,6 +10,6 @@ public abstract class GnosCTabItem extends CTabItem{
 		super(parent, style);
 		// TODO Auto-generated constructor stub
 	}
-	public abstract void createContent(CTabFolder parent);
+	public abstract void createContent(CTabFolder parent) throws Exception;
 
 }

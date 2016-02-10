@@ -17,6 +17,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 
 import com.org.gnos.application.GNOSConfig;
+import com.org.gnos.custom.models.ProjectMetaDataModel;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.events.GnosEventWithAttributeMap;
 import com.org.gnos.events.interfaces.GnosEventListener;
@@ -156,7 +157,8 @@ public class GNOSApplication extends ApplicationWindow implements GnosEventListe
 
 	private void openPitControlsTab(GnosEventWithAttributeMap event){
 		System.out.println("Opening pit controls tab");
-		projectTabItem = new ProjectTabItem(cTabFolder, SWT.CLOSE, event.attributes.get("projectName"));
+		ProjectMetaDataModel projectMetaDataModel = new ProjectMetaDataModel(event.attributes);
+		projectTabItem = new ProjectTabItem(cTabFolder, SWT.CLOSE, projectMetaDataModel);
 		projectTabItem.registerEventListener(this);
 		cTabFolder.setSelection(projectTabItem);
 

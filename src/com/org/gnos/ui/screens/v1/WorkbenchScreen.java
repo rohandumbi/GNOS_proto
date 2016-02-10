@@ -1,18 +1,20 @@
 package com.org.gnos.ui.screens.v1;
 
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.layout.FormLayout;
-import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.wb.swt.SWTResourceManager;
-import org.eclipse.swt.widgets.Label;
+import java.util.Map;
 
-import com.org.gnos.customsontrols.GnosConfigurationStepLabel;
-import com.org.gnos.customsontrols.GnosScreen;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.wb.swt.SWTResourceManager;
+
+import com.org.gnos.custom.controls.GnosConfigurationStepLabel;
+import com.org.gnos.custom.controls.GnosScreen;
+import com.org.gnos.custom.models.ProjectMetaDataModel;
 import com.org.gnos.events.GnosEvent;
-import com.org.gnos.events.interfaces.GnosEventListener;
 
 
 public class WorkbenchScreen extends GnosScreen {
@@ -26,11 +28,13 @@ public class WorkbenchScreen extends GnosScreen {
 	private GnosConfigurationStepLabel gnosStepDefineExpressionsLabel;
 	private GnosConfigurationStepLabel gnosStepModelDefinitionLabel;
 	private GnosConfigurationStepLabel gnosStepProcessRouteDefinitionLabel;
+	private ProjectMetaDataModel projectMetaData;
 	
 	
 	public CLabel labelWorkbenchHeader;
-	public WorkbenchScreen(Composite parent, int style) {
+	public WorkbenchScreen(Composite parent, int style, ProjectMetaDataModel projectMetaData){
 		super(parent, style);
+		this.projectMetaData = projectMetaData;
 		setFont(SWTResourceManager.getFont("Arial", 11, SWT.BOLD));
 		setToolTipText("");
 		setBackground(SWTResourceManager.getColor(255, 255, 255));
@@ -91,11 +95,8 @@ public class WorkbenchScreen extends GnosScreen {
 		fd_gnosStepProcessRouteDefinitionLabel.left = new FormAttachment(gnosStepMapRequiredFieldsLabel, 0, SWT.LEFT);
 		gnosStepProcessRouteDefinitionLabel.setLayoutData(fd_gnosStepProcessRouteDefinitionLabel);
 		
-		MainConfigurationViewPort mainConfigurationViewport = new MainConfigurationViewPort(this, SWT.NONE);
+		MainConfigurationViewPort mainConfigurationViewport = new MainConfigurationViewPort(this, SWT.NONE, this.projectMetaData);
 		mainConfigurationViewport.registerEventListener(this);
-		//mainConfigurationViewport.loadMapRequiredFieldsScreen();
-		//mainConfigurationViewport.setLayout(new FillLayout(SWT.HORIZONTAL));
-		
 		
 		FormData fd_mainConfigurationViewport = new FormData();
 		fd_mainConfigurationViewport.right = new FormAttachment(labelWorkbenchHeader, -6, SWT.RIGHT);

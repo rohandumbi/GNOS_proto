@@ -5,7 +5,12 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 //import org.eclipse.swt.widgets.Layout;
 
-import com.org.gnos.customsontrols.GnosScreen;
+
+
+
+
+import com.org.gnos.custom.controls.GnosScreen;
+import com.org.gnos.custom.models.ProjectMetaDataModel;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.events.interfaces.GnosEventListener;
 
@@ -16,18 +21,19 @@ public class MainConfigurationViewPort extends GnosScreen {
 	 * @param parent
 	 * @param style
 	 */
+	private ProjectMetaDataModel projectMetaData;
 	private GnosScreen viewPort;
-	private Composite parent;
 	//private Layout mainLayout;
-	public MainConfigurationViewPort(Composite parent, int style) {
+	public MainConfigurationViewPort(Composite parent, int style, ProjectMetaDataModel projectMetaData){
 		super(parent, style);
-		this.parent = parent;
+		this.projectMetaData = projectMetaData;
+		//this.parent = parent;
 		this.loadMapRequiredFieldsScreen();
 	}
 
 	private void loadMapRequiredFieldsScreen(){
 		this.setLayout(new FillLayout());
-		this.viewPort = new MapRequiredFieldsScreen(this, SWT.NONE);
+		this.viewPort = new MapRequiredFieldsScreen(this, SWT.NONE, this.projectMetaData);
 		this.viewPort.registerEventListener(this);
 	}
 
