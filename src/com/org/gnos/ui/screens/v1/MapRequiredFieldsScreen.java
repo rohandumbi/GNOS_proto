@@ -8,6 +8,9 @@ import org.eclipse.wb.swt.SWTResourceManager;
 import com.org.gnos.customsontrols.GnosScreen;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.events.interfaces.GnosEventListener;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 
 public class MapRequiredFieldsScreen extends GnosScreen {
 
@@ -20,8 +23,20 @@ public class MapRequiredFieldsScreen extends GnosScreen {
 		super(parent, style);
 		Label lblNewLabel = new Label(this, SWT.NONE);
 		lblNewLabel.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
-		lblNewLabel.setBounds(10, 10, 261, 69);
+		lblNewLabel.setBounds(10, 10, 193, 69);
 		lblNewLabel.setText("Map Required Fields Screen");
+		
+		Button buttonMapRqrdFields = new Button(this, SWT.NONE);
+		buttonMapRqrdFields.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				//TODO mapping complete
+				GnosEvent event = new GnosEvent(this, "complete:map-required-fields");
+				triggerGnosEvent(event);
+			}
+		});
+		buttonMapRqrdFields.setBounds(207, 10, 75, 25);
+		buttonMapRqrdFields.setText("Next");
 
 	}
 
@@ -30,16 +45,18 @@ public class MapRequiredFieldsScreen extends GnosScreen {
 		// Disable the check that prevents subclassing of SWT components
 	}
 
-	@Override
-	public void registerEventListener(GnosEventListener listener) {
-		// TODO Auto-generated method stub
-		
-	}
 
 	@Override
 	public void onGnosEventFired(GnosEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
-
+	
+	private void triggerGnosEvent(GnosEvent event){
+		int j = listeners.size();
+		int i = 0;
+		for(i=0; i<j; i++){
+			listeners.get(i).onGnosEventFired(event);
+		}
+	}
 }
