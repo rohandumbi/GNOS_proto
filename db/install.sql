@@ -12,7 +12,7 @@ CREATE TABLE block(
    block_id INT NOT NULL,
    pit_id INT NOT NULL,
    block_no INT NOT NULL,
-   PRIMARY KEY ( block_no, pit_no )
+   PRIMARY KEY ( block_no, pit_id )
 );
 
 DROP TABLE IF EXISTS expressions;
