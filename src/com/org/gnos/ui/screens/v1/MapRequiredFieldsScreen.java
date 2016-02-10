@@ -8,6 +8,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.SWT;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import com.org.gnos.application.GNOSConfig;
 import com.org.gnos.custom.controls.GnosScreen;
 import com.org.gnos.custom.models.ProjectMetaDataModel;
 import com.org.gnos.events.GnosEvent;
@@ -22,7 +23,7 @@ import org.eclipse.swt.events.SelectionEvent;
 public class MapRequiredFieldsScreen extends GnosScreen {
 
 	private List<ColumnHeader> allHeaders;
-	private List<String> requiredFields;
+	private String[] requiredFields;
 	private ProjectMetaDataModel projectMetaData;
 	private CSVProcessor csvProcessor;
 	/**
@@ -36,12 +37,13 @@ public class MapRequiredFieldsScreen extends GnosScreen {
 		this.allHeaders = this.getAllHeaders();
 		System.out.println("Length of all columns: " + this.allHeaders.size());
 		this.requiredFields = this.getRequiredFieldsFromProperties();
-		//System.out.println("Length of required columns: " + this.requiredFields.size());
+		System.out.println("Length of required columns: " + this.requiredFields.length);
 		this.createContent();
 	}
 	
-	private List<String> getRequiredFieldsFromProperties(){
-		return null;
+	private String[] getRequiredFieldsFromProperties(){
+		String[] requiredFields = GNOSConfig.get("fields.required").split("#");
+		return requiredFields;
 	}
 	
 	private List<ColumnHeader> getAllHeaders(){
