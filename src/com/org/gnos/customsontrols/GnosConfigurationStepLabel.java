@@ -47,6 +47,7 @@ public class GnosConfigurationStepLabel extends Composite {
 		FormData fd_labelMapRequiredFields = new FormData();
 		fd_labelMapRequiredFields.bottom = new FormAttachment(100, -9);
 		fd_labelMapRequiredFields.left = new FormAttachment(0,5);
+		fd_labelMapRequiredFields.right = new FormAttachment(100);
 		labelMapRequiredFields.setLayoutData(fd_labelMapRequiredFields);
 	}
 
@@ -59,6 +60,7 @@ public class GnosConfigurationStepLabel extends Composite {
 
 	public void setDeselectedState(){
 		this.setBackground(this.defaultLabelColor);
+		labelMapRequiredFields.setBackground(defaultLabelColor);
 		labelMapRequiredFields.setFont(SWTResourceManager.getFont("Arial", 11, SWT.NORMAL));
 		labelMapRequiredFields.setForeground(this.defaultTextColor);
 	}

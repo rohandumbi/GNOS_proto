@@ -22,6 +22,12 @@ public class WorkbenchScreen extends GnosScreen {
 	 * @param parent
 	 * @param style
 	 */
+	private GnosConfigurationStepLabel gnosStepMapRequiredFieldsLabel;
+	private GnosConfigurationStepLabel gnosStepDefineExpressionsLabel;
+	private GnosConfigurationStepLabel gnosStepModelDefinitionLabel;
+	private GnosConfigurationStepLabel gnosStepProcessRouteDefinitionLabel;
+	
+	
 	public CLabel labelWorkbenchHeader;
 	public WorkbenchScreen(Composite parent, int style) {
 		super(parent, style);
@@ -52,7 +58,7 @@ public class WorkbenchScreen extends GnosScreen {
 		label.setLayoutData(fd_label);
 		
 		
-		GnosConfigurationStepLabel gnosStepMapRequiredFieldsLabel = new GnosConfigurationStepLabel(this, SWT.NONE, "Map Required Fields");
+		gnosStepMapRequiredFieldsLabel = new GnosConfigurationStepLabel(this, SWT.NONE, "Map Required Fields");
 		FormData fd_gnosStepMapRequiredFieldsLabel = new FormData();
 		fd_gnosStepMapRequiredFieldsLabel.bottom = new FormAttachment(labelWorkbenchHeader, 40, SWT.BOTTOM);
 		fd_gnosStepMapRequiredFieldsLabel.right = new FormAttachment(label, -6);
@@ -61,7 +67,7 @@ public class WorkbenchScreen extends GnosScreen {
 		gnosStepMapRequiredFieldsLabel.setLayoutData(fd_gnosStepMapRequiredFieldsLabel);
 		gnosStepMapRequiredFieldsLabel.setSelectedState();
 		
-		GnosConfigurationStepLabel gnosStepDefineExpressionsLabel = new GnosConfigurationStepLabel(this, SWT.NONE, "Expression Definition");
+		gnosStepDefineExpressionsLabel = new GnosConfigurationStepLabel(this, SWT.NONE, "Expression Definition");
 		FormData fd_gnosStepDefineExpressionsLabel = new FormData();
 		fd_gnosStepDefineExpressionsLabel.bottom = new FormAttachment(gnosStepMapRequiredFieldsLabel, 40, SWT.BOTTOM);
 		fd_gnosStepDefineExpressionsLabel.right = new FormAttachment(label, -6);
@@ -69,7 +75,7 @@ public class WorkbenchScreen extends GnosScreen {
 		fd_gnosStepDefineExpressionsLabel.left = new FormAttachment(0, 10);
 		gnosStepDefineExpressionsLabel.setLayoutData(fd_gnosStepDefineExpressionsLabel);
 		
-		GnosConfigurationStepLabel gnosStepModelDefinitionLabel = new GnosConfigurationStepLabel(this, SWT.NONE, "Model Definition");
+		gnosStepModelDefinitionLabel = new GnosConfigurationStepLabel(this, SWT.NONE, "Model Definition");
 		FormData fd_gnosStepModelDefinitionLabel = new FormData();
 		fd_gnosStepModelDefinitionLabel.bottom = new FormAttachment(gnosStepDefineExpressionsLabel, 40, SWT.BOTTOM);
 		fd_gnosStepModelDefinitionLabel.right = new FormAttachment(label, -6);
@@ -77,7 +83,7 @@ public class WorkbenchScreen extends GnosScreen {
 		fd_gnosStepModelDefinitionLabel.left = new FormAttachment(gnosStepMapRequiredFieldsLabel, 0, SWT.LEFT);
 		gnosStepModelDefinitionLabel.setLayoutData(fd_gnosStepModelDefinitionLabel);
 		
-		GnosConfigurationStepLabel gnosStepProcessRouteDefinitionLabel = new GnosConfigurationStepLabel(this, SWT.NONE, "Process Route Definition");
+		gnosStepProcessRouteDefinitionLabel = new GnosConfigurationStepLabel(this, SWT.NONE, "Process Route Definition");
 		FormData fd_gnosStepProcessRouteDefinitionLabel = new FormData();
 		fd_gnosStepProcessRouteDefinitionLabel.bottom = new FormAttachment(gnosStepDefineExpressionsLabel, 80, SWT.BOTTOM);
 		fd_gnosStepProcessRouteDefinitionLabel.right = new FormAttachment(label, -6);
@@ -86,7 +92,8 @@ public class WorkbenchScreen extends GnosScreen {
 		gnosStepProcessRouteDefinitionLabel.setLayoutData(fd_gnosStepProcessRouteDefinitionLabel);
 		
 		MainConfigurationViewPort mainConfigurationViewport = new MainConfigurationViewPort(this, SWT.NONE);
-		mainConfigurationViewport.loadMapRequiredFieldsScreen();
+		mainConfigurationViewport.registerEventListener(this);
+		//mainConfigurationViewport.loadMapRequiredFieldsScreen();
 		//mainConfigurationViewport.setLayout(new FillLayout(SWT.HORIZONTAL));
 		
 		
@@ -104,15 +111,26 @@ public class WorkbenchScreen extends GnosScreen {
 		// Disable the check that prevents subclassing of SWT components
 	}
 
-	@Override
-	public void registerEventListener(GnosEventListener listener) {
-		// TODO Auto-generated method stub
-		
-	}
 
 	@Override
 	public void onGnosEventFired(GnosEvent e) {
 		// TODO Auto-generated method stub
-		
+		if(e.eventName == "complete:map-required-fields"){
+			//mappingRequiredFieldsComplete();
+			this.gnosStepMapRequiredFieldsLabel.setDeselectedState();
+			this.gnosStepDefineExpressionsLabel.setSelectedState();
+		}else if(e.eventName == "complete:expression-defintion"){
+			//expressionDefinitionComplete();
+			this.gnosStepDefineExpressionsLabel.setDeselectedState();
+			this.gnosStepModelDefinitionLabel.setSelectedState();
+		}else if(e.eventName == "complete:model-defintion"){
+			//modelDefinitionComplete();
+			this.gnosStepModelDefinitionLabel.setDeselectedState();
+			this.gnosStepProcessRouteDefinitionLabel.setSelectedState();
+		}else if(e.eventName == "complete:process-route-defintion"){
+			//processRouteDefinitionComplete();
+			this.gnosStepProcessRouteDefinitionLabel.setDeselectedState();
+		}
 	}
+	
 }

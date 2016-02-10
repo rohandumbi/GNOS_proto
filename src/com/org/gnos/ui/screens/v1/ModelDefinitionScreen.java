@@ -8,6 +8,9 @@ import org.eclipse.wb.swt.SWTResourceManager;
 import com.org.gnos.customsontrols.GnosScreen;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.events.interfaces.GnosEventListener;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 
 public class ModelDefinitionScreen extends GnosScreen {
 
@@ -21,8 +24,20 @@ public class ModelDefinitionScreen extends GnosScreen {
 		
 		Label lblNewLabel = new Label(this, SWT.NONE);
 		lblNewLabel.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
-		lblNewLabel.setBounds(10, 10, 325, 56);
+		lblNewLabel.setBounds(10, 10, 167, 56);
 		lblNewLabel.setText("Model Definition Screen");
+		
+		Button buttonModelsDefined = new Button(this, SWT.NONE);
+		buttonModelsDefined.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				//TODO model definition complete
+				GnosEvent event = new GnosEvent(this, "complete:model-defintion");
+				triggerGnosEvent(event);
+			}
+		});
+		buttonModelsDefined.setBounds(195, 10, 75, 25);
+		buttonModelsDefined.setText("Next");
 
 	}
 
@@ -31,16 +46,18 @@ public class ModelDefinitionScreen extends GnosScreen {
 		// Disable the check that prevents subclassing of SWT components
 	}
 
-	@Override
-	public void registerEventListener(GnosEventListener listener) {
-		// TODO Auto-generated method stub
-		
-	}
 
 	@Override
 	public void onGnosEventFired(GnosEvent e) {
 		// TODO Auto-generated method stub
 		
+	}
+	private void triggerGnosEvent(GnosEvent event){
+		int j = listeners.size();
+		int i = 0;
+		for(i=0; i<j; i++){
+			listeners.get(i).onGnosEventFired(event);
+		}
 	}
 
 }
