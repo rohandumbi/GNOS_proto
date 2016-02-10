@@ -23,7 +23,7 @@ public class GNOSConfig {
 	
 	public static String get(String key){
 		String value = prop.getProperty(key);
-				
+			
 		return value;
 	}
 }
