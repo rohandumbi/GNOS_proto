@@ -15,6 +15,15 @@ CREATE TABLE block(
    PRIMARY KEY ( block_no, pit_no )
 );
 
+DROP TABLE IF EXISTS expressions;
+
+CREATE TABLE expressions (
+   id INT NOT NULL  AUTO_INCREMENT,
+   name VARCHAR(100) NOT NULL,
+   grade TINYINT(1),
+   PRIMARY KEY ( id )
+);
+
 DROP TABLE IF EXISTS model_definition;
 
 CREATE TABLE model_definition(
@@ -26,9 +35,9 @@ CREATE TABLE model_definition(
 
 DROP TABLE IF EXISTS model_filter;
 
-CREATE TABLE model_filter(
+CREATE TABLE model_filter (
    model_id INT NOT NULL,
-   exp_left INT,
-   exp_right INT,
-   operation INT
+   operand_left INT,
+   operand_right INT,
+   operator INT
 );
