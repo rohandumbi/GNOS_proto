@@ -95,7 +95,7 @@ public class WorkbenchScreen extends GnosScreen {
 		fd_gnosStepProcessRouteDefinitionLabel.left = new FormAttachment(gnosStepMapRequiredFieldsLabel, 0, SWT.LEFT);
 		gnosStepProcessRouteDefinitionLabel.setLayoutData(fd_gnosStepProcessRouteDefinitionLabel);
 		
-		MainConfigurationViewPort mainConfigurationViewport = new MainConfigurationViewPort(this, SWT.NONE, this.projectMetaData);
+		MainConfigurationViewPort mainConfigurationViewport = new MainConfigurationViewPort(this, SWT.BORDER, this.projectMetaData);
 		mainConfigurationViewport.registerEventListener(this);
 		
 		FormData fd_mainConfigurationViewport = new FormData();

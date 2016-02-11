@@ -28,7 +28,7 @@ public class GnosConfigurationStepLabel extends Composite {
 		this.defaultLabelColor = SWTResourceManager.getColor(SWT.COLOR_WHITE);
 		this.defaultTextColor = SWTResourceManager.getColor(SWT.COLOR_BLACK);
 		this.selectedLabelColor = SWTResourceManager.getColor(240, 240, 240);
-		this.selectedTextColor = SWTResourceManager.getColor(0, 204, 255);
+		this.selectedTextColor = SWTResourceManager.getColor(0, 191, 255);
 
 		this.stepName = label;
 		createContent(parent);
