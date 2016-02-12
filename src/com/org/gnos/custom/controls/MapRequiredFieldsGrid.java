@@ -149,9 +149,28 @@ public class MapRequiredFieldsGrid extends Composite {
 		Control[] rowChildren = null;
 		for(int i = 0; i < allRows.size(); i++){
 			rowChildren = allRows.get(i).getChildren();
-			for (int j = 0; j < rowChildren.length; j++){
-				System.out.println("Row" + i +":found child number: " + j);
+			
+			String requiredFieldName = null;
+			String sourceFieldName = null;
+			String datatypeName = null;
+			
+			Control compositeRequiredFieldName = rowChildren[0];
+			Control compositeSourceFieldName = rowChildren[1];
+			Control compositeDatatype = rowChildren[2];
+			
+			if(compositeRequiredFieldName instanceof Label){
+				Label labelRequiredFieldName = (Label)compositeRequiredFieldName;
+				requiredFieldName = labelRequiredFieldName.getText();
 			}
+			if(compositeSourceFieldName instanceof Combo){
+				Combo comboSourceFieldName = (Combo)compositeSourceFieldName;
+				sourceFieldName = comboSourceFieldName.getText();
+			}
+			if(compositeDatatype instanceof Combo){
+				Combo comboDatatype = (Combo)compositeDatatype;
+				datatypeName = comboDatatype.getText();
+			}
+			System.out.println("ROW" + i +" data: " + requiredFieldName + "====" + sourceFieldName + "====" + datatypeName);
 		}
 
 		return null;
