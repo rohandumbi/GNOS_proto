@@ -30,6 +30,7 @@ public class MapRequiredFieldsScreen extends GnosScreen {
 	private String[] dataTypes;
 	private ProjectMetaDataModel projectMetaData;
 	private CSVProcessor csvProcessor;
+	private MapRequiredFieldsGrid mapRequiredFieldsGrid;
 	/**
 	 * Create the composite.
 	 * @param parent
@@ -93,7 +94,7 @@ public class MapRequiredFieldsScreen extends GnosScreen {
 		labelScreenDescription.setLayoutData(fd_labelScreenDescription);
 		labelScreenDescription.setText("For each required field in the system map your custom field and also specify its datatype.");
 		
-		MapRequiredFieldsGrid mapRequiredFieldsGrid = new MapRequiredFieldsGrid(this, SWT.NONE, this.requiredFields, this.allHeaders, this.dataTypes);
+		mapRequiredFieldsGrid = new MapRequiredFieldsGrid(this, SWT.NONE, this.requiredFields, this.allHeaders, this.dataTypes);
 		FormData fd_mapRequiredFieldsGrid = new FormData();
 		fd_mapRequiredFieldsGrid.top = new FormAttachment(labelScreenDescription, 6);
 		fd_mapRequiredFieldsGrid.left = new FormAttachment(0, 10);
@@ -112,10 +113,15 @@ public class MapRequiredFieldsScreen extends GnosScreen {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				//TODO mapping complete
+				updateHeadersWithRequiredFieldsMapping();
 				GnosEvent event = new GnosEvent(this, "complete:map-required-fields");
 				triggerGnosEvent(event);
 			}
 		});
+	}
+	
+	private void updateHeadersWithRequiredFieldsMapping(){
+		this.allHeaders = mapRequiredFieldsGrid.getMappedSourceFields();
 	}
 
 	@Override
