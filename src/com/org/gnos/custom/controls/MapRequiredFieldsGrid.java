@@ -1,5 +1,8 @@
 package com.org.gnos.custom.controls;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -9,6 +12,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import com.org.gnos.services.ColumnHeader;
+
 public class MapRequiredFieldsGrid extends Composite {
 
 	/**
@@ -16,14 +21,32 @@ public class MapRequiredFieldsGrid extends Composite {
 	 * @param parent
 	 * @param style
 	 */
-	public MapRequiredFieldsGrid(Composite parent, int style) {
+	private String[] requiredFieldNames;
+	private List<ColumnHeader> allSourceFields;
+	private String[] dataTypes;
+	private Composite compositeGridHeader;
+	private List<Composite> allRows;
+	private String[] sourceFieldsComboItems;
+	
+	public MapRequiredFieldsGrid(Composite parent, int style, String[] requiredFieldNames, List<ColumnHeader> allSourceFields, String[] dataTypes) {
 		super(parent, style);
+		this.requiredFieldNames = requiredFieldNames;
+		this.allSourceFields = allSourceFields;
+		this.dataTypes = dataTypes;
 		this.createContent(parent);
 	}
+	private void createSourceFieldsComboItems(){
+		int i = 0;
+		int sourceFieldSize = this.allSourceFields.size();
+		this.sourceFieldsComboItems = new String[sourceFieldSize];
+		for(i=0; i<sourceFieldSize; i++){
+			this.sourceFieldsComboItems[i] = this.allSourceFields.get(i).getName();
+		}
+	}
 	
-	private void createContent(Composite parent){
-		this.setLayout(new FormLayout());
-		Composite compositeGridHeader = new Composite(this, SWT.BORDER);
+	
+	private void createHeader(){
+		compositeGridHeader = new Composite(this, SWT.BORDER);
 		//compositeGridHeader.setBounds(0, 0, 749, 37);
 		compositeGridHeader.setBackground(SWTResourceManager.getColor(230, 230, 230));
 		compositeGridHeader.setLayout(new FormLayout());
@@ -70,215 +93,55 @@ public class MapRequiredFieldsGrid extends Composite {
 		fd_lblDatatypeHeader.left = new FormAttachment(label_1, 10);
 		lblDatatypeHeader.setLayoutData(fd_lblDatatypeHeader);
 		lblDatatypeHeader.setText("DATATYPE");
-		
-		/*
-		 * Row 1
-		 */
-		Composite compositeRow1 = new Composite(this, SWT.BORDER);
-		compositeRow1.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		compositeRow1.setLayout(new FormLayout());
-		FormData fd_compositeRow1 = new FormData();
-		fd_compositeRow1.bottom = new FormAttachment(compositeGridHeader, 25, SWT.BOTTOM);
-		fd_compositeRow1.top = new FormAttachment(compositeGridHeader);
-		fd_compositeRow1.right = new FormAttachment(compositeGridHeader, 0, SWT.RIGHT);
-		fd_compositeRow1.left = new FormAttachment(compositeGridHeader, 0, SWT.LEFT);
-		
-		Label lblRqrdFieldNameRow1 = new Label(compositeRow1, SWT.NONE);
-		lblRqrdFieldNameRow1.setForeground(SWTResourceManager.getColor(0,191,255));
-		lblRqrdFieldNameRow1.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		lblRqrdFieldNameRow1.setFont(SWTResourceManager.getFont("Arial", 9, SWT.BOLD));
-		FormData fd_lblRqrdFieldNameRow1 = new FormData();
-		fd_lblRqrdFieldNameRow1.top = new FormAttachment(0);
-		fd_lblRqrdFieldNameRow1.left = new FormAttachment(0, 10);
-		lblRqrdFieldNameRow1.setLayoutData(fd_lblRqrdFieldNameRow1);
-		lblRqrdFieldNameRow1.setText("block");
-		
-		Combo comboSourceFieldRow1 = new Combo(compositeRow1, SWT.NONE);
-		FormData fd_comboSourceFieldRow1 = new FormData();
-		fd_comboSourceFieldRow1.left = new FormAttachment(40, 12);
-		comboSourceFieldRow1.setLayoutData(fd_comboSourceFieldRow1);
-		
-		Combo comboDatatypeRow1 = new Combo(compositeRow1, SWT.NONE);
-		FormData fd_comboDatatypeRow1 = new FormData();
-		fd_comboDatatypeRow1.left = new FormAttachment(70, 12);
-		comboDatatypeRow1.setLayoutData(fd_comboDatatypeRow1);
-		
-		compositeRow1.setLayoutData(fd_compositeRow1);
-		
-		
-		/*
-		 * Row 2
-		 */
-		Composite compositeRow2 = new Composite(this, SWT.BORDER);
-		compositeRow2.setBackground(SWTResourceManager.getColor(245, 245, 245));
-		compositeRow2.setLayout(new FormLayout());
-		FormData fd_compositeRow2 = new FormData();
-		fd_compositeRow2.right = new FormAttachment(compositeGridHeader, 0, SWT.RIGHT);
-		fd_compositeRow2.bottom = new FormAttachment(compositeRow1, 26, SWT.BOTTOM);
-		fd_compositeRow2.top = new FormAttachment(compositeRow1, 1);
-		fd_compositeRow2.left = new FormAttachment(compositeGridHeader, 0, SWT.LEFT);
-		
-		Label lblRqrdFieldNameRow2 = new Label(compositeRow2, SWT.NONE);
-		lblRqrdFieldNameRow2.setForeground(SWTResourceManager.getColor(0,191,255));
-		lblRqrdFieldNameRow2.setBackground(SWTResourceManager.getColor(245, 245, 245));
-		lblRqrdFieldNameRow2.setFont(SWTResourceManager.getFont("Arial", 9, SWT.BOLD));
-		FormData fd_lblRqrdFieldNameRow2 = new FormData();
-		fd_lblRqrdFieldNameRow2.top = new FormAttachment(0);
-		fd_lblRqrdFieldNameRow2.left = new FormAttachment(0, 10);
-		lblRqrdFieldNameRow2.setLayoutData(fd_lblRqrdFieldNameRow2);
-		lblRqrdFieldNameRow2.setText("bin");
-		
-		Combo comboSourceFieldRow2 = new Combo(compositeRow2, SWT.NONE);
-		FormData fd_comboSourceFieldRow2 = new FormData();
-		fd_comboSourceFieldRow2.left = new FormAttachment(40, 12);
-		comboSourceFieldRow2.setLayoutData(fd_comboSourceFieldRow2);
-		
-		Combo comboDatatypeRow2 = new Combo(compositeRow2, SWT.NONE);
-		FormData fd_comboDatatypeRow2 = new FormData();
-		fd_comboDatatypeRow2.left = new FormAttachment(70, 12);
-		comboDatatypeRow2.setLayoutData(fd_comboDatatypeRow2);
-		
-		compositeRow2.setLayoutData(fd_compositeRow2);
-		
-		
-		/*
-		 * Row 3
-		 */
-		Composite compositeRow3 = new Composite(this, SWT.BORDER);
-		compositeRow3.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		compositeRow3.setLayout(new FormLayout());
-		FormData fd_compositeRow3 = new FormData();
-		fd_compositeRow3.bottom = new FormAttachment(compositeRow2, 26, SWT.BOTTOM);
-		fd_compositeRow3.top = new FormAttachment(compositeRow2, 1, SWT.BOTTOM);
-		fd_compositeRow3.right = new FormAttachment(compositeGridHeader, 0, SWT.RIGHT);
-		fd_compositeRow3.left = new FormAttachment(compositeGridHeader, 0, SWT.LEFT);
-		
-		Label lblRqrdFieldNameRow3 = new Label(compositeRow3, SWT.NONE);
-		lblRqrdFieldNameRow3.setForeground(SWTResourceManager.getColor(0,191,255));
-		lblRqrdFieldNameRow3.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		lblRqrdFieldNameRow3.setFont(SWTResourceManager.getFont("Arial", 9, SWT.BOLD));
-		FormData fd_lblRqrdFieldNameRow3 = new FormData();
-		fd_lblRqrdFieldNameRow3.top = new FormAttachment(0);
-		fd_lblRqrdFieldNameRow3.left = new FormAttachment(0, 10);
-		lblRqrdFieldNameRow3.setLayoutData(fd_lblRqrdFieldNameRow3);
-		lblRqrdFieldNameRow3.setText("mining_area");
-		
-		Combo comboSourceFieldRow3 = new Combo(compositeRow3, SWT.NONE);
-		FormData fd_comboSourceFieldRow3 = new FormData();
-		fd_comboSourceFieldRow3.left = new FormAttachment(40, 12);
-		comboSourceFieldRow3.setLayoutData(fd_comboSourceFieldRow3);
-		
-		Combo comboDatatypeRow3 = new Combo(compositeRow3, SWT.NONE);
-		FormData fd_comboDatatypeRow3 = new FormData();
-		fd_comboDatatypeRow3.left = new FormAttachment(70, 12);
-		comboDatatypeRow3.setLayoutData(fd_comboDatatypeRow3);
-		
-		compositeRow3.setLayoutData(fd_compositeRow3);
-		
-		/*
-		 * Row 4
-		 */
-		Composite compositeRow4 = new Composite(this, SWT.BORDER);
-		compositeRow4.setBackground(SWTResourceManager.getColor(245, 245, 245));
-		compositeRow4.setLayout(new FormLayout());
-		FormData fd_compositeRow4 = new FormData();
-		fd_compositeRow4.right = new FormAttachment(compositeGridHeader, 0, SWT.RIGHT);
-		fd_compositeRow4.bottom = new FormAttachment(compositeRow3, 26, SWT.BOTTOM);
-		fd_compositeRow4.top = new FormAttachment(compositeRow3, 1);
-		fd_compositeRow4.left = new FormAttachment(compositeGridHeader, 0, SWT.LEFT);
-		
-		Label lblRqrdFieldNameRow4 = new Label(compositeRow4, SWT.NONE);
-		lblRqrdFieldNameRow4.setForeground(SWTResourceManager.getColor(0,191,255));
-		lblRqrdFieldNameRow4.setBackground(SWTResourceManager.getColor(245,245,245));
-		lblRqrdFieldNameRow4.setFont(SWTResourceManager.getFont("Arial", 9, SWT.BOLD));
-		FormData fd_lblRqrdFieldNameRow4 = new FormData();
-		fd_lblRqrdFieldNameRow4.top = new FormAttachment(0);
-		fd_lblRqrdFieldNameRow4.left = new FormAttachment(0, 10);
-		lblRqrdFieldNameRow4.setLayoutData(fd_lblRqrdFieldNameRow4);
-		lblRqrdFieldNameRow4.setText("pit_name");
-		
-
-		Combo comboSourceFieldRow4 = new Combo(compositeRow4, SWT.NONE);
-		FormData fd_comboSourceFieldRow4 = new FormData();
-		fd_comboSourceFieldRow4.left = new FormAttachment(40, 12);
-		comboSourceFieldRow4.setLayoutData(fd_comboSourceFieldRow4);
-		
-		Combo comboDatatypeRow4 = new Combo(compositeRow4, SWT.NONE);
-		FormData fd_comboDatatypeRow4 = new FormData();
-		fd_comboDatatypeRow4.left = new FormAttachment(70, 12);
-		comboDatatypeRow4.setLayoutData(fd_comboDatatypeRow4);
-		
-		compositeRow4.setLayoutData(fd_compositeRow4);
-		
-		/*
-		 * Row 5
-		 */
-		Composite compositeRow5 = new Composite(this, SWT.BORDER);
-		compositeRow5.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		compositeRow5.setLayout(new FormLayout());
-		FormData fd_compositeRow5 = new FormData();
-		fd_compositeRow5.bottom = new FormAttachment(compositeRow4, 26, SWT.BOTTOM);
-		fd_compositeRow5.top = new FormAttachment(compositeRow4, 1, SWT.BOTTOM);
-		fd_compositeRow5.right = new FormAttachment(compositeGridHeader, 0, SWT.RIGHT);
-		fd_compositeRow5.left = new FormAttachment(compositeGridHeader, 0, SWT.LEFT);
-		
-		Label lblRqrdFieldNameRow5 = new Label(compositeRow5, SWT.NONE);
-		lblRqrdFieldNameRow5.setForeground(SWTResourceManager.getColor(0,191,255));
-		lblRqrdFieldNameRow5.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		lblRqrdFieldNameRow5.setFont(SWTResourceManager.getFont("Arial", 9, SWT.BOLD));
-		FormData fd_lblRqrdFieldNameRow5 = new FormData();
-		fd_lblRqrdFieldNameRow5.top = new FormAttachment(0);
-		fd_lblRqrdFieldNameRow5.left = new FormAttachment(0, 10);
-		lblRqrdFieldNameRow5.setLayoutData(fd_lblRqrdFieldNameRow5);
-		lblRqrdFieldNameRow5.setText("bench_rl");
-		
-
-		Combo comboSourceFieldRow5 = new Combo(compositeRow5, SWT.NONE);
-		FormData fd_comboSourceFieldRow5 = new FormData();
-		fd_comboSourceFieldRow5.left = new FormAttachment(40, 12);
-		comboSourceFieldRow5.setLayoutData(fd_comboSourceFieldRow5);
-		
-		Combo comboDatatypeRow5 = new Combo(compositeRow5, SWT.NONE);
-		FormData fd_comboDatatypeRow5 = new FormData();
-		fd_comboDatatypeRow5.left = new FormAttachment(70, 12);
-		comboDatatypeRow5.setLayoutData(fd_comboDatatypeRow5);
-		
-		compositeRow5.setLayoutData(fd_compositeRow5);
-		
-		/*
-		 * Row 6
-		 */
-		Composite compositeRow6 = new Composite(this, SWT.BORDER);
-		compositeRow6.setBackground(SWTResourceManager.getColor(245, 245, 245));
-		compositeRow6.setLayout(new FormLayout());
-		FormData fd_compositeRow6 = new FormData();
-		fd_compositeRow6.right = new FormAttachment(compositeGridHeader, 0, SWT.RIGHT);
-		fd_compositeRow6.bottom = new FormAttachment(compositeRow5, 26, SWT.BOTTOM);
-		fd_compositeRow6.top = new FormAttachment(compositeRow5, 1);
-		fd_compositeRow6.left = new FormAttachment(compositeGridHeader, 0, SWT.LEFT);
-		
-		Label lblRqrdFieldNameRow6 = new Label(compositeRow6, SWT.NONE);
-		lblRqrdFieldNameRow6.setForeground(SWTResourceManager.getColor(0,191,255));
-		lblRqrdFieldNameRow6.setBackground(SWTResourceManager.getColor(245,245,245));
-		lblRqrdFieldNameRow6.setFont(SWTResourceManager.getFont("Arial", 9, SWT.BOLD));
-		FormData fd_lblRqrdFieldNameRow6 = new FormData();
-		fd_lblRqrdFieldNameRow6.top = new FormAttachment(0);
-		fd_lblRqrdFieldNameRow6.left = new FormAttachment(0, 10);
-		lblRqrdFieldNameRow6.setLayoutData(fd_lblRqrdFieldNameRow6);
-		lblRqrdFieldNameRow6.setText("tonnes_wt");
-		
-
-		Combo comboSourceFieldRow6 = new Combo(compositeRow6, SWT.NONE);
-		FormData fd_comboSourceFieldRow6 = new FormData();
-		fd_comboSourceFieldRow6.left = new FormAttachment(40, 12);
-		comboSourceFieldRow6.setLayoutData(fd_comboSourceFieldRow6);
-		
-		Combo comboDatatypeRow6 = new Combo(compositeRow6, SWT.NONE);
-		FormData fd_comboDatatypeRow6 = new FormData();
-		fd_comboDatatypeRow6.left = new FormAttachment(70, 12);
-		comboDatatypeRow6.setLayoutData(fd_comboDatatypeRow6);
-		
-		compositeRow6.setLayoutData(fd_compositeRow6);
+	}
+	private void createRows(){
+		Composite presentRow = this.compositeGridHeader;//referring to the header as the 1st row when there are no rows inserted yet
+		allRows = new ArrayList<Composite>();
+		for(String requiredFieldName : this.requiredFieldNames){
+			
+			Composite compositeRow = new Composite(this, SWT.BORDER);
+			compositeRow.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+			
+			compositeRow.setLayout(new FormLayout());
+			FormData fd_compositeRow = new FormData();
+			fd_compositeRow.bottom = new FormAttachment(presentRow, 25, SWT.BOTTOM);
+			fd_compositeRow.top = new FormAttachment(presentRow);
+			fd_compositeRow.right = new FormAttachment(presentRow, 0, SWT.RIGHT);
+			fd_compositeRow.left = new FormAttachment(presentRow, 0, SWT.LEFT);
+			
+			Label lblRqrdFieldName = new Label(compositeRow, SWT.NONE);
+			lblRqrdFieldName.setForeground(SWTResourceManager.getColor(0,191,255));
+			lblRqrdFieldName.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+			lblRqrdFieldName.setFont(SWTResourceManager.getFont("Arial", 9, SWT.BOLD));
+			FormData fd_lblRqrdFieldName = new FormData();
+			fd_lblRqrdFieldName.top = new FormAttachment(0);
+			fd_lblRqrdFieldName.left = new FormAttachment(0, 10);
+			lblRqrdFieldName.setLayoutData(fd_lblRqrdFieldName);
+			lblRqrdFieldName.setText(requiredFieldName);
+			
+			Combo comboSourceField = new Combo(compositeRow, SWT.NONE);
+			comboSourceField.setItems(this.sourceFieldsComboItems);
+			FormData fd_comboSourceField = new FormData();
+			fd_comboSourceField.left = new FormAttachment(40, 12);
+			comboSourceField.setLayoutData(fd_comboSourceField);
+			
+			Combo comboDatatype = new Combo(compositeRow, SWT.NONE);
+			comboDatatype.setItems(this.dataTypes);
+			FormData fd_comboDatatype = new FormData();
+			fd_comboDatatype.left = new FormAttachment(70, 12);
+			comboDatatype.setLayoutData(fd_comboDatatype);
+			
+			compositeRow.setLayoutData(fd_compositeRow);
+			allRows.add(compositeRow);
+			presentRow = compositeRow;
+		}
+	}
+	
+	private void createContent(Composite parent){
+		this.setLayout(new FormLayout());
+		this.createSourceFieldsComboItems();
+		this.createHeader();
+		this.createRows();
 	}
 
 	@Override

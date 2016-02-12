@@ -13,7 +13,6 @@ import com.org.gnos.custom.controls.GnosScreen;
 import com.org.gnos.custom.controls.MapRequiredFieldsGrid;
 import com.org.gnos.custom.models.ProjectMetaDataModel;
 import com.org.gnos.events.GnosEvent;
-import com.org.gnos.events.interfaces.GnosEventListener;
 import com.org.gnos.services.CSVProcessor;
 import com.org.gnos.services.ColumnHeader;
 
@@ -23,19 +22,12 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.widgets.ToolBar;
-import org.eclipse.swt.widgets.Combo;
 
 public class MapRequiredFieldsScreen_V2 extends GnosScreen {
 
 	private List<ColumnHeader> allHeaders;
 	private String[] requiredFields;
+	private String[] dataTypes;
 	private ProjectMetaDataModel projectMetaData;
 	private CSVProcessor csvProcessor;
 	/**
@@ -52,6 +44,7 @@ public class MapRequiredFieldsScreen_V2 extends GnosScreen {
 		this.allHeaders = this.getAllHeaders();
 		System.out.println("Length of all columns: " + this.allHeaders.size());
 		this.requiredFields = this.getRequiredFieldsFromProperties();
+		this.dataTypes = new String[]{"String", "Integer", "Double"};
 		System.out.println("Length of required columns: " + this.requiredFields.length);
 		this.createContent();
 	}
@@ -116,7 +109,7 @@ public class MapRequiredFieldsScreen_V2 extends GnosScreen {
 		labelScreenDescription.setLayoutData(fd_labelScreenDescription);
 		labelScreenDescription.setText("For each required field in the system map your custom field and also specify its datatype.");
 		
-		MapRequiredFieldsGrid mapRequiredFieldsGrid = new MapRequiredFieldsGrid(this, SWT.NONE);
+		MapRequiredFieldsGrid mapRequiredFieldsGrid = new MapRequiredFieldsGrid(this, SWT.NONE, this.requiredFields, this.allHeaders, this.dataTypes);
 		FormData fd_mapRequiredFieldsGrid = new FormData();
 		fd_mapRequiredFieldsGrid.top = new FormAttachment(labelScreenDescription, 6);
 		fd_mapRequiredFieldsGrid.left = new FormAttachment(0, 10);
