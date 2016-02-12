@@ -33,7 +33,7 @@ public class MainConfigurationViewPort extends GnosScreen {
 
 	private void loadMapRequiredFieldsScreen(){
 		this.setLayout(new FillLayout());
-		this.viewPort = new MapRequiredFieldsScreen_V2(this, SWT.NONE, this.projectMetaData);
+		this.viewPort = new MapRequiredFieldsScreen(this, SWT.NONE, this.projectMetaData);
 		this.viewPort.registerEventListener(this);
 	}
 
