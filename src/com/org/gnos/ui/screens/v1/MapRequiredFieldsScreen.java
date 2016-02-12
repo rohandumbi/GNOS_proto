@@ -122,6 +122,7 @@ public class MapRequiredFieldsScreen extends GnosScreen {
 	
 	private void updateHeadersWithRequiredFieldsMapping(){
 		this.allHeaders = mapRequiredFieldsGrid.getMappedSourceFields();
+		//System.out.println(this.allHeaders.get(2).getName() + "..." +this.allHeaders.get(2).getRequiredFieldName() + "..." +this.allHeaders.get(2).getDataType());
 	}
 
 	@Override

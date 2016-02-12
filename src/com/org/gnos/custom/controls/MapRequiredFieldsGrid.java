@@ -28,13 +28,25 @@ public class MapRequiredFieldsGrid extends Composite {
 	private Composite compositeGridHeader;
 	private List<Composite> allRows;
 	private String[] sourceFieldsComboItems;
-
+	
 	public MapRequiredFieldsGrid(Composite parent, int style, String[] requiredFieldNames, List<ColumnHeader> allSourceFields, String[] dataTypes) {
 		super(parent, style);
 		this.requiredFieldNames = requiredFieldNames;
 		this.allSourceFields = allSourceFields;
 		this.dataTypes = dataTypes;
 		this.createContent(parent);
+	}
+	
+	private int getDatatypeCode(String dataType){
+		if(dataType.equalsIgnoreCase("String")){
+			return 1;
+		}else if(dataType.equalsIgnoreCase("Integer")){
+			return 2;
+		}else if(dataType.equalsIgnoreCase("Double")){
+			return 3;
+		}else{
+			return 0;
+		}
 	}
 	private void createSourceFieldsComboItems(){
 		int i = 0;
@@ -170,10 +182,21 @@ public class MapRequiredFieldsGrid extends Composite {
 				Combo comboDatatype = (Combo)compositeDatatype;
 				datatypeName = comboDatatype.getText();
 			}
-			System.out.println("ROW" + i +" data: " + requiredFieldName + "====" + sourceFieldName + "====" + datatypeName);
+			//System.out.println("ROW" + i +" data: " + requiredFieldName + "====" + sourceFieldName + "====" + datatypeName);
+			this.upDateSourceFieldHeader(sourceFieldName, requiredFieldName, datatypeName);
 		}
 
-		return null;
+		return this.allSourceFields;
+	}
+	
+	private void upDateSourceFieldHeader(String sourceFieldName, String requiredFieldName, String datatypeName){
+		for( ColumnHeader sourceField : this.allSourceFields){
+			if(sourceField.getName().equals(sourceFieldName)){
+				sourceField.setRequiredFieldName(requiredFieldName);
+				sourceField.setRequired(true);
+				sourceField.setDataType(this.getDatatypeCode(datatypeName));
+			}
+		}
 	}
 
 	@Override
