@@ -15,7 +15,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.services.csv.ColumnHeader;
 
-public class MapRequiredFieldsGrid extends Composite {
+public class ExpressionBuilderGrid extends Composite {
 
 	/**
 	 * Create the composite.
@@ -29,11 +29,11 @@ public class MapRequiredFieldsGrid extends Composite {
 	private List<Composite> allRows;
 	private String[] sourceFieldsComboItems;
 	
-	public MapRequiredFieldsGrid(Composite parent, int style, String[] requiredFieldNames, List<ColumnHeader> allSourceFields, String[] dataTypes) {
+	public ExpressionBuilderGrid(Composite parent, int style, List<ColumnHeader> allSourceFields) {
 		super(parent, style);
-		this.requiredFieldNames = requiredFieldNames;
+		//this.requiredFieldNames = requiredFieldNames;
 		this.allSourceFields = allSourceFields;
-		this.dataTypes = dataTypes;
+		//this.dataTypes = dataTypes;
 		this.createContent(parent);
 	}
 	
@@ -70,55 +70,65 @@ public class MapRequiredFieldsGrid extends Composite {
 		fd_compositeGridHeader.right = new FormAttachment(100);
 		compositeGridHeader.setLayoutData(fd_compositeGridHeader);
 
-		Label label = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
-		FormData fd_label = new FormData();
-		fd_label.left = new FormAttachment(40);
-		label.setLayoutData(fd_label);
+		Label firstSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
+		FormData fd_firstSeparator = new FormData();
+		fd_firstSeparator.left = new FormAttachment(5);
+		firstSeparator.setLayoutData(fd_firstSeparator);
+		
+		Label secondSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
+		FormData fd_secondSeparator = new FormData();
+		fd_secondSeparator.left = new FormAttachment(40);
+		secondSeparator.setLayoutData(fd_secondSeparator);
 
-		Label label_1 = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
-		FormData fd_label_1 = new FormData();
-		fd_label_1.left = new FormAttachment(70);
-		label_1.setLayoutData(fd_label_1);
+		Label thirdSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
+		FormData fd_thirdSeparator = new FormData();
+		fd_thirdSeparator.left = new FormAttachment(70);
+		thirdSeparator.setLayoutData(fd_thirdSeparator);
+		
+		Label lblGradeHeader = new Label(compositeGridHeader, SWT.NONE);
+		lblGradeHeader.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
+		FormData fd_lblGradeHeader = new FormData();
+		fd_lblGradeHeader.top = new FormAttachment(0,2);
+		fd_lblGradeHeader.left = new FormAttachment(0);
+		lblGradeHeader.setLayoutData(fd_lblGradeHeader);
+		lblGradeHeader.setText("GRADE");
+		lblGradeHeader.setBackground(SWTResourceManager.getColor(230, 230, 230));
 
-		Label lblRqrdFieldHeader = new Label(compositeGridHeader, SWT.NONE);
-		lblRqrdFieldHeader.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
-		FormData fd_lblRqrdFieldHeader = new FormData();
-		fd_lblRqrdFieldHeader.top = new FormAttachment(0,2);
-		fd_lblRqrdFieldHeader.left = new FormAttachment(0, 10);
-		lblRqrdFieldHeader.setLayoutData(fd_lblRqrdFieldHeader);
-		lblRqrdFieldHeader.setText("REQUIRED FIELD");
-		lblRqrdFieldHeader.setBackground(SWTResourceManager.getColor(230, 230, 230));
+		Label lblExpressionNameHeader = new Label(compositeGridHeader, SWT.NONE);
+		lblExpressionNameHeader.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
+		FormData fd_lblExpressionNameHeader = new FormData();
+		fd_lblExpressionNameHeader.top = new FormAttachment(0,2);
+		fd_lblExpressionNameHeader.left = new FormAttachment(firstSeparator, 10);
+		lblExpressionNameHeader.setLayoutData(fd_lblExpressionNameHeader);
+		lblExpressionNameHeader.setText("EXPRESSION NAME");
+		lblExpressionNameHeader.setBackground(SWTResourceManager.getColor(230, 230, 230));
 
-		Label lblSourceFieldHeader = new Label(compositeGridHeader, SWT.NONE);
-		lblSourceFieldHeader.setBackground(SWTResourceManager.getColor(230, 230, 230));
-		lblSourceFieldHeader.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
-		FormData fd_lblSourceFieldHeader = new FormData();
-		fd_lblSourceFieldHeader.top = new FormAttachment(0, 2);
-		fd_lblSourceFieldHeader.left = new FormAttachment(label, 10);
-		lblSourceFieldHeader.setLayoutData(fd_lblSourceFieldHeader);
-		lblSourceFieldHeader.setText("SOURCE FIELD");
+		Label lblExpressionDefinitionHeader = new Label(compositeGridHeader, SWT.NONE);
+		lblExpressionDefinitionHeader.setBackground(SWTResourceManager.getColor(230, 230, 230));
+		lblExpressionDefinitionHeader.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
+		FormData fd_lblExpressionDefinitionHeader = new FormData();
+		fd_lblExpressionDefinitionHeader.top = new FormAttachment(0, 2);
+		fd_lblExpressionDefinitionHeader.left = new FormAttachment(secondSeparator, 10);
+		lblExpressionDefinitionHeader.setLayoutData(fd_lblExpressionDefinitionHeader);
+		lblExpressionDefinitionHeader.setText("EXPRESSION DEFINITION");
 
-		Label lblDatatypeHeader = new Label(compositeGridHeader, SWT.NONE);
-		lblDatatypeHeader.setBackground(SWTResourceManager.getColor(230, 230, 230));
-		lblDatatypeHeader.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
-		FormData fd_lblDatatypeHeader = new FormData();
-		fd_lblDatatypeHeader.top = new FormAttachment(0,2);
-		fd_lblDatatypeHeader.left = new FormAttachment(label_1, 10);
-		lblDatatypeHeader.setLayoutData(fd_lblDatatypeHeader);
-		lblDatatypeHeader.setText("DATATYPE");
+		Label lblFiltersHeader = new Label(compositeGridHeader, SWT.NONE);
+		lblFiltersHeader.setBackground(SWTResourceManager.getColor(230, 230, 230));
+		lblFiltersHeader.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
+		FormData fd_lblFiltersHeader = new FormData();
+		fd_lblFiltersHeader.top = new FormAttachment(0,2);
+		fd_lblFiltersHeader.left = new FormAttachment(thirdSeparator, 10);
+		lblFiltersHeader.setLayoutData(fd_lblFiltersHeader);
+		lblFiltersHeader.setText("FILTERS");
+		
 	}
 	private void createRows(){
 		Composite presentRow = this.compositeGridHeader;//referring to the header as the 1st row when there are no rows inserted yet
 		allRows = new ArrayList<Composite>();
-		int i=0;
 		for(String requiredFieldName : this.requiredFieldNames){
-			
+
 			Composite compositeRow = new Composite(this, SWT.BORDER);
-			if(i%2 == 0){
-				compositeRow.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-			}else{
-				compositeRow.setBackground(SWTResourceManager.getColor(245, 245, 245));
-			}
+			compositeRow.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 
 			compositeRow.setLayout(new FormLayout());
 			FormData fd_compositeRow = new FormData();
@@ -152,7 +162,6 @@ public class MapRequiredFieldsGrid extends Composite {
 			compositeRow.setLayoutData(fd_compositeRow);
 			allRows.add(compositeRow);
 			presentRow = compositeRow;
-			i++;
 		}
 	}
 
@@ -160,7 +169,7 @@ public class MapRequiredFieldsGrid extends Composite {
 		this.setLayout(new FormLayout());
 		this.createSourceFieldsComboItems();
 		this.createHeader();
-		this.createRows();
+		//this.createRows();
 	}
 
 	public List<ColumnHeader> getMappedSourceFields(){
@@ -209,5 +218,4 @@ public class MapRequiredFieldsGrid extends Composite {
 	protected void checkSubclass() {
 		// Disable the check that prevents subclassing of SWT components
 	}
-
 }

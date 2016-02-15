@@ -40,7 +40,7 @@ public class MainConfigurationViewPort extends GnosScreen {
 	private void loadExpressionDefinitionScreen(){
 		this.viewPort.dispose();
 		this.setLayout(new FillLayout());
-		this.viewPort = new ExpressionDefinitionScreen(this, SWT.NONE);
+		this.viewPort = new ExpressionDefinitionScreen(this, SWT.NONE, this.projectMetaData);
 		this.viewPort.registerEventListener(this);
 		this.layout();
 	}
