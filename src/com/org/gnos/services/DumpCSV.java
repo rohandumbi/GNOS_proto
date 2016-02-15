@@ -8,9 +8,11 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Date;
+import java.util.List;
 
 import com.org.gnos.application.GNOSConfig;
 import com.org.gnos.db.DBManager;
+import com.org.gnos.services.csv.ColumnHeader;
 import com.org.gnos.services.csv.GNOSDataProcessor;
 
 public class DumpCSV {
@@ -139,6 +141,10 @@ public class DumpCSV {
 		GNOSDataProcessor processor = new GNOSDataProcessor("C:\\Arpan\\Workspace\\personal\\workspace\\GNOS_proto\\data\\GNOS_Test_data.csv");
 		try {
 			processor.doInBackground();
+			List<ColumnHeader> headers = processor.getHeaderColumns();
+			for(int i= 0; i < headers.size(); i++){
+				System.out.println("Name :"+headers.get(i).getName());
+			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -78,7 +78,8 @@ public class GNOSDataProcessor extends SwingWorker<Void, Void>{
 		String[] row = reader.readLine();;
 		while (row != null) {
 			if(reader.getCurrentRowCount() == 1) {
-				processHeaderRow(row);				
+				processHeaderRow(row);
+				break;
 			} else {
 				processRecord(row);
 			}

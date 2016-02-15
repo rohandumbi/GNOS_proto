@@ -57,11 +57,12 @@ public class MapRequiredFieldsScreen extends GnosScreen {
 	private List<ColumnHeader> getAllHeaders(){
 		try {
 			csvProcessor = new GNOSDataProcessor(this.projectMetaData.get("recordFileName"));
+			csvProcessor.doInBackground();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		csvProcessor.execute();
+		
 		return csvProcessor.getHeaderColumns();
 	}
 	
