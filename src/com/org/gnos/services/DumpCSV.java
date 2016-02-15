@@ -11,6 +11,7 @@ import java.util.Date;
 
 import com.org.gnos.application.GNOSConfig;
 import com.org.gnos.db.DBManager;
+import com.org.gnos.services.csv.GNOSDataProcessor;
 
 public class DumpCSV {
 	
@@ -135,8 +136,13 @@ public class DumpCSV {
 	public static void main(String[] args) {
 		GNOSConfig.load();
 		
-		DumpCSV dumper = new DumpCSV();
-		dumper.dump("C:\\Arpan\\Workspace\\personal\\workspace\\GNOS_proto\\data\\GNOS_Test_data.csv");
+		GNOSDataProcessor processor = new GNOSDataProcessor("C:\\Arpan\\Workspace\\personal\\workspace\\GNOS_proto\\data\\GNOS_Test_data.csv");
+		try {
+			processor.doInBackground();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	
 	}
 }

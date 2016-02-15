@@ -13,7 +13,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import com.org.gnos.services.ColumnHeader;
+import com.org.gnos.services.csv.ColumnHeader;
 
 public class MapRequiredFieldsGrid extends Composite {
 

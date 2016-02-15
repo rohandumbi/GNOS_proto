@@ -3,9 +3,15 @@ package com.org.gnos.ui.screens.v1;
 import java.io.IOException;
 import java.util.List;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.SWT;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.application.GNOSConfig;
@@ -13,15 +19,8 @@ import com.org.gnos.custom.controls.GnosScreen;
 import com.org.gnos.custom.controls.MapRequiredFieldsGrid;
 import com.org.gnos.custom.models.ProjectMetaDataModel;
 import com.org.gnos.events.GnosEvent;
-import com.org.gnos.services.CSVProcessor;
-import com.org.gnos.services.ColumnHeader;
-
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.FormLayout;
-import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.FormAttachment;
+import com.org.gnos.services.csv.ColumnHeader;
+import com.org.gnos.services.csv.GNOSDataProcessor;
 
 public class MapRequiredFieldsScreen extends GnosScreen {
 
@@ -29,7 +28,7 @@ public class MapRequiredFieldsScreen extends GnosScreen {
 	private String[] requiredFields;
 	private String[] dataTypes;
 	private ProjectMetaDataModel projectMetaData;
-	private CSVProcessor csvProcessor;
+	private GNOSDataProcessor csvProcessor;
 	private MapRequiredFieldsGrid mapRequiredFieldsGrid;
 	/**
 	 * Create the composite.
@@ -57,18 +56,13 @@ public class MapRequiredFieldsScreen extends GnosScreen {
 	
 	private List<ColumnHeader> getAllHeaders(){
 		try {
-			csvProcessor = new CSVProcessor(this.projectMetaData.get("recordFileName"));
+			csvProcessor = new GNOSDataProcessor(this.projectMetaData.get("recordFileName"));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		try {
-			return csvProcessor.getHeaderColumns();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
+		csvProcessor.execute();
+		return csvProcessor.getHeaderColumns();
 	}
 	
 	private void createContent(){
