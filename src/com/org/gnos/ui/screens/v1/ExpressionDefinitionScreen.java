@@ -94,6 +94,21 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 		fd_buttonExpressionDefinition.left = new FormAttachment(50, offsetX);
 		//fd_buttonMapRqrdFields.right = new FormAttachment(0, 282);
 		buttonExpressionDefinition.setLayoutData(fd_buttonExpressionDefinition);
+		
+		Button btnAddNewRow = new Button(this, SWT.NONE);
+		final Composite me = this;
+		btnAddNewRow.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				expressionBuilderGrid.addRow();
+				me.layout();
+			}
+		});
+		FormData fd_btnAddNewRow = new FormData();
+		fd_btnAddNewRow.top = new FormAttachment(buttonExpressionDefinition, 0, SWT.TOP);
+		fd_btnAddNewRow.left = new FormAttachment(buttonExpressionDefinition, 6);
+		btnAddNewRow.setLayoutData(fd_btnAddNewRow);
+		btnAddNewRow.setText("ADD NEW ROW");
 		buttonExpressionDefinition.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {

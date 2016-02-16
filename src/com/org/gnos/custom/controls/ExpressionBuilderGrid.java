@@ -15,6 +15,12 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.services.csv.ColumnHeader;
 
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.ui.internal.layout.LayoutUtil;
+
 public class ExpressionBuilderGrid extends Composite {
 
 	/**
@@ -28,6 +34,8 @@ public class ExpressionBuilderGrid extends Composite {
 	private Composite compositeGridHeader;
 	private List<Composite> allRows;
 	private String[] sourceFieldsComboItems;
+	private Composite presentRow;
+	private Text expressionName;
 	
 	public ExpressionBuilderGrid(Composite parent, int style, List<ColumnHeader> allSourceFields) {
 		super(parent, style);
@@ -120,9 +128,53 @@ public class ExpressionBuilderGrid extends Composite {
 		fd_lblFiltersHeader.left = new FormAttachment(thirdSeparator, 10);
 		lblFiltersHeader.setLayoutData(fd_lblFiltersHeader);
 		lblFiltersHeader.setText("FILTERS");
+		this.presentRow = this.compositeGridHeader;//referring to the header as the 1st row when there are no rows inserted yet
+		
+		//this.addRow();
+	}
+	
+	public void addRow(){
+		Composite compositeRow = new Composite(this, SWT.BORDER);
+		compositeRow.setLayout(new FormLayout());
+		compositeRow.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		FormData fd_compositeRow = new FormData();
+		fd_compositeRow.left = new FormAttachment(this.presentRow, 0, SWT.LEFT);
+		fd_compositeRow.bottom = new FormAttachment(this.presentRow, 26, SWT.BOTTOM);
+		fd_compositeRow.right = new FormAttachment(this.presentRow, 0, SWT.RIGHT);
+		fd_compositeRow.top = new FormAttachment(this.presentRow);
+		compositeRow.setLayoutData(fd_compositeRow);
+		
+		Button grade = new Button(compositeRow, SWT.CHECK);
+		FormData fd_grade = new FormData();
+		fd_grade.left = new FormAttachment(0, 10);
+		grade.setLayoutData(fd_grade);
+		
+		expressionName = new Text(compositeRow, SWT.BORDER);
+		fd_grade.top = new FormAttachment(expressionName, 2, SWT.TOP);
+		FormData fd_expressionName = new FormData();
+		fd_expressionName.left = new FormAttachment(5, 2);
+		fd_expressionName.top = new FormAttachment(0);
+		fd_expressionName.right = new FormAttachment(40, -2);
+		expressionName.setLayoutData(fd_expressionName);
+		//expressionName.setBounds(50, 0, 235, 21);
+		
+		Combo comboExpressionDefinition = new Combo(compositeRow, SWT.NONE);
+		fd_expressionName.right = new FormAttachment(100, -451);
+		FormData fd_comboExpressionDefinition = new FormData();
+		fd_comboExpressionDefinition.right = new FormAttachment(70, -2);
+		fd_comboExpressionDefinition.left = new FormAttachment(40, 2);
+		comboExpressionDefinition.setLayoutData(fd_comboExpressionDefinition);
+		comboExpressionDefinition.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
+		//comboExpressionDefinition.setBounds(305, 0, 185, 23);
+		comboExpressionDefinition.setItems(this.sourceFieldsComboItems);
+		
+		this.presentRow = compositeRow;
+		//this.layout();
+		
+		//this.allRows.add(compositeRow);
 		
 	}
-	private void createRows(){
+	/*private void createRows(){
 		Composite presentRow = this.compositeGridHeader;//referring to the header as the 1st row when there are no rows inserted yet
 		allRows = new ArrayList<Composite>();
 		for(String requiredFieldName : this.requiredFieldNames){
@@ -163,12 +215,13 @@ public class ExpressionBuilderGrid extends Composite {
 			allRows.add(compositeRow);
 			presentRow = compositeRow;
 		}
-	}
+	}*/
 
 	private void createContent(Composite parent){
 		this.setLayout(new FormLayout());
 		this.createSourceFieldsComboItems();
 		this.createHeader();
+		
 		//this.createRows();
 	}
 

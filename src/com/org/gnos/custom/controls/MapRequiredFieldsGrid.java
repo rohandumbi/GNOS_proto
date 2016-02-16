@@ -114,11 +114,7 @@ public class MapRequiredFieldsGrid extends Composite {
 		for(String requiredFieldName : this.requiredFieldNames){
 			
 			Composite compositeRow = new Composite(this, SWT.BORDER);
-			if(i%2 == 0){
-				compositeRow.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-			}else{
-				compositeRow.setBackground(SWTResourceManager.getColor(245, 245, 245));
-			}
+			
 
 			compositeRow.setLayout(new FormLayout());
 			FormData fd_compositeRow = new FormData();
@@ -129,7 +125,7 @@ public class MapRequiredFieldsGrid extends Composite {
 
 			Label lblRqrdFieldName = new Label(compositeRow, SWT.NONE);
 			lblRqrdFieldName.setForeground(SWTResourceManager.getColor(0,191,255));
-			lblRqrdFieldName.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+			//lblRqrdFieldName.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 			lblRqrdFieldName.setFont(SWTResourceManager.getFont("Arial", 9, SWT.BOLD));
 			FormData fd_lblRqrdFieldName = new FormData();
 			fd_lblRqrdFieldName.top = new FormAttachment(0);
@@ -148,6 +144,14 @@ public class MapRequiredFieldsGrid extends Composite {
 			FormData fd_comboDatatype = new FormData();
 			fd_comboDatatype.left = new FormAttachment(70, 12);
 			comboDatatype.setLayoutData(fd_comboDatatype);
+			
+			if(i%2 == 0){
+				compositeRow.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				lblRqrdFieldName.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+			}else{
+				compositeRow.setBackground(SWTResourceManager.getColor(245, 245, 245));
+				lblRqrdFieldName.setBackground(SWTResourceManager.getColor(245, 245, 245));
+			}
 
 			compositeRow.setLayoutData(fd_compositeRow);
 			allRows.add(compositeRow);
