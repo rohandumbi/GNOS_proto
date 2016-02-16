@@ -68,7 +68,6 @@ public class ExpressionBuilderGrid extends Composite {
 
 	private void createHeader(){
 		compositeGridHeader = new Composite(this, SWT.BORDER);
-		//compositeGridHeader.setBounds(0, 0, 749, 37);
 		compositeGridHeader.setBackground(SWTResourceManager.getColor(230, 230, 230));
 		compositeGridHeader.setLayout(new FormLayout());
 		FormData fd_compositeGridHeader = new FormData();
@@ -129,8 +128,6 @@ public class ExpressionBuilderGrid extends Composite {
 		lblFiltersHeader.setLayoutData(fd_lblFiltersHeader);
 		lblFiltersHeader.setText("FILTERS");
 		this.presentRow = this.compositeGridHeader;//referring to the header as the 1st row when there are no rows inserted yet
-		
-		//this.addRow();
 	}
 	
 	public void addRow(){
@@ -166,60 +163,13 @@ public class ExpressionBuilderGrid extends Composite {
 		
 		this.presentRow = compositeRow;
 		compositeRow.setLayoutData(fd_compositeRow);
-		//this.layout();
-		
-		//this.allRows.add(compositeRow);
-		
 	}
-	/*private void createRows(){
-		Composite presentRow = this.compositeGridHeader;//referring to the header as the 1st row when there are no rows inserted yet
-		allRows = new ArrayList<Composite>();
-		for(String requiredFieldName : this.requiredFieldNames){
-
-			Composite compositeRow = new Composite(this, SWT.BORDER);
-			compositeRow.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-
-			compositeRow.setLayout(new FormLayout());
-			FormData fd_compositeRow = new FormData();
-			fd_compositeRow.bottom = new FormAttachment(presentRow, 25, SWT.BOTTOM);
-			fd_compositeRow.top = new FormAttachment(presentRow);
-			fd_compositeRow.right = new FormAttachment(presentRow, 0, SWT.RIGHT);
-			fd_compositeRow.left = new FormAttachment(presentRow, 0, SWT.LEFT);
-
-			Label lblRqrdFieldName = new Label(compositeRow, SWT.NONE);
-			lblRqrdFieldName.setForeground(SWTResourceManager.getColor(0,191,255));
-			lblRqrdFieldName.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-			lblRqrdFieldName.setFont(SWTResourceManager.getFont("Arial", 9, SWT.BOLD));
-			FormData fd_lblRqrdFieldName = new FormData();
-			fd_lblRqrdFieldName.top = new FormAttachment(0);
-			fd_lblRqrdFieldName.left = new FormAttachment(0, 10);
-			lblRqrdFieldName.setLayoutData(fd_lblRqrdFieldName);
-			lblRqrdFieldName.setText(requiredFieldName);
-
-			Combo comboSourceField = new Combo(compositeRow, SWT.NONE);
-			comboSourceField.setItems(this.sourceFieldsComboItems);
-			FormData fd_comboSourceField = new FormData();
-			fd_comboSourceField.left = new FormAttachment(40, 12);
-			comboSourceField.setLayoutData(fd_comboSourceField);
-
-			Combo comboDatatype = new Combo(compositeRow, SWT.NONE);
-			comboDatatype.setItems(this.dataTypes);
-			FormData fd_comboDatatype = new FormData();
-			fd_comboDatatype.left = new FormAttachment(70, 12);
-			comboDatatype.setLayoutData(fd_comboDatatype);
-
-			compositeRow.setLayoutData(fd_compositeRow);
-			allRows.add(compositeRow);
-			presentRow = compositeRow;
-		}
-	}*/
 
 	private void createContent(Composite parent){
 		this.setLayout(new FormLayout());
 		this.createSourceFieldsComboItems();
 		this.createHeader();
 		
-		//this.createRows();
 	}
 
 	public List<ColumnHeader> getMappedSourceFields(){
@@ -247,7 +197,6 @@ public class ExpressionBuilderGrid extends Composite {
 				Combo comboDatatype = (Combo)compositeDatatype;
 				datatypeName = comboDatatype.getText();
 			}
-			//System.out.println("ROW" + i +" data: " + requiredFieldName + "====" + sourceFieldName + "====" + datatypeName);
 			this.upDateSourceFieldHeader(sourceFieldName, requiredFieldName, datatypeName);
 		}
 
