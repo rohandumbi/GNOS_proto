@@ -4,6 +4,8 @@ public class Expression {
 
 	int id;
 	String name;
+	String expressionValue;
+
 	boolean grade;
 	
 	public Expression(String name) {
@@ -15,6 +17,14 @@ public class Expression {
 		super();
 		this.id = id;
 		this.name = name;
+	}
+	
+	public String getExpressionValue() {
+		return expressionValue;
+	}
+
+	public void setExpressionValue(String expressionValue) {
+		this.expressionValue = expressionValue;
 	}
 
 	public int getId() {

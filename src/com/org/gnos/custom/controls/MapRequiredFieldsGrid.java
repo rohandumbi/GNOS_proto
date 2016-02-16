@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -114,9 +115,12 @@ public class MapRequiredFieldsGrid extends Composite {
 		for(String requiredFieldName : this.requiredFieldNames){
 			
 			Composite compositeRow = new Composite(this, SWT.BORDER);
-			
-
+			Color backgroundColor = SWTResourceManager.getColor(SWT.COLOR_WHITE);
+			if(i%2 != 0){
+				backgroundColor =  SWTResourceManager.getColor(245, 245, 245);
+			}
 			compositeRow.setLayout(new FormLayout());
+			compositeRow.setBackground(backgroundColor);
 			FormData fd_compositeRow = new FormData();
 			fd_compositeRow.bottom = new FormAttachment(presentRow, 25, SWT.BOTTOM);
 			fd_compositeRow.top = new FormAttachment(presentRow);
@@ -125,6 +129,7 @@ public class MapRequiredFieldsGrid extends Composite {
 
 			Label lblRqrdFieldName = new Label(compositeRow, SWT.NONE);
 			lblRqrdFieldName.setForeground(SWTResourceManager.getColor(0,191,255));
+			lblRqrdFieldName.setBackground(backgroundColor);
 			//lblRqrdFieldName.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 			lblRqrdFieldName.setFont(SWTResourceManager.getFont("Arial", 9, SWT.BOLD));
 			FormData fd_lblRqrdFieldName = new FormData();
@@ -145,13 +150,13 @@ public class MapRequiredFieldsGrid extends Composite {
 			fd_comboDatatype.left = new FormAttachment(70, 12);
 			comboDatatype.setLayoutData(fd_comboDatatype);
 			
-			if(i%2 == 0){
+			/*if(i%2 == 0){
 				compositeRow.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				lblRqrdFieldName.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 			}else{
 				compositeRow.setBackground(SWTResourceManager.getColor(245, 245, 245));
 				lblRqrdFieldName.setBackground(SWTResourceManager.getColor(245, 245, 245));
-			}
+			}*/
 
 			compositeRow.setLayoutData(fd_compositeRow);
 			allRows.add(compositeRow);

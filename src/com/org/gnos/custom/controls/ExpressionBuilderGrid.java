@@ -4,22 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import com.org.gnos.services.Expression;
 import com.org.gnos.services.csv.ColumnHeader;
-
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.ui.internal.layout.LayoutUtil;
 
 public class ExpressionBuilderGrid extends Composite {
 
@@ -36,11 +34,14 @@ public class ExpressionBuilderGrid extends Composite {
 	private String[] sourceFieldsComboItems;
 	private Composite presentRow;
 	private Text expressionName;
+	private List<Expression> expressionList;
 	
 	public ExpressionBuilderGrid(Composite parent, int style, List<ColumnHeader> allSourceFields) {
 		super(parent, style);
 		//this.requiredFieldNames = requiredFieldNames;
 		this.allSourceFields = allSourceFields;
+		this.allRows = new ArrayList<Composite>();
+		this.expressionList = new ArrayList<Expression>();
 		//this.dataTypes = dataTypes;
 		this.createContent(parent);
 	}
@@ -133,7 +134,12 @@ public class ExpressionBuilderGrid extends Composite {
 	public void addRow(){
 		Composite compositeRow = new Composite(this, SWT.BORDER);
 		compositeRow.setLayout(new FormLayout());
-		compositeRow.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		Color backgroundColor = SWTResourceManager.getColor(SWT.COLOR_WHITE);
+		if((this.allRows != null) && (this.allRows.size()%2 != 0)){
+			backgroundColor =  SWTResourceManager.getColor(245, 245, 245);
+		}
+		
+		compositeRow.setBackground(backgroundColor);
 		FormData fd_compositeRow = new FormData();
 		fd_compositeRow.left = new FormAttachment(this.presentRow, 0, SWT.LEFT);
 		fd_compositeRow.bottom = new FormAttachment(this.presentRow, 26, SWT.BOTTOM);
@@ -162,6 +168,7 @@ public class ExpressionBuilderGrid extends Composite {
 		comboExpressionDefinition.setLayoutData(fd_comboExpressionDefinition);
 		
 		this.presentRow = compositeRow;
+		this.allRows.add(compositeRow);
 		compositeRow.setLayoutData(fd_compositeRow);
 	}
 
@@ -170,6 +177,41 @@ public class ExpressionBuilderGrid extends Composite {
 		this.createSourceFieldsComboItems();
 		this.createHeader();
 		
+	}
+	
+	public List<Expression> getDefinedExpressions(){
+		Control[] rowChildren = null;
+		for(int i = 0; i < allRows.size(); i++){
+			rowChildren = allRows.get(i).getChildren();
+			boolean isGrade = false;
+			String expressionName = null;
+			String expressionValue = null;
+			
+			Control controlGrade = rowChildren[0];
+			Control controlExpressionName = rowChildren[1];
+			Control controlExpressionValue = rowChildren[2];
+			
+			if(controlGrade instanceof Button){
+				Button buttonControlGrade = (Button)controlGrade;
+				isGrade = buttonControlGrade.getSelection();
+			}
+			
+			if(controlExpressionName instanceof Text){
+				Text textControlExpressionName = (Text)controlExpressionName;
+				expressionName = textControlExpressionName.getText();
+			}
+			
+			if(controlExpressionValue instanceof Combo){
+				Combo comboControlExpressionValue = (Combo)controlExpressionValue;
+				expressionValue = comboControlExpressionValue.getText();
+			}
+			Expression expression = new Expression(expressionName);
+			expression.setExpressionValue(expressionValue);
+			expression.setGrade(isGrade);
+			
+			this.expressionList.add(expression);
+		}
+		return this.expressionList;
 	}
 
 	public List<ColumnHeader> getMappedSourceFields(){

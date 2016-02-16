@@ -2,26 +2,26 @@ package com.org.gnos.ui.screens.v1;
 
 import java.util.List;
 
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.SWT;
-import org.eclipse.wb.swt.SWTResourceManager;
-
-import com.org.gnos.custom.controls.ExpressionBuilderGrid;
-import com.org.gnos.custom.controls.GnosScreen;
-import com.org.gnos.custom.controls.MapRequiredFieldsGrid;
-import com.org.gnos.custom.models.ProjectMetaDataModel;
-import com.org.gnos.events.GnosEvent;
-import com.org.gnos.events.interfaces.GnosEventListener;
-import com.org.gnos.services.csv.ColumnHeader;
-import com.org.gnos.services.csv.GNOSDataProcessor;
-
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.wb.swt.SWTResourceManager;
+
+import com.org.gnos.application.GNOSConfig;
+import com.org.gnos.custom.controls.ExpressionBuilderGrid;
+import com.org.gnos.custom.controls.GnosScreen;
+import com.org.gnos.custom.models.ProjectMetaDataModel;
+import com.org.gnos.events.GnosEvent;
+import com.org.gnos.services.Expression;
+import com.org.gnos.services.Expressions;
+import com.org.gnos.services.csv.ColumnHeader;
+import com.org.gnos.services.csv.GNOSDataProcessor;
 
 public class ExpressionDefinitionScreen extends GnosScreen {
 
@@ -29,6 +29,7 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 	private List<ColumnHeader> allHeaders;
 	private GNOSDataProcessor csvProcessor;
 	private ProjectMetaDataModel projectMetaData;
+	private List<Expression> allDefinedExpressions;
 	/**
 	 * Create the composite.
 	 * @param parent
@@ -114,10 +115,24 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 			public void widgetSelected(SelectionEvent e) {
 				//TODO mapping complete
 				//updateHeadersWithRequiredFieldsMapping();
+				updateExpressionList();
 				GnosEvent event = new GnosEvent(this, "complete:expression-defintion");
 				triggerGnosEvent(event);
 			}
 		});
+	}
+	
+	private void updateExpressionList(){
+		Expressions expressions = new Expressions();
+		this.allDefinedExpressions = expressionBuilderGrid.getDefinedExpressions();
+		for(Expression expression: this.allDefinedExpressions){
+			//Expressions expressions = new Expressions();
+			expressions.add(expression);
+		}
+		/*Expressions expressions = new Expressions();
+		Expression expression = new Expression("Rohan");
+		expression.setGrade(true);
+		expressions.add(expression);*/
 	}
 
 	@Override

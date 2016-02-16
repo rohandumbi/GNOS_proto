@@ -11,7 +11,7 @@ import java.util.List;
 import com.org.gnos.application.GNOSConfig;
 import com.org.gnos.db.DBManager;
 
-public class Expresssions {
+public class Expressions {
 
 	private List<Expression> expressions = new ArrayList<Expression>();
 	
@@ -126,7 +126,7 @@ public class Expresssions {
     
     public static void main(String[] args) {
     	GNOSConfig.load();
-    	Expresssions ex = new Expresssions();
+    	Expressions ex = new Expressions();
     	List<Expression> exp = ex.getAll();
     	Expression expr = new Expression("test3");
     	expr.setGrade(true);
