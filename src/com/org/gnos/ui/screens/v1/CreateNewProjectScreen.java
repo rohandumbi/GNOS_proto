@@ -36,6 +36,7 @@ public class CreateNewProjectScreen extends Composite implements GnosEventGenera
 	 */
 	public CreateNewProjectScreen(final Composite parent, int style) {
 		super(parent, style);
+		setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_BACKGROUND_GRADIENT));
 		setFont(SWTResourceManager.getFont("Arial", 12, SWT.NORMAL));
 		setLayout(new FormLayout());
 
