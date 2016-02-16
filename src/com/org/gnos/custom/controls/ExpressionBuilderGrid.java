@@ -142,7 +142,6 @@ public class ExpressionBuilderGrid extends Composite {
 		fd_compositeRow.bottom = new FormAttachment(this.presentRow, 26, SWT.BOTTOM);
 		fd_compositeRow.right = new FormAttachment(this.presentRow, 0, SWT.RIGHT);
 		fd_compositeRow.top = new FormAttachment(this.presentRow);
-		compositeRow.setLayoutData(fd_compositeRow);
 		
 		Button grade = new Button(compositeRow, SWT.CHECK);
 		FormData fd_grade = new FormData();
@@ -152,23 +151,21 @@ public class ExpressionBuilderGrid extends Composite {
 		expressionName = new Text(compositeRow, SWT.BORDER);
 		fd_grade.top = new FormAttachment(expressionName, 2, SWT.TOP);
 		FormData fd_expressionName = new FormData();
-		fd_expressionName.left = new FormAttachment(5, 2);
+		fd_expressionName.left = new FormAttachment(5, 5);
 		fd_expressionName.top = new FormAttachment(0);
-		fd_expressionName.right = new FormAttachment(40, -2);
+		fd_expressionName.right = new FormAttachment(40, -5);
 		expressionName.setLayoutData(fd_expressionName);
-		//expressionName.setBounds(50, 0, 235, 21);
 		
 		Combo comboExpressionDefinition = new Combo(compositeRow, SWT.NONE);
-		fd_expressionName.right = new FormAttachment(100, -451);
 		FormData fd_comboExpressionDefinition = new FormData();
-		fd_comboExpressionDefinition.right = new FormAttachment(70, -2);
-		fd_comboExpressionDefinition.left = new FormAttachment(40, 2);
-		comboExpressionDefinition.setLayoutData(fd_comboExpressionDefinition);
+		fd_comboExpressionDefinition.right = new FormAttachment(70, -5);
+		fd_comboExpressionDefinition.left = new FormAttachment(40, 5);
 		comboExpressionDefinition.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
-		//comboExpressionDefinition.setBounds(305, 0, 185, 23);
 		comboExpressionDefinition.setItems(this.sourceFieldsComboItems);
+		comboExpressionDefinition.setLayoutData(fd_comboExpressionDefinition);
 		
 		this.presentRow = compositeRow;
+		compositeRow.setLayoutData(fd_compositeRow);
 		//this.layout();
 		
 		//this.allRows.add(compositeRow);
