@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -35,6 +36,7 @@ public class ExpressionBuilderGrid extends Composite {
 	private Composite presentRow;
 	private Text expressionName;
 	private List<Expression> expressionList;
+	private String[] arithemeticOperatorsArray;
 	
 	public ExpressionBuilderGrid(Composite parent, int style, List<ColumnHeader> allSourceFields) {
 		super(parent, style);
@@ -43,6 +45,7 @@ public class ExpressionBuilderGrid extends Composite {
 		this.allRows = new ArrayList<Composite>();
 		this.expressionList = new ArrayList<Expression>();
 		//this.dataTypes = dataTypes;
+		this.arithemeticOperatorsArray = new String[]{"+", "-", "*", "/"};
 		this.createContent(parent);
 	}
 	
@@ -159,13 +162,34 @@ public class ExpressionBuilderGrid extends Composite {
 		fd_expressionName.right = new FormAttachment(40, -5);
 		expressionName.setLayoutData(fd_expressionName);
 		
-		Combo comboExpressionDefinition = new Combo(compositeRow, SWT.NONE);
+		/*Combo comboExpressionDefinition = new Combo(compositeRow, SWT.NONE);
 		FormData fd_comboExpressionDefinition = new FormData();
 		fd_comboExpressionDefinition.right = new FormAttachment(70, -5);
 		fd_comboExpressionDefinition.left = new FormAttachment(40, 5);
 		comboExpressionDefinition.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
 		comboExpressionDefinition.setItems(this.sourceFieldsComboItems);
-		comboExpressionDefinition.setLayoutData(fd_comboExpressionDefinition);
+		comboExpressionDefinition.setLayoutData(fd_comboExpressionDefinition);*/
+		
+		Composite expressionComposite = new Composite(compositeRow, SWT.NONE);
+		expressionComposite.setLayout(new FillLayout(SWT.HORIZONTAL));
+		expressionComposite.setBackground(backgroundColor);
+		FormData fd_expressionComposite = new FormData();
+		fd_expressionComposite.right = new FormAttachment(70, -5);
+		fd_expressionComposite.left = new FormAttachment(40, 5);
+		//fd_expressionComposite.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
+		//fd_expressionComposite.setItems(this.sourceFieldsComboItems);
+		//fd_expressionComposite.setLayoutData(fd_comboExpressionDefinition);
+		Combo comboLeftOperand = new Combo(expressionComposite, SWT.NONE);
+		comboLeftOperand.setItems(sourceFieldsComboItems);
+		
+		Combo comboOperator = new Combo(expressionComposite, SWT.NONE);
+		comboOperator.setItems(this.arithemeticOperatorsArray);
+		
+		Combo comboRightOperand = new Combo(expressionComposite, SWT.NONE);
+		comboRightOperand.setItems(sourceFieldsComboItems);
+		
+		expressionComposite.setLayoutData(fd_expressionComposite);
+
 		
 		this.presentRow = compositeRow;
 		this.allRows.add(compositeRow);
