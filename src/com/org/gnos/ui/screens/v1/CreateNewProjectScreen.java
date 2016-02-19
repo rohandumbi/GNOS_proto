@@ -20,7 +20,7 @@ import com.org.gnos.events.GnosEvent;
 import com.org.gnos.events.GnosEventWithAttributeMap;
 import com.org.gnos.events.interfaces.GnosEventGenerator;
 import com.org.gnos.events.interfaces.GnosEventListener;
-import com.org.gnos.services.DumpCSV;
+import com.org.gnos.services.csv.GNOSDataProcessor;
 
 public class CreateNewProjectScreen extends Composite implements GnosEventGenerator{
 	private Text textProjectName;
@@ -108,7 +108,7 @@ public class CreateNewProjectScreen extends Composite implements GnosEventGenera
 				
 				GnosEventWithAttributeMap event = new GnosEventWithAttributeMap(this, "createNewProjectScreen:upload-records-complete", attributes);
 				if(csvFileName != null){
-					uploadFileToDB(csvFileName);
+					//uploadFileToDB(csvFileName);
 				}
 				fireChildEvent(event);
 			}
@@ -142,8 +142,15 @@ public class CreateNewProjectScreen extends Composite implements GnosEventGenera
 	}
 	
 	protected void uploadFileToDB(String fileName){
-		DumpCSV dumpCSV = new DumpCSV();
-		dumpCSV.dump(fileName);
+		/*DumpCSV dumpCSV = new DumpCSV();
+		dumpCSV.dump(fileName);*/
+		GNOSDataProcessor gnosDataProcessor = new GNOSDataProcessor(fileName);
+		try {
+			gnosDataProcessor.doInBackground();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	protected void checkSubclass() {

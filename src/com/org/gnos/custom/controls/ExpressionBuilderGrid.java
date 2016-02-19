@@ -181,12 +181,18 @@ public class ExpressionBuilderGrid extends Composite {
 		//fd_expressionComposite.setLayoutData(fd_comboExpressionDefinition);
 		Combo comboLeftOperand = new Combo(expressionComposite, SWT.NONE);
 		comboLeftOperand.setItems(sourceFieldsComboItems);
+		comboLeftOperand.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
+		comboLeftOperand.setText("Field Value");
 		
 		Combo comboOperator = new Combo(expressionComposite, SWT.NONE);
 		comboOperator.setItems(this.arithemeticOperatorsArray);
+		comboOperator.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
+		comboOperator.setText("Operator");
 		
 		Combo comboRightOperand = new Combo(expressionComposite, SWT.NONE);
 		comboRightOperand.setItems(sourceFieldsComboItems);
+		comboRightOperand.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
+		comboRightOperand.setText("Field Value");
 		
 		expressionComposite.setLayoutData(fd_expressionComposite);
 
