@@ -1,3 +1,11 @@
+DROP TABLE IF EXISTS data_columns;
+
+CREATE TABLE data_columns(
+   id INT NOT NULL AUTO_INCREMENT,
+   name VARCHAR(100) NOT NULL,
+   PRIMARY KEY ( id )
+);
+
 DROP TABLE IF EXISTS pit;
 
 CREATE TABLE pit(
@@ -21,6 +29,8 @@ CREATE TABLE expressions (
    id INT NOT NULL  AUTO_INCREMENT,
    name VARCHAR(100) NOT NULL,
    grade TINYINT(1),
+   value_type TINYINT(1),
+   value INT NOT NULL,
    PRIMARY KEY ( id )
 );
 
@@ -33,10 +43,10 @@ CREATE TABLE model_definition(
    PRIMARY KEY ( id )
 );
 
-DROP TABLE IF EXISTS model_filter;
+DROP TABLE IF EXISTS operation_defn;
 
-CREATE TABLE model_filter (
-   model_id INT NOT NULL,
+CREATE TABLE operation_defn (
+   id INT NOT NULL,
    operand_left INT,
    operand_right INT,
    operator INT

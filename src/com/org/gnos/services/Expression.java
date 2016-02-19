@@ -1,10 +1,11 @@
 package com.org.gnos.services;
 
 public class Expression {
-
+	
 	int id;
 	String name;
-	String expressionValue;
+	boolean valueType;
+	int value;
 
 	boolean grade;
 	
@@ -19,12 +20,12 @@ public class Expression {
 		this.name = name;
 	}
 	
-	public String getExpressionValue() {
-		return expressionValue;
+	public int getValue() {
+		return value;
 	}
 
-	public void setExpressionValue(String expressionValue) {
-		this.expressionValue = expressionValue;
+	public void setValue(int value) {
+		this.value = value;
 	}
 
 	public int getId() {
@@ -39,10 +40,18 @@ public class Expression {
 		return name;
 	}
 	
+	public boolean isValueType() {
+		return valueType;
+	}
+
+	public void setValueType(boolean valueType) {
+		this.valueType = valueType;
+	}
+	
 	public boolean isGrade() {
 		return grade;
 	}
-	
+
 	public void setGrade(boolean grade) {
 		this.grade = grade;
 	}

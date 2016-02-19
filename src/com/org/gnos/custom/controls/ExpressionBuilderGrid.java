@@ -230,7 +230,7 @@ public class ExpressionBuilderGrid extends Composite {
 				expressionValue = comboControlExpressionValue.getText();
 			}
 			Expression expression = new Expression(expressionName);
-			expression.setExpressionValue(expressionValue);
+			expression.setValue(this.allSourceFields.indexOf(expressionValue));
 			expression.setGrade(isGrade);
 			
 			this.expressionList.add(expression);

@@ -27,6 +27,7 @@ public class DumpCSV {
 		
 		try {
 			conn = DBManager.getConnection();
+			boolean autocommit = conn.getAutoCommit();
 			conn.setAutoCommit(false);
 			br = new BufferedReader(new FileReader(fileName));		
 			while ((line = br.readLine()) != null) {				
@@ -42,6 +43,7 @@ public class DumpCSV {
 				count++;
 			}
 			conn.commit();
+			conn.setAutoCommit(autocommit);
 			DBManager.releaseConnection(conn);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

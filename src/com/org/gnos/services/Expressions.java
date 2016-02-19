@@ -72,7 +72,7 @@ public class Expressions {
 	public boolean add(Expression expr){
 		
 		Connection conn = DBManager.getConnection();
-		String sql = "insert into expressions (name, grade) values (?, ?)";
+		String sql = "insert into expressions (name, grade, value) values (?, ?, ?)";
 		PreparedStatement pstmt = null;
 		ResultSet rs = null; 
 
@@ -80,6 +80,7 @@ public class Expressions {
 			pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 			pstmt.setString(1, expr.getName());
 			pstmt.setBoolean(2, expr.isGrade());
+			pstmt.setInt(3, expr.getValue());
 			pstmt.executeUpdate();
 			rs = pstmt.getGeneratedKeys();    
 			rs.next();  
