@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
@@ -37,10 +39,12 @@ public class ExpressionBuilderGrid extends Composite {
 	private Text expressionName;
 	private List<Expression> expressionList;
 	private String[] arithemeticOperatorsArray;
+	private Composite parent;
 	
 	public ExpressionBuilderGrid(Composite parent, int style, List<ColumnHeader> allSourceFields) {
 		super(parent, style);
 		//this.requiredFieldNames = requiredFieldNames;
+		this.parent = parent;
 		this.allSourceFields = allSourceFields;
 		this.allRows = new ArrayList<Composite>();
 		this.expressionList = new ArrayList<Expression>();
@@ -88,13 +92,19 @@ public class ExpressionBuilderGrid extends Composite {
 		
 		Label secondSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
 		FormData fd_secondSeparator = new FormData();
-		fd_secondSeparator.left = new FormAttachment(40);
+		fd_secondSeparator.left = new FormAttachment(30);
 		secondSeparator.setLayoutData(fd_secondSeparator);
 
+		
 		Label thirdSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
 		FormData fd_thirdSeparator = new FormData();
-		fd_thirdSeparator.left = new FormAttachment(70);
+		fd_thirdSeparator.left = new FormAttachment(40);
 		thirdSeparator.setLayoutData(fd_thirdSeparator);
+		
+		Label fourthSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
+		FormData fd_fourthSeparator = new FormData();
+		fd_fourthSeparator.left = new FormAttachment(70);
+		fourthSeparator.setLayoutData(fd_fourthSeparator);
 		
 		Label lblGradeHeader = new Label(compositeGridHeader, SWT.NONE);
 		lblGradeHeader.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
@@ -113,13 +123,22 @@ public class ExpressionBuilderGrid extends Composite {
 		lblExpressionNameHeader.setLayoutData(fd_lblExpressionNameHeader);
 		lblExpressionNameHeader.setText("EXPRESSION NAME");
 		lblExpressionNameHeader.setBackground(SWTResourceManager.getColor(230, 230, 230));
+		
+		Label lblExpressionTypeHeader = new Label(compositeGridHeader, SWT.NONE);
+		lblExpressionTypeHeader.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
+		FormData fd_lblExpressionTypeHeader = new FormData();
+		fd_lblExpressionTypeHeader.top = new FormAttachment(0,2);
+		fd_lblExpressionTypeHeader.left = new FormAttachment(secondSeparator, 10);
+		lblExpressionTypeHeader.setLayoutData(fd_lblExpressionTypeHeader);
+		lblExpressionTypeHeader.setText("IS COMPLEX");
+		lblExpressionTypeHeader.setBackground(SWTResourceManager.getColor(230, 230, 230));
 
 		Label lblExpressionDefinitionHeader = new Label(compositeGridHeader, SWT.NONE);
 		lblExpressionDefinitionHeader.setBackground(SWTResourceManager.getColor(230, 230, 230));
 		lblExpressionDefinitionHeader.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
 		FormData fd_lblExpressionDefinitionHeader = new FormData();
 		fd_lblExpressionDefinitionHeader.top = new FormAttachment(0, 2);
-		fd_lblExpressionDefinitionHeader.left = new FormAttachment(secondSeparator, 10);
+		fd_lblExpressionDefinitionHeader.left = new FormAttachment(thirdSeparator, 10);
 		lblExpressionDefinitionHeader.setLayoutData(fd_lblExpressionDefinitionHeader);
 		lblExpressionDefinitionHeader.setText("EXPRESSION DEFINITION");
 
@@ -128,14 +147,51 @@ public class ExpressionBuilderGrid extends Composite {
 		lblFiltersHeader.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
 		FormData fd_lblFiltersHeader = new FormData();
 		fd_lblFiltersHeader.top = new FormAttachment(0,2);
-		fd_lblFiltersHeader.left = new FormAttachment(thirdSeparator, 10);
+		fd_lblFiltersHeader.left = new FormAttachment(fourthSeparator, 10);
 		lblFiltersHeader.setLayoutData(fd_lblFiltersHeader);
 		lblFiltersHeader.setText("FILTERS");
 		this.presentRow = this.compositeGridHeader;//referring to the header as the 1st row when there are no rows inserted yet
+		
+	}
+	
+	private void toggleExpressionType(Composite compositeRow, boolean isExpression){
+		
+		//compositeRow.getChildren()[3].dispose();//disposing existing expression definition
+		Composite expressionComposite = new Composite(compositeRow, SWT.NONE);
+		expressionComposite.setLayout(new FillLayout(SWT.HORIZONTAL));
+		//expressionComposite.setBackground(backgroundColor);
+		FormData fd_expressionComposite = new FormData();
+		fd_expressionComposite.right = new FormAttachment(70, -5);
+		fd_expressionComposite.left = new FormAttachment(40, 5);
+		expressionComposite.setLayoutData(fd_expressionComposite);
+		
+		if(isExpression == true){
+			Combo comboLeftOperand = new Combo(expressionComposite, SWT.NONE);
+			comboLeftOperand.setItems(sourceFieldsComboItems);
+			comboLeftOperand.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
+			comboLeftOperand.setText("Field Value");
+			
+			Combo comboOperator = new Combo(expressionComposite, SWT.NONE);
+			comboOperator.setItems(this.arithemeticOperatorsArray);
+			comboOperator.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
+			comboOperator.setText("Operator");
+			
+			Combo comboRightOperand = new Combo(expressionComposite, SWT.NONE);
+			comboRightOperand.setItems(sourceFieldsComboItems);
+			comboRightOperand.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
+			comboRightOperand.setText("Field Value");
+			
+		}else{
+			Combo comboExpressionDefinition = new Combo(expressionComposite, SWT.NONE);
+			comboExpressionDefinition.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
+			comboExpressionDefinition.setItems(this.sourceFieldsComboItems);
+			comboExpressionDefinition.setText("Field Value");
+		}
+		compositeRow.layout();
 	}
 	
 	public void addRow(){
-		Composite compositeRow = new Composite(this, SWT.BORDER);
+		final Composite compositeRow = new Composite(this, SWT.BORDER);
 		compositeRow.setLayout(new FormLayout());
 		Color backgroundColor = SWTResourceManager.getColor(SWT.COLOR_WHITE);
 		if((this.allRows != null) && (this.allRows.size()%2 != 0)){
@@ -159,16 +215,8 @@ public class ExpressionBuilderGrid extends Composite {
 		FormData fd_expressionName = new FormData();
 		fd_expressionName.left = new FormAttachment(5, 5);
 		fd_expressionName.top = new FormAttachment(0);
-		fd_expressionName.right = new FormAttachment(40, -5);
+		fd_expressionName.right = new FormAttachment(30, -5);
 		expressionName.setLayoutData(fd_expressionName);
-		
-		/*Combo comboExpressionDefinition = new Combo(compositeRow, SWT.NONE);
-		FormData fd_comboExpressionDefinition = new FormData();
-		fd_comboExpressionDefinition.right = new FormAttachment(70, -5);
-		fd_comboExpressionDefinition.left = new FormAttachment(40, 5);
-		comboExpressionDefinition.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
-		comboExpressionDefinition.setItems(this.sourceFieldsComboItems);
-		comboExpressionDefinition.setLayoutData(fd_comboExpressionDefinition);*/
 		
 		Composite expressionComposite = new Composite(compositeRow, SWT.NONE);
 		expressionComposite.setLayout(new FillLayout(SWT.HORIZONTAL));
@@ -176,26 +224,26 @@ public class ExpressionBuilderGrid extends Composite {
 		FormData fd_expressionComposite = new FormData();
 		fd_expressionComposite.right = new FormAttachment(70, -5);
 		fd_expressionComposite.left = new FormAttachment(40, 5);
-		//fd_expressionComposite.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
-		//fd_expressionComposite.setItems(this.sourceFieldsComboItems);
-		//fd_expressionComposite.setLayoutData(fd_comboExpressionDefinition);
-		Combo comboLeftOperand = new Combo(expressionComposite, SWT.NONE);
-		comboLeftOperand.setItems(sourceFieldsComboItems);
-		comboLeftOperand.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
-		comboLeftOperand.setText("Field Value");
-		
-		Combo comboOperator = new Combo(expressionComposite, SWT.NONE);
-		comboOperator.setItems(this.arithemeticOperatorsArray);
-		comboOperator.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
-		comboOperator.setText("Operator");
-		
-		Combo comboRightOperand = new Combo(expressionComposite, SWT.NONE);
-		comboRightOperand.setItems(sourceFieldsComboItems);
-		comboRightOperand.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
-		comboRightOperand.setText("Field Value");
-		
 		expressionComposite.setLayoutData(fd_expressionComposite);
-
+		
+		Button buttonIsComplex = new Button(compositeRow, SWT.CHECK);
+		FormData fd_buttonIsComplex = new FormData();
+		fd_buttonIsComplex.left = new FormAttachment(34);
+		fd_buttonIsComplex.top = new FormAttachment(0,2);
+		buttonIsComplex.setLayoutData(fd_buttonIsComplex);
+		final Composite me = this;
+		
+		buttonIsComplex.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				boolean isSelected = ((Button)e.getSource()).getSelection();
+				System.out.println("Selection: " + isSelected);
+				compositeRow.getChildren()[4].dispose();
+				toggleExpressionType(compositeRow, isSelected);
+			}
+		});
+		
+		this.toggleExpressionType(compositeRow, false);
 		
 		this.presentRow = compositeRow;
 		this.allRows.add(compositeRow);
