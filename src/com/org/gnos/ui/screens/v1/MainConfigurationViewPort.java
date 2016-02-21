@@ -10,7 +10,7 @@ import org.eclipse.swt.widgets.Composite;
 
 
 import com.org.gnos.custom.controls.GnosScreen;
-import com.org.gnos.custom.models.ProjectMetaDataModel;
+import com.org.gnos.custom.models.ProjectModel;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.events.interfaces.GnosEventListener;
 
@@ -21,26 +21,26 @@ public class MainConfigurationViewPort extends GnosScreen {
 	 * @param parent
 	 * @param style
 	 */
-	private ProjectMetaDataModel projectMetaData;
+	private ProjectModel projectModel;
 	private GnosScreen viewPort;
 	//private Layout mainLayout;
-	public MainConfigurationViewPort(Composite parent, int style, ProjectMetaDataModel projectMetaData){
+	public MainConfigurationViewPort(Composite parent, int style, ProjectModel projectModel){
 		super(parent, style);
-		this.projectMetaData = projectMetaData;
+		this.projectModel = projectModel;
 		//this.parent = parent;
 		this.loadMapRequiredFieldsScreen();
 	}
 
 	private void loadMapRequiredFieldsScreen(){
 		this.setLayout(new FillLayout());
-		this.viewPort = new MapRequiredFieldsScreen(this, SWT.NONE, this.projectMetaData);
+		this.viewPort = new MapRequiredFieldsScreen(this, SWT.NONE, this.projectModel);
 		this.viewPort.registerEventListener(this);
 	}
 
 	private void loadExpressionDefinitionScreen(){
 		this.viewPort.dispose();
 		this.setLayout(new FillLayout());
-		this.viewPort = new ExpressionDefinitionScreen(this, SWT.NONE, this.projectMetaData);
+		this.viewPort = new ExpressionDefinitionScreen(this, SWT.NONE, this.projectModel);
 		this.viewPort.registerEventListener(this);
 		this.layout();
 	}

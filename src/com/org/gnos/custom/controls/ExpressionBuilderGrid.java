@@ -29,9 +29,7 @@ public class ExpressionBuilderGrid extends Composite {
 	 * @param parent
 	 * @param style
 	 */
-	private String[] requiredFieldNames;
 	private List<ColumnHeader> allSourceFields;
-	private String[] dataTypes;
 	private Composite compositeGridHeader;
 	private List<Composite> allRows;
 	private String[] sourceFieldsComboItems;
@@ -39,12 +37,11 @@ public class ExpressionBuilderGrid extends Composite {
 	private Text expressionName;
 	private List<Expression> expressionList;
 	private String[] arithemeticOperatorsArray;
-	private Composite parent;
 	
 	public ExpressionBuilderGrid(Composite parent, int style, List<ColumnHeader> allSourceFields) {
 		super(parent, style);
 		//this.requiredFieldNames = requiredFieldNames;
-		this.parent = parent;
+		//this.parent = parent;
 		this.allSourceFields = allSourceFields;
 		this.allRows = new ArrayList<Composite>();
 		this.expressionList = new ArrayList<Expression>();
@@ -156,7 +153,6 @@ public class ExpressionBuilderGrid extends Composite {
 	
 	private void toggleExpressionType(Composite compositeRow, boolean isExpression){
 		
-		//compositeRow.getChildren()[3].dispose();//disposing existing expression definition
 		Composite expressionComposite = new Composite(compositeRow, SWT.NONE);
 		expressionComposite.setLayout(new FillLayout(SWT.HORIZONTAL));
 		//expressionComposite.setBackground(backgroundColor);
@@ -231,14 +227,14 @@ public class ExpressionBuilderGrid extends Composite {
 		fd_buttonIsComplex.left = new FormAttachment(34);
 		fd_buttonIsComplex.top = new FormAttachment(0,2);
 		buttonIsComplex.setLayoutData(fd_buttonIsComplex);
-		final Composite me = this;
+		//final Composite me = this;
 		
 		buttonIsComplex.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				boolean isSelected = ((Button)e.getSource()).getSelection();
 				System.out.println("Selection: " + isSelected);
-				compositeRow.getChildren()[4].dispose();
+				compositeRow.getChildren()[4].dispose();//temporary hack, need to identify in a better way
 				toggleExpressionType(compositeRow, isSelected);
 			}
 		});

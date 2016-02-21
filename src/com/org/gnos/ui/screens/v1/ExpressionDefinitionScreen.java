@@ -16,7 +16,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
 import com.org.gnos.application.GNOSConfig;
 import com.org.gnos.custom.controls.ExpressionBuilderGrid;
 import com.org.gnos.custom.controls.GnosScreen;
-import com.org.gnos.custom.models.ProjectMetaDataModel;
+import com.org.gnos.custom.models.ProjectModel;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.services.Expression;
 import com.org.gnos.services.Expressions;
@@ -28,33 +28,34 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 	private ExpressionBuilderGrid expressionBuilderGrid;
 	private List<ColumnHeader> allHeaders;
 	private GNOSDataProcessor csvProcessor;
-	private ProjectMetaDataModel projectMetaData;
+	private ProjectModel projectModel;
 	private List<Expression> allDefinedExpressions;
 	/**
 	 * Create the composite.
 	 * @param parent
 	 * @param style
 	 */
-	public ExpressionDefinitionScreen(Composite parent, int style, ProjectMetaDataModel projectMetaData) {
+	public ExpressionDefinitionScreen(Composite parent, int style, ProjectModel projectModel) {
 		super(parent, style);
 		setForeground(SWTResourceManager.getColor(30, 144, 255));
 		setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
 		setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		this.projectMetaData = projectMetaData;
+		this.projectModel = projectModel;
 		this.allHeaders = this.getAllHeaders();
 		this.createContent();
 	}
 	
 	private List<ColumnHeader> getAllHeaders(){
-		try {
-			csvProcessor = new GNOSDataProcessor(this.projectMetaData.get("recordFileName"));
+		/*try {
+			csvProcessor = new GNOSDataProcessor(this.projectModel.get("recordFileName"));
 			csvProcessor.doInBackground();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		return csvProcessor.getHeaderColumns();
+		return csvProcessor.getHeaderColumns();*/
+		return this.projectModel.getAllProjectFields();
 	}
 	
 	private void createContent(){

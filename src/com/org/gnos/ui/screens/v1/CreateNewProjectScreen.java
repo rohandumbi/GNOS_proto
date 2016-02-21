@@ -28,6 +28,7 @@ public class CreateNewProjectScreen extends Composite implements GnosEventGenera
 	private Text textDescription;
 	private ArrayList<GnosEventListener> listeners = new ArrayList<GnosEventListener>();
 	private String csvFileName;
+	private FileDialog fileDialog;
 
 	/**
 	 * Create the composite.
@@ -36,6 +37,10 @@ public class CreateNewProjectScreen extends Composite implements GnosEventGenera
 	 */
 	public CreateNewProjectScreen(final Composite parent, int style) {
 		super(parent, style);
+		this.fileDialog = new FileDialog(parent.getShell(), SWT.OPEN);
+		this.fileDialog.setFilterExtensions(new String [] {"*.csv"});
+		this.fileDialog.setFilterPath("c:\\");
+		
 		setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_BACKGROUND_GRADIENT));
 		setFont(SWTResourceManager.getFont("Arial", 12, SWT.NORMAL));
 		setLayout(new FormLayout());
@@ -73,11 +78,7 @@ public class CreateNewProjectScreen extends Composite implements GnosEventGenera
 		btnBrowseFile.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				//TODO open system directory
-				//FileDialog dialog = new FileDialog(parent.getShell(), SWT.OPEN);
-				FileDialog dialog = new FileDialog(parent.getShell(), SWT.OPEN);
-				dialog.setFilterExtensions(new String [] {"*.csv"});
-				dialog.setFilterPath("c:\\");
-				csvFileName = dialog.open();
+				csvFileName = fileDialog.open();
 				System.out.println("Selected file" + csvFileName);
 				if(csvFileName != null){
 					textLocation.setText(csvFileName);

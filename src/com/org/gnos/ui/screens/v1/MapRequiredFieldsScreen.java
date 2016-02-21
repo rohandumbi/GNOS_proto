@@ -17,7 +17,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
 import com.org.gnos.application.GNOSConfig;
 import com.org.gnos.custom.controls.GnosScreen;
 import com.org.gnos.custom.controls.MapRequiredFieldsGrid;
-import com.org.gnos.custom.models.ProjectMetaDataModel;
+import com.org.gnos.custom.models.ProjectModel;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.services.csv.ColumnHeader;
 import com.org.gnos.services.csv.GNOSDataProcessor;
@@ -27,7 +27,7 @@ public class MapRequiredFieldsScreen extends GnosScreen {
 	private List<ColumnHeader> allHeaders;
 	private String[] requiredFields;
 	private String[] dataTypes;
-	private ProjectMetaDataModel projectMetaData;
+	private ProjectModel projectModel;
 	private GNOSDataProcessor csvProcessor;
 	private MapRequiredFieldsGrid mapRequiredFieldsGrid;
 	/**
@@ -35,12 +35,12 @@ public class MapRequiredFieldsScreen extends GnosScreen {
 	 * @param parent
 	 * @param style
 	 */
-	public MapRequiredFieldsScreen(Composite parent, int style, ProjectMetaDataModel projectMetaData) {
+	public MapRequiredFieldsScreen(Composite parent, int style, ProjectModel projectMetaData) {
 		super(parent, style);
 		setForeground(SWTResourceManager.getColor(30, 144, 255));
 		setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
 		setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		this.projectMetaData = projectMetaData;
+		this.projectModel = projectMetaData;
 		this.allHeaders = this.getAllHeaders();
 		System.out.println("Length of all columns: " + this.allHeaders.size());
 		this.requiredFields = this.getRequiredFieldsFromProperties();
@@ -55,15 +55,16 @@ public class MapRequiredFieldsScreen extends GnosScreen {
 	}
 	
 	private List<ColumnHeader> getAllHeaders(){
-		try {
-			csvProcessor = new GNOSDataProcessor(this.projectMetaData.get("recordFileName"));
+		/*try {
+			csvProcessor = new GNOSDataProcessor(this.projectModel.get("recordFileName"));
 			csvProcessor.doInBackground();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 		
-		return csvProcessor.getHeaderColumns();
+		//return csvProcessor.getHeaderColumns();
+		return this.projectModel.getAllProjectFields();
 	}
 	
 	private void createContent(){

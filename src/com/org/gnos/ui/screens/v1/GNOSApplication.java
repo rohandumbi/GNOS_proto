@@ -17,10 +17,11 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 
 import com.org.gnos.application.GNOSConfig;
-import com.org.gnos.custom.models.ProjectMetaDataModel;
+import com.org.gnos.custom.models.ProjectModel;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.events.GnosEventWithAttributeMap;
 import com.org.gnos.events.interfaces.GnosEventListener;
+import com.org.gnos.services.csv.GNOSDataProcessor;
 import com.org.gnos.tabitems.HomeTabItem;
 import com.org.gnos.tabitems.ProjectTabItem;
 
@@ -31,6 +32,7 @@ public class GNOSApplication extends ApplicationWindow implements GnosEventListe
 	private CTabFolder cTabFolder;
 	private HomeTabItem homeTabItem;
 	private ProjectTabItem projectTabItem;
+	private GNOSDataProcessor gnosDataProcessor;
 	/**
 	 * Create the application window.
 	 */
@@ -157,8 +159,18 @@ public class GNOSApplication extends ApplicationWindow implements GnosEventListe
 
 	private void openPitControlsTab(GnosEventWithAttributeMap event){
 		System.out.println("Opening pit controls tab");
-		ProjectMetaDataModel projectMetaDataModel = new ProjectMetaDataModel(event.attributes);
-		projectTabItem = new ProjectTabItem(cTabFolder, SWT.CLOSE, projectMetaDataModel);
+		ProjectModel projectModel = new ProjectModel(event.attributes);
+		
+		gnosDataProcessor = new GNOSDataProcessor(event.attributes.get("recordFileName"));
+		try {
+			gnosDataProcessor.doInBackground();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		projectModel.setAllProjectFields(gnosDataProcessor.getHeaderColumns());
+		
+		projectTabItem = new ProjectTabItem(cTabFolder, SWT.CLOSE, projectModel);
 		projectTabItem.registerEventListener(this);
 		cTabFolder.setSelection(projectTabItem);
 
