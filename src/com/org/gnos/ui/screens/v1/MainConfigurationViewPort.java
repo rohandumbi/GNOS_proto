@@ -3,11 +3,12 @@ package com.org.gnos.ui.screens.v1;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+
 import com.org.gnos.custom.controls.GnosScreen;
 import com.org.gnos.custom.models.ProjectModel;
 import com.org.gnos.events.GnosEvent;
 
-public class MainConfigurationViewPort extends GnosScreen {
+public class MainConfigurationViewPort extends GnosScreen{
 
 	/**
 	 * Create the composite.
@@ -22,6 +23,7 @@ public class MainConfigurationViewPort extends GnosScreen {
 		this.projectModel = projectModel;
 		//this.parent = parent;
 		this.loadFieldDatatypeDefinitionScreen();
+		//this.setMinSize(this.viewPort.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 	}
 	
 	private void loadFieldDatatypeDefinitionScreen(){

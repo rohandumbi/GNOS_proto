@@ -32,12 +32,12 @@ public class MapRequiredFieldsScreen extends GnosScreen {
 	 * @param parent
 	 * @param style
 	 */
-	public MapRequiredFieldsScreen(Composite parent, int style, ProjectModel projectMetaData) {
+	public MapRequiredFieldsScreen(Composite parent, int style, ProjectModel projectModel) {
 		super(parent, style);
 		setForeground(SWTResourceManager.getColor(30, 144, 255));
 		setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
 		setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		this.projectModel = projectMetaData;
+		this.projectModel = projectModel;
 		this.allHeaders = this.getAllHeaders();
 		System.out.println("Length of all columns: " + this.allHeaders.size());
 		this.requiredFields = this.getRequiredFieldsFromProperties();

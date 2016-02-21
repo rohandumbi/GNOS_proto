@@ -2,6 +2,8 @@ package com.org.gnos.ui.screens.v1;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -28,6 +30,8 @@ public class WorkbenchScreen extends GnosScreen {
 	private GnosConfigurationStepLabel gnosStepModelDefinitionLabel;
 	private GnosConfigurationStepLabel gnosStepProcessRouteDefinitionLabel;
 	private ProjectModel projectModel;
+	private ScrolledComposite scViewPortContainer;
+	private MainConfigurationViewPort mainConfigurationViewPort;
 	
 	
 	public CLabel labelWorkbenchHeader;
@@ -103,16 +107,22 @@ public class WorkbenchScreen extends GnosScreen {
 		fd_gnosStepProcessRouteDefinitionLabel.left = new FormAttachment(gnosStepMapRequiredFieldsLabel, 0, SWT.LEFT);
 		gnosStepProcessRouteDefinitionLabel.setLayoutData(fd_gnosStepProcessRouteDefinitionLabel);
 		
-		MainConfigurationViewPort mainConfigurationViewport = new MainConfigurationViewPort(this, SWT.BORDER, this.projectModel);
-		mainConfigurationViewport.registerEventListener(this);
+		this.scViewPortContainer = new ScrolledComposite(this, SWT.H_SCROLL | SWT.V_SCROLL | SWT.NONE);
+		FormData fd_scViewPortContainer = new FormData();
+		fd_scViewPortContainer.right = new FormAttachment(labelWorkbenchHeader, -6, SWT.RIGHT);
+		fd_scViewPortContainer.bottom = new FormAttachment(100, -6);
+		fd_scViewPortContainer.top = new FormAttachment(labelWorkbenchHeader, 6);
+		fd_scViewPortContainer.left = new FormAttachment(label, 6);
 		
-		FormData fd_mainConfigurationViewport = new FormData();
-		fd_mainConfigurationViewport.right = new FormAttachment(labelWorkbenchHeader, -6, SWT.RIGHT);
-		fd_mainConfigurationViewport.bottom = new FormAttachment(100, -6);
-		fd_mainConfigurationViewport.top = new FormAttachment(labelWorkbenchHeader, 6);
-		fd_mainConfigurationViewport.left = new FormAttachment(label, 6);
-		mainConfigurationViewport.setLayoutData(fd_mainConfigurationViewport);
-
+		this.mainConfigurationViewPort = new MainConfigurationViewPort(this.scViewPortContainer, SWT.BORDER, this.projectModel);
+		this.mainConfigurationViewPort.registerEventListener(this);
+		
+		this.scViewPortContainer.setContent(this.mainConfigurationViewPort);
+		this.scViewPortContainer.setExpandHorizontal(true);
+		this.scViewPortContainer.setExpandVertical(true);
+		this.scViewPortContainer.setMinSize(this.mainConfigurationViewPort.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		
+		this.scViewPortContainer.setLayoutData(fd_scViewPortContainer);
 	}
 
 	@Override
@@ -128,21 +138,19 @@ public class WorkbenchScreen extends GnosScreen {
 			this.gnosStepDefineFieldTypeLabel.setDeselectedState();
 			this.gnosStepMapRequiredFieldsLabel.setSelectedState();
 		}else if(e.eventName == "complete:map-required-fields"){
-			//mappingRequiredFieldsComplete();
 			this.gnosStepMapRequiredFieldsLabel.setDeselectedState();
 			this.gnosStepDefineExpressionsLabel.setSelectedState();
 		}else if(e.eventName == "complete:expression-defintion"){
-			//expressionDefinitionComplete();
 			this.gnosStepDefineExpressionsLabel.setDeselectedState();
 			this.gnosStepModelDefinitionLabel.setSelectedState();
 		}else if(e.eventName == "complete:model-defintion"){
-			//modelDefinitionComplete();
 			this.gnosStepModelDefinitionLabel.setDeselectedState();
 			this.gnosStepProcessRouteDefinitionLabel.setSelectedState();
 		}else if(e.eventName == "complete:process-route-defintion"){
 			//processRouteDefinitionComplete();
-			this.gnosStepProcessRouteDefinitionLabel.setDeselectedState();
+			//this.gnosStepProcessRouteDefinitionLabel.setDeselectedState();
 		}
+		this.scViewPortContainer.setMinSize(this.mainConfigurationViewPort.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 	}
 	
 }
