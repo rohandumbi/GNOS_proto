@@ -32,6 +32,7 @@ public class ExpressionBuilderGrid extends Composite {
 	private List<ColumnHeader> allSourceFields;
 	private Composite compositeGridHeader;
 	private List<Composite> allRows;
+	private List<String> numericSourceFields;
 	private String[] sourceFieldsComboItems;
 	private Composite presentRow;
 	private Text expressionName;
@@ -45,6 +46,7 @@ public class ExpressionBuilderGrid extends Composite {
 		this.allSourceFields = allSourceFields;
 		this.allRows = new ArrayList<Composite>();
 		this.expressionList = new ArrayList<Expression>();
+		//this.numericSourceFields = new ArrayList<String>();
 		//this.dataTypes = dataTypes;
 		this.arithemeticOperatorsArray = new String[]{"+", "-", "*", "/"};
 		this.createContent(parent);
@@ -61,13 +63,22 @@ public class ExpressionBuilderGrid extends Composite {
 			return 0;
 		}
 	}
-	private void createSourceFieldsComboItems(){
+	private String[] getSourceFieldsComboItems(){
 		int i = 0;
 		int sourceFieldSize = this.allSourceFields.size();
-		this.sourceFieldsComboItems = new String[sourceFieldSize];
+		//this.sourceFieldsComboItems = new String[sourceFieldSize];
+		this.numericSourceFields = new ArrayList<String>();
 		for(i=0; i<sourceFieldSize; i++){
-			this.sourceFieldsComboItems[i] = this.allSourceFields.get(i).getName();
+			if((this.allSourceFields.get(i).getDataType() == 2) || (this.allSourceFields.get(i).getDataType() == 3)){ //only double or integer fields are allowed in expression definition
+				//this.sourceFieldsComboItems[i] = this.allSourceFields.get(i).getName();
+				this.numericSourceFields.add(this.allSourceFields.get(i).getName());
+			}
 		}
+		this.sourceFieldsComboItems = new String[this.numericSourceFields.size()];
+		for(i=0; i<this.numericSourceFields.size(); i++){
+			this.sourceFieldsComboItems[i] = this.numericSourceFields.get(i);
+		}
+		return this.sourceFieldsComboItems;
 	}
 
 
@@ -160,10 +171,11 @@ public class ExpressionBuilderGrid extends Composite {
 		fd_expressionComposite.right = new FormAttachment(70, -5);
 		fd_expressionComposite.left = new FormAttachment(40, 5);
 		expressionComposite.setLayoutData(fd_expressionComposite);
+		String[] comboItems = this.getSourceFieldsComboItems();
 		
 		if(isExpression == true){
 			Combo comboLeftOperand = new Combo(expressionComposite, SWT.NONE);
-			comboLeftOperand.setItems(sourceFieldsComboItems);
+			comboLeftOperand.setItems(comboItems);
 			comboLeftOperand.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
 			comboLeftOperand.setText("Field Value");
 			
@@ -173,14 +185,14 @@ public class ExpressionBuilderGrid extends Composite {
 			comboOperator.setText("Operator");
 			
 			Combo comboRightOperand = new Combo(expressionComposite, SWT.NONE);
-			comboRightOperand.setItems(sourceFieldsComboItems);
+			comboRightOperand.setItems(comboItems);
 			comboRightOperand.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
 			comboRightOperand.setText("Field Value");
 			
 		}else{
 			Combo comboExpressionDefinition = new Combo(expressionComposite, SWT.NONE);
 			comboExpressionDefinition.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
-			comboExpressionDefinition.setItems(this.sourceFieldsComboItems);
+			comboExpressionDefinition.setItems(comboItems);
 			comboExpressionDefinition.setText("Field Value");
 		}
 		compositeRow.layout();
@@ -248,7 +260,7 @@ public class ExpressionBuilderGrid extends Composite {
 
 	private void createContent(Composite parent){
 		this.setLayout(new FormLayout());
-		this.createSourceFieldsComboItems();
+		//this.createSourceFieldsComboItems();
 		this.createHeader();
 		
 	}

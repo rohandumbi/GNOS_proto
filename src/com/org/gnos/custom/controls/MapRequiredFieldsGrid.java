@@ -46,7 +46,7 @@ public class MapRequiredFieldsGrid extends Composite {
 		}else if(dataType.equalsIgnoreCase("Double")){
 			return 3;
 		}else{
-			return 0;
+			return 1;
 		}
 	}
 	private void createSourceFieldsComboItems(){
