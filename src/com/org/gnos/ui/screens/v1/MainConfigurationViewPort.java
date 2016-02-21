@@ -3,16 +3,9 @@ package com.org.gnos.ui.screens.v1;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
-//import org.eclipse.swt.widgets.Layout;
-
-
-
-
-
 import com.org.gnos.custom.controls.GnosScreen;
 import com.org.gnos.custom.models.ProjectModel;
 import com.org.gnos.events.GnosEvent;
-import com.org.gnos.events.interfaces.GnosEventListener;
 
 public class MainConfigurationViewPort extends GnosScreen {
 

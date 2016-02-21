@@ -14,8 +14,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.TabFolder;
-
 import com.org.gnos.application.GNOSConfig;
 import com.org.gnos.custom.models.ProjectModel;
 import com.org.gnos.events.GnosEvent;
@@ -28,7 +26,6 @@ import com.org.gnos.tabitems.ProjectTabItem;
 public class GNOSApplication extends ApplicationWindow implements GnosEventListener{
 
 	private Composite container;
-	private TabFolder tabFolder;
 	private CTabFolder cTabFolder;
 	private HomeTabItem homeTabItem;
 	private ProjectTabItem projectTabItem;

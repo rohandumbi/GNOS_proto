@@ -1,6 +1,5 @@
 package com.org.gnos.ui.screens.v1;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
@@ -20,7 +19,6 @@ import com.org.gnos.custom.controls.MapRequiredFieldsGrid;
 import com.org.gnos.custom.models.ProjectModel;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.services.csv.ColumnHeader;
-import com.org.gnos.services.csv.GNOSDataProcessor;
 
 public class MapRequiredFieldsScreen extends GnosScreen {
 
@@ -28,7 +26,6 @@ public class MapRequiredFieldsScreen extends GnosScreen {
 	private String[] requiredFields;
 	private String[] dataTypes;
 	private ProjectModel projectModel;
-	private GNOSDataProcessor csvProcessor;
 	private MapRequiredFieldsGrid mapRequiredFieldsGrid;
 	/**
 	 * Create the composite.
@@ -55,15 +52,6 @@ public class MapRequiredFieldsScreen extends GnosScreen {
 	}
 	
 	private List<ColumnHeader> getAllHeaders(){
-		/*try {
-			csvProcessor = new GNOSDataProcessor(this.projectModel.get("recordFileName"));
-			csvProcessor.doInBackground();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
-		
-		//return csvProcessor.getHeaderColumns();
 		return this.projectModel.getAllProjectFields();
 	}
 	
@@ -118,7 +106,6 @@ public class MapRequiredFieldsScreen extends GnosScreen {
 	
 	private void updateHeadersWithRequiredFieldsMapping(){
 		this.allHeaders = mapRequiredFieldsGrid.getMappedSourceFields();
-		//System.out.println(this.allHeaders.get(2).getName() + "..." +this.allHeaders.get(2).getRequiredFieldName() + "..." +this.allHeaders.get(2).getDataType());
 	}
 
 	@Override

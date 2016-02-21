@@ -1,8 +1,6 @@
 package com.org.gnos.events;
 
 import java.util.EventObject;
-import java.util.HashMap;
-import java.util.Map;
 
 public class GnosEvent extends EventObject {
 

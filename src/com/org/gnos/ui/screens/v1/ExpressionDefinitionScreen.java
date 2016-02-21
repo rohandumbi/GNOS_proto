@@ -13,7 +13,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import com.org.gnos.application.GNOSConfig;
 import com.org.gnos.custom.controls.ExpressionBuilderGrid;
 import com.org.gnos.custom.controls.GnosScreen;
 import com.org.gnos.custom.models.ProjectModel;
@@ -21,13 +20,11 @@ import com.org.gnos.events.GnosEvent;
 import com.org.gnos.services.Expression;
 import com.org.gnos.services.Expressions;
 import com.org.gnos.services.csv.ColumnHeader;
-import com.org.gnos.services.csv.GNOSDataProcessor;
 
 public class ExpressionDefinitionScreen extends GnosScreen {
 
 	private ExpressionBuilderGrid expressionBuilderGrid;
 	private List<ColumnHeader> allHeaders;
-	private GNOSDataProcessor csvProcessor;
 	private ProjectModel projectModel;
 	private List<Expression> allDefinedExpressions;
 	/**
@@ -46,15 +43,6 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 	}
 	
 	private List<ColumnHeader> getAllHeaders(){
-		/*try {
-			csvProcessor = new GNOSDataProcessor(this.projectModel.get("recordFileName"));
-			csvProcessor.doInBackground();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		return csvProcessor.getHeaderColumns();*/
 		return this.projectModel.getAllProjectFields();
 	}
 	
