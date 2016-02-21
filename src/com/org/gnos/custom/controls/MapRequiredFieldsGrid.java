@@ -150,14 +150,6 @@ public class MapRequiredFieldsGrid extends Composite {
 			fd_comboDatatype.left = new FormAttachment(70, 12);
 			comboDatatype.setLayoutData(fd_comboDatatype);
 			
-			/*if(i%2 == 0){
-				compositeRow.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-				lblRqrdFieldName.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-			}else{
-				compositeRow.setBackground(SWTResourceManager.getColor(245, 245, 245));
-				lblRqrdFieldName.setBackground(SWTResourceManager.getColor(245, 245, 245));
-			}*/
-
 			compositeRow.setLayoutData(fd_compositeRow);
 			allRows.add(compositeRow);
 			presentRow = compositeRow;

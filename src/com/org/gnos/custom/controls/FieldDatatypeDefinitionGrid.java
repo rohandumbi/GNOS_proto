@@ -43,7 +43,7 @@ public class FieldDatatypeDefinitionGrid extends Composite {
 		}else if(dataType.equalsIgnoreCase("Double")){
 			return 3;
 		}else{
-			return 0;
+			return 1;//String by default
 		}
 	}
 
@@ -131,44 +131,34 @@ public class FieldDatatypeDefinitionGrid extends Composite {
 		this.createHeader();
 		this.createRows();
 	}
-
-	public List<ColumnHeader> getMappedSourceFields(){
+	
+	public List<ColumnHeader> getFieldDatatypes(){
 		Control[] rowChildren = null;
 		for(int i = 0; i < allRows.size(); i++){
 			rowChildren = allRows.get(i).getChildren();
+			Control compositeFieldName = rowChildren[0];
+			Control compositeDatatype = rowChildren[1];
 			
-			String requiredFieldName = null;
-			String sourceFieldName = null;
+			String fieldName = null;
 			String datatypeName = null;
 			
-			Control compositeRequiredFieldName = rowChildren[0];
-			Control compositeSourceFieldName = rowChildren[1];
-			Control compositeDatatype = rowChildren[2];
-			
-			if(compositeRequiredFieldName instanceof Label){
-				Label labelRequiredFieldName = (Label)compositeRequiredFieldName;
-				requiredFieldName = labelRequiredFieldName.getText();
-			}
-			if(compositeSourceFieldName instanceof Combo){
-				Combo comboSourceFieldName = (Combo)compositeSourceFieldName;
-				sourceFieldName = comboSourceFieldName.getText();
+			if(compositeFieldName instanceof Label){
+				Label labelFieldName = (Label)compositeFieldName;
+				fieldName = labelFieldName.getText();
 			}
 			if(compositeDatatype instanceof Combo){
 				Combo comboDatatype = (Combo)compositeDatatype;
 				datatypeName = comboDatatype.getText();
 			}
-			//System.out.println("ROW" + i +" data: " + requiredFieldName + "====" + sourceFieldName + "====" + datatypeName);
-			this.upDateSourceFieldHeader(sourceFieldName, requiredFieldName, datatypeName);
+			
+			this.updateSourceFieldWithDatatype(fieldName, datatypeName);
 		}
-
 		return this.allSourceFields;
 	}
 	
-	private void upDateSourceFieldHeader(String sourceFieldName, String requiredFieldName, String datatypeName){
+	private void updateSourceFieldWithDatatype(String sourceFieldName, String datatypeName){
 		for( ColumnHeader sourceField : this.allSourceFields){
 			if(sourceField.getName().equals(sourceFieldName)){
-				sourceField.setRequiredFieldName(requiredFieldName);
-				sourceField.setRequired(true);
 				sourceField.setDataType(this.getDatatypeCode(datatypeName));
 			}
 		}

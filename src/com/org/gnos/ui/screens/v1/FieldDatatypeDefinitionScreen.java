@@ -88,12 +88,17 @@ public class FieldDatatypeDefinitionScreen extends GnosScreen {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				//TODO mapping complete
-				//updateHeadersWithRequiredFieldsMapping();
+				projectModel.setAllProjectFields(fieldDatatypeDefinitionGrid.getFieldDatatypes());
+				//System.out.println("After mapping datatype of 3rd row is: " + projectModel.getAllProjectFields().get(2).getDataType());
 				GnosEvent event = new GnosEvent(this, "complete:datatype-defintion");
 				triggerGnosEvent(event);
 			}
 		});
 	}
+	
+	/*private void setFieldDatatypes(){
+		fieldDatatypeDefinitionGrid.setFieldDatatypes();
+	}*/
 	
 	private List<ColumnHeader> getAllHeaders(){
 		return this.projectModel.getAllProjectFields();
