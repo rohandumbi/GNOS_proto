@@ -21,13 +21,22 @@ public class MainConfigurationViewPort extends GnosScreen {
 		super(parent, style);
 		this.projectModel = projectModel;
 		//this.parent = parent;
-		this.loadMapRequiredFieldsScreen();
+		this.loadFieldDatatypeDefinitionScreen();
+	}
+	
+	private void loadFieldDatatypeDefinitionScreen(){
+		this.setLayout(new FillLayout());
+		this.viewPort = new FieldDatatypeDefinitionScreen(this, SWT.NONE, this.projectModel);
+		this.viewPort.registerEventListener(this);
+		this.layout();
 	}
 
 	private void loadMapRequiredFieldsScreen(){
+		this.viewPort.dispose();
 		this.setLayout(new FillLayout());
 		this.viewPort = new MapRequiredFieldsScreen(this, SWT.NONE, this.projectModel);
 		this.viewPort.registerEventListener(this);
+		this.layout();
 	}
 
 	private void loadExpressionDefinitionScreen(){
@@ -54,6 +63,10 @@ public class MainConfigurationViewPort extends GnosScreen {
 		this.layout();
 	}
 
+	private void datatypeDefinitionComplete(){
+		loadMapRequiredFieldsScreen();
+	}
+	
 	private void mappingRequiredFieldsComplete(){
 		loadExpressionDefinitionScreen();
 	}
@@ -79,7 +92,9 @@ public class MainConfigurationViewPort extends GnosScreen {
 	@Override
 	public void onGnosEventFired(GnosEvent e) {
 		// TODO Auto-generated method stub
-		if(e.eventName == "complete:map-required-fields"){
+		if(e.eventName == "complete:datatype-defintion"){
+			datatypeDefinitionComplete();
+		}else if(e.eventName == "complete:map-required-fields"){
 			mappingRequiredFieldsComplete();
 		}else if(e.eventName == "complete:expression-defintion"){
 			expressionDefinitionComplete();

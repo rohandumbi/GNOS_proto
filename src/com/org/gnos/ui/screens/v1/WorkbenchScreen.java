@@ -22,6 +22,7 @@ public class WorkbenchScreen extends GnosScreen {
 	 * @param parent
 	 * @param style
 	 */
+	private GnosConfigurationStepLabel gnosStepDefineFieldTypeLabel;
 	private GnosConfigurationStepLabel gnosStepMapRequiredFieldsLabel;
 	private GnosConfigurationStepLabel gnosStepDefineExpressionsLabel;
 	private GnosConfigurationStepLabel gnosStepModelDefinitionLabel;
@@ -60,14 +61,23 @@ public class WorkbenchScreen extends GnosScreen {
 		label.setLayoutData(fd_label);
 		
 		
+		gnosStepDefineFieldTypeLabel = new GnosConfigurationStepLabel(this, SWT.NONE, "Define Field Type");
+		FormData fd_gnosStepDefineFieldTypeLabel = new FormData();
+		fd_gnosStepDefineFieldTypeLabel.bottom = new FormAttachment(labelWorkbenchHeader, 40, SWT.BOTTOM);
+		fd_gnosStepDefineFieldTypeLabel.right = new FormAttachment(label, -6);
+		fd_gnosStepDefineFieldTypeLabel.top = new FormAttachment(labelWorkbenchHeader, 6);
+		fd_gnosStepDefineFieldTypeLabel.left = new FormAttachment(0, 10);
+		gnosStepDefineFieldTypeLabel.setLayoutData(fd_gnosStepDefineFieldTypeLabel);
+		gnosStepDefineFieldTypeLabel.setSelectedState();
+		
 		gnosStepMapRequiredFieldsLabel = new GnosConfigurationStepLabel(this, SWT.NONE, "Map Required Fields");
 		FormData fd_gnosStepMapRequiredFieldsLabel = new FormData();
-		fd_gnosStepMapRequiredFieldsLabel.bottom = new FormAttachment(labelWorkbenchHeader, 40, SWT.BOTTOM);
+		fd_gnosStepMapRequiredFieldsLabel.bottom = new FormAttachment(gnosStepDefineFieldTypeLabel, 40, SWT.BOTTOM);
 		fd_gnosStepMapRequiredFieldsLabel.right = new FormAttachment(label, -6);
-		fd_gnosStepMapRequiredFieldsLabel.top = new FormAttachment(labelWorkbenchHeader, 6);
-		fd_gnosStepMapRequiredFieldsLabel.left = new FormAttachment(labelWorkbenchHeader, 10, SWT.LEFT);
+		fd_gnosStepMapRequiredFieldsLabel.top = new FormAttachment(gnosStepDefineFieldTypeLabel, 6);
+		fd_gnosStepMapRequiredFieldsLabel.left = new FormAttachment(0, 10);
 		gnosStepMapRequiredFieldsLabel.setLayoutData(fd_gnosStepMapRequiredFieldsLabel);
-		gnosStepMapRequiredFieldsLabel.setSelectedState();
+		//gnosStepMapRequiredFieldsLabel.setSelectedState();
 		
 		gnosStepDefineExpressionsLabel = new GnosConfigurationStepLabel(this, SWT.NONE, "Expression Definition");
 		FormData fd_gnosStepDefineExpressionsLabel = new FormData();
@@ -114,7 +124,10 @@ public class WorkbenchScreen extends GnosScreen {
 	@Override
 	public void onGnosEventFired(GnosEvent e) {
 		// TODO Auto-generated method stub
-		if(e.eventName == "complete:map-required-fields"){
+		if(e.eventName == "complete:datatype-defintion"){
+			this.gnosStepDefineFieldTypeLabel.setDeselectedState();
+			this.gnosStepMapRequiredFieldsLabel.setSelectedState();
+		}else if(e.eventName == "complete:map-required-fields"){
 			//mappingRequiredFieldsComplete();
 			this.gnosStepMapRequiredFieldsLabel.setDeselectedState();
 			this.gnosStepDefineExpressionsLabel.setSelectedState();
