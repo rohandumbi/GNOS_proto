@@ -25,7 +25,7 @@ public class MapRequiredFieldsGrid extends Composite {
 	 */
 	private String[] requiredFieldNames;
 	private List<ColumnHeader> allSourceFields;
-	private String[] dataTypes;
+	//private String[] dataTypes;
 	private Composite compositeGridHeader;
 	private List<Composite> allRows;
 	private String[] sourceFieldsComboItems;
@@ -34,11 +34,11 @@ public class MapRequiredFieldsGrid extends Composite {
 		super(parent, style);
 		this.requiredFieldNames = requiredFieldNames;
 		this.allSourceFields = allSourceFields;
-		this.dataTypes = dataTypes;
+		//this.dataTypes = dataTypes;
 		this.createContent(parent);
 	}
 	
-	private int getDatatypeCode(String dataType){
+	/*private int getDatatypeCode(String dataType){
 		if(dataType.equalsIgnoreCase("String")){
 			return 1;
 		}else if(dataType.equalsIgnoreCase("Integer")){
@@ -48,7 +48,7 @@ public class MapRequiredFieldsGrid extends Composite {
 		}else{
 			return 1;
 		}
-	}
+	}*/
 	private void createSourceFieldsComboItems(){
 		int i = 0;
 		int sourceFieldSize = this.allSourceFields.size();
@@ -73,13 +73,13 @@ public class MapRequiredFieldsGrid extends Composite {
 
 		Label label = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
 		FormData fd_label = new FormData();
-		fd_label.left = new FormAttachment(40);
+		fd_label.left = new FormAttachment(50);
 		label.setLayoutData(fd_label);
 
-		Label label_1 = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
+		/*Label label_1 = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
 		FormData fd_label_1 = new FormData();
 		fd_label_1.left = new FormAttachment(70);
-		label_1.setLayoutData(fd_label_1);
+		label_1.setLayoutData(fd_label_1);*/
 
 		Label lblRqrdFieldHeader = new Label(compositeGridHeader, SWT.NONE);
 		lblRqrdFieldHeader.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
@@ -99,14 +99,14 @@ public class MapRequiredFieldsGrid extends Composite {
 		lblSourceFieldHeader.setLayoutData(fd_lblSourceFieldHeader);
 		lblSourceFieldHeader.setText("SOURCE FIELD");
 
-		Label lblDatatypeHeader = new Label(compositeGridHeader, SWT.NONE);
+		/*Label lblDatatypeHeader = new Label(compositeGridHeader, SWT.NONE);
 		lblDatatypeHeader.setBackground(SWTResourceManager.getColor(230, 230, 230));
 		lblDatatypeHeader.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
 		FormData fd_lblDatatypeHeader = new FormData();
 		fd_lblDatatypeHeader.top = new FormAttachment(0,2);
 		fd_lblDatatypeHeader.left = new FormAttachment(label_1, 10);
 		lblDatatypeHeader.setLayoutData(fd_lblDatatypeHeader);
-		lblDatatypeHeader.setText("DATATYPE");
+		lblDatatypeHeader.setText("DATATYPE");*/
 	}
 	private void createRows(){
 		Composite presentRow = this.compositeGridHeader;//referring to the header as the 1st row when there are no rows inserted yet
@@ -141,14 +141,15 @@ public class MapRequiredFieldsGrid extends Composite {
 			Combo comboSourceField = new Combo(compositeRow, SWT.NONE);
 			comboSourceField.setItems(this.sourceFieldsComboItems);
 			FormData fd_comboSourceField = new FormData();
-			fd_comboSourceField.left = new FormAttachment(40, 12);
+			fd_comboSourceField.left = new FormAttachment(50, 12);
+			fd_comboSourceField.right = new FormAttachment(80);
 			comboSourceField.setLayoutData(fd_comboSourceField);
 
-			Combo comboDatatype = new Combo(compositeRow, SWT.NONE);
+			/*Combo comboDatatype = new Combo(compositeRow, SWT.NONE);
 			comboDatatype.setItems(this.dataTypes);
 			FormData fd_comboDatatype = new FormData();
 			fd_comboDatatype.left = new FormAttachment(70, 12);
-			comboDatatype.setLayoutData(fd_comboDatatype);
+			comboDatatype.setLayoutData(fd_comboDatatype);*/
 			
 			compositeRow.setLayoutData(fd_compositeRow);
 			allRows.add(compositeRow);
@@ -164,7 +165,7 @@ public class MapRequiredFieldsGrid extends Composite {
 		this.createRows();
 	}
 
-	public List<ColumnHeader> getMappedSourceFields(){
+	/*public List<ColumnHeader> getMappedSourceFields(){
 		Control[] rowChildren = null;
 		for(int i = 0; i < allRows.size(); i++){
 			rowChildren = allRows.get(i).getChildren();
@@ -194,14 +195,45 @@ public class MapRequiredFieldsGrid extends Composite {
 		}
 
 		return this.allSourceFields;
+	}*/
+	
+	public void setSourceFieldMapping(){
+		Control[] rowChildren = null;
+		for(int i = 0; i < allRows.size(); i++){
+			rowChildren = allRows.get(i).getChildren();
+			
+			String requiredFieldName = null;
+			String sourceFieldName = null;
+			//String datatypeName = null;
+			
+			Control compositeRequiredFieldName = rowChildren[0];
+			Control compositeSourceFieldName = rowChildren[1];
+			//Control compositeDatatype = rowChildren[2];
+			
+			if(compositeRequiredFieldName instanceof Label){
+				Label labelRequiredFieldName = (Label)compositeRequiredFieldName;
+				requiredFieldName = labelRequiredFieldName.getText();
+			}
+			if(compositeSourceFieldName instanceof Combo){
+				Combo comboSourceFieldName = (Combo)compositeSourceFieldName;
+				sourceFieldName = comboSourceFieldName.getText();
+			}
+			/*if(compositeDatatype instanceof Combo){
+				Combo comboDatatype = (Combo)compositeDatatype;
+				datatypeName = comboDatatype.getText();
+			}*/
+			//System.out.println("ROW" + i +" data: " + requiredFieldName + "====" + sourceFieldName + "====" + datatypeName);
+			//this.upDateSourceFieldHeader(sourceFieldName, requiredFieldName, datatypeName);
+			this.upDateSourceFieldHeader(sourceFieldName, requiredFieldName);
+		}
 	}
 	
-	private void upDateSourceFieldHeader(String sourceFieldName, String requiredFieldName, String datatypeName){
+	private void upDateSourceFieldHeader(String sourceFieldName, String requiredFieldName){
 		for( ColumnHeader sourceField : this.allSourceFields){
 			if(sourceField.getName().equals(sourceFieldName)){
 				sourceField.setRequiredFieldName(requiredFieldName);
 				sourceField.setRequired(true);
-				sourceField.setDataType(this.getDatatypeCode(datatypeName));
+				//sourceField.setDataType(this.getDatatypeCode(datatypeName));
 			}
 		}
 	}

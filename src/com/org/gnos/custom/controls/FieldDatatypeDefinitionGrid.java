@@ -114,6 +114,7 @@ public class FieldDatatypeDefinitionGrid extends Composite {
 			
 			Combo comboDatatype = new Combo(compositeRow, SWT.NONE);
 			comboDatatype.setItems(this.dataTypes);
+			comboDatatype.select(0);
 			FormData fd_comboDatatype = new FormData();
 			fd_comboDatatype.left = new FormAttachment(50, 12);
 			fd_comboDatatype.right = new FormAttachment(80);
@@ -132,7 +133,7 @@ public class FieldDatatypeDefinitionGrid extends Composite {
 		this.createRows();
 	}
 	
-	public List<ColumnHeader> getFieldDatatypes(){
+	/*public List<ColumnHeader> getFieldDatatypes(){
 		Control[] rowChildren = null;
 		for(int i = 0; i < allRows.size(); i++){
 			rowChildren = allRows.get(i).getChildren();
@@ -154,6 +155,29 @@ public class FieldDatatypeDefinitionGrid extends Composite {
 			this.updateSourceFieldWithDatatype(fieldName, datatypeName);
 		}
 		return this.allSourceFields;
+	}*/
+	
+	public void setFieldDatatypes(){
+		Control[] rowChildren = null;
+		for(int i = 0; i < allRows.size(); i++){
+			rowChildren = allRows.get(i).getChildren();
+			Control compositeFieldName = rowChildren[0];
+			Control compositeDatatype = rowChildren[1];
+			
+			String fieldName = null;
+			String datatypeName = null;
+			
+			if(compositeFieldName instanceof Label){
+				Label labelFieldName = (Label)compositeFieldName;
+				fieldName = labelFieldName.getText();
+			}
+			if(compositeDatatype instanceof Combo){
+				Combo comboDatatype = (Combo)compositeDatatype;
+				datatypeName = comboDatatype.getText();
+			}
+			
+			this.updateSourceFieldWithDatatype(fieldName, datatypeName);
+		}
 	}
 	
 	private void updateSourceFieldWithDatatype(String sourceFieldName, String datatypeName){

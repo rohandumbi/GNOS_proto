@@ -88,10 +88,35 @@ public class FieldDatatypeDefinitionScreen extends GnosScreen {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				//TODO mapping complete
-				projectModel.setAllProjectFields(fieldDatatypeDefinitionGrid.getFieldDatatypes());
+				//projectModel.setAllProjectFields(fieldDatatypeDefinitionGrid.getFieldDatatypes());
+				fieldDatatypeDefinitionGrid.setFieldDatatypes();
 				//System.out.println("After mapping datatype of 3rd row is: " + projectModel.getAllProjectFields().get(2).getDataType());
 				GnosEvent event = new GnosEvent(this, "complete:datatype-defintion");
 				triggerGnosEvent(event);
+			}
+		});
+		
+		/*
+		 * Temporary Save button
+		 */
+		
+		Button buttonSave = new Button(this, SWT.NONE);
+		buttonSave.setText("SAVE");
+		//int offsetXbuttonSave = -buttonDatatypeDefinition.computeSize(SWT.DEFAULT, SWT.DEFAULT).x / 2;
+		FormData fd_buttonSave = new FormData();
+		fd_buttonSave.top = new FormAttachment(fieldDatatypeDefinitionGrid, 10, SWT.BOTTOM);
+		fd_buttonSave.left = new FormAttachment(buttonDatatypeDefinition, 0, SWT.RIGHT);
+		//fd_buttonMapRqrdFields.right = new FormAttachment(0, 282);
+		buttonSave.setLayoutData(fd_buttonSave);
+		buttonSave.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				//TODO mapping complete
+				//projectModel.setAllProjectFields(fieldDatatypeDefinitionGrid.getFieldDatatypes());
+				fieldDatatypeDefinitionGrid.setFieldDatatypes();
+				//System.out.println("After mapping datatype of 3rd row is: " + projectModel.getAllProjectFields().get(2).getDataType());
+				/*GnosEvent event = new GnosEvent(this, "complete:datatype-defintion");
+				triggerGnosEvent(event);*/
 			}
 		});
 	}

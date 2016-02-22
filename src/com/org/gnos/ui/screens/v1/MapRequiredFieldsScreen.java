@@ -97,16 +97,40 @@ public class MapRequiredFieldsScreen extends GnosScreen {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				//TODO mapping complete
-				updateHeadersWithRequiredFieldsMapping();
+				//updateHeadersWithRequiredFieldsMapping();
+				mapRequiredFieldsGrid.setSourceFieldMapping();
 				GnosEvent event = new GnosEvent(this, "complete:map-required-fields");
 				triggerGnosEvent(event);
 			}
 		});
+		
+		
+		/*
+		 * Temporary Save button
+		 */
+		Button buttonSave = new Button(this, SWT.NONE);
+		buttonSave.setText("SAVE");
+		FormData fd_buttonSave = new FormData();
+		fd_buttonSave.top = new FormAttachment(mapRequiredFieldsGrid, 10, SWT.BOTTOM);
+		fd_buttonSave.left = new FormAttachment(buttonMapRqrdFields, 0, SWT.RIGHT);
+		//fd_buttonMapRqrdFields.right = new FormAttachment(0, 282);
+		buttonSave.setLayoutData(fd_buttonSave);
+		buttonSave.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				//TODO mapping complete
+				//projectModel.setAllProjectFields(fieldDatatypeDefinitionGrid.getFieldDatatypes());
+				mapRequiredFieldsGrid.setSourceFieldMapping();
+				//System.out.println("After mapping datatype of 3rd row is: " + projectModel.getAllProjectFields().get(2).getDataType());
+				/*GnosEvent event = new GnosEvent(this, "complete:datatype-defintion");
+				triggerGnosEvent(event);*/
+			}
+		});
 	}
 	
-	private void updateHeadersWithRequiredFieldsMapping(){
+	/*private void updateHeadersWithRequiredFieldsMapping(){
 		this.allHeaders = mapRequiredFieldsGrid.getMappedSourceFields();
-	}
+	}*/
 
 	@Override
 	protected void checkSubclass() {
