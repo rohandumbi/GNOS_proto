@@ -142,7 +142,7 @@ public class DumpCSV {
 		
 		GNOSDataProcessor processor = new GNOSDataProcessor("C:\\Arpan\\Workspace\\personal\\workspace\\GNOS_proto\\data\\GNOS_Test_data.csv");
 		try {
-			processor.doInBackground();
+			processor.processData();
 			List<ColumnHeader> headers = processor.getHeaderColumns();
 			for(int i= 0; i < headers.size(); i++){
 				System.out.println("Name :"+headers.get(i).getName());
