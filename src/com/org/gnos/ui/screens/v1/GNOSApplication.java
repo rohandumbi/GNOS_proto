@@ -159,12 +159,8 @@ public class GNOSApplication extends ApplicationWindow implements GnosEventListe
 		ProjectModel projectModel = new ProjectModel(event.attributes);
 		
 		gnosDataProcessor = new GNOSDataProcessor(event.attributes.get("recordFileName"));
-		try {
-			gnosDataProcessor.doInBackground();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		gnosDataProcessor.processData();
+		
 		projectModel.setAllProjectFields(gnosDataProcessor.getHeaderColumns());
 		
 		projectTabItem = new ProjectTabItem(cTabFolder, SWT.CLOSE, projectModel);

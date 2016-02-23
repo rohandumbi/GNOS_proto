@@ -1,5 +1,7 @@
 package com.org.gnos.ui.screens.v1;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -146,12 +148,8 @@ public class CreateNewProjectScreen extends Composite implements GnosEventGenera
 		/*DumpCSV dumpCSV = new DumpCSV();
 		dumpCSV.dump(fileName);*/
 		GNOSDataProcessor gnosDataProcessor = new GNOSDataProcessor(fileName);
-		try {
-			gnosDataProcessor.doInBackground();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		gnosDataProcessor.processData();
+
 	}
 
 	protected void checkSubclass() {

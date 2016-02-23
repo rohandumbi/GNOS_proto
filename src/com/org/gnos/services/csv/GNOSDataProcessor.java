@@ -1,6 +1,5 @@
 package com.org.gnos.services.csv;
 
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,37 +7,32 @@ import javax.swing.SwingWorker;
 
 import com.org.gnos.db.DBHelper;
 
+
 public class GNOSDataProcessor extends SwingWorker<Void, Void>{
 	
 	private CSVReader reader = null;
 	private String fileName = null;
-	
+
 	private List<ColumnHeader> headers = null;
 	
 
 	public GNOSDataProcessor(String fileName) {
 		super();
 		this.fileName = fileName;
+		try {
+			reader = new CSVReader(this.fileName);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
-	public List<ColumnHeader> getHeaderColumns() {
-				
+	public List<ColumnHeader> getHeaderColumns() {			
 		return headers;
 	}
 
-	private void processHeaderRow(String[] headerRow){
-		headers = new ArrayList<ColumnHeader>();
-		for(int i=0; i < headerRow.length; i++ ){			
-			ColumnHeader header = new ColumnHeader(headerRow[i]);
-			headers.add(header);
-		}
-		
-		dropTable();
-		createTable();
-	}
+
 	
-	private void dropTable() {
-		
+	private void dropTable() {		
 		String  sql = "DROP TABLE IF EXISTS gnos_data;";
 		DBHelper.updateDB(sql);
 	}
@@ -72,21 +66,34 @@ public class GNOSDataProcessor extends SwingWorker<Void, Void>{
 		
 	}
 	
-	@Override
-	public Void doInBackground() throws Exception {
-		reader = new CSVReader(this.fileName);
-		String[] row = reader.readLine();;
-		while (row != null) {
-			if(reader.getCurrentRowCount() == 1) {
-				processHeaderRow(row);
-				break;
-			} else {
-				processRecord(row);
-			}
-			row = reader.readLine();
-			
+	private void processHeaderRow(String[] headerRow){
+		headers = new ArrayList<ColumnHeader>();
+		for(int i=0; i < headerRow.length; i++ ){			
+			ColumnHeader header = new ColumnHeader(headerRow[i]);
+			headers.add(header);
 		}
 		
+		dropTable();
+		createTable();
+	}
+	
+	@Override
+	protected Void doInBackground() throws Exception {
+		String[] row = reader.readLine();
+		while (row != null) {
+			processRecord(row);
+			row = reader.readLine();		
+		}
 		return null;
+	}
+	
+	public void processData() {
+		String[] row = reader.readLine();
+		if(row != null) {
+			if(reader.getCurrentRowCount() == 1) {
+				processHeaderRow(row);
+			}
+		}
+		this.execute();
 	}
 }
