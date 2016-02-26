@@ -3,6 +3,8 @@ package com.org.gnos.ui.screens.v1;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FormAttachment;
@@ -15,7 +17,6 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.custom.controls.FieldDatatypeDefinitionGrid;
 import com.org.gnos.custom.controls.GnosScreen;
-import com.org.gnos.custom.controls.MapRequiredFieldsGrid;
 import com.org.gnos.custom.models.ProjectModel;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.services.csv.ColumnHeader;
@@ -26,7 +27,7 @@ public class FieldDatatypeDefinitionScreen extends GnosScreen {
 	private String[] dataTypes;
 	private ProjectModel projectModel;
 	private FieldDatatypeDefinitionGrid fieldDatatypeDefinitionGrid;
-	
+
 	/**
 	 * Create the composite.
 	 * @param parent
@@ -45,7 +46,7 @@ public class FieldDatatypeDefinitionScreen extends GnosScreen {
 		this.createContent();
 
 	}
-	
+
 	private void createContent(){
 		setLayout(new FormLayout());
 		Label labelScreenName = new Label(this, SWT.NONE);
@@ -58,7 +59,7 @@ public class FieldDatatypeDefinitionScreen extends GnosScreen {
 		labelScreenName.setLayoutData(fd_labelScreenName);
 		labelScreenName.setFont(SWTResourceManager.getFont("Arial", 9, SWT.BOLD));
 		labelScreenName.setText("Source Field Datatype Mappings");
-		
+
 		Label labelScreenDescription = new Label(this, SWT.NONE);
 		labelScreenDescription.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
 		labelScreenDescription.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
@@ -68,20 +69,21 @@ public class FieldDatatypeDefinitionScreen extends GnosScreen {
 		fd_labelScreenDescription.right = new FormAttachment(0, 866);
 		labelScreenDescription.setLayoutData(fd_labelScreenDescription);
 		labelScreenDescription.setText("For each field in the system map the datatype.");
-		
+
 		fieldDatatypeDefinitionGrid = new FieldDatatypeDefinitionGrid(this, SWT.NONE, this.allHeaders, this.dataTypes);
 		FormData fd_fieldDatatypeDefinitionGrid = new FormData();
 		fd_fieldDatatypeDefinitionGrid.top = new FormAttachment(labelScreenDescription, 6);
 		fd_fieldDatatypeDefinitionGrid.left = new FormAttachment(0, 10);
 		fd_fieldDatatypeDefinitionGrid.right = new FormAttachment(100, -10);
 		fieldDatatypeDefinitionGrid.setLayoutData(fd_fieldDatatypeDefinitionGrid);
-		
+
 		Button buttonDatatypeDefinition = new Button(this, SWT.NONE);
 		buttonDatatypeDefinition.setText("NEXT");
-		int offsetX = -buttonDatatypeDefinition.computeSize(SWT.DEFAULT, SWT.DEFAULT).x / 2;
+		//int offsetX = -buttonDatatypeDefinition.computeSize(SWT.DEFAULT, SWT.DEFAULT).x / 2;
 		FormData fd_buttonDatatypeDefinition = new FormData();
+		fd_buttonDatatypeDefinition.right = new FormAttachment(50);
 		fd_buttonDatatypeDefinition.top = new FormAttachment(fieldDatatypeDefinitionGrid, 10, SWT.BOTTOM);
-		fd_buttonDatatypeDefinition.left = new FormAttachment(50, offsetX);
+		fd_buttonDatatypeDefinition.left = new FormAttachment(50, -145);
 		//fd_buttonMapRqrdFields.right = new FormAttachment(0, 282);
 		buttonDatatypeDefinition.setLayoutData(fd_buttonDatatypeDefinition);
 		buttonDatatypeDefinition.addSelectionListener(new SelectionAdapter() {
@@ -95,19 +97,39 @@ public class FieldDatatypeDefinitionScreen extends GnosScreen {
 				triggerGnosEvent(event);
 			}
 		});
-		
+
 		/*
 		 * Temporary Save button
 		 */
-		
-		Button buttonSave = new Button(this, SWT.NONE);
+
+		final Button buttonSave = new Button(this, SWT.NONE);
+		buttonSave.setImage(null);
+		buttonSave.setForeground(SWTResourceManager.getColor(0, 102, 204));
 		buttonSave.setText("SAVE");
 		//int offsetXbuttonSave = -buttonDatatypeDefinition.computeSize(SWT.DEFAULT, SWT.DEFAULT).x / 2;
 		FormData fd_buttonSave = new FormData();
+		fd_buttonSave.right = new FormAttachment(50, 145);
+		fd_buttonSave.left = new FormAttachment(buttonDatatypeDefinition, 5, SWT.RIGHT);
 		fd_buttonSave.top = new FormAttachment(fieldDatatypeDefinitionGrid, 10, SWT.BOTTOM);
-		fd_buttonSave.left = new FormAttachment(buttonDatatypeDefinition, 0, SWT.RIGHT);
 		//fd_buttonMapRqrdFields.right = new FormAttachment(0, 282);
 		buttonSave.setLayoutData(fd_buttonSave);
+
+		/*buttonSave.addPaintListener(new PaintListener() {
+			@Override
+			public void paintControl(PaintEvent arg0) {
+				// TODO Auto-generated method stub
+				//buttonSave.setBackground(SWTResourceManager.getColor(0, 102, 204));
+				arg0.gc.setForeground(SWTResourceManager.getColor(0, 102, 204));
+				buttonSave.setText("SAVE");
+				//buttonSave.setForeground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				org.eclipse.swt.graphics.Pattern pattern;
+				pattern = new org.eclipse.swt.graphics.Pattern(arg0.gc.getDevice(), 0,0,0,100, SWTResourceManager.getColor(0, 102, 204),230, SWTResourceManager.getColor(0, 102, 204),230);
+				arg0.gc.setBackgroundPattern(pattern);
+				arg0.gc.fillGradientRectangle(0, 0, buttonSave.getBounds().width, buttonSave.getBounds().height, true);
+			}
+		});*/
+
+
 		buttonSave.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -120,11 +142,11 @@ public class FieldDatatypeDefinitionScreen extends GnosScreen {
 			}
 		});
 	}
-	
+
 	/*private void setFieldDatatypes(){
 		fieldDatatypeDefinitionGrid.setFieldDatatypes();
 	}*/
-	
+
 	private List<ColumnHeader> getAllHeaders(){
 		return this.projectModel.getAllProjectFields();
 	}
@@ -138,7 +160,7 @@ public class FieldDatatypeDefinitionScreen extends GnosScreen {
 	@Override
 	public void onGnosEventFired(GnosEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 	private void triggerGnosEvent(GnosEvent event){
 		int j = listeners.size();

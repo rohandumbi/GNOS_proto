@@ -76,15 +76,6 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 		fd_expressionBuilderGrid.right = new FormAttachment(100, -10);
 		expressionBuilderGrid.setLayoutData(fd_expressionBuilderGrid);
 		
-		Button buttonExpressionDefinition = new Button(this, SWT.NONE);
-		buttonExpressionDefinition.setText("NEXT");
-		int offsetX = -buttonExpressionDefinition.computeSize(SWT.DEFAULT, SWT.DEFAULT).x / 2;
-		FormData fd_buttonExpressionDefinition = new FormData();
-		fd_buttonExpressionDefinition.top = new FormAttachment(expressionBuilderGrid, 10, SWT.BOTTOM);
-		fd_buttonExpressionDefinition.left = new FormAttachment(50, offsetX);
-		//fd_buttonMapRqrdFields.right = new FormAttachment(0, 282);
-		buttonExpressionDefinition.setLayoutData(fd_buttonExpressionDefinition);
-		
 		Button btnAddNewRow = new Button(this, SWT.NONE);
 		final Composite me = this;
 		btnAddNewRow.addSelectionListener(new SelectionAdapter() {
@@ -95,10 +86,23 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 			}
 		});
 		FormData fd_btnAddNewRow = new FormData();
-		fd_btnAddNewRow.top = new FormAttachment(buttonExpressionDefinition, 0, SWT.TOP);
-		fd_btnAddNewRow.left = new FormAttachment(buttonExpressionDefinition, 6);
 		btnAddNewRow.setLayoutData(fd_btnAddNewRow);
 		btnAddNewRow.setText("ADD NEW ROW");
+		btnAddNewRow.setSize(145, SWT.DEFAULT);
+		//int offsetX = -btnAddNewRow.computeSize(SWT.DEFAULT, SWT.DEFAULT).x / 2;
+		fd_btnAddNewRow.top = new FormAttachment(expressionBuilderGrid, 10, SWT.BOTTOM);
+		fd_btnAddNewRow.left = new FormAttachment(50, -77);
+		fd_btnAddNewRow.right = new FormAttachment(50, 77);
+		
+		
+		Button buttonExpressionDefinition = new Button(this, SWT.NONE);
+		buttonExpressionDefinition.setText("NEXT");
+		FormData fd_buttonExpressionDefinition = new FormData();
+		fd_buttonExpressionDefinition.top = new FormAttachment(expressionBuilderGrid, 10, SWT.BOTTOM);
+		fd_buttonExpressionDefinition.right = new FormAttachment(btnAddNewRow, -5, SWT.LEFT);
+		fd_buttonExpressionDefinition.left = new FormAttachment(btnAddNewRow, -145, SWT.LEFT);
+		//fd_buttonMapRqrdFields.right = new FormAttachment(0, 282);
+		buttonExpressionDefinition.setLayoutData(fd_buttonExpressionDefinition);
 		buttonExpressionDefinition.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -117,7 +121,8 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 		buttonSave.setText("SAVE");
 		FormData fd_buttonSave = new FormData();
 		fd_buttonSave.top = new FormAttachment(expressionBuilderGrid, 10, SWT.BOTTOM);
-		fd_buttonSave.left = new FormAttachment(btnAddNewRow, 0, SWT.RIGHT);
+		fd_buttonSave.left = new FormAttachment(btnAddNewRow, 5, SWT.RIGHT);
+		fd_buttonSave.right = new FormAttachment(btnAddNewRow, 145, SWT.RIGHT);
 		//fd_buttonMapRqrdFields.right = new FormAttachment(0, 282);
 		buttonSave.setLayoutData(fd_buttonSave);
 		buttonSave.addSelectionListener(new SelectionAdapter() {

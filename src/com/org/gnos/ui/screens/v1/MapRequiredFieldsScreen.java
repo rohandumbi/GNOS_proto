@@ -90,7 +90,8 @@ public class MapRequiredFieldsScreen extends GnosScreen {
 		int offsetX = -buttonMapRqrdFields.computeSize(SWT.DEFAULT, SWT.DEFAULT).x / 2;
 		FormData fd_buttonMapRqrdFields = new FormData();
 		fd_buttonMapRqrdFields.top = new FormAttachment(mapRequiredFieldsGrid, 10, SWT.BOTTOM);
-		fd_buttonMapRqrdFields.left = new FormAttachment(50, offsetX);
+		fd_buttonMapRqrdFields.left = new FormAttachment(50, -145);
+		fd_buttonMapRqrdFields.right = new FormAttachment(50);
 		//fd_buttonMapRqrdFields.right = new FormAttachment(0, 282);
 		buttonMapRqrdFields.setLayoutData(fd_buttonMapRqrdFields);
 		buttonMapRqrdFields.addSelectionListener(new SelectionAdapter() {
@@ -112,8 +113,8 @@ public class MapRequiredFieldsScreen extends GnosScreen {
 		buttonSave.setText("SAVE");
 		FormData fd_buttonSave = new FormData();
 		fd_buttonSave.top = new FormAttachment(mapRequiredFieldsGrid, 10, SWT.BOTTOM);
-		fd_buttonSave.left = new FormAttachment(buttonMapRqrdFields, 0, SWT.RIGHT);
-		//fd_buttonMapRqrdFields.right = new FormAttachment(0, 282);
+		fd_buttonSave.left = new FormAttachment(buttonMapRqrdFields, 5, SWT.RIGHT);
+		fd_buttonSave.right = new FormAttachment(50, 145);
 		buttonSave.setLayoutData(fd_buttonSave);
 		buttonSave.addSelectionListener(new SelectionAdapter() {
 			@Override

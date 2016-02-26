@@ -35,7 +35,6 @@ public class ExpressionBuilderGrid extends Composite {
 	private List<String> numericSourceFields;
 	private String[] sourceFieldsComboItems;
 	private Composite presentRow;
-	private Text expressionName;
 	private List<Expression> expressionList;
 	private String[] arithemeticOperatorsArray;
 	
@@ -218,7 +217,7 @@ public class ExpressionBuilderGrid extends Composite {
 		fd_grade.left = new FormAttachment(0, 10);
 		grade.setLayoutData(fd_grade);
 		
-		expressionName = new Text(compositeRow, SWT.BORDER);
+		Text expressionName = new Text(compositeRow, SWT.BORDER);
 		fd_grade.top = new FormAttachment(expressionName, 2, SWT.TOP);
 		FormData fd_expressionName = new FormData();
 		fd_expressionName.left = new FormAttachment(5, 5);
@@ -226,13 +225,13 @@ public class ExpressionBuilderGrid extends Composite {
 		fd_expressionName.right = new FormAttachment(30, -5);
 		expressionName.setLayoutData(fd_expressionName);
 		
-		Composite expressionComposite = new Composite(compositeRow, SWT.NONE);
+		/*Composite expressionComposite = new Composite(compositeRow, SWT.NONE);
 		expressionComposite.setLayout(new FillLayout(SWT.HORIZONTAL));
 		expressionComposite.setBackground(backgroundColor);
 		FormData fd_expressionComposite = new FormData();
 		fd_expressionComposite.right = new FormAttachment(70, -5);
 		fd_expressionComposite.left = new FormAttachment(40, 5);
-		expressionComposite.setLayoutData(fd_expressionComposite);
+		expressionComposite.setLayoutData(fd_expressionComposite);*/
 		
 		Button buttonIsComplex = new Button(compositeRow, SWT.CHECK);
 		FormData fd_buttonIsComplex = new FormData();
@@ -246,7 +245,7 @@ public class ExpressionBuilderGrid extends Composite {
 			public void widgetSelected(SelectionEvent e) {
 				boolean isSelected = ((Button)e.getSource()).getSelection();
 				System.out.println("Selection: " + isSelected);
-				compositeRow.getChildren()[4].dispose();//temporary hack, need to identify in a better way
+				compositeRow.getChildren()[3].dispose();//temporary hack, need to identify in a better way
 				toggleExpressionType(compositeRow, isSelected);
 			}
 		});
@@ -275,7 +274,7 @@ public class ExpressionBuilderGrid extends Composite {
 			
 			Control controlGrade = rowChildren[0];
 			Control controlExpressionName = rowChildren[1];
-			Control controlExpressionValue = rowChildren[2];
+			Control controlExpressionValue = rowChildren[3];
 			
 			if(controlGrade instanceof Button){
 				Button buttonControlGrade = (Button)controlGrade;
@@ -287,58 +286,41 @@ public class ExpressionBuilderGrid extends Composite {
 				expressionName = textControlExpressionName.getText();
 			}
 			
-			if(controlExpressionValue instanceof Combo){
-				Combo comboControlExpressionValue = (Combo)controlExpressionValue;
-				expressionValue = comboControlExpressionValue.getText();
+			
+			
+			if(controlExpressionValue instanceof Composite){
+				Composite compositeExpressionValue = (Composite)controlExpressionValue;
+				Control[] controlExpression = compositeExpressionValue.getChildren();
+				
+				if(controlExpression.length == 1){
+					Combo leftOperand = (Combo)controlExpression[0];
+					expressionValue = leftOperand.getText();
+				}else{
+					Combo leftOperand = (Combo)controlExpression[0];
+					Combo operator = (Combo)controlExpression[1];
+					Combo rightOperand = (Combo)controlExpression[2];
+				}
+				
+				//Combo comboDatatype = (Combo)compositeDatatype;
+				//expressionValue = leftOperand.getText();
 			}
+			
 			Expression expression = new Expression(expressionName);
-			expression.setValue(this.allSourceFields.indexOf(expressionValue));
+			int index = -1;
+			for (int j=0; j<this.allSourceFields.size(); j++) {
+			    ColumnHeader columnHeader = this.allSourceFields.get(j);
+				
+				if (columnHeader.getName().equalsIgnoreCase(expressionValue)) {
+			        index = j;
+			        break;
+			    }
+			}
+			expression.setValue(index);
 			expression.setGrade(isGrade);
 			
 			this.expressionList.add(expression);
 		}
 		return this.expressionList;
-	}
-
-	public List<ColumnHeader> getMappedSourceFields(){
-		Control[] rowChildren = null;
-		for(int i = 0; i < allRows.size(); i++){
-			rowChildren = allRows.get(i).getChildren();
-			
-			String requiredFieldName = null;
-			String sourceFieldName = null;
-			String datatypeName = null;
-			
-			Control compositeRequiredFieldName = rowChildren[0];
-			Control compositeSourceFieldName = rowChildren[1];
-			Control compositeDatatype = rowChildren[2];
-			
-			if(compositeRequiredFieldName instanceof Label){
-				Label labelRequiredFieldName = (Label)compositeRequiredFieldName;
-				requiredFieldName = labelRequiredFieldName.getText();
-			}
-			if(compositeSourceFieldName instanceof Combo){
-				Combo comboSourceFieldName = (Combo)compositeSourceFieldName;
-				sourceFieldName = comboSourceFieldName.getText();
-			}
-			if(compositeDatatype instanceof Combo){
-				Combo comboDatatype = (Combo)compositeDatatype;
-				datatypeName = comboDatatype.getText();
-			}
-			this.upDateSourceFieldHeader(sourceFieldName, requiredFieldName, datatypeName);
-		}
-
-		return this.allSourceFields;
-	}
-	
-	private void upDateSourceFieldHeader(String sourceFieldName, String requiredFieldName, String datatypeName){
-		for( ColumnHeader sourceField : this.allSourceFields){
-			if(sourceField.getName().equals(sourceFieldName)){
-				sourceField.setRequiredFieldName(requiredFieldName);
-				sourceField.setRequired(true);
-				sourceField.setDataType(this.getDatatypeCode(datatypeName));
-			}
-		}
 	}
 
 	@Override
