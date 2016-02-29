@@ -1,10 +1,9 @@
 package com.org.gnos.ui.screens.v1;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -112,8 +111,10 @@ public class CreateNewProjectScreen extends Composite implements GnosEventGenera
 				GnosEventWithAttributeMap event = new GnosEventWithAttributeMap(this, "createNewProjectScreen:upload-records-complete", attributes);
 				if(csvFileName != null){
 					//uploadFileToDB(csvFileName);
+					fireChildEvent(event);
+				}else{
+					MessageDialog.openError(parent.getShell(), "GNOS Error", "Please provide a valid CSV input file as data input.");
 				}
-				fireChildEvent(event);
 			}
 		});
 		btnSubmit.setFont(SWTResourceManager.getFont("Arial", 12, SWT.NORMAL));
