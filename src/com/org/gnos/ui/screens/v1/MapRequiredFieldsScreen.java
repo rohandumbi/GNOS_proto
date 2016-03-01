@@ -99,9 +99,11 @@ public class MapRequiredFieldsScreen extends GnosScreen {
 			public void widgetSelected(SelectionEvent e) {
 				//TODO mapping complete
 				//updateHeadersWithRequiredFieldsMapping();
-				mapRequiredFieldsGrid.setSourceFieldMapping();
-				GnosEvent event = new GnosEvent(this, "complete:map-required-fields");
-				triggerGnosEvent(event);
+				boolean isMappingSuccessful = mapRequiredFieldsGrid.setSourceFieldMapping();
+				if(isMappingSuccessful == true){
+					GnosEvent event = new GnosEvent(this, "complete:map-required-fields");
+					triggerGnosEvent(event);
+				}
 			}
 		});
 		
@@ -123,8 +125,10 @@ public class MapRequiredFieldsScreen extends GnosScreen {
 				//projectModel.setAllProjectFields(fieldDatatypeDefinitionGrid.getFieldDatatypes());
 				mapRequiredFieldsGrid.setSourceFieldMapping();
 				//System.out.println("After mapping datatype of 3rd row is: " + projectModel.getAllProjectFields().get(2).getDataType());
-				/*GnosEvent event = new GnosEvent(this, "complete:datatype-defintion");
-				triggerGnosEvent(event);*/
+				/*if(isMappingSuccessful == true){
+					GnosEvent event = new GnosEvent(this, "complete:map-required-fields");
+					triggerGnosEvent(event);
+				}*/
 			}
 		});
 	}

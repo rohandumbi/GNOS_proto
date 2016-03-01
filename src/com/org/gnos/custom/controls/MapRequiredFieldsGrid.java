@@ -3,6 +3,7 @@ package com.org.gnos.custom.controls;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FormAttachment;
@@ -29,26 +30,17 @@ public class MapRequiredFieldsGrid extends Composite {
 	private Composite compositeGridHeader;
 	private List<Composite> allRows;
 	private String[] sourceFieldsComboItems;
+	private Composite parent;
 	
 	public MapRequiredFieldsGrid(Composite parent, int style, String[] requiredFieldNames, List<ColumnHeader> allSourceFields, String[] dataTypes) {
 		super(parent, style);
+		this.parent = parent;
 		this.requiredFieldNames = requiredFieldNames;
 		this.allSourceFields = allSourceFields;
 		//this.dataTypes = dataTypes;
 		this.createContent(parent);
 	}
 	
-	/*private int getDatatypeCode(String dataType){
-		if(dataType.equalsIgnoreCase("String")){
-			return 1;
-		}else if(dataType.equalsIgnoreCase("Integer")){
-			return 2;
-		}else if(dataType.equalsIgnoreCase("Double")){
-			return 3;
-		}else{
-			return 1;
-		}
-	}*/
 	private void createSourceFieldsComboItems(){
 		int i = 0;
 		int sourceFieldSize = this.allSourceFields.size();
@@ -165,39 +157,7 @@ public class MapRequiredFieldsGrid extends Composite {
 		this.createRows();
 	}
 
-	/*public List<ColumnHeader> getMappedSourceFields(){
-		Control[] rowChildren = null;
-		for(int i = 0; i < allRows.size(); i++){
-			rowChildren = allRows.get(i).getChildren();
-			
-			String requiredFieldName = null;
-			String sourceFieldName = null;
-			String datatypeName = null;
-			
-			Control compositeRequiredFieldName = rowChildren[0];
-			Control compositeSourceFieldName = rowChildren[1];
-			Control compositeDatatype = rowChildren[2];
-			
-			if(compositeRequiredFieldName instanceof Label){
-				Label labelRequiredFieldName = (Label)compositeRequiredFieldName;
-				requiredFieldName = labelRequiredFieldName.getText();
-			}
-			if(compositeSourceFieldName instanceof Combo){
-				Combo comboSourceFieldName = (Combo)compositeSourceFieldName;
-				sourceFieldName = comboSourceFieldName.getText();
-			}
-			if(compositeDatatype instanceof Combo){
-				Combo comboDatatype = (Combo)compositeDatatype;
-				datatypeName = comboDatatype.getText();
-			}
-			//System.out.println("ROW" + i +" data: " + requiredFieldName + "====" + sourceFieldName + "====" + datatypeName);
-			this.upDateSourceFieldHeader(sourceFieldName, requiredFieldName, datatypeName);
-		}
-
-		return this.allSourceFields;
-	}*/
-	
-	public void setSourceFieldMapping(){
+	public boolean setSourceFieldMapping(){
 		Control[] rowChildren = null;
 		for(int i = 0; i < allRows.size(); i++){
 			rowChildren = allRows.get(i).getChildren();
@@ -224,8 +184,13 @@ public class MapRequiredFieldsGrid extends Composite {
 			}*/
 			//System.out.println("ROW" + i +" data: " + requiredFieldName + "====" + sourceFieldName + "====" + datatypeName);
 			//this.upDateSourceFieldHeader(sourceFieldName, requiredFieldName, datatypeName);
+			if(sourceFieldName == null || sourceFieldName == ""){
+				MessageDialog.openError(this.parent.getShell(), "GNOS Error", "Please map a source field for the Required Field: " + requiredFieldName);
+				return false;
+			}
 			this.upDateSourceFieldHeader(sourceFieldName, requiredFieldName);
 		}
+		return true;
 	}
 	
 	private void upDateSourceFieldHeader(String sourceFieldName, String requiredFieldName){
