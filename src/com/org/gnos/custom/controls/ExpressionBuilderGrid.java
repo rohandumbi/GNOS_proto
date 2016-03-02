@@ -296,6 +296,11 @@ public class ExpressionBuilderGrid extends Composite {
 				expressionName = textControlExpressionName.getText();
 			}
 			
+			if(expressionName == null || expressionName == ""){
+				MessageDialog.openError(this.parent.getShell(), "GNOS Error", "Please enter a valid name for expression.");
+				return null;
+			}
+			
 			
 			
 			if(controlExpressionValue instanceof Composite){
