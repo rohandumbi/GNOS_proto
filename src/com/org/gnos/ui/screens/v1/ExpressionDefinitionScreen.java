@@ -108,9 +108,14 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 			public void widgetSelected(SelectionEvent e) {
 				//TODO mapping complete
 				//updateHeadersWithRequiredFieldsMapping();
-				updateExpressionList();
-				GnosEvent event = new GnosEvent(this, "complete:expression-defintion");
-				triggerGnosEvent(event);
+				boolean isUpdateExpressionSuccessful = updateExpressionList();
+				if(isUpdateExpressionSuccessful == true){
+					GnosEvent event = new GnosEvent(this, "complete:expression-defintion");
+					triggerGnosEvent(event);
+				}else{
+					
+				}
+				
 			}
 		});
 		
@@ -138,13 +143,17 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 		});
 	}
 	
-	private void updateExpressionList(){
+	private boolean updateExpressionList(){
 		Expressions expressions = new Expressions();
 		this.allDefinedExpressions = expressionBuilderGrid.getDefinedExpressions();
+		if(this.allDefinedExpressions == null){
+			return false;
+		}
 		for(Expression expression: this.allDefinedExpressions){
 			//Expressions expressions = new Expressions();
 			expressions.add(expression);
 		}
+		return true;
 		/*Expressions expressions = new Expressions();
 		Expression expression = new Expression("Rohan");
 		expression.setGrade(true);

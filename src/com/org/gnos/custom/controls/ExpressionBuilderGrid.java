@@ -3,6 +3,7 @@ package com.org.gnos.custom.controls;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -37,21 +38,23 @@ public class ExpressionBuilderGrid extends Composite {
 	private Composite presentRow;
 	private List<Expression> expressionList;
 	private String[] arithemeticOperatorsArray;
+	private Composite parent;
 	
 	public ExpressionBuilderGrid(Composite parent, int style, List<ColumnHeader> allSourceFields) {
 		super(parent, style);
+		this.parent = parent;
 		//this.requiredFieldNames = requiredFieldNames;
 		//this.parent = parent;
 		this.allSourceFields = allSourceFields;
 		this.allRows = new ArrayList<Composite>();
-		this.expressionList = new ArrayList<Expression>();
+		//this.expressionList = new ArrayList<Expression>();
 		//this.numericSourceFields = new ArrayList<String>();
 		//this.dataTypes = dataTypes;
 		this.arithemeticOperatorsArray = new String[]{"+", "-", "*", "/"};
 		this.createContent(parent);
 	}
 	
-	private int getDatatypeCode(String dataType){
+	/*private int getDatatypeCode(String dataType){
 		if(dataType.equalsIgnoreCase("String")){
 			return 1;
 		}else if(dataType.equalsIgnoreCase("Integer")){
@@ -61,7 +64,7 @@ public class ExpressionBuilderGrid extends Composite {
 		}else{
 			return 0;
 		}
-	}
+	}*/
 	private String[] getSourceFieldsComboItems(){
 		int i = 0;
 		int sourceFieldSize = this.allSourceFields.size();
@@ -266,6 +269,7 @@ public class ExpressionBuilderGrid extends Composite {
 	
 	public List<Expression> getDefinedExpressions(){
 		Control[] rowChildren = null;
+		this.expressionList = new ArrayList<Expression>();
 		for(int i = 0; i < allRows.size(); i++){
 			rowChildren = allRows.get(i).getChildren();
 			boolean isGrade = false;
@@ -314,6 +318,10 @@ public class ExpressionBuilderGrid extends Composite {
 			        index = j;
 			        break;
 			    }
+			}
+			if(index<0){
+				MessageDialog.openError(this.parent.getShell(), "GNOS Error", "Please map a proper value for the expression: " + expressionName);
+				return null;
 			}
 			expression.setValue(index);
 			expression.setGrade(isGrade);
