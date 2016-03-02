@@ -5,6 +5,7 @@ import java.util.List;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -83,6 +84,10 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 			public void widgetSelected(SelectionEvent e) {
 				expressionBuilderGrid.addRow();
 				me.layout();
+				Composite parent = me.getParent();
+				parent.layout(true, true);
+				final Point newSize = parent.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);  
+				parent.setSize(newSize);
 			}
 		});
 		FormData fd_btnAddNewRow = new FormData();

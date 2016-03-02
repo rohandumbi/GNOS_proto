@@ -138,17 +138,16 @@ public class GnosExpressionComposite extends Composite {
 		 */
 		
 		Composite parentExpressionRow = this.getParent();
-		Composite parentExpressionGrid = parentExpressionRow.getParent();
-		Composite parentExpressionScreen = parentExpressionGrid.getParent();
-		
 		parentExpressionRow.layout(true, true);
 		final Point newSize = parentExpressionRow.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);  
 		parentExpressionRow.setSize(newSize);
 		
+		Composite parentExpressionGrid = parentExpressionRow.getParent();
 		parentExpressionGrid.layout(true, true);
 		final Point newSize1 = parentExpressionGrid.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);  
 		parentExpressionGrid.setSize(newSize1);
 		
+		Composite parentExpressionScreen = parentExpressionGrid.getParent();
 		parentExpressionScreen.layout(true, true);
 		final Point newSize2 = parentExpressionScreen.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);  
 		parentExpressionScreen.setSize(newSize2);
