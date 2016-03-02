@@ -113,7 +113,7 @@ public class ExpressionBuilderGrid extends Composite {
 		
 		Label fourthSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
 		FormData fd_fourthSeparator = new FormData();
-		fd_fourthSeparator.left = new FormAttachment(70);
+		fd_fourthSeparator.left = new FormAttachment(58);
 		fourthSeparator.setLayoutData(fd_fourthSeparator);
 		
 		Label lblGradeHeader = new Label(compositeGridHeader, SWT.NONE);
@@ -159,7 +159,7 @@ public class ExpressionBuilderGrid extends Composite {
 		fd_lblFiltersHeader.top = new FormAttachment(0,2);
 		fd_lblFiltersHeader.left = new FormAttachment(fourthSeparator, 10);
 		lblFiltersHeader.setLayoutData(fd_lblFiltersHeader);
-		lblFiltersHeader.setText("FILTERS");
+		lblFiltersHeader.setText("CONDITIONS (Empty means everything)");
 		this.presentRow = this.compositeGridHeader;//referring to the header as the 1st row when there are no rows inserted yet
 		
 	}
@@ -170,7 +170,7 @@ public class ExpressionBuilderGrid extends Composite {
 		expressionComposite.setLayout(new FillLayout(SWT.HORIZONTAL));
 		//expressionComposite.setBackground(backgroundColor);
 		FormData fd_expressionComposite = new FormData();
-		fd_expressionComposite.right = new FormAttachment(70, -5);
+		fd_expressionComposite.right = new FormAttachment(58, -5);
 		fd_expressionComposite.left = new FormAttachment(40, 5);
 		expressionComposite.setLayoutData(fd_expressionComposite);
 		String[] comboItems = this.getSourceFieldsComboItems();
@@ -211,7 +211,7 @@ public class ExpressionBuilderGrid extends Composite {
 		compositeRow.setBackground(backgroundColor);
 		FormData fd_compositeRow = new FormData();
 		fd_compositeRow.left = new FormAttachment(this.presentRow, 0, SWT.LEFT);
-		fd_compositeRow.bottom = new FormAttachment(this.presentRow, 26, SWT.BOTTOM);
+		//fd_compositeRow.bottom = new FormAttachment(this.presentRow, 26, SWT.BOTTOM);
 		fd_compositeRow.right = new FormAttachment(this.presentRow, 0, SWT.RIGHT);
 		fd_compositeRow.top = new FormAttachment(this.presentRow);
 		
@@ -254,6 +254,12 @@ public class ExpressionBuilderGrid extends Composite {
 		});
 		
 		this.toggleExpressionType(compositeRow, false);
+		
+		GnosExpressionComposite gnosExpressionComposite = new GnosExpressionComposite(compositeRow, SWT.NONE);
+		FormData fd_gnosExpressionComposite = new FormData();
+		fd_gnosExpressionComposite.left = new FormAttachment(58, 2);
+		fd_gnosExpressionComposite.right = new FormAttachment(100);
+		gnosExpressionComposite.setLayoutData(fd_gnosExpressionComposite);
 		
 		this.presentRow = compositeRow;
 		this.allRows.add(compositeRow);
