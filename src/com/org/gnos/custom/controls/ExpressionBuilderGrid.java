@@ -21,6 +21,8 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.services.Expression;
+import com.org.gnos.services.Filter;
+import com.org.gnos.services.Operation;
 import com.org.gnos.services.csv.ColumnHeader;
 
 public class ExpressionBuilderGrid extends Composite {
@@ -282,21 +284,39 @@ public class ExpressionBuilderGrid extends Composite {
 		for(int i = 0; i < allRows.size(); i++){
 			rowChildren = allRows.get(i).getChildren();
 			boolean isGrade = false;
+			boolean isComplex = false;
 			String expressionName = null;
 			String expressionValue = null;
 			
 			Control controlGrade = rowChildren[0];
 			Control controlExpressionName = rowChildren[1];
-			Control controlExpressionValue = rowChildren[3];
+			Control controlIsComplex = rowChildren[2];
+			Expression expression= null;
+			
+			Control controlExpressionValue = null;
+			GnosConditionCellComposite conditionComposite = null;
+			if(rowChildren[3] instanceof GnosConditionCellComposite){ //temporary hack, need to identify in a better way
+				controlExpressionValue = rowChildren[4];
+				conditionComposite = (GnosConditionCellComposite)rowChildren[3];
+			}else{
+				controlExpressionValue = rowChildren[3];
+				conditionComposite = (GnosConditionCellComposite)rowChildren[4];
+			}
 			
 			if(controlGrade instanceof Button){
 				Button buttonControlGrade = (Button)controlGrade;
 				isGrade = buttonControlGrade.getSelection();
 			}
 			
+			if(controlIsComplex instanceof Button){
+				Button buttonIsComplex = (Button)controlIsComplex;
+				isComplex = buttonIsComplex.getSelection();
+			}
+			
 			if(controlExpressionName instanceof Text){
 				Text textControlExpressionName = (Text)controlExpressionName;
 				expressionName = textControlExpressionName.getText();
+				expression = new Expression(expressionName);
 			}
 			
 			if(expressionName == null || expressionName == ""){
@@ -308,6 +328,80 @@ public class ExpressionBuilderGrid extends Composite {
 			
 			if(controlExpressionValue instanceof Composite){
 				Composite compositeExpressionValue = (Composite)controlExpressionValue;
+				if(isComplex == true){
+					expression.setValueType(isComplex);
+					Combo leftOperand = (Combo)compositeExpressionValue.getChildren()[0];
+					Combo operator = (Combo)compositeExpressionValue.getChildren()[1];
+					Combo rightOperand = (Combo)compositeExpressionValue.getChildren()[2];
+					
+					String leftOperandValue = leftOperand.getText();
+					String rightOperandValue = rightOperand.getText();
+					
+					int leftOperandIndex = -1;
+					int rightOperandIndex = -1;
+					
+					/*
+					 * Can't directly take the selection index as the column id because,
+					 * in the field combo only numeric fields are present, whereas in the columns
+					 * table all types of columns are present. Hence searching for the correct index
+					 * of left/right operand by comparing the text value with all column names.
+					 * Some complexity may be reduceable. Later!!!
+					 */
+					for (int j=0; j<this.allSourceFields.size(); j++) {
+					    ColumnHeader columnHeader = this.allSourceFields.get(j);
+						
+						if (columnHeader.getName().equalsIgnoreCase(leftOperandValue)) {
+							leftOperandIndex = j;
+					        break;
+					    }
+					}
+					
+					for (int k=0; k<this.allSourceFields.size(); k++) {
+					    ColumnHeader columnHeader = this.allSourceFields.get(k);
+						
+						if (columnHeader.getName().equalsIgnoreCase(rightOperandValue)) {
+							rightOperandIndex = k;
+					        break;
+					    }
+					}
+					
+					int operatorIndex = operator.getSelectionIndex();
+					if(leftOperandIndex<0 || rightOperandIndex<0 || rightOperandIndex<0){
+						MessageDialog.openError(this.parent.getShell(), "GNOS Error", "Expression value not properly defined: " + expressionName);
+						return null;
+					}
+					
+					Operation operation = new Operation();
+					operation.setOperand_left(leftOperandIndex);
+					operation.setOperand_right(rightOperandIndex);
+					operation.setOperator(operatorIndex);
+					
+					expression.setValue(-1);
+					expression.setOperation(operation);
+					
+				}else{
+					expression.setValueType(isComplex);
+					Combo sourceField = (Combo)compositeExpressionValue.getChildren()[0];
+					expressionValue = sourceField.getText();
+					int index = -1;
+					for (int j=0; j<this.allSourceFields.size(); j++) {
+					    ColumnHeader columnHeader = this.allSourceFields.get(j);
+						
+						if (columnHeader.getName().equalsIgnoreCase(expressionValue)) {
+					        index = j;
+					        break;
+					    }
+					}
+					if(index<0){
+						MessageDialog.openError(this.parent.getShell(), "GNOS Error", "Please map a proper value for the expression: " + expressionName);
+						return null;
+					}
+					expression.setValue(index);
+					expression.setOperation(null);
+				}
+				
+				
+				/*Composite compositeExpressionValue = (Composite)controlExpressionValue;
 				Control[] controlExpression = compositeExpressionValue.getChildren();
 				
 				if(controlExpression.length == 1){
@@ -317,14 +411,14 @@ public class ExpressionBuilderGrid extends Composite {
 					Combo leftOperand = (Combo)controlExpression[0];
 					Combo operator = (Combo)controlExpression[1];
 					Combo rightOperand = (Combo)controlExpression[2];
-				}
+				}*/
 				
 				//Combo comboDatatype = (Combo)compositeDatatype;
 				//expressionValue = leftOperand.getText();
 			}
 			
-			Expression expression = new Expression(expressionName);
-			int index = -1;
+			//Expression expression = new Expression(expressionName);
+			/*int index = -1;
 			for (int j=0; j<this.allSourceFields.size(); j++) {
 			    ColumnHeader columnHeader = this.allSourceFields.get(j);
 				
@@ -337,8 +431,17 @@ public class ExpressionBuilderGrid extends Composite {
 				MessageDialog.openError(this.parent.getShell(), "GNOS Error", "Please map a proper value for the expression: " + expressionName);
 				return null;
 			}
-			expression.setValue(index);
+			expression.setValue(index);*/
 			expression.setGrade(isGrade);
+			//expression.setValueType(isComplex);
+			
+			List<Filter> filters = conditionComposite.getExpressionFilters();
+			if(filters == null){
+				MessageDialog.openError(this.parent.getShell(), "GNOS Error", "Conditions not defined properly.");
+				return null;
+			}else{
+				expression.setFilters(filters);
+			}
 			
 			this.expressionList.add(expression);
 		}

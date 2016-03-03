@@ -13,9 +13,11 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import com.org.gnos.services.Filter;
 import com.org.gnos.services.csv.ColumnHeader;
 
 public class GnosConditionCellComposite extends Composite {
@@ -25,6 +27,7 @@ public class GnosConditionCellComposite extends Composite {
 	private Composite lastCondition;
 	private List<Composite> allConditions;
 	private List<ColumnHeader> allSourceFields;
+	private List<Filter> allFilters;
 	/**
 	 * Create the composite.
 	 * @param parent
@@ -34,6 +37,7 @@ public class GnosConditionCellComposite extends Composite {
 		super(parent, style);
 		this.parent = parent;
 		this.allConditions = new ArrayList<Composite>();
+		this.allFilters = new ArrayList<Filter>();
 		this.allSourceFields = allSourceFields;
 		this.setLayout(new FillLayout(SWT.VERTICAL));
 		
@@ -64,6 +68,26 @@ public class GnosConditionCellComposite extends Composite {
 			sourceFieldsComboItems[i] = this.allSourceFields.get(i).getName();
 		}
 		return sourceFieldsComboItems;
+	}
+	
+	public List<Filter> getExpressionFilters(){
+		for(int i=0; i<this.allConditions.size(); i++){
+			Control[] conditionComponents = this.allConditions.get(i).getChildren();
+			Combo comboField = (Combo)conditionComponents[0];
+			Combo comboOperator = (Combo)conditionComponents[1];
+			Text textConditionValue = (Text)conditionComponents[2];
+			if(comboField.getSelectionIndex() < 0 || comboOperator.getSelectionIndex()<0 || textConditionValue.getText()==null || textConditionValue.getText()==""){
+				return null;
+			}
+			int filterId = i;
+			int columnId = comboField.getSelectionIndex();
+			int opType = comboOperator.getSelectionIndex();
+			String value = textConditionValue.getText();
+			Filter filter = new Filter(filterId, columnId, opType, value);
+			this.allFilters.add(filter);
+		}
+		
+		return this.allFilters;
 	}
 
 	

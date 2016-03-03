@@ -72,7 +72,8 @@ public class Expressions {
 	public boolean add(Expression expr){
 		
 		Connection conn = DBManager.getConnection();
-		String sql = "insert into expressions (name, grade, value) values (?, ?, ?)";
+		//Rohan modified next line.
+		String sql = "insert into expressions (name, grade, value, value_type) values (?, ?, ?, ?)";
 		PreparedStatement pstmt = null;
 		ResultSet rs = null; 
 
@@ -81,6 +82,8 @@ public class Expressions {
 			pstmt.setString(1, expr.getName());
 			pstmt.setBoolean(2, expr.isGrade());
 			pstmt.setInt(3, expr.getValue());
+			//Rohan added next line
+			pstmt.setBoolean(4, expr.isValueType());
 			pstmt.executeUpdate();
 			rs = pstmt.getGeneratedKeys();    
 			rs.next();  
