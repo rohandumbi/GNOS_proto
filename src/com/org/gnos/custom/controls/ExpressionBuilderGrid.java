@@ -113,7 +113,7 @@ public class ExpressionBuilderGrid extends Composite {
 		
 		Label fourthSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
 		FormData fd_fourthSeparator = new FormData();
-		fd_fourthSeparator.left = new FormAttachment(58);
+		fd_fourthSeparator.left = new FormAttachment(62);
 		fourthSeparator.setLayoutData(fd_fourthSeparator);
 		
 		Label lblGradeHeader = new Label(compositeGridHeader, SWT.NONE);
@@ -170,7 +170,7 @@ public class ExpressionBuilderGrid extends Composite {
 		expressionComposite.setLayout(new FillLayout(SWT.HORIZONTAL));
 		//expressionComposite.setBackground(backgroundColor);
 		FormData fd_expressionComposite = new FormData();
-		fd_expressionComposite.right = new FormAttachment(58, -5);
+		fd_expressionComposite.right = new FormAttachment(62, -5);
 		fd_expressionComposite.left = new FormAttachment(40, 5);
 		expressionComposite.setLayoutData(fd_expressionComposite);
 		String[] comboItems = this.getSourceFieldsComboItems();
@@ -255,9 +255,9 @@ public class ExpressionBuilderGrid extends Composite {
 		
 		this.toggleExpressionType(compositeRow, false);
 		
-		GnosExpressionComposite gnosExpressionComposite = new GnosExpressionComposite(compositeRow, SWT.NONE);
+		GnosConditionCellComposite gnosExpressionComposite = new GnosConditionCellComposite(compositeRow, SWT.NONE, this.allSourceFields);
 		FormData fd_gnosExpressionComposite = new FormData();
-		fd_gnosExpressionComposite.left = new FormAttachment(58, 2);
+		fd_gnosExpressionComposite.left = new FormAttachment(62, 2);
 		fd_gnosExpressionComposite.right = new FormAttachment(100);
 		gnosExpressionComposite.setLayoutData(fd_gnosExpressionComposite);
 		

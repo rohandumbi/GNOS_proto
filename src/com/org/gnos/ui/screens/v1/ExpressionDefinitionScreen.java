@@ -86,8 +86,6 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 				me.layout();
 				Composite parent = me.getParent();
 				parent.layout(true, true);
-				final Point newSize = parent.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);  
-				parent.setSize(newSize);
 			}
 		});
 		FormData fd_btnAddNewRow = new FormData();
