@@ -102,13 +102,13 @@ public class ExpressionBuilderGrid extends Composite {
 		
 		Label secondSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
 		FormData fd_secondSeparator = new FormData();
-		fd_secondSeparator.left = new FormAttachment(30);
+		fd_secondSeparator.left = new FormAttachment(20);
 		secondSeparator.setLayoutData(fd_secondSeparator);
 
 		
 		Label thirdSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
 		FormData fd_thirdSeparator = new FormData();
-		fd_thirdSeparator.left = new FormAttachment(40);
+		fd_thirdSeparator.left = new FormAttachment(30);
 		thirdSeparator.setLayoutData(fd_thirdSeparator);
 		
 		Label fourthSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
@@ -171,7 +171,7 @@ public class ExpressionBuilderGrid extends Composite {
 		//expressionComposite.setBackground(backgroundColor);
 		FormData fd_expressionComposite = new FormData();
 		fd_expressionComposite.right = new FormAttachment(62, -5);
-		fd_expressionComposite.left = new FormAttachment(40, 5);
+		fd_expressionComposite.left = new FormAttachment(30, 5);
 		expressionComposite.setLayoutData(fd_expressionComposite);
 		String[] comboItems = this.getSourceFieldsComboItems();
 		
@@ -225,7 +225,7 @@ public class ExpressionBuilderGrid extends Composite {
 		FormData fd_expressionName = new FormData();
 		fd_expressionName.left = new FormAttachment(5, 5);
 		fd_expressionName.top = new FormAttachment(0);
-		fd_expressionName.right = new FormAttachment(30, -5);
+		fd_expressionName.right = new FormAttachment(20, -5);
 		expressionName.setLayoutData(fd_expressionName);
 		
 		/*Composite expressionComposite = new Composite(compositeRow, SWT.NONE);
@@ -238,22 +238,25 @@ public class ExpressionBuilderGrid extends Composite {
 		
 		Button buttonIsComplex = new Button(compositeRow, SWT.CHECK);
 		FormData fd_buttonIsComplex = new FormData();
-		fd_buttonIsComplex.left = new FormAttachment(34);
+		fd_buttonIsComplex.left = new FormAttachment(24);
 		fd_buttonIsComplex.top = new FormAttachment(0,2);
 		buttonIsComplex.setLayoutData(fd_buttonIsComplex);
 		//final Composite me = this;
+		this.toggleExpressionType(compositeRow, false);
 		
 		buttonIsComplex.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				boolean isSelected = ((Button)e.getSource()).getSelection();
 				System.out.println("Selection: " + isSelected);
-				compositeRow.getChildren()[3].dispose();//temporary hack, need to identify in a better way
+				if(compositeRow.getChildren()[3] instanceof GnosConditionCellComposite){ //temporary hack, need to identify in a better way
+					compositeRow.getChildren()[4].dispose();
+				}else{
+					compositeRow.getChildren()[3].dispose();
+				}
 				toggleExpressionType(compositeRow, isSelected);
 			}
 		});
-		
-		this.toggleExpressionType(compositeRow, false);
 		
 		GnosConditionCellComposite gnosExpressionComposite = new GnosConditionCellComposite(compositeRow, SWT.NONE, this.allSourceFields);
 		FormData fd_gnosExpressionComposite = new FormData();
