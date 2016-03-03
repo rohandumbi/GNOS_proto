@@ -329,7 +329,7 @@ public class ExpressionBuilderGrid extends Composite {
 			if(controlExpressionValue instanceof Composite){
 				Composite compositeExpressionValue = (Composite)controlExpressionValue;
 				if(isComplex == true){
-					expression.setValueType(isComplex);
+					//expression.setValueType(isComplex);
 					Combo leftOperand = (Combo)compositeExpressionValue.getChildren()[0];
 					Combo operator = (Combo)compositeExpressionValue.getChildren()[1];
 					Combo rightOperand = (Combo)compositeExpressionValue.getChildren()[2];
@@ -380,7 +380,7 @@ public class ExpressionBuilderGrid extends Composite {
 					expression.setOperation(operation);
 					
 				}else{
-					expression.setValueType(isComplex);
+					//expression.setValueType(isComplex);
 					Combo sourceField = (Combo)compositeExpressionValue.getChildren()[0];
 					expressionValue = sourceField.getText();
 					int index = -1;
@@ -399,42 +399,10 @@ public class ExpressionBuilderGrid extends Composite {
 					expression.setValue(index);
 					expression.setOperation(null);
 				}
-				
-				
-				/*Composite compositeExpressionValue = (Composite)controlExpressionValue;
-				Control[] controlExpression = compositeExpressionValue.getChildren();
-				
-				if(controlExpression.length == 1){
-					Combo leftOperand = (Combo)controlExpression[0];
-					expressionValue = leftOperand.getText();
-				}else{
-					Combo leftOperand = (Combo)controlExpression[0];
-					Combo operator = (Combo)controlExpression[1];
-					Combo rightOperand = (Combo)controlExpression[2];
-				}*/
-				
-				//Combo comboDatatype = (Combo)compositeDatatype;
-				//expressionValue = leftOperand.getText();
 			}
-			
-			//Expression expression = new Expression(expressionName);
-			/*int index = -1;
-			for (int j=0; j<this.allSourceFields.size(); j++) {
-			    ColumnHeader columnHeader = this.allSourceFields.get(j);
-				
-				if (columnHeader.getName().equalsIgnoreCase(expressionValue)) {
-			        index = j;
-			        break;
-			    }
-			}
-			if(index<0){
-				MessageDialog.openError(this.parent.getShell(), "GNOS Error", "Please map a proper value for the expression: " + expressionName);
-				return null;
-			}
-			expression.setValue(index);*/
+
 			expression.setGrade(isGrade);
-			//expression.setValueType(isComplex);
-			
+			expression.setValueType(isComplex);
 			List<Filter> filters = conditionComposite.getExpressionFilters();
 			if(filters == null){
 				MessageDialog.openError(this.parent.getShell(), "GNOS Error", "Conditions not defined properly.");

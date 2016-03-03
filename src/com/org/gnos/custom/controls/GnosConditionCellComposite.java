@@ -14,6 +14,8 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
@@ -70,27 +72,6 @@ public class GnosConditionCellComposite extends Composite {
 		return sourceFieldsComboItems;
 	}
 	
-	public List<Filter> getExpressionFilters(){
-		for(int i=0; i<this.allConditions.size(); i++){
-			Control[] conditionComponents = this.allConditions.get(i).getChildren();
-			Combo comboField = (Combo)conditionComponents[0];
-			Combo comboOperator = (Combo)conditionComponents[1];
-			Text textConditionValue = (Text)conditionComponents[2];
-			if(comboField.getSelectionIndex() < 0 || comboOperator.getSelectionIndex()<0 || textConditionValue.getText()==null || textConditionValue.getText()==""){
-				return null;
-			}
-			int filterId = i;
-			int columnId = comboField.getSelectionIndex();
-			int opType = comboOperator.getSelectionIndex();
-			String value = textConditionValue.getText();
-			Filter filter = new Filter(filterId, columnId, opType, value);
-			this.allFilters.add(filter);
-		}
-		
-		return this.allFilters;
-	}
-
-	
 	protected void addCondition(){
 		lastCondition = new Composite(this, SWT.NONE);
 		lastCondition.setLayout(new FormLayout());
@@ -115,7 +96,7 @@ public class GnosConditionCellComposite extends Composite {
 		fd_comboOperator.left = new FormAttachment(comboField);
 		fd_comboOperator.right = new FormAttachment(60);
 		comboField.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
-		comboOperator.setItems(new String[]{"=", "<>", "In"});
+		comboOperator.setItems(new String[]{"=", "<>", ">", "<", "In"});
 		comboOperator.setText("Operator");
 		comboOperator.setLayoutData(fd_comboOperator);
 		
@@ -126,6 +107,21 @@ public class GnosConditionCellComposite extends Composite {
 		fd_textConditionValue.right = new FormAttachment(100);
 		textConditionValue.setText("Value");
 		textConditionValue.setLayoutData(fd_textConditionValue);
+		
+		textConditionValue.addListener(SWT.MouseUp, new Listener() {
+
+	        @Override
+	        public void handleEvent(Event event) {
+	            Text text = (Text) event.widget;
+	            text.setText("");
+	            /*String selection = text.getSelectionText();
+
+	            if(selection.length() > 0)
+	            {
+	                System.out.println("Selected text: " + selection);
+	            }*/
+	        }
+	    });
 		
 		allConditions.add(lastCondition);
 		this.layout(true, true);
@@ -149,6 +145,28 @@ public class GnosConditionCellComposite extends Composite {
 		Composite viewportContainer = configurationViewport.getParent();
 		viewportContainer.layout(true, true);*/
 	}
+	
+
+	public List<Filter> getExpressionFilters(){
+		for(int i=0; i<this.allConditions.size(); i++){
+			Control[] conditionComponents = this.allConditions.get(i).getChildren();
+			Combo comboField = (Combo)conditionComponents[0];
+			Combo comboOperator = (Combo)conditionComponents[1];
+			Text textConditionValue = (Text)conditionComponents[2];
+			if(comboField.getSelectionIndex() < 0 || comboOperator.getSelectionIndex()<0 || textConditionValue.getText()==null || textConditionValue.getText().equalsIgnoreCase("")){
+				return null;
+			}
+			int filterId = i;
+			int columnId = comboField.getSelectionIndex();
+			int opType = comboOperator.getSelectionIndex();
+			String value = textConditionValue.getText();
+			Filter filter = new Filter(filterId, columnId, opType, value);
+			this.allFilters.add(filter);
+		}
+		
+		return this.allFilters;
+	}
+
 
 	@Override
 	protected void checkSubclass() {
