@@ -86,6 +86,15 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 				me.layout();
 				Composite parent = me.getParent();
 				parent.layout(true, true);
+				//parent.getParent().layout(true, true);
+				/*final Point newSize = parent.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);  
+				parent.setSize(newSize);*/
+				
+				/*
+				 * Temporary hack to make scrollable container work
+				 */
+				WorkbenchScreen workbenchScreen = (WorkbenchScreen)parent.getParent().getParent();
+				workbenchScreen.setScrolledCompositeMinSize();
 			}
 		});
 		FormData fd_btnAddNewRow = new FormData();

@@ -3,6 +3,10 @@ package com.org.gnos.ui.screens.v1;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -107,7 +111,8 @@ public class WorkbenchScreen extends GnosScreen {
 		fd_gnosStepProcessRouteDefinitionLabel.left = new FormAttachment(gnosStepMapRequiredFieldsLabel, 0, SWT.LEFT);
 		gnosStepProcessRouteDefinitionLabel.setLayoutData(fd_gnosStepProcessRouteDefinitionLabel);
 		
-		this.scViewPortContainer = new ScrolledComposite(this, SWT.H_SCROLL | SWT.V_SCROLL | SWT.NONE);
+		//this.scViewPortContainer = new ScrolledComposite(this, SWT.H_SCROLL | SWT.V_SCROLL | SWT.NONE);
+		this.scViewPortContainer = new ScrolledComposite(this, SWT.V_SCROLL | SWT.NONE);
 		FormData fd_scViewPortContainer = new FormData();
 		fd_scViewPortContainer.right = new FormAttachment(labelWorkbenchHeader, -6, SWT.RIGHT);
 		fd_scViewPortContainer.bottom = new FormAttachment(100, -6);
@@ -120,9 +125,21 @@ public class WorkbenchScreen extends GnosScreen {
 		this.scViewPortContainer.setContent(this.mainConfigurationViewPort);
 		this.scViewPortContainer.setExpandHorizontal(true);
 		this.scViewPortContainer.setExpandVertical(true);
-		this.scViewPortContainer.setMinSize(this.mainConfigurationViewPort.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-		
+		this.scViewPortContainer.setLayout(new FillLayout());
+		//this.scViewPortContainer.setMinSize(this.mainConfigurationViewPort.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		scViewPortContainer.addControlListener(new ControlAdapter() {
+		    public void controlResized(ControlEvent e) {
+		        System.out.println("MVCP resized");
+		    	Rectangle r = scViewPortContainer.getClientArea();
+		        scViewPortContainer.setMinSize(mainConfigurationViewPort.computeSize(r.width, SWT.DEFAULT));
+		    }
+		});
 		this.scViewPortContainer.setLayoutData(fd_scViewPortContainer);
+	}
+	
+	public void setScrolledCompositeMinSize(){
+		Rectangle r = scViewPortContainer.getClientArea();
+        scViewPortContainer.setMinSize(mainConfigurationViewPort.computeSize(r.width, SWT.DEFAULT));
 	}
 
 	@Override
