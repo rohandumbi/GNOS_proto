@@ -3,9 +3,12 @@ package com.org.gnos.ui.screens.v1;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -28,6 +31,7 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 	private List<ColumnHeader> allHeaders;
 	private ProjectModel projectModel;
 	private List<Expression> allDefinedExpressions;
+	private Composite parent;
 	/**
 	 * Create the composite.
 	 * @param parent
@@ -38,6 +42,7 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 		setForeground(SWTResourceManager.getColor(30, 144, 255));
 		setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
 		setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		this.parent = parent;
 		this.projectModel = projectModel;
 		this.allHeaders = this.getAllHeaders();
 		this.createContent();
@@ -77,6 +82,14 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 		fd_expressionBuilderGrid.right = new FormAttachment(100, -10);
 		expressionBuilderGrid.setLayoutData(fd_expressionBuilderGrid);
 		
+		expressionBuilderGrid.addControlListener(new ControlAdapter() {
+		    public void controlResized(ControlEvent e) {
+		        //System.out.println("Expression builder grid resized");
+		        WorkbenchScreen workbenchScreen = (WorkbenchScreen)parent.getParent().getParent();
+				workbenchScreen.setScrolledCompositeMinSize();
+		    }
+		});
+		
 		Button btnAddNewRow = new Button(this, SWT.NONE);
 		final Composite me = this;
 		btnAddNewRow.addSelectionListener(new SelectionAdapter() {
@@ -84,17 +97,7 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 			public void widgetSelected(SelectionEvent e) {
 				expressionBuilderGrid.addRow();
 				me.layout();
-				Composite parent = me.getParent();
 				parent.layout(true, true);
-				//parent.getParent().layout(true, true);
-				/*final Point newSize = parent.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);  
-				parent.setSize(newSize);*/
-				
-				/*
-				 * Temporary hack to make scrollable container work
-				 */
-				WorkbenchScreen workbenchScreen = (WorkbenchScreen)parent.getParent().getParent();
-				workbenchScreen.setScrolledCompositeMinSize();
 			}
 		});
 		FormData fd_btnAddNewRow = new FormData();
@@ -166,10 +169,6 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 			expressions.add(expression);
 		}
 		return true;
-		/*Expressions expressions = new Expressions();
-		Expression expression = new Expression("Rohan");
-		expression.setGrade(true);
-		expressions.add(expression);*/
 	}
 
 	@Override

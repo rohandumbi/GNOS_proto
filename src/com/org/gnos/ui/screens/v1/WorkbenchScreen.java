@@ -129,7 +129,7 @@ public class WorkbenchScreen extends GnosScreen {
 		//this.scViewPortContainer.setMinSize(this.mainConfigurationViewPort.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		scViewPortContainer.addControlListener(new ControlAdapter() {
 		    public void controlResized(ControlEvent e) {
-		        System.out.println("MVCP resized");
+		        //System.out.println("MVCP resized");
 		    	Rectangle r = scViewPortContainer.getClientArea();
 		        scViewPortContainer.setMinSize(mainConfigurationViewPort.computeSize(r.width, SWT.DEFAULT));
 		    }
@@ -140,6 +140,7 @@ public class WorkbenchScreen extends GnosScreen {
 	public void setScrolledCompositeMinSize(){
 		Rectangle r = scViewPortContainer.getClientArea();
         scViewPortContainer.setMinSize(mainConfigurationViewPort.computeSize(r.width, SWT.DEFAULT));
+        scViewPortContainer.setOrigin(mainConfigurationViewPort.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 	}
 
 	@Override
