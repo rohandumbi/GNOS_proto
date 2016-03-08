@@ -73,6 +73,7 @@ public class GNOSApplicationWindow {
 		homeComposite.setLayout(homeTabLayout);
 		
 		//Composite homeScreen = new Composite(homeComposite, SWT.NONE);
+		@SuppressWarnings("unused")
 		Composite createNewPageScreen = new Composite(homeComposite, SWT.NONE);
 		Composite homeScreen = new HomeScreen(homeComposite, SWT.NONE);
 		

@@ -24,6 +24,7 @@ import com.org.gnos.services.csv.ColumnHeader;
 
 public class GnosConditionCellComposite extends Composite {
 
+	@SuppressWarnings("unused")
 	private Composite parent;
 	//private Text textConditionValue;
 	private Composite lastCondition;
