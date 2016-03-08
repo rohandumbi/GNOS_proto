@@ -7,7 +7,7 @@ import com.org.gnos.services.csv.ColumnHeader;
 
 public class ProjectModel {
 	private Map<String, String> projectMetaData;
-	private List<ColumnHeader> allProjectFields;
+	private String[] allProjectFields;
 	
 	public ProjectModel(){
 		super();
@@ -24,10 +24,10 @@ public class ProjectModel {
 	public String get(String key){
 		return this.projectMetaData.get(key);
 	}
-	public List<ColumnHeader> getAllProjectFields() {
+	public String[] getAllProjectFields() {
 		return allProjectFields;
 	}
-	public void setAllProjectFields(List<ColumnHeader> allProjectFields) {
+	public void setAllProjectFields(String[] allProjectFields) {
 		this.allProjectFields = allProjectFields;
 	}
 }

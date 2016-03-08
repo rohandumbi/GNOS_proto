@@ -24,11 +24,12 @@ import com.org.gnos.events.GnosEvent;
 import com.org.gnos.services.Expression;
 import com.org.gnos.services.Expressions;
 import com.org.gnos.services.csv.ColumnHeader;
+import com.org.gnos.services.csv.GNOSCSVDataProcessor;
 
 public class ExpressionDefinitionScreen extends GnosScreen {
 
 	private ExpressionBuilderGrid expressionBuilderGrid;
-	private List<ColumnHeader> allHeaders;
+	private String[] allHeaders;
 	private ProjectModel projectModel;
 	private List<Expression> allDefinedExpressions;
 	private Composite parent;
@@ -48,7 +49,7 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 		this.createContent();
 	}
 	
-	private List<ColumnHeader> getAllHeaders(){
+	private String[] getAllHeaders(){
 		return this.projectModel.getAllProjectFields();
 	}
 	
@@ -151,6 +152,7 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 				//TODO mapping complete
 				//projectModel.setAllProjectFields(fieldDatatypeDefinitionGrid.getFieldDatatypes());
 				updateExpressionList();
+				GNOSCSVDataProcessor.getInstance().compute();
 				//System.out.println("After mapping datatype of 3rd row is: " + projectModel.getAllProjectFields().get(2).getDataType());
 				/*GnosEvent event = new GnosEvent(this, "complete:datatype-defintion");
 				triggerGnosEvent(event);*/

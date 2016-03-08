@@ -1,22 +1,16 @@
 package com.org.gnos.services;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.org.gnos.application.GNOSConfig;
-import com.org.gnos.db.DBManager;
 
 public class Expressions {
 
-	private List<Expression> expressions = new ArrayList<Expression>();
+	private static List<Expression> expressions = new ArrayList<Expression>();
 	
-	public List<Expression> getAll() {
-		Connection conn = DBManager.getConnection();
+	public static List<Expression> getAll() {
+/*		Connection conn = DBManager.getConnection();
 		String sql = "select * from expressions";
 		Statement stmt = null;
 		ResultSet rs= null;
@@ -40,14 +34,14 @@ public class Expressions {
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-		}
+		}*/
 		
 		return expressions;
 	}
 	
 	public boolean delete(int exp_id) {
 		
-		Connection conn = DBManager.getConnection();
+/*		Connection conn = DBManager.getConnection();
 		String sql = "delete from expressions where id = "+exp_id;
 		Statement stmt = null;
 		
@@ -64,14 +58,15 @@ public class Expressions {
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-		}
+		}*/
 		
 		return true;
 	}
 	
-	public boolean add(Expression expr){
+	public static boolean add(Expression expr){
 		
-		Connection conn = DBManager.getConnection();
+		expressions.add(expr);
+		/*		Connection conn = DBManager.getConnection();
 		//Rohan modified next line.
 		String sql = "insert into expressions (name, grade, value, value_type) values (?, ?, ?, ?)";
 		PreparedStatement pstmt = null;
@@ -99,14 +94,14 @@ public class Expressions {
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-		}
+		}*/
 		
 		return true;
 	}
 	
     public boolean update(Expression expr){
 		
-    	Connection conn = DBManager.getConnection();
+    	/*Connection conn = DBManager.getConnection();
 		String sql = "update expressions set grade = "+expr.isGrade()+" where id="+expr.getId();
 		Statement stmt = null;
 		
@@ -123,7 +118,7 @@ public class Expressions {
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-		}
+		}*/
 		
 		return true;
 	}

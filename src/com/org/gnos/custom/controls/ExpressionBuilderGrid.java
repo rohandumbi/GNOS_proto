@@ -1,7 +1,10 @@
 package com.org.gnos.custom.controls;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
@@ -23,7 +26,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
 import com.org.gnos.services.Expression;
 import com.org.gnos.services.Filter;
 import com.org.gnos.services.Operation;
-import com.org.gnos.services.csv.ColumnHeader;
+import com.org.gnos.services.csv.GNOSCSVDataProcessor;
 
 public class ExpressionBuilderGrid extends Composite {
 
@@ -32,7 +35,7 @@ public class ExpressionBuilderGrid extends Composite {
 	 * @param parent
 	 * @param style
 	 */
-	private List<ColumnHeader> allSourceFields;
+	private String[] allSourceFields;
 	private Composite compositeGridHeader;
 	private List<Composite> allRows;
 	private List<String> numericSourceFields;
@@ -42,7 +45,7 @@ public class ExpressionBuilderGrid extends Composite {
 	private String[] arithemeticOperatorsArray;
 	private Composite parent;
 	
-	public ExpressionBuilderGrid(Composite parent, int style, List<ColumnHeader> allSourceFields) {
+	public ExpressionBuilderGrid(Composite parent, int style, String[] allSourceFields) {
 		super(parent, style);
 		this.parent = parent;
 		//this.requiredFieldNames = requiredFieldNames;
@@ -69,14 +72,18 @@ public class ExpressionBuilderGrid extends Composite {
 	}*/
 	private String[] getSourceFieldsComboItems(){
 		int i = 0;
-		int sourceFieldSize = this.allSourceFields.size();
-		//this.sourceFieldsComboItems = new String[sourceFieldSize];
+		int sourceFieldSize = this.allSourceFields.length;
 		this.numericSourceFields = new ArrayList<String>();
-		for(i=0; i<sourceFieldSize; i++){
-			if((this.allSourceFields.get(i).getDataType() == 2) || (this.allSourceFields.get(i).getDataType() == 3)){ //only double or integer fields are allowed in expression definition
-				//this.sourceFieldsComboItems[i] = this.allSourceFields.get(i).getName();
-				this.numericSourceFields.add(this.allSourceFields.get(i).getName());
-			}
+		Map dataTypeMap = GNOSCSVDataProcessor.getInstance().getDataTypeMapping();
+		Set<String> keys = dataTypeMap.keySet();
+		Iterator<String> it = keys.iterator();
+		while(it.hasNext()){
+			String key = it.next();
+			String value = (String)dataTypeMap.get(key);
+			
+			if(!"String".equalsIgnoreCase(value)){
+				this.numericSourceFields.add(key);
+			}		
 		}
 		this.sourceFieldsComboItems = new String[this.numericSourceFields.size()];
 		for(i=0; i<this.numericSourceFields.size(); i++){
@@ -347,19 +354,19 @@ public class ExpressionBuilderGrid extends Composite {
 					 * of left/right operand by comparing the text value with all column names.
 					 * Some complexity may be reduceable. Later!!!
 					 */
-					for (int j=0; j<this.allSourceFields.size(); j++) {
-					    ColumnHeader columnHeader = this.allSourceFields.get(j);
+					for (int j=0; j<this.allSourceFields.length; j++) {
+					    String columnName = this.allSourceFields[j];
 						
-						if (columnHeader.getName().equalsIgnoreCase(leftOperandValue)) {
+						if (columnName.equalsIgnoreCase(leftOperandValue)) {
 							leftOperandIndex = j;
 					        break;
 					    }
 					}
 					
-					for (int k=0; k<this.allSourceFields.size(); k++) {
-					    ColumnHeader columnHeader = this.allSourceFields.get(k);
+					for (int k=0; k<this.allSourceFields.length; k++) {
+						 String columnName = this.allSourceFields[k];
 						
-						if (columnHeader.getName().equalsIgnoreCase(rightOperandValue)) {
+						if (columnName.equalsIgnoreCase(rightOperandValue)) {
 							rightOperandIndex = k;
 					        break;
 					    }
@@ -384,10 +391,10 @@ public class ExpressionBuilderGrid extends Composite {
 					Combo sourceField = (Combo)compositeExpressionValue.getChildren()[0];
 					expressionValue = sourceField.getText();
 					int index = -1;
-					for (int j=0; j<this.allSourceFields.size(); j++) {
-					    ColumnHeader columnHeader = this.allSourceFields.get(j);
+					for (int j=0; j<this.allSourceFields.length; j++) {
+						String columnName = this.allSourceFields[j];
 						
-						if (columnHeader.getName().equalsIgnoreCase(expressionValue)) {
+						if (columnName.equalsIgnoreCase(expressionValue)) {
 					        index = j;
 					        break;
 					    }

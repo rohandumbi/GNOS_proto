@@ -16,6 +16,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.services.csv.ColumnHeader;
+import com.org.gnos.services.csv.GNOSCSVDataProcessor;
 
 public class MapRequiredFieldsGrid extends Composite {
 
@@ -25,14 +26,14 @@ public class MapRequiredFieldsGrid extends Composite {
 	 * @param style
 	 */
 	private String[] requiredFieldNames;
-	private List<ColumnHeader> allSourceFields;
+	private String[] allSourceFields;
 	//private String[] dataTypes;
 	private Composite compositeGridHeader;
 	private List<Composite> allRows;
 	private String[] sourceFieldsComboItems;
 	private Composite parent;
 	
-	public MapRequiredFieldsGrid(Composite parent, int style, String[] requiredFieldNames, List<ColumnHeader> allSourceFields, String[] dataTypes) {
+	public MapRequiredFieldsGrid(Composite parent, int style, String[] requiredFieldNames, String[] allSourceFields, String[] dataTypes) {
 		super(parent, style);
 		this.parent = parent;
 		this.requiredFieldNames = requiredFieldNames;
@@ -43,10 +44,10 @@ public class MapRequiredFieldsGrid extends Composite {
 	
 	private void createSourceFieldsComboItems(){
 		int i = 0;
-		int sourceFieldSize = this.allSourceFields.size();
+		int sourceFieldSize = this.allSourceFields.length;
 		this.sourceFieldsComboItems = new String[sourceFieldSize];
 		for(i=0; i<sourceFieldSize; i++){
-			this.sourceFieldsComboItems[i] = this.allSourceFields.get(i).getName();
+			this.sourceFieldsComboItems[i] = this.allSourceFields[i];
 		}
 	}
 
@@ -194,13 +195,7 @@ public class MapRequiredFieldsGrid extends Composite {
 	}
 	
 	private void upDateSourceFieldHeader(String sourceFieldName, String requiredFieldName){
-		for( ColumnHeader sourceField : this.allSourceFields){
-			if(sourceField.getName().equals(sourceFieldName)){
-				sourceField.setRequiredFieldName(requiredFieldName);
-				sourceField.setRequired(true);
-				//sourceField.setDataType(this.getDatatypeCode(datatypeName));
-			}
-		}
+		GNOSCSVDataProcessor.getInstance().addRequiredFieldMapping(requiredFieldName, sourceFieldName);
 	}
 
 	@Override

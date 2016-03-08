@@ -28,14 +28,14 @@ public class GnosConditionCellComposite extends Composite {
 	//private Text textConditionValue;
 	private Composite lastCondition;
 	private List<Composite> allConditions;
-	private List<ColumnHeader> allSourceFields;
+	private String[] allSourceFields;
 	private List<Filter> allFilters;
 	/**
 	 * Create the composite.
 	 * @param parent
 	 * @param style
 	 */
-	public GnosConditionCellComposite(Composite parent, int style, List<ColumnHeader> allSourceFields) {
+	public GnosConditionCellComposite(Composite parent, int style, String[] allSourceFields) {
 		super(parent, style);
 		this.parent = parent;
 		this.allConditions = new ArrayList<Composite>();
@@ -56,7 +56,7 @@ public class GnosConditionCellComposite extends Composite {
 	
 	private String[] getSourceFieldsComboItems(){
 		int i = 0;
-		int sourceFieldSize = this.allSourceFields.size();
+		int sourceFieldSize = this.allSourceFields.length;
 		//this.sourceFieldsComboItems = new String[sourceFieldSize];
 		/*this.numericSourceFields = new ArrayList<String>();
 		for(i=0; i<sourceFieldSize; i++){
@@ -67,7 +67,7 @@ public class GnosConditionCellComposite extends Composite {
 		}*/
 		String[] sourceFieldsComboItems = new String[sourceFieldSize];
 		for(i=0; i<sourceFieldSize; i++){
-			sourceFieldsComboItems[i] = this.allSourceFields.get(i).getName();
+			sourceFieldsComboItems[i] = this.allSourceFields[i];
 		}
 		return sourceFieldsComboItems;
 	}

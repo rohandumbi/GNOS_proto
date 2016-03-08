@@ -22,7 +22,7 @@ import com.org.gnos.services.csv.ColumnHeader;
 
 public class MapRequiredFieldsScreen extends GnosScreen {
 
-	private List<ColumnHeader> allHeaders;
+	private String[] allHeaders;
 	private String[] requiredFields;
 	private String[] dataTypes;
 	private ProjectModel projectModel;
@@ -39,7 +39,7 @@ public class MapRequiredFieldsScreen extends GnosScreen {
 		setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		this.projectModel = projectModel;
 		this.allHeaders = this.getAllHeaders();
-		System.out.println("Length of all columns: " + this.allHeaders.size());
+		System.out.println("Length of all columns: " + this.allHeaders.length);
 		this.requiredFields = this.getRequiredFieldsFromProperties();
 		this.dataTypes = new String[]{"String", "Integer", "Double"};
 		System.out.println("Length of required columns: " + this.requiredFields.length);
@@ -51,7 +51,7 @@ public class MapRequiredFieldsScreen extends GnosScreen {
 		return requiredFields;
 	}
 	
-	private List<ColumnHeader> getAllHeaders(){
+	private String[] getAllHeaders(){
 		return this.projectModel.getAllProjectFields();
 	}
 	

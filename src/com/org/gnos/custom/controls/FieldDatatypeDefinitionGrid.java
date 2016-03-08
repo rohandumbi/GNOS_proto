@@ -15,6 +15,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.services.csv.ColumnHeader;
+import com.org.gnos.services.csv.GNOSCSVDataProcessor;
 
 public class FieldDatatypeDefinitionGrid extends Composite {
 
@@ -23,12 +24,12 @@ public class FieldDatatypeDefinitionGrid extends Composite {
 	 * @param parent
 	 * @param style
 	 */
-	private List<ColumnHeader> allSourceFields;
+	private String[] allSourceFields;
 	private String[] dataTypes;
 	private Composite compositeGridHeader;
 	private List<Composite> allRows;
 	
-	public FieldDatatypeDefinitionGrid(Composite parent, int style, List<ColumnHeader> allSourceFields, String[] dataTypes) {
+	public FieldDatatypeDefinitionGrid(Composite parent, int style, String[] allSourceFields, String[] dataTypes) {
 		super(parent, style);
 		this.allSourceFields = allSourceFields;
 		this.dataTypes = dataTypes;
@@ -85,7 +86,7 @@ public class FieldDatatypeDefinitionGrid extends Composite {
 		Composite presentRow = this.compositeGridHeader;//referring to the header as the 1st row when there are no rows inserted yet
 		allRows = new ArrayList<Composite>();
 		int i=0;
-		for(ColumnHeader sourceField : this.allSourceFields){
+		for(String columnHeaderName : this.allSourceFields){
 			Composite compositeRow = new Composite(this, SWT.BORDER);
 			Color backgroundColor = SWTResourceManager.getColor(SWT.COLOR_WHITE);
 			if(i%2 != 0){
@@ -100,7 +101,7 @@ public class FieldDatatypeDefinitionGrid extends Composite {
 			fd_compositeRow.right = new FormAttachment(presentRow, 0, SWT.RIGHT);
 			fd_compositeRow.left = new FormAttachment(presentRow, 0, SWT.LEFT);
 			
-			String columnHeaderName = sourceField.getName();
+			//String columnHeaderName = sourceField.getName();
 			
 			Label lblSourceFieldName = new Label(compositeRow, SWT.NONE);
 			lblSourceFieldName.setForeground(SWTResourceManager.getColor(0,191,255));
@@ -181,11 +182,12 @@ public class FieldDatatypeDefinitionGrid extends Composite {
 	}
 	
 	private void updateSourceFieldWithDatatype(String sourceFieldName, String datatypeName){
-		for( ColumnHeader sourceField : this.allSourceFields){
+		/*for( ColumnHeader sourceField : this.allSourceFields){
 			if(sourceField.getName().equals(sourceFieldName)){
 				sourceField.setDataType(this.getDatatypeCode(datatypeName));
 			}
-		}
+		}*/
+		GNOSCSVDataProcessor.getInstance().addDataTypeMapping(sourceFieldName, datatypeName);
 	}
 
 	@Override

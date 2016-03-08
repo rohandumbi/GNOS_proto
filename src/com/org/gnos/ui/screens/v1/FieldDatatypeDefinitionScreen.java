@@ -23,7 +23,7 @@ import com.org.gnos.services.csv.ColumnHeader;
 
 public class FieldDatatypeDefinitionScreen extends GnosScreen {
 
-	private List<ColumnHeader> allHeaders;
+	private String[] allHeaders;
 	private String[] dataTypes;
 	private ProjectModel projectModel;
 	private FieldDatatypeDefinitionGrid fieldDatatypeDefinitionGrid;
@@ -40,7 +40,7 @@ public class FieldDatatypeDefinitionScreen extends GnosScreen {
 		setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		this.projectModel = projectModel;
 		this.allHeaders = this.getAllHeaders();
-		System.out.println("Length of all columns: " + this.allHeaders.size());
+		System.out.println("Length of all columns: " + this.allHeaders.length);
 		//this.requiredFields = this.getRequiredFieldsFromProperties();
 		this.dataTypes = new String[]{"String", "Integer", "Double"};
 		this.createContent();
@@ -147,7 +147,7 @@ public class FieldDatatypeDefinitionScreen extends GnosScreen {
 		fieldDatatypeDefinitionGrid.setFieldDatatypes();
 	}*/
 
-	private List<ColumnHeader> getAllHeaders(){
+	private String[] getAllHeaders(){
 		return this.projectModel.getAllProjectFields();
 	}
 

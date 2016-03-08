@@ -28,5 +28,4 @@ public class Operation {
 	public int getId() {
 		return id;
 	}	
-	
 }
