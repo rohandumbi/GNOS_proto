@@ -62,36 +62,82 @@ public class GNOSCSVDataProcessor {
 			float value = 0;
 			boolean isComplex = expr.isValueType();
 			boolean isGrade = expr.isGrade();
-			//List<Filter> filters= expr.getFilters();
+			List<Filter> filters= expr.getFilters();
+			
 			for(int i=0; i < dataArr.length; i++) {
-				System.out.println("Row id "+i +" : Value :"+value);
 				String[] rowValues = data.get(i);
+				boolean conditionsMet = true;
 				try{
-					if(isComplex) {
-						Operation operation = expr.getOperation();
-						float leftOperand = Float.parseFloat(rowValues[operation.getOperand_left()]);
-						float rightOperand = Float.parseFloat(rowValues[operation.getOperand_right()]);
-						switch(operation.getOperator()) {
-							case 0: value = leftOperand + rightOperand; break;
-							case 1: value = leftOperand - rightOperand; break;
-							case 2: value = leftOperand * rightOperand; break;
-							case 3: value = leftOperand / rightOperand; break;
+					
+					for (Filter filter: filters){
+						String conditionValue = filter.getValue();
+						String valueToCheck = rowValues[filter.getColumnId()];
+						switch(filter.getOpType()){
+							case 0: if(!(valueToCheck.equalsIgnoreCase(conditionValue))){
+										conditionsMet = false;
+										break;
+									}
+							case 1: if(valueToCheck.equalsIgnoreCase(conditionValue)){
+										conditionsMet = false;
+										break;
+									}
+							case 2: if(!(Float.parseFloat(valueToCheck) > Float.parseFloat(conditionValue))){
+										conditionsMet = false;
+										break;
+									}
+							case 3: if(!(Float.parseFloat(valueToCheck) < Float.parseFloat(conditionValue))){
+										conditionsMet = false;
+										break;
+									}
+							case 4: if(!(conditionValue.contains(valueToCheck))){
+								conditionsMet = false;
+								break;
+							}
 						}
-					} else {
-						value = Float.parseFloat(rowValues[expr.getValue()]);
 					}
-					if(isGrade) {
-						value = ( value / Float.parseFloat(rowValues[tonnesWtIdx]));
+					if(!conditionsMet){
+						
+						if(isComplex) {
+							Operation operation = expr.getOperation();
+							float leftOperand = Float.parseFloat(rowValues[operation.getOperand_left()]);
+							float rightOperand = Float.parseFloat(rowValues[operation.getOperand_right()]);
+							switch(operation.getOperator()) {
+								case 0: value = leftOperand + rightOperand; break;
+								case 1: value = leftOperand - rightOperand; break;
+								case 2: value = leftOperand * rightOperand; break;
+								case 3: value = leftOperand / rightOperand; break;
+							}
+						} else {
+							value = Float.parseFloat(rowValues[expr.getValue()]);
+						}
+						if(isGrade) {
+							value = ( value / Float.parseFloat(rowValues[tonnesWtIdx]));
+						}
+
+					} else {
+						value = 0;
 					}
 				} catch(Exception e){
+					value = 0;
 					e.printStackTrace();
 				}
+				dataArr[i] = String.valueOf(value);
 			
 			}
+			computedData.add(dataArr);
 			
 		}
+		print(computedData);
 	}
 	
+	public void print(List<String[]> data) {
+		for(String[] row: data){
+			for(int i=0; i < row.length; i++ ){
+				System.out.println(" "+ row[i]);
+			}
+		}
+		
+	}
 	public void addRequiredFieldMapping(String requiredField, String mappedTo) {
 		requiredFieldMap.put(requiredField, mappedTo);
 	}
