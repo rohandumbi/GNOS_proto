@@ -1,11 +1,15 @@
 package com.org.gnos.services.csv;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.org.gnos.db.DBManager;
 import com.org.gnos.services.Expression;
 import com.org.gnos.services.Expressions;
 import com.org.gnos.services.Filter;
@@ -84,25 +88,15 @@ public class GNOSCSVDataProcessor {
 										conditionsMet = false;
 									}
 									break;
-							case 2: /*if(!(Float.parseFloat(valueToCheck) > Float.parseFloat(conditionValue))){
-										conditionsMet = false;
-									}*/
-									if(!(conditionValue.contains(valueToCheck))){
+							case 2: if(!(conditionValue.toLowerCase().contains(valueToCheck.toLowerCase()))){
 										conditionsMet = false;
 									}
 									break;
-							case 3: /*if(!(Float.parseFloat(valueToCheck) < Float.parseFloat(conditionValue))){
-										conditionsMet = false;
-									}*/
-							
-									if(!(Float.parseFloat(valueToCheck) > Float.parseFloat(conditionValue))){
+							case 3: if(!(Float.parseFloat(valueToCheck) > Float.parseFloat(conditionValue))){
 										conditionsMet = false;
 									}
 									break;							
-							case 4: /*if(!(conditionValue.contains(valueToCheck))){
-										conditionsMet = false;
-									}*/
-									if(!(Float.parseFloat(valueToCheck) < Float.parseFloat(conditionValue))){
+							case 4: if(!(Float.parseFloat(valueToCheck) < Float.parseFloat(conditionValue))){
 										conditionsMet = false;
 									}
 									break;
@@ -140,10 +134,9 @@ public class GNOSCSVDataProcessor {
 			computedData.add(dataArr);
 			
 		}
-		dumpCsv(computedData);
 	}
 	
-	public void dumpCsv(List<String[]> data) {
+	public void dumpToCsv() {
 		for(String[] row: data){
 			for(int i=0; i < row.length; i++ ){
 				System.out.print(row[i]+ ",");
@@ -152,6 +145,61 @@ public class GNOSCSVDataProcessor {
 		}
 		
 	}
+	
+	public void dumpToDB() {
+		Connection conn = DBManager.getConnection();
+		boolean autoCommit = true;
+		try {
+			autoCommit = conn.getAutoCommit();
+			conn.setAutoCommit(false);
+			createTable(conn);
+			final int batchSize = 1000;
+            int count = 0;
+            
+		}  
+		catch (SQLException sqle) {
+			sqle.printStackTrace();
+		}
+		finally {
+			try {
+				conn.setAutoCommit(autoCommit);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			DBManager.releaseConnection(conn);
+		}
+
+		
+	}
+	
+	private void createTable(Connection conn) throws SQLException {
+		String  sql = "CREATE TABLE gnos_data ( ";
+		
+		for(int i =0; i< columns.length; i++){
+			String columnName = columns[i].replaceAll("\\s+","_").toLowerCase();
+			sql += columnName +" VARCHAR(50)";
+			sql += ",";
+		}
+		List<Expression> expressions = Expressions.getAll();
+		for(Expression expr: expressions){
+			String columnName = expr.getName().replaceAll("\\s+","_").toLowerCase();
+			sql += columnName +" VARCHAR(50)";
+			sql += ",";
+		}
+		sql = sql.substring(0, sql.length() -1);
+		sql += ");";
+		Statement stmt = null;
+		try {
+			stmt = conn.createStatement();
+			stmt.executeUpdate(sql);
+		} finally {
+			if(stmt != null){
+				stmt.close();
+			}
+		}
+		
+	}
+	
 	public void addRequiredFieldMapping(String requiredField, String mappedTo) {
 		requiredFieldMap.put(requiredField, mappedTo);
 	}
