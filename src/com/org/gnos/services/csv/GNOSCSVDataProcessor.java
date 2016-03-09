@@ -127,14 +127,15 @@ public class GNOSCSVDataProcessor {
 			computedData.add(dataArr);
 			
 		}
-		print(computedData);
+		dumpCsv(computedData);
 	}
 	
-	public void print(List<String[]> data) {
+	public void dumpCsv(List<String[]> data) {
 		for(String[] row: data){
 			for(int i=0; i < row.length; i++ ){
-				System.out.println(" "+ row[i]);
+				System.out.print(row[i]+ ",");
 			}
+			System.out.println("");
 		}
 		
 	}
