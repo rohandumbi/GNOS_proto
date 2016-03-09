@@ -1,5 +1,9 @@
 package com.org.gnos.services.csv;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -27,6 +31,7 @@ public class GNOSCSVDataProcessor {
 	
 	//private List<String[]> computedData = new ArrayList<String[]>();
 	private List<String[]> computedData;
+	private List<String> computedColumns;
 	
 	public boolean processCsv(String fileName){
 		
@@ -55,6 +60,7 @@ public class GNOSCSVDataProcessor {
 	
 	public void compute() {
 		computedData = new ArrayList<String[]>();
+		computedColumns = new ArrayList<String>();
 		int tonnesWtIdx = -1;
 		for(int j=0; j < columns.length;j++){
 			if(columns[j].equalsIgnoreCase(requiredFieldMap.get("tonnes_wt"))){
@@ -64,7 +70,7 @@ public class GNOSCSVDataProcessor {
 		}
 		List<Expression> expressions = Expressions.getAll();
 		for(Expression expr: expressions){
-			System.out.println("Expr name = "+expr.getName());
+			computedColumns.add(expr.getName());
 			String[] dataArr = new String[data.size()];
 			float value = 0;
 			boolean isComplex = expr.isValueType();
@@ -137,13 +143,52 @@ public class GNOSCSVDataProcessor {
 	}
 	
 	public void dumpToCsv() {
-		for(String[] row: data){
-			for(int i=0; i < row.length; i++ ){
-				System.out.print(row[i]+ ",");
+		BufferedWriter bw = null;
+		try {
+			bw = new BufferedWriter(new FileWriter(new File("OUTPUT.CSV")));
+			// Write header column
+			StringBuilder sb = new StringBuilder();
+			for(int i =0; i< columns.length; i++){
+				sb.append(columns[i] +",");
 			}
-			System.out.println("");
+			for(int j =0; j< computedColumns.size(); j++){
+				sb.append(computedColumns.get(j) +",");
+			}
+			bw.write(sb.substring(0, sb.length()-1)+"\n");
+			
+			// Write rows
+			final int batchSize = 1000;
+            int count = 0;
+            for(int i=0; i < data.size() ; i++) {
+            	sb = new StringBuilder();
+            	String[] row = data.get(i);
+            	int j=0;
+            	for(; j < row.length ; j++) {
+            		sb.append(row[j]+",");
+            	}
+            	for(int jj=0; jj< computedData.size(); jj++){
+            		sb.append(computedData.get(jj)[i]+",");
+            	}
+            	bw.write(sb.substring(0, sb.length()-1)+"\n");
+            	
+            	if (++count % batchSize == 0) {
+                    bw.flush();
+                }
+            }
+            
+		} catch (IOException ioe) {
+			   ioe.printStackTrace();
 		}
-		
+		finally
+		{ 
+		   try{
+		      if(bw!=null){
+		    	  bw.close();
+		      }
+		   }catch(Exception ex){
+		       System.out.println("Error in closing the BufferedWriter"+ex);
+		    }
+		}
 	}
 	
 	public void dumpToDB() {
@@ -157,7 +202,7 @@ public class GNOSCSVDataProcessor {
 			final int batchSize = 1000;
             int count = 0;
             StringBuffer  buff = new StringBuffer("insert into gnos_data values (");
-            int columnCount = columns.length + Expressions.getAll().size();
+            int columnCount = columns.length + computedColumns.size();
             for(int i=0; i < columnCount ; i++){
             	buff.append("?");
             	if(i < columnCount -1 ){
@@ -228,9 +273,8 @@ public class GNOSCSVDataProcessor {
 			sql += columnName +" VARCHAR(50)";
 			sql += ",";
 		}
-		List<Expression> expressions = Expressions.getAll();
-		for(Expression expr: expressions){
-			String columnName = expr.getName().replaceAll("\\s+","_").toLowerCase();
+		for(int j =0; j< computedColumns.size(); j++){
+			String columnName = computedColumns.get(j).replaceAll("\\s+","_").toLowerCase();
 			sql += columnName +" VARCHAR(50)";
 			sql += ",";
 		}
@@ -247,6 +291,7 @@ public class GNOSCSVDataProcessor {
 		}
 		
 	}
+	
 	
 	public void addRequiredFieldMapping(String requiredField, String mappedTo) {
 		requiredFieldMap.put(requiredField, mappedTo);

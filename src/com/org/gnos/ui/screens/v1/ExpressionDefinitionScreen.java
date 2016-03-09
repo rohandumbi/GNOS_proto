@@ -154,6 +154,7 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 				updateExpressionList();
 				GNOSCSVDataProcessor.getInstance().compute();
 				GNOSCSVDataProcessor.getInstance().dumpToDB();
+				GNOSCSVDataProcessor.getInstance().dumpToCsv();
 				resetExpressionList();
 				//System.out.println("After mapping datatype of 3rd row is: " + projectModel.getAllProjectFields().get(2).getDataType());
 				/*GnosEvent event = new GnosEvent(this, "complete:datatype-defintion");
