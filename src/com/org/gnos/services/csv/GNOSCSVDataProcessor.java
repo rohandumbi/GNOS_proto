@@ -72,28 +72,30 @@ public class GNOSCSVDataProcessor {
 					for (Filter filter: filters){
 						String conditionValue = filter.getValue();
 						String valueToCheck = rowValues[filter.getColumnId()];
+
 						switch(filter.getOpType()){
 							case 0: if(!(valueToCheck.equalsIgnoreCase(conditionValue))){
 										conditionsMet = false;
-										break;
 									}
+									break;
 							case 1: if(valueToCheck.equalsIgnoreCase(conditionValue)){
 										conditionsMet = false;
-										break;
 									}
+									break;
 							case 2: if(!(Float.parseFloat(valueToCheck) > Float.parseFloat(conditionValue))){
 										conditionsMet = false;
-										break;
 									}
+									break;
 							case 3: if(!(Float.parseFloat(valueToCheck) < Float.parseFloat(conditionValue))){
 										conditionsMet = false;
-										break;
 									}
+									break;							
 							case 4: if(!(conditionValue.contains(valueToCheck))){
-								conditionsMet = false;
-								break;
-							}
+										conditionsMet = false;
+									}
+									break;
 						}
+						System.out.println("conditionValue :"+conditionValue+ " conditionValue: "+valueToCheck +" conditionsMet: " +conditionsMet);
 					}
 					if(conditionsMet){						
 						if(isComplex) {
