@@ -285,6 +285,10 @@ public class ExpressionBuilderGrid extends Composite {
 		
 	}
 	
+	public void resetAllRows(){
+		this.allRows = new ArrayList<Composite>();
+	}
+	
 	public List<Expression> getDefinedExpressions(){
 		Control[] rowChildren = null;
 		this.expressionList = new ArrayList<Expression>();

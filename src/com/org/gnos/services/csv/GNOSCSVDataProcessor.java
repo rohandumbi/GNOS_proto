@@ -20,7 +20,8 @@ public class GNOSCSVDataProcessor {
 	private Map<String, String> requiredFieldMap = new HashMap<String, String>();
 	private Map<String, String> dataTypeMap = new HashMap<String, String>();
 	
-	private List<String[]> computedData = new ArrayList<String[]>();
+	//private List<String[]> computedData = new ArrayList<String[]>();
+	private List<String[]> computedData;
 	
 	public boolean processCsv(String fileName){
 		
@@ -48,6 +49,7 @@ public class GNOSCSVDataProcessor {
 	}
 	
 	public void compute() {
+		computedData = new ArrayList<String[]>();
 		int tonnesWtIdx = -1;
 		for(int j=0; j < columns.length;j++){
 			if(columns[j].equalsIgnoreCase(requiredFieldMap.get("tonnes_wt"))){
