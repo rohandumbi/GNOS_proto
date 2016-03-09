@@ -1,6 +1,7 @@
 package com.org.gnos.services.csv;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -101,7 +102,6 @@ public class GNOSCSVDataProcessor {
 									}
 									break;
 						}
-						System.out.println("conditionValue :"+conditionValue+ " conditionValue: "+valueToCheck +" conditionsMet: " +conditionsMet);
 					}
 					if(conditionsMet){						
 						if(isComplex) {
@@ -149,12 +149,41 @@ public class GNOSCSVDataProcessor {
 	public void dumpToDB() {
 		Connection conn = DBManager.getConnection();
 		boolean autoCommit = true;
+		PreparedStatement ps = null;
 		try {
 			autoCommit = conn.getAutoCommit();
 			conn.setAutoCommit(false);
 			createTable(conn);
 			final int batchSize = 1000;
             int count = 0;
+            StringBuffer  buff = new StringBuffer("insert into gnos_data values (");
+            int columnCount = columns.length + Expressions.getAll().size();
+            for(int i=0; i < columnCount ; i++){
+            	buff.append("?");
+            	if(i < columnCount -1 ){
+            		buff.append(",");
+            	} else {
+            		buff.append(")");
+            	}
+            }
+            ps = conn.prepareStatement(buff.toString());
+            for(int i=0; i < data.size() ; i++) {
+            	String[] row = data.get(i);
+            	int j=0;
+            	for(; j < row.length ; j++) {
+            		ps.setString(j+1, row[j]);
+            	}
+            	for(int jj=0; jj< computedData.size(); jj++){
+            		ps.setString(j+jj+1, computedData.get(jj)[i]);
+            	}
+            	ps.addBatch();
+            	
+            	if (++count % batchSize == 0) {
+                    ps.executeBatch();
+                }
+            }
+            ps.executeBatch();
+            conn.commit();
             
 		}  
 		catch (SQLException sqle) {
@@ -163,6 +192,9 @@ public class GNOSCSVDataProcessor {
 		finally {
 			try {
 				conn.setAutoCommit(autoCommit);
+				if(ps!= null){
+					ps.close();
+				}
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -172,7 +204,23 @@ public class GNOSCSVDataProcessor {
 		
 	}
 	
+	private void dropTable(Connection conn) throws SQLException {
+		String  sql = "DROP TABLE IF EXISTS gnos_data; ";
+		
+		Statement stmt = null;
+		try {
+			stmt = conn.createStatement();
+			stmt.executeUpdate(sql);
+		} finally {
+			if(stmt != null){
+				stmt.close();
+			}
+		}
+		
+	}
+	
 	private void createTable(Connection conn) throws SQLException {
+		dropTable(conn);
 		String  sql = "CREATE TABLE gnos_data ( ";
 		
 		for(int i =0; i< columns.length; i++){

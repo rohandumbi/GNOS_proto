@@ -153,6 +153,7 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 				//projectModel.setAllProjectFields(fieldDatatypeDefinitionGrid.getFieldDatatypes());
 				updateExpressionList();
 				GNOSCSVDataProcessor.getInstance().compute();
+				GNOSCSVDataProcessor.getInstance().dumpToDB();
 				resetExpressionList();
 				//System.out.println("After mapping datatype of 3rd row is: " + projectModel.getAllProjectFields().get(2).getDataType());
 				/*GnosEvent event = new GnosEvent(this, "complete:datatype-defintion");
