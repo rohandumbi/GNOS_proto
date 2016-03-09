@@ -286,6 +286,9 @@ public class ExpressionBuilderGrid extends Composite {
 	}
 	
 	public void resetAllRows(){
+		for(Composite existingRow : this.allRows){
+			existingRow.setEnabled(false);
+		}
 		this.allRows = new ArrayList<Composite>();
 	}
 	
