@@ -95,8 +95,7 @@ public class GNOSCSVDataProcessor {
 							}
 						}
 					}
-					if(!conditionsMet){
-						
+					if(conditionsMet){						
 						if(isComplex) {
 							Operation operation = expr.getOperation();
 							float leftOperand = Float.parseFloat(rowValues[operation.getOperand_left()]);
@@ -110,7 +109,7 @@ public class GNOSCSVDataProcessor {
 						} else {
 							value = Float.parseFloat(rowValues[expr.getValue()]);
 						}
-						if(isGrade) {
+						if(!isGrade) {
 							value = ( value / Float.parseFloat(rowValues[tonnesWtIdx]));
 						}
 
