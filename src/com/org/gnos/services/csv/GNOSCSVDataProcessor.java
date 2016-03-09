@@ -84,15 +84,25 @@ public class GNOSCSVDataProcessor {
 										conditionsMet = false;
 									}
 									break;
-							case 2: if(!(Float.parseFloat(valueToCheck) > Float.parseFloat(conditionValue))){
+							case 2: /*if(!(Float.parseFloat(valueToCheck) > Float.parseFloat(conditionValue))){
+										conditionsMet = false;
+									}*/
+									if(!(conditionValue.contains(valueToCheck))){
 										conditionsMet = false;
 									}
 									break;
-							case 3: if(!(Float.parseFloat(valueToCheck) < Float.parseFloat(conditionValue))){
+							case 3: /*if(!(Float.parseFloat(valueToCheck) < Float.parseFloat(conditionValue))){
+										conditionsMet = false;
+									}*/
+							
+									if(!(Float.parseFloat(valueToCheck) > Float.parseFloat(conditionValue))){
 										conditionsMet = false;
 									}
 									break;							
-							case 4: if(!(conditionValue.contains(valueToCheck))){
+							case 4: /*if(!(conditionValue.contains(valueToCheck))){
+										conditionsMet = false;
+									}*/
+									if(!(Float.parseFloat(valueToCheck) < Float.parseFloat(conditionValue))){
 										conditionsMet = false;
 									}
 									break;

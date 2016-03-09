@@ -144,7 +144,7 @@ public class GnosConditionCellComposite extends Composite {
 				//System.out.println("Selected field: " + ((Combo)event.widget).getText());
 				if(isNumeric(((Combo)event.widget).getText())){
 					//System.out.println("Numeric");
-					comboOperator.setItems(new String[]{"=", "<>", ">", "<", "In"});
+					comboOperator.setItems(new String[]{"=", "<>", "In", ">", "<"});
 				}else{
 					//System.out.println("String");
 					comboOperator.setItems(new String[]{"=", "<>", "In"});
