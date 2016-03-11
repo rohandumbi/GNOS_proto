@@ -19,6 +19,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.custom.controls.ExpressionBuilderGrid;
 import com.org.gnos.custom.controls.GnosScreen;
+import com.org.gnos.custom.controls.SavedExpressionsGrid;
 import com.org.gnos.custom.models.ProjectModel;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.services.Expression;
@@ -29,6 +30,7 @@ import com.org.gnos.services.csv.GNOSCSVDataProcessor;
 public class ExpressionDefinitionScreen extends GnosScreen {
 
 	private ExpressionBuilderGrid expressionBuilderGrid;
+	private SavedExpressionsGrid savedExpressionsGrid;
 	private String[] allHeaders;
 	private ProjectModel projectModel;
 	private List<Expression> allDefinedExpressions;
@@ -60,7 +62,7 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 		labelScreenName.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		FormData fd_labelScreenName = new FormData();
 		//fd_labelScreenName.bottom = new FormAttachment(100, -461);
-		fd_labelScreenName.top = new FormAttachment(0, 10);
+		fd_labelScreenName.top = new FormAttachment(0, 20);
 		fd_labelScreenName.left = new FormAttachment(0, 10);
 		labelScreenName.setLayoutData(fd_labelScreenName);
 		labelScreenName.setFont(SWTResourceManager.getFont("Arial", 9, SWT.BOLD));
@@ -72,7 +74,7 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 		FormData fd_labelScreenDescription = new FormData();
 		fd_labelScreenDescription.top = new FormAttachment(labelScreenName, 10, SWT.BOTTOM);
 		fd_labelScreenDescription.left = new FormAttachment(0, 10);
-		fd_labelScreenDescription.right = new FormAttachment(0, 866);
+		//fd_labelScreenDescription.right = new FormAttachment(0, 866);
 		labelScreenDescription.setLayoutData(fd_labelScreenDescription);
 		labelScreenDescription.setText("Define your own expressions to be used. Add filters.");
 		
@@ -103,7 +105,7 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 		});
 		FormData fd_btnAddNewRow = new FormData();
 		btnAddNewRow.setLayoutData(fd_btnAddNewRow);
-		btnAddNewRow.setText("ADD NEW ROW");
+		btnAddNewRow.setText("ADD NEW EXPRESSION");
 		btnAddNewRow.setSize(145, SWT.DEFAULT);
 		//int offsetX = -btnAddNewRow.computeSize(SWT.DEFAULT, SWT.DEFAULT).x / 2;
 		fd_btnAddNewRow.top = new FormAttachment(expressionBuilderGrid, 10, SWT.BOTTOM);
@@ -146,7 +148,7 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 		fd_buttonSave.right = new FormAttachment(btnAddNewRow, 145, SWT.RIGHT);
 		//fd_buttonMapRqrdFields.right = new FormAttachment(0, 282);
 		buttonSave.setLayoutData(fd_buttonSave);
-		buttonSave.addSelectionListener(new SelectionAdapter() {
+		/*buttonSave.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				//TODO mapping complete
@@ -156,9 +158,50 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 				GNOSCSVDataProcessor.getInstance().dumpToDB();
 				GNOSCSVDataProcessor.getInstance().dumpToCsv();
 				resetExpressionList();
+			}
+		});*/
+		
+		Label labelSavedExpressions = new Label(this, SWT.NONE);
+		labelSavedExpressions.setText("Saved Expressions");
+		labelSavedExpressions.setForeground(SWTResourceManager.getColor(0, 191, 255));
+		labelSavedExpressions.setFont(SWTResourceManager.getFont("Arial", 9, SWT.BOLD));
+		labelSavedExpressions.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		FormData fd_labelSavedExpressions = new FormData();
+		fd_labelSavedExpressions.top = new FormAttachment(buttonSave, 10);
+		fd_labelSavedExpressions.left = new FormAttachment(0, 10);
+		labelSavedExpressions.setLayoutData(fd_labelSavedExpressions);
+		
+		savedExpressionsGrid = new SavedExpressionsGrid(this, SWT.NONE, this.allHeaders);
+		FormData fd_savedExpressionsGrid = new FormData();
+		fd_savedExpressionsGrid.top = new FormAttachment(labelSavedExpressions, 6);
+		fd_savedExpressionsGrid.left = new FormAttachment(0, 10);
+		fd_savedExpressionsGrid.right = new FormAttachment(100, -10);
+		savedExpressionsGrid.setLayoutData(fd_savedExpressionsGrid);
+		
+		savedExpressionsGrid.addControlListener(new ControlAdapter() {
+		    public void controlResized(ControlEvent e) {
+		        //System.out.println("Expression builder grid resized");
+		        WorkbenchScreen workbenchScreen = (WorkbenchScreen)parent.getParent().getParent();
+				workbenchScreen.setScrolledCompositeMinSize();
+		    }
+		});
+		
+		buttonSave.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				//TODO mapping complete
+				//projectModel.setAllProjectFields(fieldDatatypeDefinitionGrid.getFieldDatatypes());
+				updateExpressionList();
+				GNOSCSVDataProcessor.getInstance().compute();
+				GNOSCSVDataProcessor.getInstance().dumpToDB();
+				GNOSCSVDataProcessor.getInstance().dumpToCsv();
+				List<Composite> allExpressions = expressionBuilderGrid.getAllRowsComposite();
+				savedExpressionsGrid.addRows(allExpressions);
+				me.layout();
+				parent.layout(true, true);
+				resetExpressionList();
 				//System.out.println("After mapping datatype of 3rd row is: " + projectModel.getAllProjectFields().get(2).getDataType());
-				/*GnosEvent event = new GnosEvent(this, "complete:datatype-defintion");
-				triggerGnosEvent(event);*/
+				
 			}
 		});
 	}

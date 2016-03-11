@@ -28,7 +28,7 @@ import com.org.gnos.services.Filter;
 import com.org.gnos.services.Operation;
 import com.org.gnos.services.csv.GNOSCSVDataProcessor;
 
-public class ExpressionBuilderGrid extends Composite {
+public class SavedExpressionsGrid extends Composite {
 
 	/**
 	 * Create the composite.
@@ -45,7 +45,7 @@ public class ExpressionBuilderGrid extends Composite {
 	private String[] arithemeticOperatorsArray;
 	private Composite parent;
 	
-	public ExpressionBuilderGrid(Composite parent, int style, String[] allSourceFields) {
+	public SavedExpressionsGrid(Composite parent, int style, String[] allSourceFields) {
 		super(parent, style);
 		this.parent = parent;
 		//this.requiredFieldNames = requiredFieldNames;
@@ -59,18 +59,7 @@ public class ExpressionBuilderGrid extends Composite {
 		this.createContent(parent);
 	}
 	
-	/*private int getDatatypeCode(String dataType){
-		if(dataType.equalsIgnoreCase("String")){
-			return 1;
-		}else if(dataType.equalsIgnoreCase("Integer")){
-			return 2;
-		}else if(dataType.equalsIgnoreCase("Double")){
-			return 3;
-		}else{
-			return 0;
-		}
-	}*/
-	private String[] getSourceFieldsComboItems(){
+	/*private String[] getSourceFieldsComboItems(){
 		int i = 0;
 		int sourceFieldSize = this.allSourceFields.length;
 		this.numericSourceFields = new ArrayList<String>();
@@ -90,7 +79,7 @@ public class ExpressionBuilderGrid extends Composite {
 			this.sourceFieldsComboItems[i] = this.numericSourceFields.get(i);
 		}
 		return this.sourceFieldsComboItems;
-	}
+	}*/
 
 
 	private void createHeader(){
@@ -173,7 +162,21 @@ public class ExpressionBuilderGrid extends Composite {
 		
 	}
 	
-	private void toggleExpressionType(Composite compositeRow, boolean isExpression){
+	public void addRows(List<Composite> compositeSavedExpressionCollection){
+		for(int i=0; i<compositeSavedExpressionCollection.size(); i++){
+			Composite compositeSavedExpression = compositeSavedExpressionCollection.get(i);
+			compositeSavedExpression.setParent(this);
+			FormData fd_compositeRow = new FormData();
+			fd_compositeRow.left = new FormAttachment(this.presentRow, 0, SWT.LEFT);
+			//fd_compositeRow.bottom = new FormAttachment(this.presentRow, 26, SWT.BOTTOM);
+			fd_compositeRow.right = new FormAttachment(this.presentRow, 0, SWT.RIGHT);
+			fd_compositeRow.top = new FormAttachment(this.presentRow);
+			compositeSavedExpression.setLayoutData(fd_compositeRow);
+			this.presentRow = compositeSavedExpression;
+		}
+	}
+	
+	/*private void toggleExpressionType(Composite compositeRow, boolean isExpression){
 		
 		Composite expressionComposite = new Composite(compositeRow, SWT.NONE);
 		expressionComposite.setLayout(new FillLayout(SWT.HORIZONTAL));
@@ -207,9 +210,9 @@ public class ExpressionBuilderGrid extends Composite {
 			comboExpressionDefinition.setText("Field Value");
 		}
 		compositeRow.layout();
-	}
+	}*/
 	
-	public void addRow(){
+	/*public void addRow(){
 		final Composite compositeRow = new Composite(this, SWT.BORDER);
 		compositeRow.setLayout(new FormLayout());
 		Color backgroundColor = SWTResourceManager.getColor(SWT.COLOR_WHITE);
@@ -220,7 +223,6 @@ public class ExpressionBuilderGrid extends Composite {
 		compositeRow.setBackground(backgroundColor);
 		FormData fd_compositeRow = new FormData();
 		fd_compositeRow.left = new FormAttachment(this.presentRow, 0, SWT.LEFT);
-		//fd_compositeRow.bottom = new FormAttachment(this.presentRow, 26, SWT.BOTTOM);
 		fd_compositeRow.right = new FormAttachment(this.presentRow, 0, SWT.RIGHT);
 		fd_compositeRow.top = new FormAttachment(this.presentRow);
 		
@@ -237,20 +239,11 @@ public class ExpressionBuilderGrid extends Composite {
 		fd_expressionName.right = new FormAttachment(20, -5);
 		expressionName.setLayoutData(fd_expressionName);
 		
-		/*Composite expressionComposite = new Composite(compositeRow, SWT.NONE);
-		expressionComposite.setLayout(new FillLayout(SWT.HORIZONTAL));
-		expressionComposite.setBackground(backgroundColor);
-		FormData fd_expressionComposite = new FormData();
-		fd_expressionComposite.right = new FormAttachment(70, -5);
-		fd_expressionComposite.left = new FormAttachment(40, 5);
-		expressionComposite.setLayoutData(fd_expressionComposite);*/
-		
 		Button buttonIsComplex = new Button(compositeRow, SWT.CHECK);
 		FormData fd_buttonIsComplex = new FormData();
 		fd_buttonIsComplex.left = new FormAttachment(24);
 		fd_buttonIsComplex.top = new FormAttachment(0,2);
 		buttonIsComplex.setLayoutData(fd_buttonIsComplex);
-		//final Composite me = this;
 		this.toggleExpressionType(compositeRow, false);
 		
 		buttonIsComplex.addSelectionListener(new SelectionAdapter() {
@@ -276,7 +269,7 @@ public class ExpressionBuilderGrid extends Composite {
 		this.presentRow = compositeRow;
 		this.allRows.add(compositeRow);
 		compositeRow.setLayoutData(fd_compositeRow);
-	}
+	}*/
 
 	private void createContent(Composite parent){
 		this.setLayout(new FormLayout());
@@ -290,14 +283,9 @@ public class ExpressionBuilderGrid extends Composite {
 			existingRow.setEnabled(false);
 		}
 		this.allRows = new ArrayList<Composite>();
-		this.presentRow = compositeGridHeader;
 	}
 	
-	public List<Composite> getAllRowsComposite(){
-		return this.allRows;
-	}
-	
-	public List<Expression> getDefinedExpressions(){
+	/*public List<Expression> getDefinedExpressions(){
 		Control[] rowChildren = null;
 		this.expressionList = new ArrayList<Expression>();
 		for(int i = 0; i < allRows.size(); i++){
@@ -359,13 +347,13 @@ public class ExpressionBuilderGrid extends Composite {
 					int leftOperandIndex = -1;
 					int rightOperandIndex = -1;
 					
-					/*
+					
 					 * Can't directly take the selection index as the column id because,
 					 * in the field combo only numeric fields are present, whereas in the columns
 					 * table all types of columns are present. Hence searching for the correct index
 					 * of left/right operand by comparing the text value with all column names.
 					 * Some complexity may be reduceable. Later!!!
-					 */
+					 
 					for (int j=0; j<this.allSourceFields.length; j++) {
 					    String columnName = this.allSourceFields[j];
 						
@@ -433,7 +421,7 @@ public class ExpressionBuilderGrid extends Composite {
 			this.expressionList.add(expression);
 		}
 		return this.expressionList;
-	}
+	}*/
 
 	@Override
 	protected void checkSubclass() {
