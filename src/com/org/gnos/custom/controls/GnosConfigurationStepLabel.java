@@ -1,5 +1,7 @@
 package com.org.gnos.custom.controls;
 
+import java.util.ArrayList;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FormAttachment;
@@ -9,7 +11,12 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-public class GnosConfigurationStepLabel extends Composite {
+import com.org.gnos.events.GnosEvent;
+import com.org.gnos.events.interfaces.GnosEventGenerator;
+import com.org.gnos.events.interfaces.GnosEventListener;
+import com.org.gnos.utilities.ClickBehavior;
+
+public class GnosConfigurationStepLabel extends Composite implements GnosEventGenerator{
 
 	/**
 	 * Create the composite.
@@ -22,6 +29,7 @@ public class GnosConfigurationStepLabel extends Composite {
 	private Color selectedTextColor;
 	private String stepName;
 	private Label labelMapRequiredFields ;
+	protected ArrayList<GnosEventListener> listeners = new ArrayList<GnosEventListener>();
 
 	public GnosConfigurationStepLabel(Composite parent, int style, String label) {
 		super(parent, style);
@@ -49,6 +57,15 @@ public class GnosConfigurationStepLabel extends Composite {
 		fd_labelMapRequiredFields.left = new FormAttachment(0,5);
 		fd_labelMapRequiredFields.right = new FormAttachment(100);
 		labelMapRequiredFields.setLayoutData(fd_labelMapRequiredFields);
+		labelMapRequiredFields.addMouseListener(new ClickBehavior(new Runnable(){
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				GnosEvent event = new GnosEvent(this, stepName);
+				fireChildEvent(event);
+				System.out.println("Got the click...");
+			}
+		}));
 	}
 
 	public void setSelectedState(){
@@ -68,6 +85,20 @@ public class GnosConfigurationStepLabel extends Composite {
 	@Override
 	protected void checkSubclass() {
 		// Disable the check that prevents subclassing of SWT components
+	}
+
+	@Override
+	public void registerEventListener(GnosEventListener listener) {
+		// TODO Auto-generated method stub
+		listeners.add(listener);
+	}
+	
+	private void fireChildEvent(GnosEvent event){
+		int j = listeners.size();
+		int i = 0;
+		for(i=0; i<j; i++){
+			listeners.get(i).onGnosEventFired(event);
+		}
 	}
 
 }

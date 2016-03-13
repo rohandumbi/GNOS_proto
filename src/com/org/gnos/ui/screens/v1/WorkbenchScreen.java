@@ -5,7 +5,6 @@ import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
@@ -19,6 +18,7 @@ import com.org.gnos.custom.controls.GnosConfigurationStepLabel;
 import com.org.gnos.custom.controls.GnosScreen;
 import com.org.gnos.custom.models.ProjectModel;
 import com.org.gnos.events.GnosEvent;
+import com.org.gnos.utilities.ClickBehavior;
 
 
 public class WorkbenchScreen extends GnosScreen {
@@ -36,8 +36,8 @@ public class WorkbenchScreen extends GnosScreen {
 	private ProjectModel projectModel;
 	private ScrolledComposite scViewPortContainer;
 	private MainConfigurationViewPort mainConfigurationViewPort;
-	
-	
+
+
 	public CLabel labelWorkbenchHeader;
 	public WorkbenchScreen(Composite parent, int style, ProjectModel projectModel){
 		super(parent, style);
@@ -46,7 +46,7 @@ public class WorkbenchScreen extends GnosScreen {
 		setToolTipText("");
 		setBackground(SWTResourceManager.getColor(255, 255, 255));
 		setLayout(new FormLayout());
-		
+
 		labelWorkbenchHeader = new CLabel(this, SWT.NONE);
 		labelWorkbenchHeader.setImage(SWTResourceManager.getImage(WorkbenchScreen.class, "/com/org/gnos/resources/settings16.png"));
 		labelWorkbenchHeader.setForeground(SWTResourceManager.getColor(255, 255, 255));
@@ -59,7 +59,7 @@ public class WorkbenchScreen extends GnosScreen {
 		fd_labelWorkbenchHeader.left = new FormAttachment(0);
 		labelWorkbenchHeader.setLayoutData(fd_labelWorkbenchHeader);
 		labelWorkbenchHeader.setText("Project Import Configuration");
-		
+
 		Label label = new Label(this, SWT.SEPARATOR | SWT.VERTICAL);
 		FormData fd_label = new FormData();
 		fd_label.left = new FormAttachment(0, 260);
@@ -67,8 +67,8 @@ public class WorkbenchScreen extends GnosScreen {
 		fd_label.bottom = new FormAttachment(100, 10);
 		fd_label.right = new FormAttachment(0, 262);
 		label.setLayoutData(fd_label);
-		
-		
+
+
 		gnosStepDefineFieldTypeLabel = new GnosConfigurationStepLabel(this, SWT.NONE, "Define Field Type");
 		FormData fd_gnosStepDefineFieldTypeLabel = new FormData();
 		fd_gnosStepDefineFieldTypeLabel.bottom = new FormAttachment(labelWorkbenchHeader, 40, SWT.BOTTOM);
@@ -77,7 +77,9 @@ public class WorkbenchScreen extends GnosScreen {
 		fd_gnosStepDefineFieldTypeLabel.left = new FormAttachment(0, 10);
 		gnosStepDefineFieldTypeLabel.setLayoutData(fd_gnosStepDefineFieldTypeLabel);
 		gnosStepDefineFieldTypeLabel.setSelectedState();
-		
+		gnosStepDefineFieldTypeLabel.registerEventListener(this);
+
+
 		gnosStepMapRequiredFieldsLabel = new GnosConfigurationStepLabel(this, SWT.NONE, "Map Required Fields");
 		FormData fd_gnosStepMapRequiredFieldsLabel = new FormData();
 		fd_gnosStepMapRequiredFieldsLabel.bottom = new FormAttachment(gnosStepDefineFieldTypeLabel, 40, SWT.BOTTOM);
@@ -86,7 +88,8 @@ public class WorkbenchScreen extends GnosScreen {
 		fd_gnosStepMapRequiredFieldsLabel.left = new FormAttachment(0, 10);
 		gnosStepMapRequiredFieldsLabel.setLayoutData(fd_gnosStepMapRequiredFieldsLabel);
 		//gnosStepMapRequiredFieldsLabel.setSelectedState();
-		
+		gnosStepMapRequiredFieldsLabel.registerEventListener(this);
+
 		gnosStepDefineExpressionsLabel = new GnosConfigurationStepLabel(this, SWT.NONE, "Expression Definition");
 		FormData fd_gnosStepDefineExpressionsLabel = new FormData();
 		fd_gnosStepDefineExpressionsLabel.bottom = new FormAttachment(gnosStepMapRequiredFieldsLabel, 40, SWT.BOTTOM);
@@ -94,7 +97,8 @@ public class WorkbenchScreen extends GnosScreen {
 		fd_gnosStepDefineExpressionsLabel.top = new FormAttachment(gnosStepMapRequiredFieldsLabel);
 		fd_gnosStepDefineExpressionsLabel.left = new FormAttachment(0, 10);
 		gnosStepDefineExpressionsLabel.setLayoutData(fd_gnosStepDefineExpressionsLabel);
-		
+		gnosStepDefineExpressionsLabel.registerEventListener(this);
+
 		gnosStepModelDefinitionLabel = new GnosConfigurationStepLabel(this, SWT.NONE, "Model Definition");
 		FormData fd_gnosStepModelDefinitionLabel = new FormData();
 		fd_gnosStepModelDefinitionLabel.bottom = new FormAttachment(gnosStepDefineExpressionsLabel, 40, SWT.BOTTOM);
@@ -102,7 +106,8 @@ public class WorkbenchScreen extends GnosScreen {
 		fd_gnosStepModelDefinitionLabel.top = new FormAttachment(gnosStepDefineExpressionsLabel);
 		fd_gnosStepModelDefinitionLabel.left = new FormAttachment(gnosStepMapRequiredFieldsLabel, 0, SWT.LEFT);
 		gnosStepModelDefinitionLabel.setLayoutData(fd_gnosStepModelDefinitionLabel);
-		
+		gnosStepModelDefinitionLabel.registerEventListener(this);
+
 		gnosStepProcessRouteDefinitionLabel = new GnosConfigurationStepLabel(this, SWT.NONE, "Process Route Definition");
 		FormData fd_gnosStepProcessRouteDefinitionLabel = new FormData();
 		fd_gnosStepProcessRouteDefinitionLabel.bottom = new FormAttachment(gnosStepDefineExpressionsLabel, 80, SWT.BOTTOM);
@@ -110,7 +115,8 @@ public class WorkbenchScreen extends GnosScreen {
 		fd_gnosStepProcessRouteDefinitionLabel.top = new FormAttachment(gnosStepDefineExpressionsLabel, 40);
 		fd_gnosStepProcessRouteDefinitionLabel.left = new FormAttachment(gnosStepMapRequiredFieldsLabel, 0, SWT.LEFT);
 		gnosStepProcessRouteDefinitionLabel.setLayoutData(fd_gnosStepProcessRouteDefinitionLabel);
-		
+		gnosStepProcessRouteDefinitionLabel.registerEventListener(this);
+
 		//this.scViewPortContainer = new ScrolledComposite(this, SWT.H_SCROLL | SWT.V_SCROLL | SWT.NONE);
 		this.scViewPortContainer = new ScrolledComposite(this, SWT.V_SCROLL | SWT.NONE);
 		FormData fd_scViewPortContainer = new FormData();
@@ -118,29 +124,29 @@ public class WorkbenchScreen extends GnosScreen {
 		fd_scViewPortContainer.bottom = new FormAttachment(100, -6);
 		fd_scViewPortContainer.top = new FormAttachment(labelWorkbenchHeader, 6);
 		fd_scViewPortContainer.left = new FormAttachment(label, 6);
-		
+
 		this.mainConfigurationViewPort = new MainConfigurationViewPort(this.scViewPortContainer, SWT.BORDER, this.projectModel);
 		this.mainConfigurationViewPort.registerEventListener(this);
-		
+
 		this.scViewPortContainer.setContent(this.mainConfigurationViewPort);
 		this.scViewPortContainer.setExpandHorizontal(true);
 		this.scViewPortContainer.setExpandVertical(true);
 		this.scViewPortContainer.setLayout(new FillLayout());
 		//this.scViewPortContainer.setMinSize(this.mainConfigurationViewPort.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		scViewPortContainer.addControlListener(new ControlAdapter() {
-		    public void controlResized(ControlEvent e) {
-		        //System.out.println("MVCP resized");
-		    	Rectangle r = scViewPortContainer.getClientArea();
-		        scViewPortContainer.setMinSize(mainConfigurationViewPort.computeSize(r.width, SWT.DEFAULT));
-		    }
+			public void controlResized(ControlEvent e) {
+				//System.out.println("MVCP resized");
+				Rectangle r = scViewPortContainer.getClientArea();
+				scViewPortContainer.setMinSize(mainConfigurationViewPort.computeSize(r.width, SWT.DEFAULT));
+			}
 		});
 		this.scViewPortContainer.setLayoutData(fd_scViewPortContainer);
 	}
-	
+
 	public void setScrolledCompositeMinSize(){
 		Rectangle r = scViewPortContainer.getClientArea();
-        scViewPortContainer.setMinSize(mainConfigurationViewPort.computeSize(r.width, SWT.DEFAULT));
-        scViewPortContainer.setOrigin(mainConfigurationViewPort.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		scViewPortContainer.setMinSize(mainConfigurationViewPort.computeSize(r.width, SWT.DEFAULT));
+		scViewPortContainer.setOrigin(mainConfigurationViewPort.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 	}
 
 	@Override
@@ -168,7 +174,44 @@ public class WorkbenchScreen extends GnosScreen {
 			//processRouteDefinitionComplete();
 			//this.gnosStepProcessRouteDefinitionLabel.setDeselectedState();
 		}
+		
+		if(e.eventName == "Define Field Type"){
+			gnosStepDefineFieldTypeLabel.setSelectedState();
+			
+			gnosStepMapRequiredFieldsLabel.setDeselectedState();
+			gnosStepDefineExpressionsLabel.setDeselectedState();
+			gnosStepModelDefinitionLabel.setDeselectedState();
+			gnosStepProcessRouteDefinitionLabel.setDeselectedState();
+		}else if(e.eventName == "Map Required Fields"){
+			gnosStepMapRequiredFieldsLabel.setSelectedState();
+			
+			gnosStepDefineFieldTypeLabel.setDeselectedState();
+			gnosStepDefineExpressionsLabel.setDeselectedState();
+			gnosStepModelDefinitionLabel.setDeselectedState();
+			gnosStepProcessRouteDefinitionLabel.setDeselectedState();
+		}else if(e.eventName == "Expression Definition"){
+			gnosStepDefineExpressionsLabel.setSelectedState();
+			
+			gnosStepDefineFieldTypeLabel.setDeselectedState();
+			gnosStepMapRequiredFieldsLabel.setDeselectedState();
+			gnosStepModelDefinitionLabel.setDeselectedState();
+			gnosStepProcessRouteDefinitionLabel.setDeselectedState();
+		}else if(e.eventName == "Model Definition"){
+			gnosStepModelDefinitionLabel.setSelectedState();
+			
+			gnosStepDefineFieldTypeLabel.setDeselectedState();
+			gnosStepMapRequiredFieldsLabel.setDeselectedState();
+			gnosStepDefineExpressionsLabel.setDeselectedState();
+			gnosStepProcessRouteDefinitionLabel.setDeselectedState();
+		}else if(e.eventName == "Process Route Definition"){
+			gnosStepProcessRouteDefinitionLabel.setSelectedState();
+			
+			gnosStepDefineFieldTypeLabel.setDeselectedState();
+			gnosStepMapRequiredFieldsLabel.setDeselectedState();
+			gnosStepDefineExpressionsLabel.setDeselectedState();
+			gnosStepModelDefinitionLabel.setDeselectedState();
+		}
 		this.scViewPortContainer.setMinSize(this.mainConfigurationViewPort.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 	}
-	
+
 }
