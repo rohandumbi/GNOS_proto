@@ -88,8 +88,10 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 		expressionBuilderGrid.addControlListener(new ControlAdapter() {
 		    public void controlResized(ControlEvent e) {
 		        //System.out.println("Expression builder grid resized");
-		        WorkbenchScreen workbenchScreen = (WorkbenchScreen)parent.getParent().getParent();
-				workbenchScreen.setScrolledCompositeMinSize();
+		    	if((parent.getParent() !=null) && parent.getParent().getParent() instanceof WorkbenchScreen){//hack for the time being
+		    		 WorkbenchScreen workbenchScreen = (WorkbenchScreen)parent.getParent().getParent();
+					 workbenchScreen.setScrolledCompositeMinSize();
+		    	}
 		    }
 		});
 		
@@ -181,8 +183,10 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 		savedExpressionsGrid.addControlListener(new ControlAdapter() {
 		    public void controlResized(ControlEvent e) {
 		        //System.out.println("Expression builder grid resized");
-		        WorkbenchScreen workbenchScreen = (WorkbenchScreen)parent.getParent().getParent();
-				workbenchScreen.setScrolledCompositeMinSize();
+		    	if((parent.getParent() !=null) && parent.getParent().getParent() instanceof WorkbenchScreen){//hack for the time being
+		    		 WorkbenchScreen workbenchScreen = (WorkbenchScreen)parent.getParent().getParent();
+					 workbenchScreen.setScrolledCompositeMinSize();
+		    	}
 		    }
 		});
 		
