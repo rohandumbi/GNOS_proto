@@ -127,6 +127,7 @@ public class WorkbenchScreen extends GnosScreen {
 
 		this.mainConfigurationViewPort = new MainConfigurationViewPort(this.scViewPortContainer, SWT.BORDER, this.projectModel);
 		this.mainConfigurationViewPort.registerEventListener(this);
+		this.mainConfigurationViewPort.loadFieldDatatypeDefinitionScreen();
 
 		this.scViewPortContainer.setContent(this.mainConfigurationViewPort);
 		this.scViewPortContainer.setExpandHorizontal(true);
@@ -182,6 +183,8 @@ public class WorkbenchScreen extends GnosScreen {
 			gnosStepDefineExpressionsLabel.setDeselectedState();
 			gnosStepModelDefinitionLabel.setDeselectedState();
 			gnosStepProcessRouteDefinitionLabel.setDeselectedState();
+			
+			mainConfigurationViewPort.loadFieldDatatypeDefinitionScreen();
 		}else if(e.eventName == "Map Required Fields"){
 			gnosStepMapRequiredFieldsLabel.setSelectedState();
 			
@@ -189,6 +192,8 @@ public class WorkbenchScreen extends GnosScreen {
 			gnosStepDefineExpressionsLabel.setDeselectedState();
 			gnosStepModelDefinitionLabel.setDeselectedState();
 			gnosStepProcessRouteDefinitionLabel.setDeselectedState();
+			
+			mainConfigurationViewPort.loadMapRequiredFieldsScreen();
 		}else if(e.eventName == "Expression Definition"){
 			gnosStepDefineExpressionsLabel.setSelectedState();
 			
@@ -196,6 +201,8 @@ public class WorkbenchScreen extends GnosScreen {
 			gnosStepMapRequiredFieldsLabel.setDeselectedState();
 			gnosStepModelDefinitionLabel.setDeselectedState();
 			gnosStepProcessRouteDefinitionLabel.setDeselectedState();
+			
+			mainConfigurationViewPort.loadExpressionDefinitionScreen();
 		}else if(e.eventName == "Model Definition"){
 			gnosStepModelDefinitionLabel.setSelectedState();
 			
@@ -203,6 +210,8 @@ public class WorkbenchScreen extends GnosScreen {
 			gnosStepMapRequiredFieldsLabel.setDeselectedState();
 			gnosStepDefineExpressionsLabel.setDeselectedState();
 			gnosStepProcessRouteDefinitionLabel.setDeselectedState();
+			
+			mainConfigurationViewPort.loadModelDefinitionScreen();
 		}else if(e.eventName == "Process Route Definition"){
 			gnosStepProcessRouteDefinitionLabel.setSelectedState();
 			
@@ -210,6 +219,8 @@ public class WorkbenchScreen extends GnosScreen {
 			gnosStepMapRequiredFieldsLabel.setDeselectedState();
 			gnosStepDefineExpressionsLabel.setDeselectedState();
 			gnosStepModelDefinitionLabel.setDeselectedState();
+			
+			mainConfigurationViewPort.loadProcessRouteDefinitionScreen();
 		}
 		this.scViewPortContainer.setMinSize(this.mainConfigurationViewPort.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 	}
