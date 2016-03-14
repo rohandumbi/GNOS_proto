@@ -1,6 +1,7 @@
 package com.org.gnos.ui.screens.v1;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 
@@ -17,51 +18,80 @@ public class MainConfigurationViewPort extends GnosScreen{
 	 */
 	private ProjectModel projectModel;
 	private GnosScreen viewPort;
+	private StackLayout stackLayout;
+	private FieldDatatypeDefinitionScreen fieldDatatypeDefinitionScreen;
+	private MapRequiredFieldsScreen mapRequiredFieldsScreen;
+	private ExpressionDefinitionScreen expressionDefinitionScreen;
+	private ModelDefinitionScreen modelDefinitionScreen;
+	private ProcessRouteDefinitionScreen processRouteDefinitionScreen;
+	
 	//private Layout mainLayout;
 	public MainConfigurationViewPort(Composite parent, int style, ProjectModel projectModel){
 		super(parent, style);
 		this.projectModel = projectModel;
+		this.stackLayout = new StackLayout();
+		this.setLayout(stackLayout);
 		//this.parent = parent;
-		this.loadFieldDatatypeDefinitionScreen();
+		//this.loadFieldDatatypeDefinitionScreen();
 		//this.setMinSize(this.viewPort.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 	}
 	
-	private void loadFieldDatatypeDefinitionScreen(){
-		this.setLayout(new FillLayout());
+	public void loadFieldDatatypeDefinitionScreen(){
+		/*this.setLayout(new FillLayout());
 		this.viewPort = new FieldDatatypeDefinitionScreen(this, SWT.NONE, this.projectModel);
 		this.viewPort.registerEventListener(this);
+		this.layout();*/
+		fieldDatatypeDefinitionScreen = new FieldDatatypeDefinitionScreen(this, SWT.NONE, this.projectModel);
+		fieldDatatypeDefinitionScreen.registerEventListener(this);
+		this.stackLayout.topControl = fieldDatatypeDefinitionScreen;
 		this.layout();
 	}
 
-	private void loadMapRequiredFieldsScreen(){
-		this.viewPort.dispose();
+	public void loadMapRequiredFieldsScreen(){
+		/*this.viewPort.dispose();
 		this.setLayout(new FillLayout());
 		this.viewPort = new MapRequiredFieldsScreen(this, SWT.NONE, this.projectModel);
 		this.viewPort.registerEventListener(this);
+		this.layout();*/
+		mapRequiredFieldsScreen = new MapRequiredFieldsScreen(this, SWT.NONE, this.projectModel);
+		mapRequiredFieldsScreen.registerEventListener(this);
+		this.stackLayout.topControl = mapRequiredFieldsScreen;
 		this.layout();
 	}
 
-	private void loadExpressionDefinitionScreen(){
-		this.viewPort.dispose();
+	public void loadExpressionDefinitionScreen(){
+		/*this.viewPort.dispose();
 		this.setLayout(new FillLayout());
 		this.viewPort = new ExpressionDefinitionScreen(this, SWT.NONE, this.projectModel);
 		this.viewPort.registerEventListener(this);
+		this.layout();*/
+		expressionDefinitionScreen = new ExpressionDefinitionScreen(this, SWT.NONE, this.projectModel);
+		expressionDefinitionScreen.registerEventListener(this);
+		this.stackLayout.topControl = expressionDefinitionScreen;
 		this.layout();
 	}
 
-	private void loadModelDefinitionScreen(){
-		this.viewPort.dispose();
+	public void loadModelDefinitionScreen(){
+		/*this.viewPort.dispose();
 		this.setLayout(new FillLayout());
 		this.viewPort = new ModelDefinitionScreen(this, SWT.NONE);
 		this.viewPort.registerEventListener(this);
+		this.layout();*/
+		modelDefinitionScreen = new ModelDefinitionScreen(this, SWT.NONE);
+		modelDefinitionScreen.registerEventListener(this);
+		this.stackLayout.topControl = modelDefinitionScreen;
 		this.layout();
 	}
 
-	private void loadProcessRouteDefinitionScreen(){
-		this.viewPort.dispose();
+	public void loadProcessRouteDefinitionScreen(){
+		/*this.viewPort.dispose();
 		this.setLayout(new FillLayout());
 		this.viewPort = new ProcessRouteDefinitionScreen(this, SWT.NONE);
 		this.viewPort.registerEventListener(this);
+		this.layout();*/
+		processRouteDefinitionScreen = new ProcessRouteDefinitionScreen(this, SWT.NONE);
+		processRouteDefinitionScreen.registerEventListener(this);
+		this.stackLayout.topControl = processRouteDefinitionScreen;
 		this.layout();
 	}
 
