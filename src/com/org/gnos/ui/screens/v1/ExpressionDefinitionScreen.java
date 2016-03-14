@@ -85,9 +85,11 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 		fd_expressionBuilderGrid.right = new FormAttachment(100, -10);
 		expressionBuilderGrid.setLayoutData(fd_expressionBuilderGrid);
 		
+		final Composite self = this;
 		expressionBuilderGrid.addControlListener(new ControlAdapter() {
 		    public void controlResized(ControlEvent e) {
 		        //System.out.println("Expression builder grid resized");
+		    	Composite parent = self.getParent();
 		    	if((parent.getParent() !=null) && parent.getParent().getParent() instanceof WorkbenchScreen){//hack for the time being
 		    		 WorkbenchScreen workbenchScreen = (WorkbenchScreen)parent.getParent().getParent();
 					 workbenchScreen.setScrolledCompositeMinSize();
@@ -183,6 +185,7 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 		savedExpressionsGrid.addControlListener(new ControlAdapter() {
 		    public void controlResized(ControlEvent e) {
 		        //System.out.println("Expression builder grid resized");
+		    	Composite parent = self.getParent();
 		    	if((parent.getParent() !=null) && parent.getParent().getParent() instanceof WorkbenchScreen){//hack for the time being
 		    		 WorkbenchScreen workbenchScreen = (WorkbenchScreen)parent.getParent().getParent();
 					 workbenchScreen.setScrolledCompositeMinSize();
@@ -195,15 +198,17 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 			public void widgetSelected(SelectionEvent e) {
 				//TODO mapping complete
 				//projectModel.setAllProjectFields(fieldDatatypeDefinitionGrid.getFieldDatatypes());
-				updateExpressionList();
-				GNOSCSVDataProcessor.getInstance().compute();
-				GNOSCSVDataProcessor.getInstance().dumpToDB();
-				GNOSCSVDataProcessor.getInstance().dumpToCsv();
-				List<Composite> allExpressions = expressionBuilderGrid.getAllRowsComposite();
-				savedExpressionsGrid.addRows(allExpressions);
-				me.layout();
-				parent.layout(true, true);
-				resetExpressionList();
+				boolean isUpdateExpressionSuccessful = updateExpressionList();
+				if(isUpdateExpressionSuccessful){
+					GNOSCSVDataProcessor.getInstance().compute();
+					GNOSCSVDataProcessor.getInstance().dumpToDB();
+					GNOSCSVDataProcessor.getInstance().dumpToCsv();
+					List<Composite> allExpressions = expressionBuilderGrid.getAllRowsComposite();
+					savedExpressionsGrid.addRows(allExpressions);
+					me.layout();
+					parent.layout(true, true);
+					resetExpressionList();
+				}
 				//System.out.println("After mapping datatype of 3rd row is: " + projectModel.getAllProjectFields().get(2).getDataType());
 				
 			}
