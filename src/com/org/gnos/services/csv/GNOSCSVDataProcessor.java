@@ -11,6 +11,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,8 +27,10 @@ public class GNOSCSVDataProcessor {
 	private String[] columns = null;
 	private List<String[]> data = new ArrayList<String[]>();
 	
-	private Map<String, String> requiredFieldMap = new HashMap<String, String>();
-	private Map<String, String> dataTypeMap = new HashMap<String, String>();
+	//private Map<String, String> requiredFieldMap = new HashMap<String, String>();
+	private Map<String, String> requiredFieldMap = new LinkedHashMap<String, String>();
+	//private Map<String, String> dataTypeMap = new HashMap<String, String>();
+	private Map<String, String> dataTypeMap = new LinkedHashMap<String, String>();
 	
 	//private List<String[]> computedData = new ArrayList<String[]>();
 	private List<String[]> computedData;

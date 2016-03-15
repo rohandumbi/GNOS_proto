@@ -75,13 +75,14 @@ public class ExpressionBuilderGrid extends Composite {
 		int sourceFieldSize = this.allSourceFields.length;
 		this.numericSourceFields = new ArrayList<String>();
 		Map dataTypeMap = GNOSCSVDataProcessor.getInstance().getDataTypeMapping();
+		//Set<String> keys = dataTypeMap.entrySet();
 		Set<String> keys = dataTypeMap.keySet();
 		Iterator<String> it = keys.iterator();
 		while(it.hasNext()){
 			String key = it.next();
 			String value = (String)dataTypeMap.get(key);
 			
-			if(!"String".equalsIgnoreCase(value)){
+			if(!"Text".equalsIgnoreCase(value)){
 				this.numericSourceFields.add(key);
 			}		
 		}

@@ -42,7 +42,7 @@ public class FieldDatatypeDefinitionScreen extends GnosScreen {
 		this.allHeaders = this.getAllHeaders();
 		System.out.println("Length of all columns: " + this.allHeaders.length);
 		//this.requiredFields = this.getRequiredFieldsFromProperties();
-		this.dataTypes = new String[]{"String", "Number"/*, "Double"*/};
+		this.dataTypes = new String[]{"Number", "Text"/*, "Double"*/};
 		this.createContent();
 
 	}
