@@ -132,6 +132,7 @@ public class FieldDatatypeDefinitionGrid extends Composite {
 		this.setLayout(new FormLayout());
 		this.createHeader();
 		this.createRows();
+		this.setFieldDatatypes();//setting the data type mapping with default standards
 	}
 	
 	/*public List<ColumnHeader> getFieldDatatypes(){

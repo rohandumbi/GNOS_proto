@@ -113,32 +113,12 @@ public class FieldDatatypeDefinitionScreen extends GnosScreen {
 		fd_buttonSave.top = new FormAttachment(fieldDatatypeDefinitionGrid, 10, SWT.BOTTOM);
 		//fd_buttonMapRqrdFields.right = new FormAttachment(0, 282);
 		buttonSave.setLayoutData(fd_buttonSave);
-
-		/*buttonSave.addPaintListener(new PaintListener() {
-			@Override
-			public void paintControl(PaintEvent arg0) {
-				// TODO Auto-generated method stub
-				//buttonSave.setBackground(SWTResourceManager.getColor(0, 102, 204));
-				arg0.gc.setForeground(SWTResourceManager.getColor(0, 102, 204));
-				buttonSave.setText("SAVE");
-				//buttonSave.setForeground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-				org.eclipse.swt.graphics.Pattern pattern;
-				pattern = new org.eclipse.swt.graphics.Pattern(arg0.gc.getDevice(), 0,0,0,100, SWTResourceManager.getColor(0, 102, 204),230, SWTResourceManager.getColor(0, 102, 204),230);
-				arg0.gc.setBackgroundPattern(pattern);
-				arg0.gc.fillGradientRectangle(0, 0, buttonSave.getBounds().width, buttonSave.getBounds().height, true);
-			}
-		});*/
-
-
 		buttonSave.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				//TODO mapping complete
 				//projectModel.setAllProjectFields(fieldDatatypeDefinitionGrid.getFieldDatatypes());
 				fieldDatatypeDefinitionGrid.setFieldDatatypes();
-				//System.out.println("After mapping datatype of 3rd row is: " + projectModel.getAllProjectFields().get(2).getDataType());
-				/*GnosEvent event = new GnosEvent(this, "complete:datatype-defintion");
-				triggerGnosEvent(event);*/
 			}
 		});
 	}

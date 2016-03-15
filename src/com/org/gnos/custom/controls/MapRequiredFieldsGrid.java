@@ -33,7 +33,7 @@ public class MapRequiredFieldsGrid extends Composite {
 	private String[] sourceFieldsComboItems;
 	private Composite parent;
 	
-	public MapRequiredFieldsGrid(Composite parent, int style, String[] requiredFieldNames, String[] allSourceFields, String[] dataTypes) {
+	public MapRequiredFieldsGrid(Composite parent, int style, String[] requiredFieldNames, String[] allSourceFields/*, String[] dataTypes*/) {
 		super(parent, style);
 		this.parent = parent;
 		this.requiredFieldNames = requiredFieldNames;
@@ -133,6 +133,7 @@ public class MapRequiredFieldsGrid extends Composite {
 
 			Combo comboSourceField = new Combo(compositeRow, SWT.NONE);
 			comboSourceField.setItems(this.sourceFieldsComboItems);
+			comboSourceField.select(i);
 			FormData fd_comboSourceField = new FormData();
 			fd_comboSourceField.left = new FormAttachment(50, 12);
 			fd_comboSourceField.right = new FormAttachment(80);
@@ -156,6 +157,7 @@ public class MapRequiredFieldsGrid extends Composite {
 		this.createSourceFieldsComboItems();
 		this.createHeader();
 		this.createRows();
+		this.setSourceFieldMapping(); //updating the default standard mappings initially
 	}
 
 	public boolean setSourceFieldMapping(){

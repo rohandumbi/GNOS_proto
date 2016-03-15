@@ -24,7 +24,7 @@ public class MapRequiredFieldsScreen extends GnosScreen {
 
 	private String[] allHeaders;
 	private String[] requiredFields;
-	private String[] dataTypes;
+	//private String[] dataTypes;
 	private ProjectModel projectModel;
 	private MapRequiredFieldsGrid mapRequiredFieldsGrid;
 	/**
@@ -41,7 +41,7 @@ public class MapRequiredFieldsScreen extends GnosScreen {
 		this.allHeaders = this.getAllHeaders();
 		System.out.println("Length of all columns: " + this.allHeaders.length);
 		this.requiredFields = this.getRequiredFieldsFromProperties();
-		this.dataTypes = new String[]{"String", "Integer", "Double"};
+		//this.dataTypes = new String[]{"String", "Integer", "Double"};
 		System.out.println("Length of required columns: " + this.requiredFields.length);
 		this.createContent();
 	}
@@ -78,7 +78,7 @@ public class MapRequiredFieldsScreen extends GnosScreen {
 		labelScreenDescription.setLayoutData(fd_labelScreenDescription);
 		labelScreenDescription.setText("For each required field in the system map your custom field and also specify its datatype.");
 		
-		mapRequiredFieldsGrid = new MapRequiredFieldsGrid(this, SWT.NONE, this.requiredFields, this.allHeaders, this.dataTypes);
+		mapRequiredFieldsGrid = new MapRequiredFieldsGrid(this, SWT.NONE, this.requiredFields, this.allHeaders/*, this.dataTypes*/);
 		FormData fd_mapRequiredFieldsGrid = new FormData();
 		fd_mapRequiredFieldsGrid.top = new FormAttachment(labelScreenDescription, 6);
 		fd_mapRequiredFieldsGrid.left = new FormAttachment(0, 10);
