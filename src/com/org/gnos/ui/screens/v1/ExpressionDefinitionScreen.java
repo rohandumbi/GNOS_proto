@@ -113,8 +113,8 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 		btnAddNewRow.setSize(145, SWT.DEFAULT);
 		//int offsetX = -btnAddNewRow.computeSize(SWT.DEFAULT, SWT.DEFAULT).x / 2;
 		fd_btnAddNewRow.top = new FormAttachment(expressionBuilderGrid, 10, SWT.BOTTOM);
-		fd_btnAddNewRow.left = new FormAttachment(50, -77);
-		fd_btnAddNewRow.right = new FormAttachment(50, 77);
+		fd_btnAddNewRow.left = new FormAttachment(50, -145);
+		fd_btnAddNewRow.right = new FormAttachment(50);
 		
 		
 		Button buttonExpressionDefinition = new Button(this, SWT.NONE);
@@ -165,6 +165,18 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 			}
 		});*/
 		
+		/*
+		 * Temporary Export to CSV button
+		 */
+		Button buttonExportToCSV = new Button(this, SWT.NONE);
+		buttonExportToCSV.setText("SAVE TO CSV");
+		FormData fd_buttonExportToCSV = new FormData();
+		fd_buttonExportToCSV.top = new FormAttachment(expressionBuilderGrid, 10, SWT.BOTTOM);
+		fd_buttonExportToCSV.left = new FormAttachment(buttonSave, 5, SWT.RIGHT);
+		fd_buttonExportToCSV.right = new FormAttachment(buttonSave, 145, SWT.RIGHT);
+		//fd_buttonMapRqrdFields.right = new FormAttachment(0, 282);
+		buttonExportToCSV.setLayoutData(fd_buttonExportToCSV);
+		
 		Label labelSavedExpressions = new Label(this, SWT.NONE);
 		labelSavedExpressions.setText("Saved Expressions");
 		labelSavedExpressions.setForeground(SWTResourceManager.getColor(0, 191, 255));
@@ -202,6 +214,27 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 				if(isUpdateExpressionSuccessful){
 					GNOSCSVDataProcessor.getInstance().compute();
 					GNOSCSVDataProcessor.getInstance().dumpToDB();
+					//GNOSCSVDataProcessor.getInstance().dumpToCsv();
+					List<Composite> allExpressions = expressionBuilderGrid.getAllRowsComposite();
+					savedExpressionsGrid.addRows(allExpressions);
+					me.layout();
+					parent.layout(true, true);
+					resetExpressionList();
+				}
+				//System.out.println("After mapping datatype of 3rd row is: " + projectModel.getAllProjectFields().get(2).getDataType());
+				
+			}
+		});
+		
+		buttonExportToCSV.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				//TODO mapping complete
+				//projectModel.setAllProjectFields(fieldDatatypeDefinitionGrid.getFieldDatatypes());
+				boolean isUpdateExpressionSuccessful = updateExpressionList();
+				if(isUpdateExpressionSuccessful){
+					GNOSCSVDataProcessor.getInstance().compute();
+					//GNOSCSVDataProcessor.getInstance().dumpToDB();
 					GNOSCSVDataProcessor.getInstance().dumpToCsv();
 					List<Composite> allExpressions = expressionBuilderGrid.getAllRowsComposite();
 					savedExpressionsGrid.addRows(allExpressions);
