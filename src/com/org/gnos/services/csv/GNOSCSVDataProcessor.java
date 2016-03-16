@@ -78,14 +78,17 @@ public class GNOSCSVDataProcessor {
 			float value = 0;
 			boolean isComplex = expr.isValueType();
 			boolean isGrade = expr.isGrade();
-			List<Filter> filters= expr.getFilters();
+			//List<Filter> filters= expr.getFilters();
+			String conditionExpr = expr.getCondition();
 			
 			for(int i=0; i < dataArr.length; i++) {
 				String[] rowValues = data.get(i);
 				boolean conditionsMet = true;
 				try{
-					
-					for (Filter filter: filters){
+					if(conditionExpr != null){
+						conditionsMet = GnosExpressionParser.evaluate(conditionExpr, rowValues, expr.getConditionColumns());
+					}
+/*					for (Filter filter: filters){
 						String conditionValue = filter.getValue();
 						String valueToCheck = rowValues[filter.getColumnId()];
 
@@ -111,7 +114,7 @@ public class GNOSCSVDataProcessor {
 									}
 									break;
 						}
-					}
+					}*/
 					if(conditionsMet){						
 						if(isComplex) {
 							Operation operation = expr.getOperation();

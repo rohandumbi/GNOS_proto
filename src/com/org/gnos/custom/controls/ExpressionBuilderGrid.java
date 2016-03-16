@@ -428,7 +428,7 @@ public class ExpressionBuilderGrid extends Composite {
 				MessageDialog.openError(this.parent.getShell(), "GNOS Error", "Conditions not defined properly.");
 				return null;
 			}else{
-				expression.setFilters(filters);
+				expression.setCondition("[bin]>30 AND [bin] < 70");
 			}
 			
 			this.expressionList.add(expression);
