@@ -228,10 +228,11 @@ public class ExpressionBuilderGrid extends Composite {
 		Button grade = new Button(compositeRow, SWT.CHECK);
 		FormData fd_grade = new FormData();
 		fd_grade.left = new FormAttachment(0, 10);
+		fd_grade.top = new FormAttachment(compositeRow, 2, SWT.TOP);
 		grade.setLayoutData(fd_grade);
 		
 		Text expressionName = new Text(compositeRow, SWT.BORDER);
-		fd_grade.top = new FormAttachment(expressionName, 2, SWT.TOP);
+		//fd_grade.top = new FormAttachment(expressionName, 2, SWT.TOP);
 		FormData fd_expressionName = new FormData();
 		fd_expressionName.left = new FormAttachment(5, 5);
 		fd_expressionName.top = new FormAttachment(0);
@@ -268,11 +269,17 @@ public class ExpressionBuilderGrid extends Composite {
 			}
 		});
 		
-		GnosConditionCellComposite gnosExpressionComposite = new GnosConditionCellComposite(compositeRow, SWT.NONE, this.allSourceFields);
+		/*GnosConditionCellComposite gnosExpressionComposite = new GnosConditionCellComposite(compositeRow, SWT.NONE, this.allSourceFields);
 		FormData fd_gnosExpressionComposite = new FormData();
 		fd_gnosExpressionComposite.left = new FormAttachment(62, 2);
 		fd_gnosExpressionComposite.right = new FormAttachment(100);
-		gnosExpressionComposite.setLayoutData(fd_gnosExpressionComposite);
+		gnosExpressionComposite.setLayoutData(fd_gnosExpressionComposite);*/
+		
+		Text textExpression = new Text(compositeRow, SWT.BORDER);
+		FormData fd_textExpression = new FormData();
+		fd_textExpression.left = new FormAttachment(62, 2);
+		fd_textExpression.right = new FormAttachment(100);
+		textExpression.setLayoutData(fd_textExpression);
 		
 		this.presentRow = compositeRow;
 		this.allRows.add(compositeRow);
@@ -311,16 +318,20 @@ public class ExpressionBuilderGrid extends Composite {
 			Control controlGrade = rowChildren[0];
 			Control controlExpressionName = rowChildren[1];
 			Control controlIsComplex = rowChildren[2];
+			
 			Expression expression= null;
 			
 			Control controlExpressionValue = null;
 			GnosConditionCellComposite conditionComposite = null;
-			if(rowChildren[3] instanceof GnosConditionCellComposite){ //temporary hack, need to identify in a better way
+			
+			Text textCondition = null;
+			
+			if(rowChildren[3] instanceof Text){ //temporary hack, need to identify in a better way
 				controlExpressionValue = rowChildren[4];
-				conditionComposite = (GnosConditionCellComposite)rowChildren[3];
+				textCondition = (Text)rowChildren[3];
 			}else{
 				controlExpressionValue = rowChildren[3];
-				conditionComposite = (GnosConditionCellComposite)rowChildren[4];
+				textCondition = (Text)rowChildren[4];
 			}
 			
 			if(controlGrade instanceof Button){
@@ -423,12 +434,15 @@ public class ExpressionBuilderGrid extends Composite {
 
 			expression.setGrade(isGrade);
 			expression.setValueType(isComplex);
-			List<Filter> filters = conditionComposite.getExpressionFilters();
-			if(filters == null){
+			//List<Filter> filters = conditionComposite.getExpressionFilters();
+			String condition = textCondition.getText();
+			if(condition == null){
 				MessageDialog.openError(this.parent.getShell(), "GNOS Error", "Conditions not defined properly.");
 				return null;
 			}else{
-				expression.setCondition("[bin]>30 AND [bin] < 70");
+				//expression.setCondition("[bin]>30 AND [bin] < 70");
+				expression.setCondition(condition);
+				
 			}
 			
 			this.expressionList.add(expression);
