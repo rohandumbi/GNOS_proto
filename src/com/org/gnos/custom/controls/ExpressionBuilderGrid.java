@@ -190,6 +190,11 @@ public class ExpressionBuilderGrid extends Composite {
 			comboLeftOperand.setItems(comboItems);
 			comboLeftOperand.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
 			comboLeftOperand.setText("Field Value");
+			comboLeftOperand.addSelectionListener(new SelectionAdapter() {
+			      public void widgetSelected(SelectionEvent e) {
+			    	  System.out.println("detected combo click");
+			      }
+			});
 			
 			Combo comboOperator = new Combo(expressionComposite, SWT.NONE);
 			comboOperator.setItems(this.arithemeticOperatorsArray);
@@ -200,12 +205,22 @@ public class ExpressionBuilderGrid extends Composite {
 			comboRightOperand.setItems(comboItems);
 			comboRightOperand.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
 			comboRightOperand.setText("Field Value");
+			comboRightOperand.addSelectionListener(new SelectionAdapter() {
+			      public void widgetSelected(SelectionEvent e) {
+			    	  System.out.println("detected combo click");
+			      }
+			});
 			
 		}else{
 			Combo comboExpressionDefinition = new Combo(expressionComposite, SWT.NONE);
 			comboExpressionDefinition.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
 			comboExpressionDefinition.setItems(comboItems);
 			comboExpressionDefinition.setText("Field Value");
+			comboExpressionDefinition.addSelectionListener(new SelectionAdapter() {
+			      public void widgetSelected(SelectionEvent e) {
+			    	  System.out.println("detected combo click");
+			      }
+			});
 		}
 		compositeRow.layout();
 	}
@@ -436,14 +451,29 @@ public class ExpressionBuilderGrid extends Composite {
 			expression.setValueType(isComplex);
 			//List<Filter> filters = conditionComposite.getExpressionFilters();
 			String condition = textCondition.getText();
-			if(condition == null){
+			/*if(condition == null){
 				MessageDialog.openError(this.parent.getShell(), "GNOS Error", "Conditions not defined properly.");
 				return null;
 			}else{
 				//expression.setCondition("[bin]>30 AND [bin] < 70");
-				expression.setCondition(condition);
+				boolean isConditionValid = expression.setCondition(condition);
+				if(!isConditionValid){
+					MessageDialog.openError(this.parent.getShell(), "GNOS Error", "Conditions not defined properly.");
+					return null;
+				}
 				
+			}*/
+			if(condition == null || condition == ""){
+				//condition = "[" + "bin" + "]" + "==" + "[" + "bin" + "]";//temporary hack to set everything when no condition
+				condition = "[bin]==[bin]";
+				System.out.println("Condition: " + condition);
 			}
+			boolean isConditionValid = expression.setCondition(condition);
+			System.out.println("Condition: " + isConditionValid);
+			if(!isConditionValid){
+				MessageDialog.openError(this.parent.getShell(), "GNOS Error", "Conditions not defined properly.");
+				return null;
+			} 
 			
 			this.expressionList.add(expression);
 		}
