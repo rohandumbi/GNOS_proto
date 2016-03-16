@@ -4,7 +4,7 @@ import java.util.List;
 
 public class GnosExpressionParser {
 
-	private static final String[] operators = { "!=", "==", ">=", "<=", ">", "<", "||", "&&", "*", "/", "+", "-", "^" };
+	private static final String[] operators = { "!=", "==", ">=", "<=", ">", "<", "||", "&&", "*", "/", "+", "-", "^", "OR", "AND" };
 
 	private static boolean parseAndEvaluateExpression(String ex){
 		for (char c : ex.toCharArray())
@@ -25,11 +25,9 @@ public class GnosExpressionParser {
 	}*/
 
 	static boolean evaluate(String str, String[] values, List<Integer> columnIds){
-		System.out.println("Original String :"+ str);
 		for (int i = 0; i < columnIds.size(); i++){
-			str = str.replace("[" + columnIds.get(i) + "]", "" + values[i]);
+			str = str.replace("[" + columnIds.get(i) + "]", "" + values[columnIds.get(i)]);
 		}
-		System.out.println("Updated String :"+ str);
 		return parseAndEvaluateExpression(str);
 	}
 
@@ -61,7 +59,7 @@ public class GnosExpressionParser {
 		s = s.trim();
 		int minParens = Integer.MAX_VALUE;
 		int[] currentMin = null;
-		for (int sampSize = 1; sampSize <= 2; sampSize++)
+		for (int sampSize = 1; sampSize <= 3; sampSize++)
 		{
 			for (int locInStr = 0; locInStr < (s.length() + 1) - sampSize; locInStr++)
 			{
@@ -105,9 +103,9 @@ public class GnosExpressionParser {
 	private static int logicalOperatorType(String op){
 		switch (op.trim())
 		{
-		case "||":
+		case "OR":
 			return 0;
-		case "&&":
+		case "AND":
 			return 1;
 		default:
 			return -1;
@@ -178,7 +176,7 @@ public class GnosExpressionParser {
 		case "!=":
 			return left != right;
 		default:
-			System.err.println("ERROR: Operator type not recognized.");
+			System.err.println("ERROR: Operator type not recognized."+op);
 			return false;
 		}
 	}
@@ -189,7 +187,7 @@ public class GnosExpressionParser {
 		String left = s.substring(0, start).trim();
 		String right = s.substring(op[1]).trim();
 		String oper = s.substring(start, op[1]).trim();
-		System.out.println("MATH:  Left: \"" + left + "\" Right: \"" + right + "\" Operator: \"" + oper + "\"");
+		//System.out.println("MATH:  Left: \"" + left + "\" Right: \"" + right + "\" Operator: \"" + oper + "\"");
 		if (containsMathematicalOperator(left))
 			left = "" + parseMathematicalExpression(left);
 		if (containsMathematicalOperator(right))
@@ -225,7 +223,7 @@ public class GnosExpressionParser {
 		case "!=":
 			return !left.equals(right);
 		default:
-			System.err.println("ERROR: Operator type not recognized.");
+			System.err.println("ERROR: string Operator type not recognized."+op);
 			return false;
 		}
 	}

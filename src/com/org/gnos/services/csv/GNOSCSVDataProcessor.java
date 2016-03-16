@@ -87,6 +87,7 @@ public class GNOSCSVDataProcessor {
 				try{
 					if(conditionExpr != null){
 						conditionsMet = GnosExpressionParser.evaluate(conditionExpr, rowValues, expr.getConditionColumns());
+						System.out.println("conditionsMet :"+conditionsMet);
 					}
 /*					for (Filter filter: filters){
 						String conditionValue = filter.getValue();
