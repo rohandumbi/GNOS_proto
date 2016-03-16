@@ -9,6 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -32,7 +33,8 @@ public class GNOSCSVDataProcessor {
 	//private Map<String, String> dataTypeMap = new HashMap<String, String>();
 	private Map<String, String> dataTypeMap = new LinkedHashMap<String, String>();
 	
-	//private List<String[]> computedData = new ArrayList<String[]>();
+
+	private Map<String, PitBenchMappingData> pitBenchMapping ;
 	private List<String[]> computedData;
 	private List<String> computedColumns;
 	
@@ -71,6 +73,7 @@ public class GNOSCSVDataProcessor {
 				break;
 			}
 		}
+		parsePitAndBenchData();
 		List<Expression> expressions = Expressions.getAll();
 		for(Expression expr: expressions){
 			computedColumns.add(expr.getName());
@@ -78,7 +81,6 @@ public class GNOSCSVDataProcessor {
 			float value = 0;
 			boolean isComplex = expr.isValueType();
 			boolean isGrade = expr.isGrade();
-			//List<Filter> filters= expr.getFilters();
 			String conditionExpr = expr.getUpdatedCondition();
 			
 			for(int i=0; i < dataArr.length; i++) {
@@ -87,35 +89,8 @@ public class GNOSCSVDataProcessor {
 				try{
 					if(conditionExpr != null){
 						conditionsMet = GnosExpressionParser.evaluate(conditionExpr, rowValues, expr.getConditionColumns());
-						System.out.println("conditionsMet :"+conditionsMet);
+						//System.out.println("conditionsMet :"+conditionsMet);
 					}
-/*					for (Filter filter: filters){
-						String conditionValue = filter.getValue();
-						String valueToCheck = rowValues[filter.getColumnId()];
-
-						switch(filter.getOpType()){
-							case 0: if(!(valueToCheck.equalsIgnoreCase(conditionValue))){
-										conditionsMet = false;
-									}
-									break;
-							case 1: if(valueToCheck.equalsIgnoreCase(conditionValue)){
-										conditionsMet = false;
-									}
-									break;
-							case 2: if(!(conditionValue.toLowerCase().contains(valueToCheck.toLowerCase()))){
-										conditionsMet = false;
-									}
-									break;
-							case 3: if(!(Float.parseFloat(valueToCheck) > Float.parseFloat(conditionValue))){
-										conditionsMet = false;
-									}
-									break;							
-							case 4: if(!(Float.parseFloat(valueToCheck) < Float.parseFloat(conditionValue))){
-										conditionsMet = false;
-									}
-									break;
-						}
-					}*/
 					if(conditionsMet){						
 						if(isComplex) {
 							Operation operation = expr.getOperation();
@@ -147,6 +122,53 @@ public class GNOSCSVDataProcessor {
 			computedData.add(dataArr);
 			
 		}
+	}
+	
+	private void parsePitAndBenchData() {
+
+		pitBenchMapping = new HashMap<String, PitBenchMappingData>();
+		computedColumns.add("pit_no");
+		computedColumns.add("bench_no");
+		String pitNameAlias = requiredFieldMap.get("pit_name");
+		String benchNameAlias = requiredFieldMap.get("bench_rl");
+		int pitNameColIdx = -1;
+		int benchColIdx = -1;
+		for(int j=0; j < columns.length;j++){
+			if(columns[j].equalsIgnoreCase(pitNameAlias)){
+				pitNameColIdx = j;
+			} else if(columns[j].equalsIgnoreCase(benchNameAlias)){
+				benchColIdx = j;
+			}
+			if( pitNameColIdx >= 0 && benchColIdx >= 0 ){
+				break;
+			}
+		}
+		String[] pitNos = new String[data.size()];
+		String[] benchNos = new String[data.size()];
+
+		for(int i=0; i < data.size(); i++) {
+			String[] rowValues = data.get(i);
+			int pitNo = -1;
+			PitBenchMappingData mappingData = pitBenchMapping.get(rowValues[pitNameColIdx]);
+			if(mappingData != null){
+				mappingData.addBenchData(Integer.parseInt(rowValues[benchColIdx]));
+				pitNo = mappingData.pitNo;
+			} else {
+				pitNo = pitBenchMapping.size()+1;
+				mappingData = new PitBenchMappingData(pitNo);
+				mappingData.addBenchData(Integer.parseInt(rowValues[benchColIdx]));
+				pitBenchMapping.put(rowValues[pitNameColIdx], mappingData);
+			}
+			pitNos[i] = String.valueOf(pitNo);
+		}
+		for(int i=0; i < data.size(); i++) {
+			String[] rowValues = data.get(i);
+			PitBenchMappingData mappingData = pitBenchMapping.get(rowValues[pitNameColIdx]);
+			int benchNo = mappingData.benchValues.size() - mappingData.benchValues.indexOf(Integer.parseInt(rowValues[benchColIdx]));
+			benchNos[i] = String.valueOf(benchNo);
+		}
+		computedData.add(pitNos);
+		computedData.add(benchNos);
 	}
 	
 	public void dumpToCsv() {
@@ -332,4 +354,18 @@ public class GNOSCSVDataProcessor {
 
 	
 
+	class PitBenchMappingData{
+		int pitNo = -1;
+		List benchValues = new ArrayList();
+		
+		PitBenchMappingData(int pitNo) {
+			this.pitNo = pitNo;
+		}
+		void addBenchData(Integer benchVal) {
+			if(benchValues.indexOf(benchVal) == -1){
+				benchValues.add(benchVal);
+				Collections.sort(benchValues);
+			}
+		}
+	}
 }
