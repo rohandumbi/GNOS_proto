@@ -1,21 +1,12 @@
 package com.org.gnos.custom.controls;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -24,9 +15,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.services.Expression;
-import com.org.gnos.services.Filter;
-import com.org.gnos.services.Operation;
-import com.org.gnos.services.csv.GNOSCSVDataProcessor;
 
 public class SavedExpressionsGrid extends Composite {
 
@@ -163,8 +151,47 @@ public class SavedExpressionsGrid extends Composite {
 	}
 	
 	public void addRows(List<Composite> compositeSavedExpressionCollection){
+		Composite controlExpressionValue = null;
+		String expressionValue = null;
 		for(int i=0; i<compositeSavedExpressionCollection.size(); i++){
 			Composite compositeSavedExpression = compositeSavedExpressionCollection.get(i);
+			Control[] rowChildren = compositeSavedExpression.getChildren();
+			if(rowChildren[3] instanceof Text){ //temporary hack, need to identify in a better way
+				controlExpressionValue = (Composite)rowChildren[4];
+				//textCondition = (Text)rowChildren[3];
+			}else{
+				controlExpressionValue = (Composite)rowChildren[3];
+				//textCondition = (Text)rowChildren[4];
+			}
+			
+			if(controlExpressionValue.getChildren().length > 1){//complex expression
+				Control[] expressionChildren = controlExpressionValue.getChildren();
+				Combo leftOperand = (Combo)expressionChildren[0];
+				Combo operator = (Combo)expressionChildren[1];
+				Combo rightOperand = (Combo)expressionChildren[2];
+				
+				String sLeftOperand = leftOperand.getText();
+				String sOperator = operator.getText();
+				String sRightOperand = rightOperand.getText();
+				
+				expressionValue = sLeftOperand + sOperator + sRightOperand;
+				
+			}else{//simple expression
+				Control[] expressionChildren = controlExpressionValue.getChildren();
+				Combo operand = (Combo)expressionChildren[0];
+				expressionValue = operand.getText();
+			}
+			System.out.println("Expression Value is:  " + expressionValue);
+			controlExpressionValue.dispose();
+			//controlExpressionValue.getParent().layout();
+			//controlExpressionValue = null;
+			Text textExpression = new Text(compositeSavedExpression, SWT.BORDER);
+			textExpression.setText(expressionValue);
+			FormData fd_textExpression = new FormData();
+			fd_textExpression.right = new FormAttachment(62, -5);
+			fd_textExpression.left = new FormAttachment(30, 5);
+			textExpression.setLayoutData(fd_textExpression);
+			
 			compositeSavedExpression.setParent(this);
 			FormData fd_compositeRow = new FormData();
 			fd_compositeRow.left = new FormAttachment(this.presentRow, 0, SWT.LEFT);
