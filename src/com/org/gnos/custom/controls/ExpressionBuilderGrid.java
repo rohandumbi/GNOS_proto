@@ -278,7 +278,7 @@ public class ExpressionBuilderGrid extends Composite {
 		Text textExpression = new Text(compositeRow, SWT.BORDER);
 		FormData fd_textExpression = new FormData();
 		fd_textExpression.left = new FormAttachment(62, 2);
-		fd_textExpression.right = new FormAttachment(100);
+		fd_textExpression.right = new FormAttachment(100, -2);
 		textExpression.setLayoutData(fd_textExpression);
 		
 		this.presentRow = compositeRow;
