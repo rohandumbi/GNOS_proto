@@ -101,10 +101,12 @@ public class GnosExpressionParser {
 	}
 
 	private static int logicalOperatorType(String op){
-		switch (op.trim())
+		switch (op.trim().toUpperCase())
 		{
+		case "||":
 		case "OR":
 			return 0;
+		case "&&":
 		case "AND":
 			return 1;
 		default:
@@ -144,7 +146,7 @@ public class GnosExpressionParser {
 	}
 
 	private static boolean isOperator(String op){
-		op = op.trim();
+		op = op.trim().toUpperCase();
 		for (String s : operators)
 		{
 			if (s.equals(op))

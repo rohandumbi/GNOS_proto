@@ -14,6 +14,7 @@ public class Expression {
 	int value;
 	Operation operation = null;
 	String condition = null;
+	String updatedCondition = null;
 	List conditionColumns = new ArrayList<Integer>();
 	
 	public Expression(String name) {
@@ -102,13 +103,19 @@ public class Expression {
 				updatedConditionStr += splits[i];
 			}			
 		}
-		this.condition = updatedConditionStr;
+		this.updatedCondition = updatedConditionStr;
+		this.condition = condition;
 		
 		
 		return true;
 	}
 
 	
+	
+	public String getUpdatedCondition() {
+		return updatedCondition;
+	}
+
 	public List getConditionColumns() {
 		return conditionColumns;
 	}

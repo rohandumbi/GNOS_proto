@@ -79,7 +79,7 @@ public class GNOSCSVDataProcessor {
 			boolean isComplex = expr.isValueType();
 			boolean isGrade = expr.isGrade();
 			//List<Filter> filters= expr.getFilters();
-			String conditionExpr = expr.getCondition();
+			String conditionExpr = expr.getUpdatedCondition();
 			
 			for(int i=0; i < dataArr.length; i++) {
 				String[] rowValues = data.get(i);
