@@ -26,6 +26,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.services.Expression;
+import com.org.gnos.services.Expressions;
 import com.org.gnos.services.Operation;
 import com.org.gnos.services.csv.GNOSCSVDataProcessor;
 
@@ -45,6 +46,7 @@ public class ExpressionBuilderGrid extends Composite {
 	private List<Expression> expressionList;
 	private String[] arithemeticOperatorsArray;
 	private Composite parent;
+	private List<String> presentExpressionNames;
 
 	public ExpressionBuilderGrid(Composite parent, int style, String[] allSourceFields) {
 		super(parent, style);
@@ -58,6 +60,24 @@ public class ExpressionBuilderGrid extends Composite {
 		//this.dataTypes = dataTypes;
 		this.arithemeticOperatorsArray = new String[]{"+", "-", "*", "/"};
 		this.createContent(parent);
+	}
+	
+	private boolean isExpressionNameDuplicate(String expressionName){
+		boolean isPresentInExpressionGrid = false;
+		boolean isPresentInSavedGrid = false;
+		for(String str: presentExpressionNames) {
+		    if(str.trim().equalsIgnoreCase(expressionName.trim()))
+		    	isPresentInExpressionGrid = true;
+		}
+		if(!isPresentInExpressionGrid){
+			List<Expression> savedExpressions = Expressions.getAll();
+			for(Expression expression : savedExpressions){
+				if(expression.getName().trim().equalsIgnoreCase(expressionName)){
+					isPresentInSavedGrid = true;
+				}
+			}
+		}
+		return isPresentInExpressionGrid||isPresentInSavedGrid;
 	}
 
 	/*private int getDatatypeCode(String dataType){
@@ -294,7 +314,7 @@ public class ExpressionBuilderGrid extends Composite {
 			public void widgetSelected(SelectionEvent e) {
 				boolean isSelected = ((Button)e.getSource()).getSelection();
 				System.out.println("Selection: " + isSelected);
-				if(compositeRow.getChildren()[3] instanceof GnosConditionCellComposite){ //temporary hack, need to identify in a better way
+				if(compositeRow.getChildren()[3] instanceof Text){ //temporary hack, need to identify in a better way
 					compositeRow.getChildren()[4].dispose();
 				}else{
 					compositeRow.getChildren()[3].dispose();
@@ -342,6 +362,7 @@ public class ExpressionBuilderGrid extends Composite {
 	public List<Expression> getDefinedExpressions(){
 		Control[] rowChildren = null;
 		this.expressionList = new ArrayList<Expression>();
+		this.presentExpressionNames = new ArrayList<String>();
 		for(int i = 0; i < allRows.size(); i++){
 			rowChildren = allRows.get(i).getChildren();
 			boolean isGrade = false;
@@ -387,6 +408,13 @@ public class ExpressionBuilderGrid extends Composite {
 			if(expressionName == null || expressionName == ""){
 				MessageDialog.openError(this.parent.getShell(), "GNOS Error", "Please enter a valid name for expression.");
 				return null;
+			}
+			
+			if(isExpressionNameDuplicate(expressionName)){
+				MessageDialog.openError(this.parent.getShell(), "GNOS Error", "Expression name: " + expressionName + " already exists. Please use a unique expression name.");
+				return null;
+			}else{
+				presentExpressionNames.add(expressionName);
 			}
 
 
@@ -483,9 +511,8 @@ public class ExpressionBuilderGrid extends Composite {
 
 			}*/
 			if(condition == null || condition == ""){
-				//condition = "[" + "bin" + "]" + "==" + "[" + "bin" + "]";//temporary hack to set everything when no condition
 				condition = "[bin]==[bin]";
-				System.out.println("Condition: " + condition);
+				System.out.println("Condition: " + condition);//temporary hack to set everything when no condition
 			}
 			boolean isConditionValid = expression.setCondition(condition);
 			System.out.println("Condition: " + isConditionValid);
