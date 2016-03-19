@@ -224,6 +224,8 @@ public class ExpressionParser {
 			return left.equals(right);
 		case "!=":
 			return !left.equals(right);
+		case "IN":
+			return true;
 		default:
 			System.err.println("ERROR: Operator type not recognized.");
 			return false;

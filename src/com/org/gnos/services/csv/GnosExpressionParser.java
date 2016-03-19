@@ -4,7 +4,7 @@ import java.util.List;
 
 public class GnosExpressionParser {
 
-	private static final String[] operators = { "!=", "==", ">=", "<=", ">", "<", "||", "&&", "*", "/", "+", "-", "^", "OR", "AND" };
+	private static final String[] operators = { "!=", "==", ">=", "<=", ">", "<", "||", "&&", "*", "/", "+", "-", "^", "OR", "AND" , "IN"};
 
 	private static boolean parseAndEvaluateExpression(String ex){
 		for (char c : ex.toCharArray())
@@ -224,6 +224,14 @@ public class GnosExpressionParser {
 			return left.equals(right);
 		case "!=":
 			return !left.equals(right);
+		case "IN":
+			String[] parts = right.split(",");
+			for(String part: parts){
+				if(part.equalsIgnoreCase(left)){
+					return true;
+				}
+			}
+			return false;
 		default:
 			System.err.println("ERROR: string Operator type not recognized."+op);
 			return false;
