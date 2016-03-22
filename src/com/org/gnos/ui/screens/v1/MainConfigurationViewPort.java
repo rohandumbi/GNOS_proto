@@ -45,7 +45,7 @@ public class MainConfigurationViewPort extends GnosScreen{
 		expressionDefinitionScreen = new ExpressionDefinitionScreen(this.dummyShell, SWT.NONE, this.projectModel);
 		expressionDefinitionScreen.registerEventListener(this);
 		
-		modelDefinitionScreen = new ModelDefinitionScreen(this.dummyShell, SWT.NONE);
+		modelDefinitionScreen = new ModelDefinitionScreen(this.dummyShell, SWT.NONE, this.projectModel);
 		modelDefinitionScreen.registerEventListener(this);
 		
 		processRouteDefinitionScreen = new ProcessRouteDefinitionScreen(this.dummyShell, SWT.NONE);
