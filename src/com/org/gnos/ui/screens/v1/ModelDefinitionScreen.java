@@ -7,8 +7,6 @@ import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -17,16 +15,13 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import com.org.gnos.custom.controls.ExpressionBuilderGrid;
 import com.org.gnos.custom.controls.GnosScreen;
 import com.org.gnos.custom.controls.ModelDefinitionGrid;
-import com.org.gnos.custom.controls.SavedExpressionsGrid;
 import com.org.gnos.custom.controls.SavedModelsGrid;
 import com.org.gnos.custom.models.ProjectModel;
 import com.org.gnos.events.GnosEvent;
-import com.org.gnos.services.Expression;
-import com.org.gnos.services.Expressions;
-import com.org.gnos.services.csv.ColumnHeader;
+import com.org.gnos.services.Model;
+import com.org.gnos.services.Models;
 import com.org.gnos.services.csv.GNOSCSVDataProcessor;
 
 public class ModelDefinitionScreen extends GnosScreen {
@@ -35,7 +30,7 @@ public class ModelDefinitionScreen extends GnosScreen {
 	private SavedModelsGrid savedModelsGrid;
 	private String[] allHeaders;
 	private ProjectModel projectModel;
-	private List<Expression> allDefinedExpressions;
+	private List<Model> allDefinedModels;
 	private Composite parent;
 	/**
 	 * Create the composite.
@@ -119,20 +114,20 @@ public class ModelDefinitionScreen extends GnosScreen {
 		fd_btnAddNewRow.right = new FormAttachment(50);
 		
 		
-		Button buttonExpressionDefinition = new Button(this, SWT.NONE);
-		buttonExpressionDefinition.setText("NEXT");
-		FormData fd_buttonExpressionDefinition = new FormData();
-		fd_buttonExpressionDefinition.top = new FormAttachment(modelDefinitionGrid, 10, SWT.BOTTOM);
-		fd_buttonExpressionDefinition.right = new FormAttachment(btnAddNewRow, -5, SWT.LEFT);
-		fd_buttonExpressionDefinition.left = new FormAttachment(btnAddNewRow, -145, SWT.LEFT);
+		Button buttonNext = new Button(this, SWT.NONE);
+		buttonNext.setText("NEXT");
+		FormData fd_buttonNext = new FormData();
+		fd_buttonNext.top = new FormAttachment(modelDefinitionGrid, 10, SWT.BOTTOM);
+		fd_buttonNext.right = new FormAttachment(btnAddNewRow, -5, SWT.LEFT);
+		fd_buttonNext.left = new FormAttachment(btnAddNewRow, -145, SWT.LEFT);
 		//fd_buttonMapRqrdFields.right = new FormAttachment(0, 282);
-		buttonExpressionDefinition.setLayoutData(fd_buttonExpressionDefinition);
-		buttonExpressionDefinition.addSelectionListener(new SelectionAdapter() {
+		buttonNext.setLayoutData(fd_buttonNext);
+		buttonNext.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				//TODO mapping complete
 				//updateHeadersWithRequiredFieldsMapping();
-				boolean isUpdateExpressionSuccessful = updateExpressionList();
+				boolean isUpdateExpressionSuccessful = updateModelList();
 				if(isUpdateExpressionSuccessful == true){
 					GnosEvent event = new GnosEvent(this, "complete:model-defintion");
 					triggerGnosEvent(event);
@@ -212,16 +207,15 @@ public class ModelDefinitionScreen extends GnosScreen {
 			public void widgetSelected(SelectionEvent e) {
 				//TODO mapping complete
 				//projectModel.setAllProjectFields(fieldDatatypeDefinitionGrid.getFieldDatatypes());
-				boolean isUpdateExpressionSuccessful = updateExpressionList();
+				boolean isUpdateExpressionSuccessful = updateModelList();
 				if(isUpdateExpressionSuccessful){
 					GNOSCSVDataProcessor.getInstance().compute();
-					GNOSCSVDataProcessor.getInstance().dumpToDB();
-					//GNOSCSVDataProcessor.getInstance().dumpToCsv();
-					List<Composite> allExpressions = modelDefinitionGrid.getAllRowsComposite();
-					savedModelsGrid.addRows(allExpressions);
+					//GNOSCSVDataProcessor.getInstance().dumpToDB();
+					List<Composite> allModels = modelDefinitionGrid.getAllRowsComposite();
+					savedModelsGrid.addRows(allModels);
 					me.layout();
 					parent.layout(true, true);
-					resetExpressionList();
+					resetModelList();
 				}
 				//System.out.println("After mapping datatype of 3rd row is: " + projectModel.getAllProjectFields().get(2).getDataType());
 				
@@ -233,16 +227,15 @@ public class ModelDefinitionScreen extends GnosScreen {
 			public void widgetSelected(SelectionEvent e) {
 				//TODO mapping complete
 				//projectModel.setAllProjectFields(fieldDatatypeDefinitionGrid.getFieldDatatypes());
-				boolean isUpdateExpressionSuccessful = updateExpressionList();
+				boolean isUpdateExpressionSuccessful = updateModelList();
 				if(isUpdateExpressionSuccessful){
 					GNOSCSVDataProcessor.getInstance().compute();
-					//GNOSCSVDataProcessor.getInstance().dumpToDB();
-					GNOSCSVDataProcessor.getInstance().dumpToCsv();
-					List<Composite> allExpressions = modelDefinitionGrid.getAllRowsComposite();
-					savedModelsGrid.addRows(allExpressions);
+					//GNOSCSVDataProcessor.getInstance().dumpToCsv();
+					List<Composite> allModels = modelDefinitionGrid.getAllRowsComposite();
+					savedModelsGrid.addRows(allModels);
 					me.layout();
 					parent.layout(true, true);
-					resetExpressionList();
+					resetModelList();
 				}
 				//System.out.println("After mapping datatype of 3rd row is: " + projectModel.getAllProjectFields().get(2).getDataType());
 				
@@ -250,20 +243,20 @@ public class ModelDefinitionScreen extends GnosScreen {
 		});
 	}
 	
-	private boolean updateExpressionList(){
+	private boolean updateModelList(){
 		//Expressions expressions = new Expressions();
-		this.allDefinedExpressions = modelDefinitionGrid.getDefinedExpressions();
-		if(this.allDefinedExpressions == null){
+		this.allDefinedModels = modelDefinitionGrid.getDefinedModels();
+		if(this.allDefinedModels == null){
 			return false;
 		}
-		for(Expression expression: this.allDefinedExpressions){
+		for(Model model: this.allDefinedModels){
 			//Expressions expressions = new Expressions();
-			Expressions.add(expression);
+			Models.add(model);
 		}
 		return true;
 	}
 	
-	public void resetExpressionList(){
+	public void resetModelList(){
 		modelDefinitionGrid.resetAllRows();
 	}
 
