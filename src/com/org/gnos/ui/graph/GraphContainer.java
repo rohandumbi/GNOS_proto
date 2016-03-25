@@ -11,6 +11,7 @@ import org.eclipse.zest.core.widgets.GraphNode;
 import org.eclipse.zest.core.widgets.ZestStyles;
 import org.eclipse.zest.layouts.LayoutStyles;
 import org.eclipse.zest.layouts.algorithms.SpringLayoutAlgorithm;
+import org.eclipse.zest.layouts.algorithms.TreeLayoutAlgorithm;
 
 public class GraphContainer extends Composite {
 
@@ -32,7 +33,7 @@ public class GraphContainer extends Composite {
 		this.setLayout(new FillLayout(SWT.VERTICAL));
 		this.graph = new Graph(this, SWT.NONE);
 		this.rootNode = new GraphNode(graph, SWT.NONE, "BLOCK");
-		this.graph.setLayoutAlgorithm(new SpringLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);
+		this.graph.setLayoutAlgorithm(new TreeLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);
 		// Selection listener on graphConnect or GraphNode is not supported
 		// see https://bugs.eclipse.org/bugs/show_bug.cgi?id=236528
 		this.graph.addSelectionListener(new SelectionAdapter() {
@@ -49,7 +50,7 @@ public class GraphContainer extends Composite {
 		GraphNode node2 = new GraphNode(graph, SWT.NONE, "DUMMY_LEVEL_2");
 		new GraphConnection(graph, ZestStyles.CONNECTIONS_DIRECTED, this.rootNode,node1);
 		new GraphConnection(graph, ZestStyles.CONNECTIONS_DIRECTED, node1,node2);
-		this.graph.setLayoutAlgorithm(new SpringLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);
+		this.graph.setLayoutAlgorithm(new TreeLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);
 		this.layout();
 		
 	}

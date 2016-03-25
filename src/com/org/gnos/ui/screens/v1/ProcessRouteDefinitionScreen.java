@@ -81,7 +81,7 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 		FormData fd_containerComposite = new FormData();
 		fd_containerComposite.left = new FormAttachment(0, 6);
 		fd_containerComposite.right = new FormAttachment(100, -6);
-		fd_containerComposite.top = new FormAttachment(20, 6);
+		fd_containerComposite.top = new FormAttachment(15, 6);
 		fd_containerComposite.bottom = new FormAttachment(100, -6);
 		graphContainerComposite.setLayoutData(fd_containerComposite);
 
