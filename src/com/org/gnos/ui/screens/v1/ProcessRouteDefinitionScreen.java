@@ -14,6 +14,7 @@ import org.eclipse.zest.layouts.algorithms.SpringLayoutAlgorithm;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.events.interfaces.GnosEventListener;
 import com.org.gnos.ui.custom.controls.GnosScreen;
+import com.org.gnos.ui.graph.GraphContainer;
 
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -26,8 +27,9 @@ import org.eclipse.swt.layout.FormLayout;
 public class ProcessRouteDefinitionScreen extends GnosScreen {
 
 
-	private Composite parent;
-	private Graph graph;
+	//private Composite parent;
+	private GraphContainer graphContainerComposite;
+	
 	/**
 	 * Create the composite.
 	 * @param parent
@@ -56,7 +58,7 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 		setForeground(SWTResourceManager.getColor(30, 144, 255));
 		setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
 		setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		this.parent = parent;
+		//this.parent = parent;
 		//this.projectModel = projectModel;
 		//this.allHeaders = this.getAllHeaders();
 		this.createContent();
@@ -65,20 +67,37 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 
 	private void createContent(){
 		setLayout(new FormLayout());
-		Composite containerComposite = new Composite(this, SWT.NONE);
-		containerComposite.setLayout(new FillLayout(SWT.HORIZONTAL));
+		Button buttonAddProcess = new Button(this, SWT.NONE);
+		buttonAddProcess.setText("DEFINE A PROCESS");
+		FormData fd_buttonAddProcess = new FormData();
+		fd_buttonAddProcess.top = new FormAttachment(0, 6);
+		//fd_buttonNext.right = new FormAttachment(btnAddNewRow, -5, SWT.LEFT);
+		fd_buttonAddProcess.left = new FormAttachment(0, 6);
+		//fd_buttonMapRqrdFields.right = new FormAttachment(0, 282);
+		buttonAddProcess.setLayoutData(fd_buttonAddProcess);
+		
+		this.graphContainerComposite = new GraphContainer(this, SWT.NONE);
+		graphContainerComposite.setLayout(new FillLayout(SWT.HORIZONTAL));
 		FormData fd_containerComposite = new FormData();
 		fd_containerComposite.left = new FormAttachment(0, 6);
 		fd_containerComposite.right = new FormAttachment(100, -6);
-		fd_containerComposite.top = new FormAttachment(0, 6);
+		fd_containerComposite.top = new FormAttachment(20, 6);
 		fd_containerComposite.bottom = new FormAttachment(100, -6);
-		containerComposite.setLayoutData(fd_containerComposite);
+		graphContainerComposite.setLayoutData(fd_containerComposite);
 
-		graph = new Graph(containerComposite, SWT.NONE);
+		buttonAddProcess.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				//TODO mapping complete
+				graphContainerComposite.addProcessToGraph();
+			}
+		});
+		
+		/*graph = new Graph(containerComposite, SWT.NONE);
 		// now a few nodes
-		GraphNode node1 = new GraphNode(graph, SWT.NONE, "Jim");
-		GraphNode node2 = new GraphNode(graph, SWT.NONE, "Jack");
-		GraphNode node3 = new GraphNode(graph, SWT.NONE, "Joe");
+		GraphNode node1 = new GraphNode(graph, SWT.NONE, "BLOCK");
+		GraphNode node2 = new GraphNode(graph, SWT.NONE, "HG_FEED");
+		GraphNode node3 = new GraphNode(graph, SWT.NONE, "LG_FEED");
 		GraphNode node4 = new GraphNode(graph, SWT.NONE, "Bill");
 		// Lets have a directed connection
 		new GraphConnection(graph, ZestStyles.CONNECTIONS_DIRECTED, node1,
@@ -105,7 +124,7 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 				System.out.println(e);
 			}
 
-		});
+		});*/
 		//this.parent.layout();
 	}
 
