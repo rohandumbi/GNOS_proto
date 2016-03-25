@@ -5,9 +5,9 @@ import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
-import com.org.gnos.custom.controls.GnosScreen;
 import com.org.gnos.custom.models.ProjectModel;
 import com.org.gnos.events.GnosEvent;
+import com.org.gnos.ui.custom.controls.GnosScreen;
 
 public class MainConfigurationViewPort extends GnosScreen{
 

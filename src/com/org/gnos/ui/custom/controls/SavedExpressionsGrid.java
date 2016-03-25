@@ -1,4 +1,4 @@
-package com.org.gnos.custom.controls;
+package com.org.gnos.ui.custom.controls;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +16,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.services.Expression;
 
-public class SavedModelsGrid extends Composite {
+public class SavedExpressionsGrid extends Composite {
 
 	/**
 	 * Create the composite.
@@ -33,7 +33,7 @@ public class SavedModelsGrid extends Composite {
 	private String[] arithemeticOperatorsArray;
 	private Composite parent;
 	
-	public SavedModelsGrid(Composite parent, int style, String[] allSourceFields) {
+	public SavedExpressionsGrid(Composite parent, int style, String[] allSourceFields) {
 		super(parent, style);
 		this.parent = parent;
 		//this.requiredFieldNames = requiredFieldNames;
@@ -83,22 +83,32 @@ public class SavedModelsGrid extends Composite {
 
 		Label firstSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
 		FormData fd_firstSeparator = new FormData();
-		fd_firstSeparator.left = new FormAttachment(33);
+		fd_firstSeparator.left = new FormAttachment(5);
 		firstSeparator.setLayoutData(fd_firstSeparator);
-
+		
 		Label secondSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
 		FormData fd_secondSeparator = new FormData();
-		fd_secondSeparator.left = new FormAttachment(66);
+		fd_secondSeparator.left = new FormAttachment(20);
 		secondSeparator.setLayoutData(fd_secondSeparator);
 
-
+		
+		Label thirdSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
+		FormData fd_thirdSeparator = new FormData();
+		fd_thirdSeparator.left = new FormAttachment(30);
+		thirdSeparator.setLayoutData(fd_thirdSeparator);
+		
+		Label fourthSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
+		FormData fd_fourthSeparator = new FormData();
+		fd_fourthSeparator.left = new FormAttachment(62);
+		fourthSeparator.setLayoutData(fd_fourthSeparator);
+		
 		Label lblGradeHeader = new Label(compositeGridHeader, SWT.NONE);
 		lblGradeHeader.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
 		FormData fd_lblGradeHeader = new FormData();
 		fd_lblGradeHeader.top = new FormAttachment(0,2);
-		fd_lblGradeHeader.left = new FormAttachment(0, 10);
+		fd_lblGradeHeader.left = new FormAttachment(0);
 		lblGradeHeader.setLayoutData(fd_lblGradeHeader);
-		lblGradeHeader.setText("IDENTIFIER/NAME");
+		lblGradeHeader.setText("GRADE");
 		lblGradeHeader.setBackground(SWTResourceManager.getColor(230, 230, 230));
 
 		Label lblExpressionNameHeader = new Label(compositeGridHeader, SWT.NONE);
@@ -107,27 +117,45 @@ public class SavedModelsGrid extends Composite {
 		fd_lblExpressionNameHeader.top = new FormAttachment(0,2);
 		fd_lblExpressionNameHeader.left = new FormAttachment(firstSeparator, 10);
 		lblExpressionNameHeader.setLayoutData(fd_lblExpressionNameHeader);
-		lblExpressionNameHeader.setText("FIELD");
+		lblExpressionNameHeader.setText("EXPRESSION NAME");
 		lblExpressionNameHeader.setBackground(SWTResourceManager.getColor(230, 230, 230));
-
+		
 		Label lblExpressionTypeHeader = new Label(compositeGridHeader, SWT.NONE);
 		lblExpressionTypeHeader.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
 		FormData fd_lblExpressionTypeHeader = new FormData();
 		fd_lblExpressionTypeHeader.top = new FormAttachment(0,2);
 		fd_lblExpressionTypeHeader.left = new FormAttachment(secondSeparator, 10);
 		lblExpressionTypeHeader.setLayoutData(fd_lblExpressionTypeHeader);
-		lblExpressionTypeHeader.setText("CONDITION");
+		lblExpressionTypeHeader.setText("IS COMPLEX");
 		lblExpressionTypeHeader.setBackground(SWTResourceManager.getColor(230, 230, 230));
+
+		Label lblExpressionDefinitionHeader = new Label(compositeGridHeader, SWT.NONE);
+		lblExpressionDefinitionHeader.setBackground(SWTResourceManager.getColor(230, 230, 230));
+		lblExpressionDefinitionHeader.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
+		FormData fd_lblExpressionDefinitionHeader = new FormData();
+		fd_lblExpressionDefinitionHeader.top = new FormAttachment(0, 2);
+		fd_lblExpressionDefinitionHeader.left = new FormAttachment(thirdSeparator, 10);
+		lblExpressionDefinitionHeader.setLayoutData(fd_lblExpressionDefinitionHeader);
+		lblExpressionDefinitionHeader.setText("EXPRESSION DEFINITION");
+
+		Label lblFiltersHeader = new Label(compositeGridHeader, SWT.NONE);
+		lblFiltersHeader.setBackground(SWTResourceManager.getColor(230, 230, 230));
+		lblFiltersHeader.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
+		FormData fd_lblFiltersHeader = new FormData();
+		fd_lblFiltersHeader.top = new FormAttachment(0,2);
+		fd_lblFiltersHeader.left = new FormAttachment(fourthSeparator, 10);
+		lblFiltersHeader.setLayoutData(fd_lblFiltersHeader);
+		lblFiltersHeader.setText("CONDITIONS (Empty means everything)");
 		this.presentRow = this.compositeGridHeader;//referring to the header as the 1st row when there are no rows inserted yet
 		
 	}
 	
 	public void addRows(List<Composite> compositeSavedExpressionCollection){
-		//Composite controlExpressionValue = null;
-		//String expressionValue = null;
+		Composite controlExpressionValue = null;
+		String expressionValue = null;
 		for(int i=0; i<compositeSavedExpressionCollection.size(); i++){
 			Composite compositeSavedExpression = compositeSavedExpressionCollection.get(i);
-			/*Control[] rowChildren = compositeSavedExpression.getChildren();
+			Control[] rowChildren = compositeSavedExpression.getChildren();
 			if(rowChildren[3] instanceof Text){ //temporary hack, need to identify in a better way
 				controlExpressionValue = (Composite)rowChildren[4];
 				//textCondition = (Text)rowChildren[3];
@@ -162,7 +190,7 @@ public class SavedModelsGrid extends Composite {
 			FormData fd_textExpression = new FormData();
 			fd_textExpression.right = new FormAttachment(62, -5);
 			fd_textExpression.left = new FormAttachment(30, 5);
-			textExpression.setLayoutData(fd_textExpression);*/
+			textExpression.setLayoutData(fd_textExpression);
 			
 			compositeSavedExpression.setParent(this);
 			FormData fd_compositeRow = new FormData();

@@ -14,10 +14,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import com.org.gnos.custom.controls.GnosConfigurationStepLabel;
-import com.org.gnos.custom.controls.GnosScreen;
 import com.org.gnos.custom.models.ProjectModel;
 import com.org.gnos.events.GnosEvent;
+import com.org.gnos.ui.custom.controls.GnosConfigurationStepLabel;
+import com.org.gnos.ui.custom.controls.GnosScreen;
 import com.org.gnos.utilities.ClickBehavior;
 
 

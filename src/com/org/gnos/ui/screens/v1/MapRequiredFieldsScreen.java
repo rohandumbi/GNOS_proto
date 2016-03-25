@@ -14,11 +14,11 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.application.GNOSConfig;
-import com.org.gnos.custom.controls.GnosScreen;
-import com.org.gnos.custom.controls.MapRequiredFieldsGrid;
 import com.org.gnos.custom.models.ProjectModel;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.services.csv.ColumnHeader;
+import com.org.gnos.ui.custom.controls.GnosScreen;
+import com.org.gnos.ui.custom.controls.MapRequiredFieldsGrid;
 
 public class MapRequiredFieldsScreen extends GnosScreen {
 

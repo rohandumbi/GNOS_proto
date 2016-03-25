@@ -1,4 +1,4 @@
-package com.org.gnos.tabitems;
+package com.org.gnos.ui.tabitems;
 
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;

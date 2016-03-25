@@ -1,4 +1,4 @@
-package com.org.gnos.tabitems;
+package com.org.gnos.ui.tabitems;
 
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;

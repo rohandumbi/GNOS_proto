@@ -1,14 +1,13 @@
-package com.org.gnos.custom.controls;
+package com.org.gnos.ui.custom.controls;
 
 import java.util.ArrayList;
 
-import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.widgets.Composite;
 
 import com.org.gnos.events.interfaces.GnosEventGenerator;
 import com.org.gnos.events.interfaces.GnosEventListener;
 
-public abstract class GnosScreenScrollable extends ScrolledComposite implements GnosEventGenerator, GnosEventListener{
+public abstract class GnosScreen extends Composite implements GnosEventGenerator, GnosEventListener{
 
 	protected ArrayList<GnosEventListener> listeners = new ArrayList<GnosEventListener>();
 	
@@ -17,7 +16,7 @@ public abstract class GnosScreenScrollable extends ScrolledComposite implements 
 	 * @param parent
 	 * @param style
 	 */
-	public GnosScreenScrollable(Composite parent, int style) {
+	public GnosScreen(Composite parent, int style) {
 		super(parent, style);
 	}
 	

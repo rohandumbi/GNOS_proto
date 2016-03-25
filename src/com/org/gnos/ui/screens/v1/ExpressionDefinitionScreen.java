@@ -17,15 +17,15 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import com.org.gnos.custom.controls.ExpressionBuilderGrid;
-import com.org.gnos.custom.controls.GnosScreen;
-import com.org.gnos.custom.controls.SavedExpressionsGrid;
 import com.org.gnos.custom.models.ProjectModel;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.services.Expression;
 import com.org.gnos.services.Expressions;
 import com.org.gnos.services.csv.ColumnHeader;
 import com.org.gnos.services.csv.GNOSCSVDataProcessor;
+import com.org.gnos.ui.custom.controls.ExpressionBuilderGrid;
+import com.org.gnos.ui.custom.controls.GnosScreen;
+import com.org.gnos.ui.custom.controls.SavedExpressionsGrid;
 
 public class ExpressionDefinitionScreen extends GnosScreen {
 

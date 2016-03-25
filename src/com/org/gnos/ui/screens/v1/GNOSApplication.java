@@ -22,8 +22,8 @@ import com.org.gnos.events.GnosEventWithAttributeMap;
 import com.org.gnos.events.interfaces.GnosEventListener;
 import com.org.gnos.services.csv.GNOSCSVDataProcessor;
 import com.org.gnos.services.csv.GNOSDataProcessor;
-import com.org.gnos.tabitems.HomeTabItem;
-import com.org.gnos.tabitems.ProjectTabItem;
+import com.org.gnos.ui.tabitems.HomeTabItem;
+import com.org.gnos.ui.tabitems.ProjectTabItem;
 
 public class GNOSApplication extends ApplicationWindow implements GnosEventListener{
 

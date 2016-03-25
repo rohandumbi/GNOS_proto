@@ -11,9 +11,9 @@ import org.eclipse.zest.core.widgets.ZestStyles;
 import org.eclipse.zest.layouts.LayoutStyles;
 import org.eclipse.zest.layouts.algorithms.SpringLayoutAlgorithm;
 
-import com.org.gnos.custom.controls.GnosScreen;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.events.interfaces.GnosEventListener;
+import com.org.gnos.ui.custom.controls.GnosScreen;
 
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.events.SelectionAdapter;
