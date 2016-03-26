@@ -1,28 +1,26 @@
 package com.org.gnos.ui.screens.v1;
 
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
+import java.util.List;
+
 import org.eclipse.swt.SWT;
-import org.eclipse.wb.swt.SWTResourceManager;
-import org.eclipse.zest.core.widgets.Graph;
-import org.eclipse.zest.core.widgets.GraphConnection;
-import org.eclipse.zest.core.widgets.GraphNode;
-import org.eclipse.zest.core.widgets.ZestStyles;
-import org.eclipse.zest.layouts.LayoutStyles;
-import org.eclipse.zest.layouts.algorithms.SpringLayoutAlgorithm;
-
-import com.org.gnos.events.GnosEvent;
-import com.org.gnos.events.interfaces.GnosEventListener;
-import com.org.gnos.ui.custom.controls.GnosScreen;
-import com.org.gnos.ui.graph.GraphContainer;
-
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.wb.swt.SWTResourceManager;
+
+import com.org.gnos.events.GnosEvent;
+import com.org.gnos.services.Model;
+import com.org.gnos.services.Models;
+import com.org.gnos.services.ProcessNode;
+import com.org.gnos.services.ProcessRoute;
+import com.org.gnos.services.ProcessRoutes;
+import com.org.gnos.ui.custom.controls.GnosScreen;
+import com.org.gnos.ui.graph.GraphContainer;
 
 public class ProcessRouteDefinitionScreen extends GnosScreen {
 
@@ -64,6 +62,18 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 		this.createContent();
 
 	}
+	
+	private ProcessRoute createDummyProcess(){
+		ProcessRoute dummyProcess = new ProcessRoute();
+		List<Model> allModels = Models.getAll();
+		for(Model model: allModels){
+			ProcessNode processNode = new ProcessNode();
+			processNode.setModel(model);
+			dummyProcess.addNode(processNode);
+		}
+		ProcessRoutes.add(dummyProcess);
+		return dummyProcess;
+	}
 
 	private void createContent(){
 		setLayout(new FormLayout());
@@ -77,19 +87,21 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 		buttonAddProcess.setLayoutData(fd_buttonAddProcess);
 		
 		this.graphContainerComposite = new GraphContainer(this, SWT.NONE);
-		graphContainerComposite.setLayout(new FillLayout(SWT.HORIZONTAL));
+		this.graphContainerComposite.setLayout(new FillLayout(SWT.HORIZONTAL));
 		FormData fd_containerComposite = new FormData();
 		fd_containerComposite.left = new FormAttachment(0, 6);
 		fd_containerComposite.right = new FormAttachment(100, -6);
 		fd_containerComposite.top = new FormAttachment(15, 6);
 		fd_containerComposite.bottom = new FormAttachment(100, -6);
-		graphContainerComposite.setLayoutData(fd_containerComposite);
+		this.graphContainerComposite.setLayoutData(fd_containerComposite);
 
 		buttonAddProcess.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				//TODO mapping complete
-				graphContainerComposite.addProcessToGraph();
+				//graphContainerComposite.addProcessToGraph();
+				ProcessRoute newProcess = createDummyProcess();
+				graphContainerComposite.addProcessToGraph(newProcess);
 			}
 		});
 		

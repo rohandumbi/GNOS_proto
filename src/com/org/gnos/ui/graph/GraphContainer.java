@@ -1,5 +1,6 @@
 package com.org.gnos.ui.graph;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -10,8 +11,10 @@ import org.eclipse.zest.core.widgets.GraphConnection;
 import org.eclipse.zest.core.widgets.GraphNode;
 import org.eclipse.zest.core.widgets.ZestStyles;
 import org.eclipse.zest.layouts.LayoutStyles;
-import org.eclipse.zest.layouts.algorithms.SpringLayoutAlgorithm;
 import org.eclipse.zest.layouts.algorithms.TreeLayoutAlgorithm;
+
+import com.org.gnos.services.ProcessNode;
+import com.org.gnos.services.ProcessRoute;
 
 public class GraphContainer extends Composite {
 
@@ -45,12 +48,25 @@ public class GraphContainer extends Composite {
 		});
 	}
 	
-	public void addProcessToGraph(){
-		GraphNode node1 = new GraphNode(graph, SWT.NONE, "DUMMY_LEVEL_1");
+	public void addProcessToGraph(ProcessRoute process){
+		/*GraphNode node1 = new GraphNode(graph, SWT.NONE, "DUMMY_LEVEL_1");
 		GraphNode node2 = new GraphNode(graph, SWT.NONE, "DUMMY_LEVEL_2");
 		new GraphConnection(graph, ZestStyles.CONNECTIONS_DIRECTED, this.rootNode,node1);
 		new GraphConnection(graph, ZestStyles.CONNECTIONS_DIRECTED, node1,node2);
-		this.graph.setLayoutAlgorithm(new TreeLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);
+		this.graph.setLayoutAlgorithm(new TreeLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);*/
+		if(!process.isEmpty()){
+			ProcessNode presentProcessNode = process.getStart();
+			GraphNode lastGraphNode = this.rootNode;
+			do{
+				GraphNode newGraphNode = new GraphNode(graph, SWT.NONE, presentProcessNode.getModel().getName());
+				new GraphConnection(graph, ZestStyles.CONNECTIONS_DIRECTED, lastGraphNode,newGraphNode);
+				graph.setLayoutAlgorithm(new TreeLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);
+				lastGraphNode = newGraphNode;
+				presentProcessNode = presentProcessNode.getNextNode();
+			}while(presentProcessNode != null);
+		}else{
+			MessageDialog.openError(this.parent.getShell(), "GNOS Error", "Process defined is empty.");
+		}
 		//this.layout();
 		
 	}

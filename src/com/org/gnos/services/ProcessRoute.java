@@ -1,16 +1,17 @@
 package com.org.gnos.services;
 
-public class Process {
+public class ProcessRoute {
 	private ProcessNode start;
 	private ProcessNode end;
+	private int processId;
 	
 	public boolean isEmpty(){
 		return (start==null) && (end==null);
 	}
-	public Process(){
+	public ProcessRoute(){
 		super();
 	}
-	public Process(ProcessNode node){
+	public ProcessRoute(ProcessNode node){
 		this.start = node;
 		this.end = node;
 	}
@@ -22,6 +23,15 @@ public class Process {
 			this.end.setNextNode(node);
 			this.end = node;
 		}
+	}
+	public int getProcessId() {
+		return processId;
+	}
+	public void setProcessId(int processId) {
+		this.processId = processId;
+	}
+	public ProcessNode getStart(){
+		return start;
 	}
 	
 }

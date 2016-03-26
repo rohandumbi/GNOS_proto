@@ -5,11 +5,11 @@ import java.util.List;
 
 import com.org.gnos.application.GNOSConfig;
 
-public class Processes {
+public class ProcessRoutes {
 
-	private static List<Process> processes = new ArrayList<Process>();
+	private static List<ProcessRoute> processes = new ArrayList<ProcessRoute>();
 	
-	public static List<Process> getAll() {
+	public static List<ProcessRoute> getAll() {
 /*		Connection conn = DBManager.getConnection();
 		String sql = "select * from expressions";
 		Statement stmt = null;
@@ -63,7 +63,7 @@ public class Processes {
 		return true;
 	}
 	
-	public static boolean add(Process process){
+	public static boolean add(ProcessRoute process){
 		
 		processes.add(process);
 		/*		Connection conn = DBManager.getConnection();
