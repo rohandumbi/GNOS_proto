@@ -51,7 +51,7 @@ public class GraphContainer extends Composite {
 		new GraphConnection(graph, ZestStyles.CONNECTIONS_DIRECTED, this.rootNode,node1);
 		new GraphConnection(graph, ZestStyles.CONNECTIONS_DIRECTED, node1,node2);
 		this.graph.setLayoutAlgorithm(new TreeLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);
-		this.layout();
+		//this.layout();
 		
 	}
 	

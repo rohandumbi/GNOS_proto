@@ -93,39 +93,6 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 			}
 		});
 		
-		/*graph = new Graph(containerComposite, SWT.NONE);
-		// now a few nodes
-		GraphNode node1 = new GraphNode(graph, SWT.NONE, "BLOCK");
-		GraphNode node2 = new GraphNode(graph, SWT.NONE, "HG_FEED");
-		GraphNode node3 = new GraphNode(graph, SWT.NONE, "LG_FEED");
-		GraphNode node4 = new GraphNode(graph, SWT.NONE, "Bill");
-		// Lets have a directed connection
-		new GraphConnection(graph, ZestStyles.CONNECTIONS_DIRECTED, node1,
-				node2);
-		// Lets have a dotted graph connection
-		new GraphConnection(graph, ZestStyles.CONNECTIONS_DOT, node2, node3);
-		// Standard connection
-		new GraphConnection(graph, SWT.NONE, node3, node1);
-		// Change line color and line width
-		GraphConnection graphConnection = new GraphConnection(graph, SWT.NONE,
-				node1, node4);
-		graphConnection.changeLineColor(parent.getDisplay().getSystemColor(SWT.COLOR_GREEN));
-		// Also set a text
-		graphConnection.setText("This is a text");
-		graphConnection.setHighlightColor(parent.getDisplay().getSystemColor(SWT.COLOR_RED));
-		graphConnection.setLineWidth(3);
-
-		graph.setLayoutAlgorithm(new SpringLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);
-		// Selection listener on graphConnect or GraphNode is not supported
-		// see https://bugs.eclipse.org/bugs/show_bug.cgi?id=236528
-		graph.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				System.out.println(e);
-			}
-
-		});*/
-		//this.parent.layout();
 	}
 
 	@Override
