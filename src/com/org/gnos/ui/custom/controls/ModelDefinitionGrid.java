@@ -9,7 +9,6 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -22,7 +21,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
 import com.org.gnos.services.Expression;
 import com.org.gnos.services.Expressions;
 import com.org.gnos.services.Model;
-import com.org.gnos.services.Operation;
+import com.org.gnos.services.Models;
 
 public class ModelDefinitionGrid extends Composite {
 
@@ -57,21 +56,21 @@ public class ModelDefinitionGrid extends Composite {
 	}
 	
 	private boolean isModelNameDuplicate(String modelName){
-		boolean isPresentInExpressionGrid = false;
+		boolean isPresentInModelGrid = false;
 		boolean isPresentInSavedGrid = false;
 		for(String str: presentmodelNames) {
 		    if(str.trim().equalsIgnoreCase(modelName.trim()))
-		    	isPresentInExpressionGrid = true;
+		    	isPresentInModelGrid = true;
 		}
-		if(!isPresentInExpressionGrid){
-			List<Expression> savedExpressions = Expressions.getAll();
-			for(Expression expression : savedExpressions){
-				if(expression.getName().trim().equalsIgnoreCase(modelName)){
+		if(!isPresentInModelGrid){
+			List<Model> savedModels = Models.getAll();
+			for(Model model : savedModels){
+				if(model.getName().trim().equalsIgnoreCase(modelName)){
 					isPresentInSavedGrid = true;
 				}
 			}
 		}
-		return isPresentInExpressionGrid||isPresentInSavedGrid;
+		return isPresentInModelGrid||isPresentInSavedGrid;
 	}
 
 	

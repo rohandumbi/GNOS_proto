@@ -86,12 +86,12 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 		//fd_buttonMapRqrdFields.right = new FormAttachment(0, 282);
 		buttonAddProcess.setLayoutData(fd_buttonAddProcess);
 		
-		this.graphContainerComposite = new GraphContainer(this, SWT.NONE);
+		this.graphContainerComposite = new GraphContainer(this, SWT.BORDER);
 		this.graphContainerComposite.setLayout(new FillLayout(SWT.HORIZONTAL));
 		FormData fd_containerComposite = new FormData();
-		fd_containerComposite.left = new FormAttachment(0, 6);
+		fd_containerComposite.left = new FormAttachment(25, 6);
 		fd_containerComposite.right = new FormAttachment(100, -6);
-		fd_containerComposite.top = new FormAttachment(15, 6);
+		fd_containerComposite.top = new FormAttachment(0, 6);
 		fd_containerComposite.bottom = new FormAttachment(100, -6);
 		this.graphContainerComposite.setLayoutData(fd_containerComposite);
 
