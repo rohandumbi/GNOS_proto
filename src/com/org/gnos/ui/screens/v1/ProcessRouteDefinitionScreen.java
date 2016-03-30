@@ -20,6 +20,7 @@ import com.org.gnos.services.ProcessNode;
 import com.org.gnos.services.ProcessRoute;
 import com.org.gnos.services.ProcessRoutes;
 import com.org.gnos.ui.custom.controls.GnosScreen;
+import com.org.gnos.ui.custom.controls.ProcessDefinitionDialog;
 import com.org.gnos.ui.graph.GraphContainer;
 
 public class ProcessRouteDefinitionScreen extends GnosScreen {
@@ -27,6 +28,7 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 
 	//private Composite parent;
 	private GraphContainer graphContainerComposite;
+	private Composite parent;
 	
 	/**
 	 * Create the composite.
@@ -56,7 +58,7 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 		setForeground(SWTResourceManager.getColor(30, 144, 255));
 		setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
 		setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		//this.parent = parent;
+		this.parent = parent;
 		//this.projectModel = projectModel;
 		//this.allHeaders = this.getAllHeaders();
 		this.createContent();
@@ -100,6 +102,8 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 			public void widgetSelected(SelectionEvent e) {
 				//TODO mapping complete
 				//graphContainerComposite.addProcessToGraph();
+				ProcessDefinitionDialog processDefinitionDialog = new ProcessDefinitionDialog(parent.getShell());
+				processDefinitionDialog.open();
 				ProcessRoute newProcess = createDummyProcess();
 				graphContainerComposite.addProcessToGraph(newProcess);
 			}
