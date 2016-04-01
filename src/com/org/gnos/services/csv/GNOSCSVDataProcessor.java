@@ -19,7 +19,6 @@ import java.util.Map;
 import com.org.gnos.db.DBManager;
 import com.org.gnos.services.Expression;
 import com.org.gnos.services.Expressions;
-import com.org.gnos.services.Filter;
 import com.org.gnos.services.Operation;
 
 public class GNOSCSVDataProcessor {
