@@ -31,12 +31,10 @@ import com.org.gnos.ui.custom.controls.GnosScreen;
 public class GNOSApplication extends ApplicationWindow implements GnosEventListener{
 
 	private Composite container;
-	//private CTabFolder cTabFolder;
-	//private HomeTabItem homeTabItem;
-	//private ProjectTabItem projectTabItem;
 	private StackLayout stackLayout;
 	private GnosScreen viewPort;
 	private Shell dummyShell;
+	
 	private ProjectScreen projectScreen;
 	private WorkbenchScreen workbenchScreen;
 	private GNOSCSVDataProcessor gnosCsvDataProcessor;
@@ -60,15 +58,10 @@ public class GNOSApplication extends ApplicationWindow implements GnosEventListe
 		container = new Composite(parent, SWT.NONE);		
 		this.stackLayout = new StackLayout();
 		container.setLayout(stackLayout);
-		this.dummyShell = new Shell();
 
-		projectScreen = new ProjectScreen(this.dummyShell, SWT.NONE);
+		projectScreen = new ProjectScreen(container, SWT.NONE);
 		projectScreen.registerEventListener(this);
 		loadProjectScreen();
-
-		
-		Label label_1 = new Label(container, SWT.NONE);
-		label_1.setLayoutData(new FormData());
 		
 		getShell().setMinimumSize(814, 511);
 		parent.pack();
@@ -77,10 +70,6 @@ public class GNOSApplication extends ApplicationWindow implements GnosEventListe
 	}
 
 	private void loadProjectScreen() {
-		if(this.viewPort != null){
-			//this.viewPort.dispose();
-			this.viewPort.setParent(dummyShell);
-		}
 		this.viewPort = projectScreen;
 		this.viewPort.setParent(container);
 		this.stackLayout.topControl = this.viewPort;
@@ -88,17 +77,25 @@ public class GNOSApplication extends ApplicationWindow implements GnosEventListe
 	}
 	
 	private void loadWorkBenchScreen(ProjectModel projectModel) {
-		workbenchScreen = new WorkbenchScreen(this.dummyShell, SWT.NONE, projectModel);
+		workbenchScreen = new WorkbenchScreen(container, SWT.NONE, projectModel);
 		workbenchScreen.registerEventListener(this);
-		if(this.viewPort != null){
-			//this.viewPort.dispose();
-			this.viewPort.setParent(dummyShell);
-		}
 		this.viewPort = workbenchScreen;
 		this.viewPort.setParent(container);
 		this.stackLayout.topControl = this.viewPort;
 		container.layout();
 	}
+	
+	private void openProjectConfiguration(GnosEventWithAttributeMap event){
+
+		ProjectModel projectModel = new ProjectModel(event.attributes);
+		
+		gnosCsvDataProcessor = GNOSCSVDataProcessor.getInstance();
+		gnosCsvDataProcessor.processCsv(event.attributes.get("recordFileName"));
+		
+		projectModel.setAllProjectFields(gnosCsvDataProcessor.getHeaderColumns());
+		loadWorkBenchScreen(projectModel);
+	}
+	
 	/**
 	 * Create the actions.
 	 */
@@ -135,6 +132,44 @@ public class GNOSApplication extends ApplicationWindow implements GnosEventListe
 	}
 
 	/**
+	 * Configure the shell.
+	 * @param newShell
+	 */
+	@Override
+	protected void configureShell(Shell newShell) {
+		super.configureShell(newShell);
+		newShell.setText("GNOS - New age mining");
+	}
+
+	@Override
+	protected void constrainShellSize() {
+		super.constrainShellSize();
+		getShell().setMaximized(true);
+	}
+	
+	/**
+	 * Return the initial size of the window.
+	 */
+	@Override
+	protected Point getInitialSize() {
+		return new Point(301, 142);
+	}
+	
+	
+
+	@Override
+	public void onGnosEventFired(GnosEvent e) {
+		if(e.eventName == "homeTab:new-project-created"){
+			GnosEventWithAttributeMap event = (GnosEventWithAttributeMap)e;
+			openProjectConfiguration(event);
+		} else if(e.eventName == "createNewProjectScreen:upload-records-complete") {
+			GnosEventWithAttributeMap event = (GnosEventWithAttributeMap)e;
+			openProjectConfiguration(event);
+		}
+
+	}
+	
+	/**
 	 * Launch the application.
 	 * @param args
 	 */
@@ -148,60 +183,6 @@ public class GNOSApplication extends ApplicationWindow implements GnosEventListe
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	/**
-	 * Configure the shell.
-	 * @param newShell
-	 */
-	@Override
-	protected void configureShell(Shell newShell) {
-		super.configureShell(newShell);
-		newShell.setText("GNOS - New age mining");
-	}
-
-	/**
-	 * Return the initial size of the window.
-	 */
-	@Override
-	protected Point getInitialSize() {
-		return new Point(301, 142);
-	}
-
-	@Override
-	public void onGnosEventFired(GnosEvent e) {
-		// TODO Auto-generated method stub
-		if(e.eventName == "homeTab:new-project-created"){
-			GnosEventWithAttributeMap event = (GnosEventWithAttributeMap)e;
-			openPitControlsTab(event);
-		} else if(e.eventName == "createNewProjectScreen:upload-records-complete") {
-			GnosEventWithAttributeMap event = (GnosEventWithAttributeMap)e;
-			openPitControlsTab(event);
-		}
-
-	}
-
-	@Override
-	protected void constrainShellSize() {
-		super.constrainShellSize();
-		getShell().setMaximized( true );
-	}
-
-	private void openPitControlsTab(GnosEventWithAttributeMap event){
-		System.out.println("Opening pit controls tab");
-		ProjectModel projectModel = new ProjectModel(event.attributes);
-		
-		gnosCsvDataProcessor = GNOSCSVDataProcessor.getInstance();
-		gnosCsvDataProcessor.processCsv(event.attributes.get("recordFileName"));
-		
-		projectModel.setAllProjectFields(gnosCsvDataProcessor.getHeaderColumns());
-		loadWorkBenchScreen(projectModel);
-		//container.setLayoutData(new WorkbenchScreen(container, SWT.NONE, projectModel));
-		//projectTabItem = new ProjectTabItem(cTabFolder, SWT.CLOSE, projectModel);
-		//projectTabItem.registerEventListener(this);
-		//cTabFolder.setSelection(projectTabItem);
-
-		//homeTabItem.createContent(cTabFolder);
 	}
 
 }

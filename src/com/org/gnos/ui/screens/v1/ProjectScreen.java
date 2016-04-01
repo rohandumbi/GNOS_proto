@@ -26,7 +26,19 @@ public class ProjectScreen extends GnosScreen {
 	}
 
 	private void createContent(){
+		
+		
 		setLayout(new FormLayout());
+		
+		
+		Label label = new Label(this, SWT.SEPARATOR | SWT.VERTICAL);
+		FormData fd_label = new FormData();
+		fd_label.left = new FormAttachment(0, 260);
+		fd_label.top = new FormAttachment(0);
+		fd_label.bottom = new FormAttachment(100, 10);
+		fd_label.right = new FormAttachment(0, 262);
+		label.setLayoutData(fd_label);
+		
 		CLabel labelProject = new CLabel(this, SWT.NONE);
 		labelProject.setForeground(SWTResourceManager.getColor(255, 255, 255));
 		labelProject.setFont(SWTResourceManager.getFont("Arial", 12, SWT.NORMAL));
@@ -39,13 +51,7 @@ public class ProjectScreen extends GnosScreen {
 		labelProject.setLayoutData(fd_labelProject);
 		labelProject.setText("Projects");
 		
-		Label label = new Label(this, SWT.SEPARATOR | SWT.VERTICAL);
-		FormData fd_label = new FormData();
-		fd_label.left = new FormAttachment(0, 260);
-		fd_label.top = new FormAttachment(labelProject, 6);
-		fd_label.bottom = new FormAttachment(100, 10);
-		fd_label.right = new FormAttachment(0, 262);
-		label.setLayoutData(fd_label);
+
 		
 		CLabel lastLabel = labelProject;
 		for(int i=0; i< 10; i++){
