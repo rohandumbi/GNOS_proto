@@ -17,6 +17,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import com.org.gnos.db.models.Project;
+import com.org.gnos.db.models.Projects;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.events.GnosEventWithAttributeMap;
 import com.org.gnos.events.interfaces.GnosEventGenerator;
@@ -107,7 +109,8 @@ public class CreateNewProjectScreen extends Composite implements GnosEventGenera
 				attributes.put("projectName", textProjectName.getText());
 				attributes.put("projectDescription", textDescription.getText());
 				attributes.put("recordFileName", csvFileName);
-				
+				Project project = new Project(textProjectName.getText(), textDescription.getText());
+				Projects.add(project);
 				GnosEventWithAttributeMap event = new GnosEventWithAttributeMap(this, "createNewProjectScreen:upload-records-complete", attributes);
 				if(csvFileName != null){
 					//uploadFileToDB(csvFileName);

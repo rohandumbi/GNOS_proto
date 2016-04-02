@@ -1,5 +1,7 @@
 package com.org.gnos.ui.screens.v1;
 
+import java.util.List;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -10,9 +12,9 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
+import com.org.gnos.db.models.Project;
+import com.org.gnos.db.models.Projects;
 import com.org.gnos.events.GnosEvent;
-import com.org.gnos.events.GnosEventWithAttributeMap;
-import com.org.gnos.events.interfaces.GnosEventListener;
 import com.org.gnos.ui.custom.controls.GnosScreen;
 import com.org.gnos.utilities.SWTResourceManager;
 
@@ -52,9 +54,9 @@ public class ProjectScreen extends GnosScreen {
 		labelProject.setText("Projects");
 		
 
-		
+		List<Project> projects = Projects.getAll();
 		CLabel lastLabel = labelProject;
-		for(int i=0; i< 10; i++){
+		for(int i=0; i< projects.size(); i++){
 			CLabel labelProject1 = new CLabel(this, SWT.NONE);
 			labelProject1.setForeground(SWTResourceManager.getColor(255, 255, 255));
 			labelProject1.setFont(SWTResourceManager.getFont("Arial", 12, SWT.NORMAL));
@@ -65,7 +67,7 @@ public class ProjectScreen extends GnosScreen {
 			fd_labelProject1.top = new FormAttachment(lastLabel, 6);
 			fd_labelProject1.left = new FormAttachment(0, 10);
 			labelProject1.setLayoutData(fd_labelProject1);
-			labelProject1.setText("Project "+(i+1));
+			labelProject1.setText(projects.get(i).getName());
 			lastLabel = labelProject1;
 		}
 
