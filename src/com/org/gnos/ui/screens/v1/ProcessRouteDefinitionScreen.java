@@ -80,7 +80,7 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 	private void createContent(){
 		setLayout(new FormLayout());
 		Button buttonAddProcess = new Button(this, SWT.NONE);
-		buttonAddProcess.setText("DEFINE A PROCESS");
+		buttonAddProcess.setText("ADD A PROCESS");
 		FormData fd_buttonAddProcess = new FormData();
 		fd_buttonAddProcess.top = new FormAttachment(0, 6);
 		//fd_buttonNext.right = new FormAttachment(btnAddNewRow, -5, SWT.LEFT);

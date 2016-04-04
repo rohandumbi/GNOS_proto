@@ -8,12 +8,15 @@ import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.ColorDialog;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
@@ -34,14 +37,14 @@ public class ProcessDefinitionFormScreen extends GnosScreen {
 	private Composite modelListContainerComposite;
 	private ScrolledComposite scViewportContainer;
 	private String[] sourceFieldsComboItems;
+	private Composite parent;
 
-	public ProcessDefinitionFormScreen(Composite parent, int style) {
-		super(parent, style);
-		//setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_BACKGROUND_GRADIENT));
+	public ProcessDefinitionFormScreen(Composite parent0, int style) {
+		super(parent0, style);
+		this.parent = parent0;
 		setLayout(new FormLayout());
 
 		Label lblProcessName = new Label(this, SWT.NONE);
-		//lblProcessName.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		lblProcessName.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
 		FormData fd_lblProcessName = new FormData();
 		fd_lblProcessName.top = new FormAttachment(0, 37);
@@ -50,21 +53,57 @@ public class ProcessDefinitionFormScreen extends GnosScreen {
 		lblProcessName.setText("Process Name:");
 
 		textProcessName = new Text(this, SWT.BORDER);
+		textProcessName.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
 		FormData fd_textProcessName = new FormData();
 		fd_textProcessName.right = new FormAttachment(lblProcessName, 522, SWT.RIGHT);
 		fd_textProcessName.top = new FormAttachment(0, 37);
 		fd_textProcessName.left = new FormAttachment(lblProcessName, 6);
 		textProcessName.setLayoutData(fd_textProcessName);
 
-		Label lblChooseColor = new Label(this, SWT.NONE);
-		lblChooseColor.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
-		//lblChooseColor.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		FormData fd_lblChooseColor = new FormData();
+		Button btnChooseProcessColor = new Button(this, SWT.NONE);
+		btnChooseProcessColor.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
+		btnChooseProcessColor.setText("Choose Color");
+		FormData fd_btnChooseProcessColor = new FormData();
 		//fd_lblChooseColor.bottom = new FormAttachment(lblStep, -89);
-		fd_lblChooseColor.left = new FormAttachment(lblProcessName, 0, SWT.LEFT);
-		fd_lblChooseColor.top = new FormAttachment(lblProcessName, 20, SWT.BOTTOM);
-		lblChooseColor.setLayoutData(fd_lblChooseColor);
-		lblChooseColor.setText("Choose Color:");
+		fd_btnChooseProcessColor.left = new FormAttachment(lblProcessName, 0, SWT.LEFT);
+		fd_btnChooseProcessColor.top = new FormAttachment(lblProcessName, 20, SWT.BOTTOM);
+		btnChooseProcessColor.setLayoutData(fd_btnChooseProcessColor);
+
+		final Label colorLabel = new Label(this, SWT.BORDER);
+		colorLabel.setText("                              ");
+		colorLabel.setBackground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+		FormData fd_colorLabel = new FormData();
+		//fd_lblChooseColor.bottom = new FormAttachment(lblStep, -89);
+		fd_colorLabel.left = new FormAttachment(btnChooseProcessColor, 5, SWT.RIGHT);
+		fd_colorLabel.top = new FormAttachment(btnChooseProcessColor, 0, SWT.TOP);
+		fd_colorLabel.bottom = new FormAttachment(btnChooseProcessColor, 0, SWT.BOTTOM);
+		colorLabel.setLayoutData(fd_colorLabel);
+
+		btnChooseProcessColor.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				// Create the color-change dialog
+				ColorDialog dlg = new ColorDialog(parent.getShell());
+
+				// Set the selected color in the dialog from
+				// user's selected color
+				dlg.setRGB(colorLabel.getBackground().getRGB());
+
+				// Change the title bar text
+				dlg.setText("Choose a Color");
+
+				// Open the dialog and retrieve the selected color
+				RGB rgb = dlg.open();
+				if (rgb != null) {
+					// Dispose the old color, create the
+					// new one, and set into the label
+					//color.dispose();
+					Color color = new Color(parent.getShell().getDisplay(), rgb);
+					colorLabel.setBackground(color);
+				}
+			}
+		});
+
+
 
 		Button btnNewButton = new Button(this, SWT.NONE);
 		btnNewButton.addSelectionListener(new SelectionAdapter() {
@@ -76,9 +115,9 @@ public class ProcessDefinitionFormScreen extends GnosScreen {
 		btnNewButton.setAlignment(SWT.LEFT);
 		btnNewButton.setImage(SWTResourceManager.getImage(ProcessDefinitionFormScreen.class, "/com/org/gnos/resources/Add_blue_24.png"));
 		FormData fd_btnNewButton = new FormData();
-		fd_btnNewButton.bottom = new FormAttachment(lblChooseColor, 51, SWT.BOTTOM);
+		fd_btnNewButton.bottom = new FormAttachment(btnChooseProcessColor, 51, SWT.BOTTOM);
 		fd_btnNewButton.right = new FormAttachment(0, 173);
-		fd_btnNewButton.top = new FormAttachment(lblChooseColor, 17);
+		fd_btnNewButton.top = new FormAttachment(btnChooseProcessColor, 17);
 		fd_btnNewButton.left = new FormAttachment(0, 44);
 		btnNewButton.setLayoutData(fd_btnNewButton);
 		btnNewButton.setText("Add Model Step");
@@ -179,7 +218,7 @@ public class ProcessDefinitionFormScreen extends GnosScreen {
 				comboStep.setListVisible(true);
 			}
 		});
-		
+
 		Button deleteButton = new Button(processStep, SWT.NONE);
 		deleteButton.setImage(SWTResourceManager.getImage(ProcessDefinitionFormScreen.class, "/com/org/gnos/resources/trash.png"));
 		FormData fd_deleteButton = new FormData();
@@ -199,10 +238,10 @@ public class ProcessDefinitionFormScreen extends GnosScreen {
 
 		this.lastProcessStep = processStep;
 		this.modelListContainerComposite.layout();
-		
+
 		this.adjustScrollableViewport();
 	}
-	
+
 	private void adjustScrollableViewport(){
 		Rectangle r = this.scViewportContainer.getClientArea();
 		this.scViewportContainer.setMinSize(this.modelListContainerComposite.computeSize(r.width, SWT.DEFAULT));
