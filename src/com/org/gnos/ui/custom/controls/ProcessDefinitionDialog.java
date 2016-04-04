@@ -55,9 +55,11 @@ public class ProcessDefinitionDialog extends Dialog {
 
 	private void setDialogLocation(){
 		Rectangle monitorArea = getShell().getDisplay().getPrimaryMonitor().getBounds();
-		Rectangle shellArea = getShell().getBounds();
-		int x = monitorArea.x + (monitorArea.width - shellArea.width)/2;
-		int y = monitorArea.y + (monitorArea.height - shellArea.height)/2;
+		//Rectangle shellArea = getShell().getBounds();
+		int x = monitorArea.x + (monitorArea.width - 980)/2;
+		int y = monitorArea.y + (monitorArea.height - 650)/2;
+		System.out.println("Process dialog X: "+ x);
+		System.out.println("Process dialog Y: "+ y);
 		getShell().setLocation(x,y);
 	}
 
