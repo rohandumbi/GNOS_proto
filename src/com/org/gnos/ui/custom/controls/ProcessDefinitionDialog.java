@@ -46,7 +46,7 @@ public class ProcessDefinitionDialog extends Dialog {
 
 	@Override
 	protected Point getInitialSize() {
-		return new Point(1024, 780);
+		return new Point(980, 650);
 	}
 
 	@Override
