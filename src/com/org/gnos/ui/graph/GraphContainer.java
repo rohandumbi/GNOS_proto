@@ -59,7 +59,8 @@ public class GraphContainer extends Composite {
 			GraphNode lastGraphNode = this.rootNode;
 			do{
 				GraphNode newGraphNode = new GraphNode(graph, SWT.NONE, presentProcessNode.getModel().getName());
-				new GraphConnection(graph, ZestStyles.CONNECTIONS_DIRECTED, lastGraphNode,newGraphNode);
+				GraphConnection newGraphConnection = new GraphConnection(graph, ZestStyles.CONNECTIONS_DIRECTED, lastGraphNode,newGraphNode);
+				newGraphConnection.setLineColor(process.getProcessRepresentativeColor());
 				graph.setLayoutAlgorithm(new TreeLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);
 				lastGraphNode = newGraphNode;
 				presentProcessNode = presentProcessNode.getNextNode();
