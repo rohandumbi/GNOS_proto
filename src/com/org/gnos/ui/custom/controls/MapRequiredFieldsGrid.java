@@ -106,6 +106,7 @@ public class MapRequiredFieldsGrid extends Composite {
 	private void createRows(){
 		Composite presentRow = this.compositeGridHeader;//referring to the header as the 1st row when there are no rows inserted yet
 		allRows = new ArrayList<Composite>();
+		Map<String, String> existingMapping = ProjectConfigutration.getInstance().getRequiredFieldMapping();
 		int i=0;
 		for(String requiredFieldName : this.requiredFieldNames){
 			
@@ -125,7 +126,6 @@ public class MapRequiredFieldsGrid extends Composite {
 			Label lblRqrdFieldName = new Label(compositeRow, SWT.NONE);
 			lblRqrdFieldName.setForeground(SWTResourceManager.getColor(0,191,255));
 			lblRqrdFieldName.setBackground(backgroundColor);
-			//lblRqrdFieldName.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 			lblRqrdFieldName.setFont(SWTResourceManager.getFont("Arial", 9, SWT.BOLD));
 			FormData fd_lblRqrdFieldName = new FormData();
 			fd_lblRqrdFieldName.top = new FormAttachment(0);
@@ -135,17 +135,22 @@ public class MapRequiredFieldsGrid extends Composite {
 
 			Combo comboSourceField = new Combo(compositeRow, SWT.NONE);
 			comboSourceField.setItems(this.sourceFieldsComboItems);
-			comboSourceField.select(i);
+			if(existingMapping != null){
+				String mappedField = existingMapping.get(requiredFieldName);
+				for(int j=0; j< this.allSourceFields.size(); j++) {
+					if(mappedField.equalsIgnoreCase(this.allSourceFields.get(j).getName())){
+						comboSourceField.select(j);
+						break;
+					}
+				}
+			} else {
+				comboSourceField.select(i);
+			}
+			
 			FormData fd_comboSourceField = new FormData();
 			fd_comboSourceField.left = new FormAttachment(50, 12);
 			fd_comboSourceField.right = new FormAttachment(80);
 			comboSourceField.setLayoutData(fd_comboSourceField);
-
-			/*Combo comboDatatype = new Combo(compositeRow, SWT.NONE);
-			comboDatatype.setItems(this.dataTypes);
-			FormData fd_comboDatatype = new FormData();
-			fd_comboDatatype.left = new FormAttachment(70, 12);
-			comboDatatype.setLayoutData(fd_comboDatatype);*/
 			
 			compositeRow.setLayoutData(fd_compositeRow);
 			allRows.add(compositeRow);
@@ -189,7 +194,7 @@ public class MapRequiredFieldsGrid extends Composite {
 				MessageDialog.openError(this.parent.getShell(), "GNOS Error", "Please map a source field for the Required Field: " + requiredFieldName);
 				return false;
 			}
-			requiredFieldMapping.put(sourceFieldName, requiredFieldName);
+			requiredFieldMapping.put(requiredFieldName, sourceFieldName);
 		}
 		ProjectConfigutration.getInstance().setRequiredFieldMapping(requiredFieldMapping);
 		return true;

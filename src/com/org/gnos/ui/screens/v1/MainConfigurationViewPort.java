@@ -52,12 +52,6 @@ public class MainConfigurationViewPort extends GnosScreen{
 	}
 	
 	public void loadFieldDatatypeDefinitionScreen(){
-		/*this.setLayout(new FillLayout());
-		this.viewPort = new FieldDatatypeDefinitionScreen(this, SWT.NONE, this.projectModel);
-		this.viewPort.registerEventListener(this);
-		this.layout();*/
-		/*fieldDatatypeDefinitionScreen = new FieldDatatypeDefinitionScreen(this, SWT.NONE, this.projectModel);
-		fieldDatatypeDefinitionScreen.registerEventListener(this);*/
 		if(this.viewPort != null){
 			//this.viewPort.dispose();
 			this.viewPort.setParent(dummyShell);
@@ -69,14 +63,6 @@ public class MainConfigurationViewPort extends GnosScreen{
 	}
 
 	public void loadMapRequiredFieldsScreen(){
-		/*this.viewPort.dispose();
-		this.setLayout(new FillLayout());
-		this.viewPort = new MapRequiredFieldsScreen(this, SWT.NONE, this.projectModel);
-		this.viewPort.registerEventListener(this);
-		this.layout();*/
-		/*mapRequiredFieldsScreen = new MapRequiredFieldsScreen(this, SWT.NONE, this.projectModel);
-		mapRequiredFieldsScreen.registerEventListener(this);*/
-		//this.viewPort.dispose();
 		this.viewPort.setParent(dummyShell);
 		this.viewPort = mapRequiredFieldsScreen;
 		this.viewPort.setParent(this);
@@ -85,14 +71,6 @@ public class MainConfigurationViewPort extends GnosScreen{
 	}
 
 	public void loadExpressionDefinitionScreen(){
-		/*this.viewPort.dispose();
-		this.setLayout(new FillLayout());
-		this.viewPort = new ExpressionDefinitionScreen(this, SWT.NONE, this.projectModel);
-		this.viewPort.registerEventListener(this);
-		this.layout();*/
-		/*expressionDefinitionScreen = new ExpressionDefinitionScreen(this, SWT.NONE, this.projectModel);
-		expressionDefinitionScreen.registerEventListener(this);*/
-		//this.viewPort.dispose();
 		this.viewPort.setParent(dummyShell);
 		this.viewPort = expressionDefinitionScreen;
 		this.viewPort.setParent(this);
@@ -101,14 +79,6 @@ public class MainConfigurationViewPort extends GnosScreen{
 	}
 
 	public void loadModelDefinitionScreen(){
-		/*this.viewPort.dispose();
-		this.setLayout(new FillLayout());
-		this.viewPort = new ModelDefinitionScreen(this, SWT.NONE);
-		this.viewPort.registerEventListener(this);
-		this.layout();*/
-		/*modelDefinitionScreen = new ModelDefinitionScreen(this, SWT.NONE);
-		modelDefinitionScreen.registerEventListener(this);*/
-		//this.viewPort.dispose();
 		this.viewPort.setParent(dummyShell);
 		this.viewPort = modelDefinitionScreen;
 		this.viewPort.setParent(this);
@@ -117,14 +87,6 @@ public class MainConfigurationViewPort extends GnosScreen{
 	}
 
 	public void loadProcessRouteDefinitionScreen(){
-		/*this.viewPort.dispose();
-		this.setLayout(new FillLayout());
-		this.viewPort = new ProcessRouteDefinitionScreen(this, SWT.NONE);
-		this.viewPort.registerEventListener(this);
-		this.layout();*/
-		/*processRouteDefinitionScreen = new ProcessRouteDefinitionScreen(this, SWT.NONE);
-		processRouteDefinitionScreen.registerEventListener(this);*/
-		//this.viewPort.dispose();
 		this.viewPort.setParent(dummyShell);
 		this.viewPort = processRouteDefinitionScreen;
 		this.viewPort.setParent(this);
@@ -133,12 +95,12 @@ public class MainConfigurationViewPort extends GnosScreen{
 	}
 
 	private void datatypeDefinitionComplete(){
-		//ProjectConfigutration.getInstance().saveFieldData();
+		ProjectConfigutration.getInstance().saveFieldData();
 		loadMapRequiredFieldsScreen();
 	}
 	
 	private void mappingRequiredFieldsComplete(){
-		//ProjectConfigutration.getInstance().saveRequiredFieldMappingData();
+		ProjectConfigutration.getInstance().saveRequiredFieldMappingData();
 		loadExpressionDefinitionScreen();
 	}
 	

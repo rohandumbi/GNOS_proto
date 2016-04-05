@@ -114,7 +114,12 @@ public class FieldDatatypeDefinitionGrid extends Composite {
 			
 			Combo comboDatatype = new Combo(compositeRow, SWT.NONE);
 			comboDatatype.setItems(this.dataTypes);
-			comboDatatype.select(0);
+			if(field.getDataType() == Field.TYPE_STRING){
+				comboDatatype.select(1);
+			} else {
+				comboDatatype.select(0);
+			}
+			
 			FormData fd_comboDatatype = new FormData();
 			fd_comboDatatype.left = new FormAttachment(50, 12);
 			fd_comboDatatype.right = new FormAttachment(80);

@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -23,6 +24,9 @@ public class ProjectConfigutration {
 	private List<Field> fields = new ArrayList<Field>();
 	private Map<String, String> requiredFieldMapping = new LinkedHashMap<String, String>();
 	private List<Expression> expressions = new ArrayList<Expression>();
+	
+	private Map<String, String> savedRequiredFieldMapping;
+	
 	private int projectId = -1;
 	
 	public static ProjectConfigutration getInstance() {
@@ -56,7 +60,7 @@ public class ProjectConfigutration {
 		Statement stmt = null;
 		ResultSet rs = null; 
 		Connection conn = DBManager.getConnection();
-		
+		Date currDate = new Date();
 		try {
 			stmt = conn.createStatement();
 			stmt.execute(sql);
@@ -93,7 +97,7 @@ public class ProjectConfigutration {
 			while(rs.next()){
 				requiredFieldMapping.put(rs.getString(1), rs.getString(2));
 			}
-			
+			savedRequiredFieldMapping = requiredFieldMapping;
 		} catch(SQLException e){
 			e.printStackTrace();
 		} finally {
@@ -142,24 +146,34 @@ public class ProjectConfigutration {
 	public void saveFieldData() {
 		
 		Connection conn = DBManager.getConnection();
-		String sql = " insert into fields (project_id, name, data_type) values (?, ?, ?)";
+		String insert_sql = " insert into fields (project_id, name, data_type) values (?, ?, ?)";
+		String update_sql = " update fields set data_type = ?  where id = ? ";
 		PreparedStatement pstmt = null;
+		PreparedStatement pstmt1 = null;
 		ResultSet rs = null; 
 		boolean autoCommit = true;
 
 		try {
 			autoCommit = conn.getAutoCommit();
 			conn.setAutoCommit(false);
-			pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+			pstmt = conn.prepareStatement(insert_sql, Statement.RETURN_GENERATED_KEYS);
+			pstmt1 = conn.prepareStatement(update_sql);
 			
 			for(Field field: fields) {
-				pstmt.setInt(1, projectId);
-				pstmt.setString(2, field.getName());
-				pstmt.setShort(3, field.getDataType());
-				pstmt.executeUpdate();
-				rs = pstmt.getGeneratedKeys();    
-				rs.next();  
-				field.setId(rs.getInt(1));
+				if(field.getId() == -1){
+					pstmt.setInt(1, projectId);
+					pstmt.setString(2, field.getName());
+					pstmt.setShort(3, field.getDataType());
+					pstmt.executeUpdate();
+					rs = pstmt.getGeneratedKeys();    
+					rs.next();  
+					field.setId(rs.getInt(1));
+				} else {
+					pstmt1.setShort(1, field.getDataType());
+					pstmt1.setInt(2, field.getId());
+					pstmt1.executeUpdate();
+				}
+
 			}
 
 			conn.commit();
@@ -182,26 +196,42 @@ public class ProjectConfigutration {
 	public void saveRequiredFieldMappingData() {
 		
 		Connection conn = DBManager.getConnection();
-		String sql = " insert into required_field_mapping (project_id, field_name, mapped_field_name) values (?, ?, ?)";
+		String insert_sql = " insert into required_field_mapping (project_id, field_name, mapped_field_name) values (?, ?, ?)";
+		String update_sql = " update required_field_mapping set mapped_field_name = ? where project_id = ? AND field_name = ? ";
 		PreparedStatement pstmt = null;
 		boolean autoCommit = true;
 
 		try {
 			autoCommit = conn.getAutoCommit();
 			conn.setAutoCommit(false);
-			pstmt = conn.prepareStatement(sql);
-			Set keys = requiredFieldMapping.keySet();
-			Iterator<String> it = keys.iterator();
-			while(it.hasNext()) {
-				String key = it.next();
-				pstmt.setInt(1, projectId);
-				pstmt.setString(2, key);
-				pstmt.setString(3, requiredFieldMapping.get(key));
-				pstmt.executeUpdate();   
+			if(savedRequiredFieldMapping == null || savedRequiredFieldMapping.size() == 0) {
+				pstmt = conn.prepareStatement(insert_sql);
+				Set keys = requiredFieldMapping.keySet();
+				Iterator<String> it = keys.iterator();
+				while(it.hasNext()) {
+					String key = it.next();
+					pstmt.setInt(1, projectId);
+					pstmt.setString(2, key);
+					pstmt.setString(3, requiredFieldMapping.get(key));
+					pstmt.executeUpdate();   
+				}
+			} else {
+				pstmt = conn.prepareStatement(update_sql);
+				Set keys = requiredFieldMapping.keySet();
+				Iterator<String> it = keys.iterator();
+				while(it.hasNext()) {
+					String key = it.next();				
+					pstmt.setString(1, requiredFieldMapping.get(key));
+					pstmt.setInt(2, projectId);
+					pstmt.setString(3, key);
+					
+					pstmt.executeUpdate();   
+				}
 			}
 
+
 			conn.commit();
-			
+			savedRequiredFieldMapping = requiredFieldMapping;
 		} catch(SQLException e){
 			e.printStackTrace();
 		} finally {

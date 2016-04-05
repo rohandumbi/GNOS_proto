@@ -98,7 +98,6 @@ public class FieldDatatypeDefinitionScreen extends GnosScreen {
 		buttonSave.setImage(null);
 		buttonSave.setForeground(SWTResourceManager.getColor(0, 102, 204));
 		buttonSave.setText("SAVE");
-		//int offsetXbuttonSave = -buttonDatatypeDefinition.computeSize(SWT.DEFAULT, SWT.DEFAULT).x / 2;
 		FormData fd_buttonSave = new FormData();
 		fd_buttonSave.right = new FormAttachment(50, 145);
 		fd_buttonSave.left = new FormAttachment(buttonDatatypeDefinition, 5, SWT.RIGHT);
@@ -108,8 +107,6 @@ public class FieldDatatypeDefinitionScreen extends GnosScreen {
 		buttonSave.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				//TODO mapping complete
-				//projectModel.setAllProjectFields(fieldDatatypeDefinitionGrid.getFieldDatatypes());
 				fieldDatatypeDefinitionGrid.setFieldDatatypes();
 			}
 		});
