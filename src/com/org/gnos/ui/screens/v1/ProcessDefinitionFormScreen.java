@@ -19,6 +19,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.ColorDialog;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
@@ -28,6 +29,8 @@ import org.eclipse.wb.swt.SWTResourceManager;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.services.Model;
 import com.org.gnos.services.Models;
+import com.org.gnos.services.ProcessNode;
+import com.org.gnos.services.ProcessRoute;
 import com.org.gnos.ui.custom.controls.GnosScreen;
 
 public class ProcessDefinitionFormScreen extends GnosScreen {
@@ -38,6 +41,7 @@ public class ProcessDefinitionFormScreen extends GnosScreen {
 	private ScrolledComposite scViewportContainer;
 	private String[] sourceFieldsComboItems;
 	private Composite parent;
+	private Label colorLabel;
 
 	public ProcessDefinitionFormScreen(Composite parent0, int style) {
 		super(parent0, style);
@@ -69,7 +73,7 @@ public class ProcessDefinitionFormScreen extends GnosScreen {
 		fd_btnChooseProcessColor.top = new FormAttachment(lblProcessName, 20, SWT.BOTTOM);
 		btnChooseProcessColor.setLayoutData(fd_btnChooseProcessColor);
 
-		final Label colorLabel = new Label(this, SWT.BORDER);
+		this.colorLabel = new Label(this, SWT.BORDER);
 		colorLabel.setText("                              ");
 		colorLabel.setBackground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 		FormData fd_colorLabel = new FormData();
@@ -246,6 +250,25 @@ public class ProcessDefinitionFormScreen extends GnosScreen {
 		Rectangle r = this.scViewportContainer.getClientArea();
 		this.scViewportContainer.setMinSize(this.modelListContainerComposite.computeSize(r.width, SWT.DEFAULT));
 		this.scViewportContainer.setOrigin(this.modelListContainerComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+	}
+	
+	public ProcessRoute getDefinedProcess(){
+		String processName = this.textProcessName.getText();
+		ProcessRoute processRoute = new ProcessRoute(processName);
+		processRoute.setProcessRepresentativeColor(this.colorLabel.getBackground());
+		Control[] definedModelSteps = this.modelListContainerComposite.getChildren();
+		for(Control definedModelStep : definedModelSteps){
+			Composite definedModelStepComposite = (Composite)definedModelStep;
+			Combo modelSelection = (Combo)definedModelStepComposite.getChildren()[1]; //Combo is always 2nd child
+			List<Model> allModels = Models.getAll();
+			ProcessNode processNode = new ProcessNode();
+			int modelSelectionIndex = modelSelection.getSelectionIndex();
+			processNode.setModel(allModels.get(modelSelectionIndex));
+			processNode.setValue(modelSelectionIndex);
+			processRoute.addNode(processNode);
+		}
+		
+		return processRoute;
 	}
 
 	@Override

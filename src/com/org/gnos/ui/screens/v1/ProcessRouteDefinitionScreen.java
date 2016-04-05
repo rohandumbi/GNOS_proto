@@ -2,6 +2,7 @@ package com.org.gnos.ui.screens.v1;
 
 import java.util.List;
 
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -66,7 +67,7 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 	}
 	
 	private ProcessRoute createDummyProcess(){
-		ProcessRoute dummyProcess = new ProcessRoute();
+		ProcessRoute dummyProcess = new ProcessRoute("test_process");
 		List<Model> allModels = Models.getAll();
 		for(Model model: allModels){
 			ProcessNode processNode = new ProcessNode();
@@ -103,8 +104,13 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 				//TODO mapping complete
 				//graphContainerComposite.addProcessToGraph();
 				ProcessDefinitionDialog processDefinitionDialog = new ProcessDefinitionDialog(parent.getShell());
-				processDefinitionDialog.open();
-				ProcessRoute newProcess = createDummyProcess();
+				//processDefinitionDialog.open();
+				ProcessRoute newProcess = new ProcessRoute();
+				if (Window.OK == processDefinitionDialog.open()) {
+					newProcess = processDefinitionDialog.getDefinedProcessRoute();
+				}
+				
+				//ProcessRoute newProcess = createDummyProcess();
 				graphContainerComposite.addProcessToGraph(newProcess);
 			}
 		});

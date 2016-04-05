@@ -10,11 +10,14 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
+import com.org.gnos.services.ProcessRoute;
 import com.org.gnos.ui.screens.v1.ProcessDefinitionFormScreen;
 
 public class ProcessDefinitionDialog extends Dialog {
 
-
+	private ProcessDefinitionFormScreen processDefinitionFormScreen;
+	private ProcessRoute definedProcessRoute;
+	
 	public ProcessDefinitionDialog(Shell parentShell) {
 		super(parentShell);
 		// TODO Auto-generated constructor stub
@@ -24,12 +27,11 @@ public class ProcessDefinitionDialog extends Dialog {
 		Composite container = (Composite) super.createDialogArea(parent);
 		container.getShell().setText("Process Definition Dialog");
 		container.setLayout(new FillLayout());
-		ProcessDefinitionFormScreen processDefinitionFormScreen = new ProcessDefinitionFormScreen(container, SWT.NONE);
+		this.processDefinitionFormScreen = new ProcessDefinitionFormScreen(container, SWT.NONE);
 		this.setDialogLocation();
 		return container;
 	}
 
-	// override method to use "Login" as label for the OK button
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
 		createButton(parent, IDialogConstants.OK_ID, "Create Process", true);
@@ -44,14 +46,9 @@ public class ProcessDefinitionDialog extends Dialog {
 	@Override
 	protected void okPressed() {
 		System.out.println("OK Pressed");
+		this.definedProcessRoute = this.processDefinitionFormScreen.getDefinedProcess();
 		super.okPressed();
 	}
-
-	/*@Override
-	protected void configureShell(Shell shell) {
-		super.configureShell(shell);
-		shell.setText("Process Definition Dialog");
-	}*/
 
 	private void setDialogLocation(){
 		Rectangle monitorArea = getShell().getDisplay().getPrimaryMonitor().getBounds();
@@ -61,6 +58,10 @@ public class ProcessDefinitionDialog extends Dialog {
 		System.out.println("Process dialog X: "+ x);
 		System.out.println("Process dialog Y: "+ y);
 		getShell().setLocation(x,y);
+	}
+	
+	public ProcessRoute getDefinedProcessRoute(){
+		return this.definedProcessRoute;
 	}
 
 
