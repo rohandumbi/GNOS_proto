@@ -148,6 +148,7 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 				}
 				
 				//ProcessRoute newProcess = createDummyProcess();
+				ProcessRoutes.add(newProcess);
 				graphContainerComposite.addProcessToGraph(newProcess);
 				definedProcessListComposite.addProcess(newProcess);
 			}
