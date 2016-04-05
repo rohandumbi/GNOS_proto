@@ -15,6 +15,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import com.org.gnos.core.Field;
+import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.custom.models.ProjectModel;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.services.Model;
@@ -28,8 +30,7 @@ public class ModelDefinitionScreen extends GnosScreen {
 
 	private ModelDefinitionGrid modelDefinitionGrid;
 	private SavedModelsGrid savedModelsGrid;
-	private String[] allHeaders;
-	private ProjectModel projectModel;
+	private List<Field> fields;
 	private List<Model> allDefinedModels;
 	private Composite parent;
 	/**
@@ -37,20 +38,16 @@ public class ModelDefinitionScreen extends GnosScreen {
 	 * @param parent
 	 * @param style
 	 */
-	public ModelDefinitionScreen(Composite parent, int style, ProjectModel projectModel) {
+	public ModelDefinitionScreen(Composite parent, int style) {
 		super(parent, style);
 		setForeground(SWTResourceManager.getColor(30, 144, 255));
 		setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
 		setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		this.parent = parent;
-		this.projectModel = projectModel;
-		this.allHeaders = this.getAllHeaders();
+		this.fields = ProjectConfigutration.getInstance().getFields();
 		this.createContent();
 	}
 	
-	private String[] getAllHeaders(){
-		return this.projectModel.getAllProjectFields();
-	}
 	
 	private void createContent(){
 		setLayout(new FormLayout());
@@ -75,7 +72,7 @@ public class ModelDefinitionScreen extends GnosScreen {
 		labelScreenDescription.setLayoutData(fd_labelScreenDescription);
 		labelScreenDescription.setText("Define your own models. Add filters.");
 		
-		modelDefinitionGrid = new ModelDefinitionGrid(this, SWT.NONE, this.allHeaders);
+		modelDefinitionGrid = new ModelDefinitionGrid(this, SWT.NONE, this.fields);
 		FormData fd_expressionBuilderGrid = new FormData();
 		fd_expressionBuilderGrid.top = new FormAttachment(labelScreenDescription, 6);
 		fd_expressionBuilderGrid.left = new FormAttachment(0, 10);
@@ -184,7 +181,7 @@ public class ModelDefinitionScreen extends GnosScreen {
 		fd_labelSavedExpressions.left = new FormAttachment(0, 10);
 		labelSavedExpressions.setLayoutData(fd_labelSavedExpressions);
 		
-		savedModelsGrid = new SavedModelsGrid(this, SWT.NONE, this.allHeaders);
+		savedModelsGrid = new SavedModelsGrid(this, SWT.NONE, this.fields);
 		FormData fd_savedExpressionsGrid = new FormData();
 		fd_savedExpressionsGrid.top = new FormAttachment(labelSavedExpressions, 6);
 		fd_savedExpressionsGrid.left = new FormAttachment(0, 10);

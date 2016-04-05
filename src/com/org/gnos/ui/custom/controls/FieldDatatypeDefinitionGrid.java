@@ -14,7 +14,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import com.org.gnos.services.csv.ColumnHeader;
+import com.org.gnos.core.Field;
 import com.org.gnos.services.csv.GNOSCSVDataProcessor;
 
 public class FieldDatatypeDefinitionGrid extends Composite {
@@ -24,28 +24,26 @@ public class FieldDatatypeDefinitionGrid extends Composite {
 	 * @param parent
 	 * @param style
 	 */
-	private String[] allSourceFields;
+	private List<Field> allSourceFields;
 	private String[] dataTypes;
 	private Composite compositeGridHeader;
 	private List<Composite> allRows;
 	
-	public FieldDatatypeDefinitionGrid(Composite parent, int style, String[] allSourceFields, String[] dataTypes) {
+	public FieldDatatypeDefinitionGrid(Composite parent, int style, List<Field> allSourceFields, String[] dataTypes) {
 		super(parent, style);
 		this.allSourceFields = allSourceFields;
 		this.dataTypes = dataTypes;
 		this.createContent(parent);
 	}
 	
-	private int getDatatypeCode(String dataType){
-		if(dataType.equalsIgnoreCase("String")){
-			return 1;
-		}else if(dataType.equalsIgnoreCase("Integer")){
-			return 2;
-		}else if(dataType.equalsIgnoreCase("Double")){
-			return 3;
-		}else{
-			return 1;//String by default
-		}
+	private short getDatatypeCode(String dataType){
+		short code = -1;
+		if(dataType.equalsIgnoreCase("Number")){
+			code = Field.TYPE_NUMBER;
+		}else if(dataType.equalsIgnoreCase("Text")){
+			code = Field.TYPE_STRING;
+		} 
+		return code;
 	}
 
 	private void createHeader(){
@@ -86,13 +84,14 @@ public class FieldDatatypeDefinitionGrid extends Composite {
 		Composite presentRow = this.compositeGridHeader;//referring to the header as the 1st row when there are no rows inserted yet
 		allRows = new ArrayList<Composite>();
 		int i=0;
-		for(String columnHeaderName : this.allSourceFields){
+		for(Field field : this.allSourceFields){
 			Composite compositeRow = new Composite(this, SWT.BORDER);
 			Color backgroundColor = SWTResourceManager.getColor(SWT.COLOR_WHITE);
 			if(i%2 != 0){
 				backgroundColor =  SWTResourceManager.getColor(245, 245, 245);
 			}
 			
+			compositeRow.setData(field);
 			compositeRow.setLayout(new FormLayout());
 			compositeRow.setBackground(backgroundColor);
 			FormData fd_compositeRow = new FormData();
@@ -111,7 +110,7 @@ public class FieldDatatypeDefinitionGrid extends Composite {
 			fd_lblSourceFieldName.top = new FormAttachment(0);
 			fd_lblSourceFieldName.left = new FormAttachment(0, 10);
 			lblSourceFieldName.setLayoutData(fd_lblSourceFieldName);
-			lblSourceFieldName.setText(columnHeaderName);
+			lblSourceFieldName.setText(field.getName());
 			
 			Combo comboDatatype = new Combo(compositeRow, SWT.NONE);
 			comboDatatype.setItems(this.dataTypes);
@@ -135,29 +134,6 @@ public class FieldDatatypeDefinitionGrid extends Composite {
 		this.setFieldDatatypes();//setting the data type mapping with default standards
 	}
 	
-	/*public List<ColumnHeader> getFieldDatatypes(){
-		Control[] rowChildren = null;
-		for(int i = 0; i < allRows.size(); i++){
-			rowChildren = allRows.get(i).getChildren();
-			Control compositeFieldName = rowChildren[0];
-			Control compositeDatatype = rowChildren[1];
-			
-			String fieldName = null;
-			String datatypeName = null;
-			
-			if(compositeFieldName instanceof Label){
-				Label labelFieldName = (Label)compositeFieldName;
-				fieldName = labelFieldName.getText();
-			}
-			if(compositeDatatype instanceof Combo){
-				Combo comboDatatype = (Combo)compositeDatatype;
-				datatypeName = comboDatatype.getText();
-			}
-			
-			this.updateSourceFieldWithDatatype(fieldName, datatypeName);
-		}
-		return this.allSourceFields;
-	}*/
 	
 	public void setFieldDatatypes(){
 		Control[] rowChildren = null;
@@ -168,7 +144,7 @@ public class FieldDatatypeDefinitionGrid extends Composite {
 			
 			String fieldName = null;
 			String datatypeName = null;
-			
+			Field field = (Field)allRows.get(i).getData();
 			if(compositeFieldName instanceof Label){
 				Label labelFieldName = (Label)compositeFieldName;
 				fieldName = labelFieldName.getText();
@@ -177,20 +153,10 @@ public class FieldDatatypeDefinitionGrid extends Composite {
 				Combo comboDatatype = (Combo)compositeDatatype;
 				datatypeName = comboDatatype.getText();
 			}
-			
-			this.updateSourceFieldWithDatatype(fieldName, datatypeName);
+			field.setDataType(this.getDatatypeCode(datatypeName));
 		}
 	}
 	
-	private void updateSourceFieldWithDatatype(String sourceFieldName, String datatypeName){
-		/*for( ColumnHeader sourceField : this.allSourceFields){
-			if(sourceField.getName().equals(sourceFieldName)){
-				sourceField.setDataType(this.getDatatypeCode(datatypeName));
-			}
-		}*/
-		GNOSCSVDataProcessor.getInstance().addDataTypeMapping(sourceFieldName, datatypeName);
-	}
-
 	@Override
 	protected void checkSubclass() {
 		// Disable the check that prevents subclassing of SWT components

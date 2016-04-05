@@ -18,7 +18,8 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import com.org.gnos.services.Expression;
+import com.org.gnos.core.Expression;
+import com.org.gnos.core.Field;
 import com.org.gnos.services.Expressions;
 import com.org.gnos.services.Model;
 import com.org.gnos.services.Models;
@@ -30,7 +31,7 @@ public class ModelDefinitionGrid extends Composite {
 	 * @param parent
 	 * @param style
 	 */
-	private String[] allSourceFields;
+	private List<Field> allSourceFields;
 	private Composite compositeGridHeader;
 	private List<Composite> allRows;
 	private List<String> numericSourceFields;
@@ -41,7 +42,7 @@ public class ModelDefinitionGrid extends Composite {
 	private Composite parent;
 	private List<String> presentmodelNames;
 
-	public ModelDefinitionGrid(Composite parent, int style, String[] allSourceFields) {
+	public ModelDefinitionGrid(Composite parent, int style, List<Field> allSourceFields) {
 		super(parent, style);
 		this.parent = parent;
 		//this.requiredFieldNames = requiredFieldNames;

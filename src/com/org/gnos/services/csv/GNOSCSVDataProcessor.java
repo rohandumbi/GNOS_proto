@@ -16,8 +16,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.org.gnos.core.Expression;
+import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.db.DBManager;
-import com.org.gnos.services.Expression;
 import com.org.gnos.services.Expressions;
 import com.org.gnos.services.Operation;
 
@@ -26,11 +27,6 @@ public class GNOSCSVDataProcessor {
 	private final static GNOSCSVDataProcessor instance = new GNOSCSVDataProcessor();
 	private String[] columns = null;
 	private List<String[]> data = new ArrayList<String[]>();
-	
-	//private Map<String, String> requiredFieldMap = new HashMap<String, String>();
-	private Map<String, String> requiredFieldMap = new LinkedHashMap<String, String>();
-	//private Map<String, String> dataTypeMap = new HashMap<String, String>();
-	private Map<String, String> dataTypeMap = new LinkedHashMap<String, String>();
 	
 
 	private Map<String, PitBenchMappingData> pitBenchMapping ;
@@ -63,6 +59,7 @@ public class GNOSCSVDataProcessor {
 	}
 	
 	public void compute() {
+		Map<String, String> requiredFieldMap = ProjectConfigutration.getInstance().getRequiredFieldMapping();
 		computedData = new ArrayList<String[]>();
 		computedColumns = new ArrayList<String>();
 		int tonnesWtIdx = -1;
@@ -78,7 +75,7 @@ public class GNOSCSVDataProcessor {
 			computedColumns.add(expr.getName());
 			String[] dataArr = new String[data.size()];
 			float value = 0;
-			boolean isComplex = expr.isValueType();
+			boolean isComplex = expr.isComplex();
 			boolean isGrade = expr.isGrade();
 			String conditionExpr = expr.getUpdatedCondition();
 			
@@ -125,6 +122,7 @@ public class GNOSCSVDataProcessor {
 	
 	private void parsePitAndBenchData() {
 
+		Map<String, String> requiredFieldMap = ProjectConfigutration.getInstance().getRequiredFieldMapping();
 		pitBenchMapping = new HashMap<String, PitBenchMappingData>();
 		computedColumns.add("pit_no");
 		computedColumns.add("bench_no");
@@ -318,19 +316,6 @@ public class GNOSCSVDataProcessor {
 			}
 		}
 		
-	}
-	
-	
-	public void addRequiredFieldMapping(String requiredField, String mappedTo) {
-		requiredFieldMap.put(requiredField, mappedTo);
-	}
-	
-	public void addDataTypeMapping(String sourceFieldName, String datatypeName) {
-		dataTypeMap.put(sourceFieldName, datatypeName);
-	}
-	
-	public Map getDataTypeMapping() {
-		return dataTypeMap;
 	}
 	
 	public String[] getHeaderColumns() {

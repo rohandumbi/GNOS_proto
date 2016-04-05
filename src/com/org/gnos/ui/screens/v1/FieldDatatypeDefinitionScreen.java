@@ -3,8 +3,6 @@ package com.org.gnos.ui.screens.v1;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FormAttachment;
@@ -15,17 +13,16 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import com.org.gnos.custom.models.ProjectModel;
+import com.org.gnos.core.Field;
+import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.events.GnosEvent;
-import com.org.gnos.services.csv.ColumnHeader;
 import com.org.gnos.ui.custom.controls.FieldDatatypeDefinitionGrid;
 import com.org.gnos.ui.custom.controls.GnosScreen;
 
 public class FieldDatatypeDefinitionScreen extends GnosScreen {
 
-	private String[] allHeaders;
+	private List<Field> fields;
 	private String[] dataTypes;
-	private ProjectModel projectModel;
 	private FieldDatatypeDefinitionGrid fieldDatatypeDefinitionGrid;
 
 	/**
@@ -33,15 +30,13 @@ public class FieldDatatypeDefinitionScreen extends GnosScreen {
 	 * @param parent
 	 * @param style
 	 */
-	public FieldDatatypeDefinitionScreen(Composite parent, int style, ProjectModel projectModel) {
+	public FieldDatatypeDefinitionScreen(Composite parent, int style) {
 		super(parent, style);
 		setForeground(SWTResourceManager.getColor(30, 144, 255));
 		setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
 		setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		this.projectModel = projectModel;
-		this.allHeaders = this.getAllHeaders();
-		System.out.println("Length of all columns: " + this.allHeaders.length);
-		//this.requiredFields = this.getRequiredFieldsFromProperties();
+		this.fields = ProjectConfigutration.getInstance().getFields();
+		System.out.println("Length of all columns: " + this.fields.size());
 		this.dataTypes = new String[]{"Number", "Text"/*, "Double"*/};
 		this.createContent();
 
@@ -70,7 +65,7 @@ public class FieldDatatypeDefinitionScreen extends GnosScreen {
 		labelScreenDescription.setLayoutData(fd_labelScreenDescription);
 		labelScreenDescription.setText("For each field in the system map the datatype.");
 
-		fieldDatatypeDefinitionGrid = new FieldDatatypeDefinitionGrid(this, SWT.NONE, this.allHeaders, this.dataTypes);
+		fieldDatatypeDefinitionGrid = new FieldDatatypeDefinitionGrid(this, SWT.NONE, this.fields, this.dataTypes);
 		FormData fd_fieldDatatypeDefinitionGrid = new FormData();
 		fd_fieldDatatypeDefinitionGrid.top = new FormAttachment(labelScreenDescription, 6);
 		fd_fieldDatatypeDefinitionGrid.left = new FormAttachment(0, 10);
@@ -89,10 +84,7 @@ public class FieldDatatypeDefinitionScreen extends GnosScreen {
 		buttonDatatypeDefinition.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				//TODO mapping complete
-				//projectModel.setAllProjectFields(fieldDatatypeDefinitionGrid.getFieldDatatypes());
 				fieldDatatypeDefinitionGrid.setFieldDatatypes();
-				//System.out.println("After mapping datatype of 3rd row is: " + projectModel.getAllProjectFields().get(2).getDataType());
 				GnosEvent event = new GnosEvent(this, "complete:datatype-defintion");
 				triggerGnosEvent(event);
 			}
@@ -121,14 +113,6 @@ public class FieldDatatypeDefinitionScreen extends GnosScreen {
 				fieldDatatypeDefinitionGrid.setFieldDatatypes();
 			}
 		});
-	}
-
-	/*private void setFieldDatatypes(){
-		fieldDatatypeDefinitionGrid.setFieldDatatypes();
-	}*/
-
-	private String[] getAllHeaders(){
-		return this.projectModel.getAllProjectFields();
 	}
 
 	@Override

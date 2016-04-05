@@ -1,5 +1,8 @@
 package com.org.gnos.ui.screens.v1;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.StatusLineManager;
 import org.eclipse.jface.action.ToolBarManager;
@@ -13,7 +16,9 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 import com.org.gnos.application.GNOSConfig;
-import com.org.gnos.custom.models.ProjectModel;
+import com.org.gnos.core.Field;
+import com.org.gnos.core.ProjectConfigutration;
+import com.org.gnos.db.models.Projects;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.events.GnosEventWithAttributeMap;
 import com.org.gnos.events.interfaces.GnosEventListener;
@@ -68,8 +73,8 @@ public class GNOSApplication extends ApplicationWindow implements GnosEventListe
 		container.layout();
 	}
 	
-	private void loadWorkBenchScreen(ProjectModel projectModel) {
-		workbenchScreen = new WorkbenchScreen(container, SWT.NONE, projectModel);
+	private void loadWorkBenchScreen() {
+		workbenchScreen = new WorkbenchScreen(container, SWT.NONE);
 		workbenchScreen.registerEventListener(this);
 		this.viewPort = workbenchScreen;
 		this.viewPort.setParent(container);
@@ -77,16 +82,21 @@ public class GNOSApplication extends ApplicationWindow implements GnosEventListe
 		container.layout();
 	}
 	
-	private void openProjectConfiguration(GnosEventWithAttributeMap event){
-
-		ProjectModel projectModel = new ProjectModel(event.attributes);
-		
+	private void loadCSVFile(String fileName) {
 		gnosCsvDataProcessor = GNOSCSVDataProcessor.getInstance();
-		gnosCsvDataProcessor.processCsv(event.attributes.get("recordFileName"));
-		
-		projectModel.setAllProjectFields(gnosCsvDataProcessor.getHeaderColumns());
-		loadWorkBenchScreen(projectModel);
+		gnosCsvDataProcessor.processCsv(fileName);
+		String[] columns = gnosCsvDataProcessor.getHeaderColumns();
+		List<Field> fields = new ArrayList<Field>();
+		for(int i=0;i < columns.length; i++ ){
+			Field  field = new Field(columns[i]);
+			fields.add(field);
+		}
+		ProjectConfigutration.getInstance().setFields(fields);
 	}
+	private void openProjectConfiguration(){
+		loadWorkBenchScreen();
+	}
+	
 	
 	/**
 	 * Create the actions.
@@ -151,12 +161,17 @@ public class GNOSApplication extends ApplicationWindow implements GnosEventListe
 
 	@Override
 	public void onGnosEventFired(GnosEvent e) {
-		if(e.eventName == "homeTab:new-project-created"){
+		if(e.eventName == "project:created") {			
 			GnosEventWithAttributeMap event = (GnosEventWithAttributeMap)e;
-			openProjectConfiguration(event);
-		} else if(e.eventName == "createNewProjectScreen:upload-records-complete") {
+			String fileName = event.attributes.get("recordFileName");
+			loadCSVFile(fileName);
+			ProjectConfigutration.getInstance().setProjectId(Integer.parseInt(event.attributes.get("projectId")));
+			openProjectConfiguration();
+		} else if(e.eventName == "project:opened") {
 			GnosEventWithAttributeMap event = (GnosEventWithAttributeMap)e;
-			openProjectConfiguration(event);
+			int projectId = Integer.parseInt(event.attributes.get("projectId"));
+			ProjectConfigutration.getInstance().load(projectId);
+			openProjectConfiguration();
 		}
 
 	}

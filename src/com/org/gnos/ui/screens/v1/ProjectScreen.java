@@ -1,5 +1,6 @@
 package com.org.gnos.ui.screens.v1;
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
@@ -15,7 +16,9 @@ import org.eclipse.swt.widgets.Label;
 import com.org.gnos.db.models.Project;
 import com.org.gnos.db.models.Projects;
 import com.org.gnos.events.GnosEvent;
+import com.org.gnos.events.GnosEventWithAttributeMap;
 import com.org.gnos.ui.custom.controls.GnosScreen;
+import com.org.gnos.utilities.ClickBehavior;
 import com.org.gnos.utilities.SWTResourceManager;
 
 public class ProjectScreen extends GnosScreen {
@@ -55,6 +58,7 @@ public class ProjectScreen extends GnosScreen {
 		
 
 		List<Project> projects = Projects.getAll();
+		final Object me = this;
 		CLabel lastLabel = labelProject;
 		for(int i=0; i< projects.size(); i++){
 			CLabel labelProject1 = new CLabel(this, SWT.NONE);
@@ -68,6 +72,19 @@ public class ProjectScreen extends GnosScreen {
 			fd_labelProject1.left = new FormAttachment(0, 10);
 			labelProject1.setLayoutData(fd_labelProject1);
 			labelProject1.setText(projects.get(i).getName());
+			final int projectId = projects.get(i).getId();
+			labelProject1.addMouseListener(new ClickBehavior(new Runnable(){
+				@Override
+				public void run() {
+					HashMap<String, String> attributes = new HashMap<String, String>();
+					
+					attributes.put("projectId", ""+projectId);
+					GnosEventWithAttributeMap event = new GnosEventWithAttributeMap(me, "project:opened", attributes);
+
+					fireChildEvent(event);
+					System.out.println("Got the click...");
+				}
+			}));
 			lastLabel = labelProject1;
 		}
 
@@ -101,6 +118,7 @@ public class ProjectScreen extends GnosScreen {
 	public void onGnosEventFired(GnosEvent e) {
 		if(e.eventName == "createNewProjectScreen:upload-records-complete") {
 			System.out.println("New project event fired");
+			e.eventName = "project:created";
 			fireChildEvent(e);
 		}
 		

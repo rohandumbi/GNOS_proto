@@ -25,7 +25,8 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import com.org.gnos.services.Expression;
+import com.org.gnos.core.Expression;
+import com.org.gnos.core.Field;
 import com.org.gnos.services.Expressions;
 import com.org.gnos.services.Operation;
 import com.org.gnos.services.csv.GNOSCSVDataProcessor;
@@ -37,7 +38,7 @@ public class ExpressionBuilderGrid extends Composite {
 	 * @param parent
 	 * @param style
 	 */
-	private String[] allSourceFields;
+	private List<Field> allSourceFields;
 	private Composite compositeGridHeader;
 	private List<Composite> allRows;
 	private List<String> numericSourceFields;
@@ -48,7 +49,7 @@ public class ExpressionBuilderGrid extends Composite {
 	private Composite parent;
 	private List<String> presentExpressionNames;
 
-	public ExpressionBuilderGrid(Composite parent, int style, String[] allSourceFields) {
+	public ExpressionBuilderGrid(Composite parent, int style, List<Field> allSourceFields) {
 		super(parent, style);
 		this.parent = parent;
 		//this.requiredFieldNames = requiredFieldNames;
@@ -93,18 +94,11 @@ public class ExpressionBuilderGrid extends Composite {
 	}*/
 	private String[] getSourceFieldsComboItems(){
 		int i = 0;
-		int sourceFieldSize = this.allSourceFields.length;
+		int sourceFieldSize = this.allSourceFields.size();
 		this.numericSourceFields = new ArrayList<String>();
-		Map dataTypeMap = GNOSCSVDataProcessor.getInstance().getDataTypeMapping();
-		//Set<String> keys = dataTypeMap.entrySet();
-		Set<String> keys = dataTypeMap.keySet();
-		Iterator<String> it = keys.iterator();
-		while(it.hasNext()){
-			String key = it.next();
-			String value = (String)dataTypeMap.get(key);
-
-			if(!"Text".equalsIgnoreCase(value)){
-				this.numericSourceFields.add(key);
+		for(Field field: this.allSourceFields){
+			if(field.getDataType() == Field.TYPE_NUMBER){
+				this.numericSourceFields.add(field.getName());
 			}		
 		}
 		this.sourceFieldsComboItems = new String[this.numericSourceFields.size()];
@@ -322,13 +316,7 @@ public class ExpressionBuilderGrid extends Composite {
 				toggleExpressionType(compositeRow, isSelected);
 			}
 		});
-
-		/*GnosConditionCellComposite gnosExpressionComposite = new GnosConditionCellComposite(compositeRow, SWT.NONE, this.allSourceFields);
-		FormData fd_gnosExpressionComposite = new FormData();
-		fd_gnosExpressionComposite.left = new FormAttachment(62, 2);
-		fd_gnosExpressionComposite.right = new FormAttachment(100);
-		gnosExpressionComposite.setLayoutData(fd_gnosExpressionComposite);*/
-
+		
 		Text textExpression = new Text(compositeRow, SWT.BORDER);
 		FormData fd_textExpression = new FormData();
 		fd_textExpression.left = new FormAttachment(62, 2);
@@ -377,7 +365,6 @@ public class ExpressionBuilderGrid extends Composite {
 			Expression expression= null;
 
 			Control controlExpressionValue = null;
-			//GnosConditionCellComposite conditionComposite = null;
 
 			Text textCondition = null;
 
@@ -440,8 +427,8 @@ public class ExpressionBuilderGrid extends Composite {
 					 * of left/right operand by comparing the text value with all column names.
 					 * Some complexity may be reduceable. Later!!!
 					 */
-					for (int j=0; j<this.allSourceFields.length; j++) {
-						String columnName = this.allSourceFields[j];
+					for (int j=0; j<this.allSourceFields.size(); j++) {
+						String columnName = this.allSourceFields.get(j).getName();
 
 						if (columnName.equalsIgnoreCase(leftOperandValue)) {
 							leftOperandIndex = j;
@@ -449,8 +436,8 @@ public class ExpressionBuilderGrid extends Composite {
 						}
 					}
 
-					for (int k=0; k<this.allSourceFields.length; k++) {
-						String columnName = this.allSourceFields[k];
+					for (int k=0; k<this.allSourceFields.size(); k++) {
+						String columnName = this.allSourceFields.get(k).getName();
 
 						if (columnName.equalsIgnoreCase(rightOperandValue)) {
 							rightOperandIndex = k;
@@ -477,8 +464,8 @@ public class ExpressionBuilderGrid extends Composite {
 					Combo sourceField = (Combo)compositeExpressionValue.getChildren()[0];
 					expressionValue = sourceField.getText();
 					int index = -1;
-					for (int j=0; j<this.allSourceFields.length; j++) {
-						String columnName = this.allSourceFields[j];
+					for (int j=0; j<this.allSourceFields.size(); j++) {
+						String columnName = this.allSourceFields.get(j).getName();
 
 						if (columnName.equalsIgnoreCase(expressionValue)) {
 							index = j;
@@ -495,7 +482,7 @@ public class ExpressionBuilderGrid extends Composite {
 			}
 
 			expression.setGrade(isGrade);
-			expression.setValueType(isComplex);
+			expression.setComplex(isComplex);
 			//List<Filter> filters = conditionComposite.getExpressionFilters();
 			String condition = textCondition.getText();
 			/*if(condition == null){

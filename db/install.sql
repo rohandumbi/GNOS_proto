@@ -4,18 +4,29 @@ CREATE TABLE project (
    id INT NOT NULL AUTO_INCREMENT,
    name VARCHAR(100) NOT NULL,
    description VARCHAR(400),
+   fileName VARCHAR(200) NOT NULL,
    created_date	DATETIME,
    modified_date DATETIME,
    PRIMARY KEY ( id )
 );
 
-DROP TABLE IF EXISTS data_columns;
+DROP TABLE IF EXISTS fields;
 
-CREATE TABLE data_columns(
+CREATE TABLE fields(
    id INT NOT NULL AUTO_INCREMENT,
    project_id INT NOT NULL,
    name VARCHAR(100) NOT NULL,
+   data_type TINYINT,
    PRIMARY KEY ( id )
+);
+
+DROP TABLE IF EXISTS required_field_mapping;
+
+CREATE TABLE required_field_mapping(
+   project_id INT NOT NULL,
+   field_name VARCHAR(100) NOT NULL,
+   mapped_field_name VARCHAR(100) NOT NULL,
+   PRIMARY KEY ( project_id, field_name )
 );
 
 DROP TABLE IF EXISTS pit;

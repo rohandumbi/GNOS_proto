@@ -110,7 +110,9 @@ public class CreateNewProjectScreen extends Composite implements GnosEventGenera
 				attributes.put("projectDescription", textDescription.getText());
 				attributes.put("recordFileName", csvFileName);
 				Project project = new Project(textProjectName.getText(), textDescription.getText());
+				project.setFileName(csvFileName);
 				Projects.add(project);
+				attributes.put("projectId", ""+project.getId());
 				GnosEventWithAttributeMap event = new GnosEventWithAttributeMap(this, "createNewProjectScreen:upload-records-complete", attributes);
 				if(csvFileName != null){
 					//uploadFileToDB(csvFileName);

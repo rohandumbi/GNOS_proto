@@ -31,7 +31,7 @@ public class ProjectTabItem extends GnosCTabItem implements GnosEventGenerator,G
 		this.setFont(SWTResourceManager.getFont("Arial", 12, SWT.NORMAL));
 		this.setText(this.projectName.toUpperCase());
 		//this.setControl(new ProjectWorkbenchScreen(parent, SWT.NONE));
-		this.setControl(new WorkbenchScreen(parent, SWT.NONE, this.projectModel));
+		this.setControl(new WorkbenchScreen(parent, SWT.NONE));
 	}
 	protected void checkSubclass() {
 		// Disable the check that prevents subclassing of SWT components

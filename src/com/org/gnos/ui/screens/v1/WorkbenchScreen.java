@@ -33,15 +33,13 @@ public class WorkbenchScreen extends GnosScreen {
 	private GnosConfigurationStepLabel gnosStepDefineExpressionsLabel;
 	private GnosConfigurationStepLabel gnosStepModelDefinitionLabel;
 	private GnosConfigurationStepLabel gnosStepProcessRouteDefinitionLabel;
-	private ProjectModel projectModel;
 	private ScrolledComposite scViewPortContainer;
 	private MainConfigurationViewPort mainConfigurationViewPort;
 
 
 	public CLabel labelWorkbenchHeader;
-	public WorkbenchScreen(Composite parent, int style, ProjectModel projectModel){
+	public WorkbenchScreen(Composite parent, int style){
 		super(parent, style);
-		this.projectModel = projectModel;
 		setFont(SWTResourceManager.getFont("Arial", 11, SWT.BOLD));
 		setToolTipText("");
 		setBackground(SWTResourceManager.getColor(255, 255, 255));
@@ -125,7 +123,7 @@ public class WorkbenchScreen extends GnosScreen {
 		fd_scViewPortContainer.top = new FormAttachment(labelWorkbenchHeader, 6);
 		fd_scViewPortContainer.left = new FormAttachment(label, 6);
 
-		this.mainConfigurationViewPort = new MainConfigurationViewPort(this.scViewPortContainer, SWT.BORDER, this.projectModel);
+		this.mainConfigurationViewPort = new MainConfigurationViewPort(this.scViewPortContainer, SWT.BORDER);
 		this.mainConfigurationViewPort.registerEventListener(this);
 		this.mainConfigurationViewPort.loadFieldDatatypeDefinitionScreen();
 

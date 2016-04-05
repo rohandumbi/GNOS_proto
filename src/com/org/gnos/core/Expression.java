@@ -1,21 +1,22 @@
-package com.org.gnos.services;
+package com.org.gnos.core;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import com.org.gnos.services.Operation;
 import com.org.gnos.services.csv.GNOSCSVDataProcessor;
 
 public class Expression {
 	
-	int id;
-	String name;
-	boolean grade;
-	boolean valueType;
-	int value;
-	Operation operation = null;
-	String condition = null;
-	String updatedCondition = null;
-	List conditionColumns = new ArrayList<Integer>();
+	private int id;
+	private String name;
+	private boolean grade;
+	private boolean isComplex;
+	private int value;
+	private Operation operation = null;
+	private String condition = null;
+	private String updatedCondition = null;
+	private List conditionColumns = new ArrayList<Integer>();
 	
 	public Expression(String name) {
 		super();
@@ -48,14 +49,14 @@ public class Expression {
 		return name;
 	}
 	
-	public boolean isValueType() {
-		return valueType;
+	public boolean isComplex() {
+		return isComplex;
 	}
 
-	public void setValueType(boolean valueType) {
-		this.valueType = valueType;
+	public void setComplex(boolean isComplex) {
+		this.isComplex = isComplex;
 	}
-	
+
 	public boolean isGrade() {
 		return grade;
 	}

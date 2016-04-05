@@ -17,9 +17,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import com.org.gnos.core.Expression;
+import com.org.gnos.core.Field;
+import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.custom.models.ProjectModel;
 import com.org.gnos.events.GnosEvent;
-import com.org.gnos.services.Expression;
 import com.org.gnos.services.Expressions;
 import com.org.gnos.services.csv.ColumnHeader;
 import com.org.gnos.services.csv.GNOSCSVDataProcessor;
@@ -31,8 +33,7 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 
 	private ExpressionBuilderGrid expressionBuilderGrid;
 	private SavedExpressionsGrid savedExpressionsGrid;
-	private String[] allHeaders;
-	private ProjectModel projectModel;
+	private List<Field> fields;
 	private List<Expression> allDefinedExpressions;
 	private Composite parent;
 	/**
@@ -40,20 +41,16 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 	 * @param parent
 	 * @param style
 	 */
-	public ExpressionDefinitionScreen(Composite parent, int style, ProjectModel projectModel) {
+	public ExpressionDefinitionScreen(Composite parent, int style) {
 		super(parent, style);
 		setForeground(SWTResourceManager.getColor(30, 144, 255));
 		setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
 		setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		this.parent = parent;
-		this.projectModel = projectModel;
-		this.allHeaders = this.getAllHeaders();
+		this.fields = ProjectConfigutration.getInstance().getFields();
 		this.createContent();
 	}
 	
-	private String[] getAllHeaders(){
-		return this.projectModel.getAllProjectFields();
-	}
 	
 	private void createContent(){
 		setLayout(new FormLayout());
@@ -78,7 +75,7 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 		labelScreenDescription.setLayoutData(fd_labelScreenDescription);
 		labelScreenDescription.setText("Define your own expressions to be used. Add filters.");
 		
-		expressionBuilderGrid = new ExpressionBuilderGrid(this, SWT.NONE, this.allHeaders);
+		expressionBuilderGrid = new ExpressionBuilderGrid(this, SWT.NONE, this.fields);
 		FormData fd_expressionBuilderGrid = new FormData();
 		fd_expressionBuilderGrid.top = new FormAttachment(labelScreenDescription, 6);
 		fd_expressionBuilderGrid.left = new FormAttachment(0, 10);
@@ -187,7 +184,7 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 		fd_labelSavedExpressions.left = new FormAttachment(0, 10);
 		labelSavedExpressions.setLayoutData(fd_labelSavedExpressions);
 		
-		savedExpressionsGrid = new SavedExpressionsGrid(this, SWT.NONE, this.allHeaders);
+		savedExpressionsGrid = new SavedExpressionsGrid(this, SWT.NONE, this.fields);
 		FormData fd_savedExpressionsGrid = new FormData();
 		fd_savedExpressionsGrid.top = new FormAttachment(labelSavedExpressions, 6);
 		fd_savedExpressionsGrid.left = new FormAttachment(0, 10);

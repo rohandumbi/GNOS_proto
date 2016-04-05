@@ -14,32 +14,29 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.application.GNOSConfig;
-import com.org.gnos.custom.models.ProjectModel;
+import com.org.gnos.core.Field;
+import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.events.GnosEvent;
-import com.org.gnos.services.csv.ColumnHeader;
 import com.org.gnos.ui.custom.controls.GnosScreen;
 import com.org.gnos.ui.custom.controls.MapRequiredFieldsGrid;
 
 public class MapRequiredFieldsScreen extends GnosScreen {
 
-	private String[] allHeaders;
+	private List<Field> allHeaders;
 	private String[] requiredFields;
-	//private String[] dataTypes;
-	private ProjectModel projectModel;
 	private MapRequiredFieldsGrid mapRequiredFieldsGrid;
 	/**
 	 * Create the composite.
 	 * @param parent
 	 * @param style
 	 */
-	public MapRequiredFieldsScreen(Composite parent, int style, ProjectModel projectModel) {
+	public MapRequiredFieldsScreen(Composite parent, int style) {
 		super(parent, style);
 		setForeground(SWTResourceManager.getColor(30, 144, 255));
 		setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
 		setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		this.projectModel = projectModel;
-		this.allHeaders = this.getAllHeaders();
-		System.out.println("Length of all columns: " + this.allHeaders.length);
+		this.allHeaders = ProjectConfigutration.getInstance().getFields();
+		System.out.println("Length of all columns: " + this.allHeaders.size());
 		this.requiredFields = this.getRequiredFieldsFromProperties();
 		//this.dataTypes = new String[]{"String", "Integer", "Double"};
 		System.out.println("Length of required columns: " + this.requiredFields.length);
@@ -49,10 +46,6 @@ public class MapRequiredFieldsScreen extends GnosScreen {
 	private String[] getRequiredFieldsFromProperties(){
 		String[] requiredFields = GNOSConfig.get("fields.required").split("#");
 		return requiredFields;
-	}
-	
-	private String[] getAllHeaders(){
-		return this.projectModel.getAllProjectFields();
 	}
 	
 	private void createContent(){
@@ -78,7 +71,7 @@ public class MapRequiredFieldsScreen extends GnosScreen {
 		labelScreenDescription.setLayoutData(fd_labelScreenDescription);
 		labelScreenDescription.setText("For each required field in the system map your custom field and also specify its datatype.");
 		
-		mapRequiredFieldsGrid = new MapRequiredFieldsGrid(this, SWT.NONE, this.requiredFields, this.allHeaders/*, this.dataTypes*/);
+		mapRequiredFieldsGrid = new MapRequiredFieldsGrid(this, SWT.NONE, this.requiredFields, this.allHeaders);
 		FormData fd_mapRequiredFieldsGrid = new FormData();
 		fd_mapRequiredFieldsGrid.top = new FormAttachment(labelScreenDescription, 6);
 		fd_mapRequiredFieldsGrid.left = new FormAttachment(0, 10);

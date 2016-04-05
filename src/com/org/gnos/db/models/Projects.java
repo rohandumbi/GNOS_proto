@@ -16,6 +16,7 @@ import com.org.gnos.db.DBManager;
 public class Projects {
 
 	private static List<Project> projects ;
+	private static Project activeProject;
 	
 	public static List<Project> getAll() {
 		
@@ -35,7 +36,7 @@ public class Projects {
 			rs = stmt.getResultSet();
 			Project project = null;
 			while(rs.next()){
-				project = new Project(rs.getInt(1), rs.getString(2), rs.getString(3), (Date)rs.getTimestamp(4), (Date)rs.getTimestamp(5));
+				project = new Project(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), (Date)rs.getTimestamp(5), (Date)rs.getTimestamp(6));
 				projects.add(project);
 			}
 			
@@ -57,7 +58,7 @@ public class Projects {
 	public static boolean add(Project project){
 		
 		Connection conn = DBManager.getConnection();
-		String sql = "insert into project (name, description, created_date, modified_date) values (?, ?, ?, ?)";
+		String sql = "insert into project (name, description, fileName, created_date, modified_date) values (?, ?, ?, ?,?)";
 		PreparedStatement pstmt = null;
 		ResultSet rs = null; 
 
@@ -65,8 +66,9 @@ public class Projects {
 			pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 			pstmt.setString(1, project.getName());
 			pstmt.setString(2, project.getDesc());
-			pstmt.setTimestamp(3, new Timestamp(project.getCreatedDate().getTime()));
-			pstmt.setTimestamp(4, new Timestamp(project.getModifiedDate().getTime()));
+			pstmt.setString(3, project.getFileName());
+			pstmt.setTimestamp(4, new Timestamp(project.getCreatedDate().getTime()));
+			pstmt.setTimestamp(5, new Timestamp(project.getModifiedDate().getTime()));
 			pstmt.executeUpdate();
 			rs = pstmt.getGeneratedKeys();    
 			rs.next();  
@@ -85,4 +87,13 @@ public class Projects {
 		}
 		return true;
 	}
+
+	public static Project getActiveProject() {
+		return activeProject;
+	}
+
+	public static void setActiveProject(Project activeProject) {
+		Projects.activeProject = activeProject;
+	}
+	
 }

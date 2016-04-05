@@ -9,7 +9,7 @@ public class Project {
 	private String desc;
 	private Date createdDate;
 	private Date modifiedDate;
-	
+	private String fileName;
 	
 	public Project(String name, String desc) {
 		super();
@@ -23,11 +23,12 @@ public class Project {
 	}
 	
 	
-	public Project(int id, String name, String desc, Date createdDate, Date modifiedDate) {
+	public Project(int id, String name, String desc, String fileName, Date createdDate, Date modifiedDate) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.desc = desc;
+		this.fileName = fileName;
 		this.createdDate = createdDate;
 		this.modifiedDate = modifiedDate;
 	}
@@ -59,6 +60,12 @@ public class Project {
 	}
 	public void setModifiedDate(Date modifiedDate) {
 		this.modifiedDate = modifiedDate;
+	}
+	public String getFileName() {
+		return fileName;
+	}
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
 	}
 	
 	

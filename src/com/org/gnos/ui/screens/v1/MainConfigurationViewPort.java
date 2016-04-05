@@ -5,6 +5,7 @@ import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
+import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.custom.models.ProjectModel;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.ui.custom.controls.GnosScreen;
@@ -16,7 +17,6 @@ public class MainConfigurationViewPort extends GnosScreen{
 	 * @param parent
 	 * @param style
 	 */
-	private ProjectModel projectModel;
 	private GnosScreen viewPort;
 	private StackLayout stackLayout;
 	private FieldDatatypeDefinitionScreen fieldDatatypeDefinitionScreen;
@@ -27,25 +27,24 @@ public class MainConfigurationViewPort extends GnosScreen{
 	private Shell dummyShell;
 	
 	//private Layout mainLayout;
-	public MainConfigurationViewPort(Composite parent, int style, ProjectModel projectModel){
+	public MainConfigurationViewPort(Composite parent, int style){
 		super(parent, style);
-		this.projectModel = projectModel;
 		this.stackLayout = new StackLayout();
 		this.setLayout(stackLayout);
 		this.dummyShell = new Shell();
 		//this.parent = parent;
 		//this.loadFieldDatatypeDefinitionScreen();
 		//this.setMinSize(this.viewPort.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-		fieldDatatypeDefinitionScreen = new FieldDatatypeDefinitionScreen(this.dummyShell, SWT.NONE, this.projectModel);
+		fieldDatatypeDefinitionScreen = new FieldDatatypeDefinitionScreen(this.dummyShell, SWT.NONE);
 		fieldDatatypeDefinitionScreen.registerEventListener(this);
 		
-		mapRequiredFieldsScreen = new MapRequiredFieldsScreen(this.dummyShell, SWT.NONE, this.projectModel);
+		mapRequiredFieldsScreen = new MapRequiredFieldsScreen(this.dummyShell, SWT.NONE);
 		mapRequiredFieldsScreen.registerEventListener(this);
 		
-		expressionDefinitionScreen = new ExpressionDefinitionScreen(this.dummyShell, SWT.NONE, this.projectModel);
+		expressionDefinitionScreen = new ExpressionDefinitionScreen(this.dummyShell, SWT.NONE);
 		expressionDefinitionScreen.registerEventListener(this);
 		
-		modelDefinitionScreen = new ModelDefinitionScreen(this.dummyShell, SWT.NONE, this.projectModel);
+		modelDefinitionScreen = new ModelDefinitionScreen(this.dummyShell, SWT.NONE);
 		modelDefinitionScreen.registerEventListener(this);
 		
 		processRouteDefinitionScreen = new ProcessRouteDefinitionScreen(this.dummyShell, SWT.NONE);
@@ -134,14 +133,17 @@ public class MainConfigurationViewPort extends GnosScreen{
 	}
 
 	private void datatypeDefinitionComplete(){
+		//ProjectConfigutration.getInstance().saveFieldData();
 		loadMapRequiredFieldsScreen();
 	}
 	
 	private void mappingRequiredFieldsComplete(){
+		//ProjectConfigutration.getInstance().saveRequiredFieldMappingData();
 		loadExpressionDefinitionScreen();
 	}
 	
 	private void expressionDefinitionComplete(){
+		//ProjectConfigutration.getInstance().saveExpressionData();
 		loadModelDefinitionScreen();
 	}
 	

@@ -1,6 +1,7 @@
 package com.org.gnos.ui.custom.controls;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -23,8 +24,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.services.Filter;
-import com.org.gnos.services.csv.ColumnHeader;
-import com.org.gnos.services.csv.GNOSCSVDataProcessor;
 
 public class GnosConditionCellComposite extends Composite {
 
@@ -60,7 +59,7 @@ public class GnosConditionCellComposite extends Composite {
 	}
 	
 	private boolean isNumeric(String field){
-		Map<String, String> dataTypeMap = GNOSCSVDataProcessor.getInstance().getDataTypeMapping();
+		Map<String, String> dataTypeMap = new HashMap<>();//GNOSCSVDataProcessor.getInstance().getDataTypeMapping();
 		Set<String> keys = dataTypeMap.keySet();
 		Iterator<String> it = keys.iterator();
 		while(it.hasNext()){
