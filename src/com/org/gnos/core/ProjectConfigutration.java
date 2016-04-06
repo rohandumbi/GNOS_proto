@@ -249,7 +249,8 @@ public class ProjectConfigutration {
 	public void saveExpressionData() {
 		
 		Connection conn = DBManager.getConnection();
-		String sql = " insert into expressions (project_id, name, grade, value_type, value, filter_str) values (?, ?, ?, ?, ?, ?)";
+		String insert_sql = " insert into expressions (project_id, name, grade, value_type, value, filter_str) values (?, ?, ?, ?, ?, ?)";
+		String update_sql = " update expressions set grade=?,  value_type = ?, value = ?  filter_str = ? where id = ?";
 		PreparedStatement pstmt = null;
 		ResultSet rs = null; 
 		boolean autoCommit = true;
@@ -257,7 +258,7 @@ public class ProjectConfigutration {
 		try {
 			autoCommit = conn.getAutoCommit();
 			conn.setAutoCommit(false);
-			pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+			pstmt = conn.prepareStatement(insert_sql, Statement.RETURN_GENERATED_KEYS);
 			
 			for(Expression expression: expressions) {
 				pstmt.setInt(1, projectId);

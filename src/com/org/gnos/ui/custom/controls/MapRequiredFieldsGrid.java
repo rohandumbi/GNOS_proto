@@ -135,7 +135,7 @@ public class MapRequiredFieldsGrid extends Composite {
 
 			Combo comboSourceField = new Combo(compositeRow, SWT.NONE);
 			comboSourceField.setItems(this.sourceFieldsComboItems);
-			if(existingMapping != null){
+			if(existingMapping != null && existingMapping.size()> 0){
 				String mappedField = existingMapping.get(requiredFieldName);
 				for(int j=0; j< this.allSourceFields.size(); j++) {
 					if(mappedField.equalsIgnoreCase(this.allSourceFields.get(j).getName())){
