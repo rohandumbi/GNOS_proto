@@ -24,6 +24,7 @@ public class MainConfigurationViewPort extends GnosScreen{
 	private ExpressionDefinitionScreen expressionDefinitionScreen;
 	private ModelDefinitionScreen modelDefinitionScreen;
 	private ProcessRouteDefinitionScreen processRouteDefinitionScreen;
+	private PitGroupDefinitionScreen pitGroupDefinitionScreen;
 	private Shell dummyShell;
 	
 	//private Layout mainLayout;
@@ -49,6 +50,9 @@ public class MainConfigurationViewPort extends GnosScreen{
 		
 		processRouteDefinitionScreen = new ProcessRouteDefinitionScreen(this.dummyShell, SWT.NONE);
 		processRouteDefinitionScreen.registerEventListener(this);
+		
+		pitGroupDefinitionScreen = new PitGroupDefinitionScreen(this.dummyShell, SWT.NONE);
+		pitGroupDefinitionScreen.registerEventListener(this);
 	}
 	
 	public void loadFieldDatatypeDefinitionScreen(){
@@ -93,6 +97,14 @@ public class MainConfigurationViewPort extends GnosScreen{
 		this.stackLayout.topControl = processRouteDefinitionScreen;
 		this.layout();
 	}
+	
+	public void loadPitGroupDefinitionScreen(){
+		this.viewPort.setParent(dummyShell);
+		this.viewPort = pitGroupDefinitionScreen;
+		this.viewPort.setParent(this);
+		this.stackLayout.topControl = pitGroupDefinitionScreen;
+		this.layout();
+	}
 
 	private void datatypeDefinitionComplete(){
 		ProjectConfigutration.getInstance().saveFieldData();
@@ -115,6 +127,7 @@ public class MainConfigurationViewPort extends GnosScreen{
 	
 	private void processRouteDefinitionComplete(){
 		//No-Op for the time being
+		loadPitGroupDefinitionScreen();
 	}
 	
 	@Override

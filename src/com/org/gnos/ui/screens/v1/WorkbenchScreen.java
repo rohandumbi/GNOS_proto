@@ -33,6 +33,7 @@ public class WorkbenchScreen extends GnosScreen {
 	private GnosConfigurationStepLabel gnosStepDefineExpressionsLabel;
 	private GnosConfigurationStepLabel gnosStepModelDefinitionLabel;
 	private GnosConfigurationStepLabel gnosStepProcessRouteDefinitionLabel;
+	private GnosConfigurationStepLabel gnosStepPitGroupDefinitionLabel;
 	private ScrolledComposite scViewPortContainer;
 	private MainConfigurationViewPort mainConfigurationViewPort;
 
@@ -108,12 +109,21 @@ public class WorkbenchScreen extends GnosScreen {
 
 		gnosStepProcessRouteDefinitionLabel = new GnosConfigurationStepLabel(this, SWT.NONE, "Process Route Definition");
 		FormData fd_gnosStepProcessRouteDefinitionLabel = new FormData();
-		fd_gnosStepProcessRouteDefinitionLabel.bottom = new FormAttachment(gnosStepDefineExpressionsLabel, 80, SWT.BOTTOM);
+		fd_gnosStepProcessRouteDefinitionLabel.bottom = new FormAttachment(gnosStepModelDefinitionLabel, 40, SWT.BOTTOM);
 		fd_gnosStepProcessRouteDefinitionLabel.right = new FormAttachment(label, -6);
-		fd_gnosStepProcessRouteDefinitionLabel.top = new FormAttachment(gnosStepDefineExpressionsLabel, 40);
+		fd_gnosStepProcessRouteDefinitionLabel.top = new FormAttachment(gnosStepModelDefinitionLabel);
 		fd_gnosStepProcessRouteDefinitionLabel.left = new FormAttachment(gnosStepMapRequiredFieldsLabel, 0, SWT.LEFT);
 		gnosStepProcessRouteDefinitionLabel.setLayoutData(fd_gnosStepProcessRouteDefinitionLabel);
 		gnosStepProcessRouteDefinitionLabel.registerEventListener(this);
+		
+		gnosStepPitGroupDefinitionLabel = new GnosConfigurationStepLabel(this, SWT.NONE, "Pit Group Definition");
+		FormData fd_gnosStepPitGroupDefinitionLabel = new FormData();
+		fd_gnosStepPitGroupDefinitionLabel.bottom = new FormAttachment(gnosStepProcessRouteDefinitionLabel, 40, SWT.BOTTOM);
+		fd_gnosStepPitGroupDefinitionLabel.right = new FormAttachment(label, -6);
+		fd_gnosStepPitGroupDefinitionLabel.top = new FormAttachment(gnosStepProcessRouteDefinitionLabel);
+		fd_gnosStepPitGroupDefinitionLabel.left = new FormAttachment(gnosStepProcessRouteDefinitionLabel, 0, SWT.LEFT);
+		gnosStepPitGroupDefinitionLabel.setLayoutData(fd_gnosStepPitGroupDefinitionLabel);
+		gnosStepPitGroupDefinitionLabel.registerEventListener(this);
 
 		//this.scViewPortContainer = new ScrolledComposite(this, SWT.H_SCROLL | SWT.V_SCROLL | SWT.NONE);
 		this.scViewPortContainer = new ScrolledComposite(this, SWT.V_SCROLL | SWT.NONE);
@@ -172,7 +182,8 @@ public class WorkbenchScreen extends GnosScreen {
 			this.gnosStepProcessRouteDefinitionLabel.setSelectedState();
 		}else if(e.eventName == "complete:process-route-defintion"){
 			//processRouteDefinitionComplete();
-			//this.gnosStepProcessRouteDefinitionLabel.setDeselectedState();
+			this.gnosStepProcessRouteDefinitionLabel.setDeselectedState();
+			this.gnosStepPitGroupDefinitionLabel.setSelectedState();
 		}
 		
 		if(e.eventName == "Define Field Type"){
@@ -182,6 +193,7 @@ public class WorkbenchScreen extends GnosScreen {
 			gnosStepDefineExpressionsLabel.setDeselectedState();
 			gnosStepModelDefinitionLabel.setDeselectedState();
 			gnosStepProcessRouteDefinitionLabel.setDeselectedState();
+			gnosStepPitGroupDefinitionLabel.setDeselectedState();
 			
 			mainConfigurationViewPort.loadFieldDatatypeDefinitionScreen();
 		}else if(e.eventName == "Map Required Fields"){
@@ -191,6 +203,7 @@ public class WorkbenchScreen extends GnosScreen {
 			gnosStepDefineExpressionsLabel.setDeselectedState();
 			gnosStepModelDefinitionLabel.setDeselectedState();
 			gnosStepProcessRouteDefinitionLabel.setDeselectedState();
+			gnosStepPitGroupDefinitionLabel.setDeselectedState();
 			
 			mainConfigurationViewPort.loadMapRequiredFieldsScreen();
 		}else if(e.eventName == "Expression Definition"){
@@ -200,6 +213,7 @@ public class WorkbenchScreen extends GnosScreen {
 			gnosStepMapRequiredFieldsLabel.setDeselectedState();
 			gnosStepModelDefinitionLabel.setDeselectedState();
 			gnosStepProcessRouteDefinitionLabel.setDeselectedState();
+			gnosStepPitGroupDefinitionLabel.setDeselectedState();
 			
 			mainConfigurationViewPort.loadExpressionDefinitionScreen();
 		}else if(e.eventName == "Model Definition"){
@@ -209,6 +223,7 @@ public class WorkbenchScreen extends GnosScreen {
 			gnosStepMapRequiredFieldsLabel.setDeselectedState();
 			gnosStepDefineExpressionsLabel.setDeselectedState();
 			gnosStepProcessRouteDefinitionLabel.setDeselectedState();
+			gnosStepPitGroupDefinitionLabel.setDeselectedState();
 			
 			mainConfigurationViewPort.loadModelDefinitionScreen();
 		}else if(e.eventName == "Process Route Definition"){
@@ -218,8 +233,19 @@ public class WorkbenchScreen extends GnosScreen {
 			gnosStepMapRequiredFieldsLabel.setDeselectedState();
 			gnosStepDefineExpressionsLabel.setDeselectedState();
 			gnosStepModelDefinitionLabel.setDeselectedState();
+			gnosStepPitGroupDefinitionLabel.setDeselectedState();
 			
 			mainConfigurationViewPort.loadProcessRouteDefinitionScreen();
+		}else if(e.eventName == "Pit Group Definition"){
+			gnosStepPitGroupDefinitionLabel.setSelectedState();
+			
+			gnosStepDefineFieldTypeLabel.setDeselectedState();
+			gnosStepMapRequiredFieldsLabel.setDeselectedState();
+			gnosStepDefineExpressionsLabel.setDeselectedState();
+			gnosStepModelDefinitionLabel.setDeselectedState();
+			gnosStepProcessRouteDefinitionLabel.setDeselectedState();
+			
+			mainConfigurationViewPort.loadPitGroupDefinitionScreen();
 		}
 		this.scViewPortContainer.setMinSize(this.mainConfigurationViewPort.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 	}
