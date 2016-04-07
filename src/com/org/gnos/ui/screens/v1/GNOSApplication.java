@@ -157,6 +157,27 @@ public class GNOSApplication extends ApplicationWindow implements GnosEventListe
 		return new Point(301, 142);
 	}
 	
+	 /**
+    *
+    * @see org.eclipse.jface.window.Window#handleShellCloseEvent()
+    */
+	
+   protected void handleShellCloseEvent() {
+       /*boolean cancelled = saveAppIfDirty();
+       if (cancelled) {
+           setReturnCode(OK);
+       } else {
+           tidyUpOnExit();
+           super.handleShellCloseEvent();
+       }*/
+	   tidyUpOnExit();
+       super.handleShellCloseEvent();
+   }
+   
+   private void tidyUpOnExit(){
+	   System.out.println("Closing window");
+   }
+	
 	
 
 	@Override
