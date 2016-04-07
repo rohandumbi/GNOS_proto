@@ -108,6 +108,7 @@ public class FieldDatatypeDefinitionScreen extends GnosScreen {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				fieldDatatypeDefinitionGrid.setFieldDatatypes();
+				ProjectConfigutration.getInstance().saveFieldData();
 			}
 		});
 	}

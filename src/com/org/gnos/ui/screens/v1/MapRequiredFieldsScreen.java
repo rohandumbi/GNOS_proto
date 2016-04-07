@@ -117,6 +117,7 @@ public class MapRequiredFieldsScreen extends GnosScreen {
 				//TODO mapping complete
 				//projectModel.setAllProjectFields(fieldDatatypeDefinitionGrid.getFieldDatatypes());
 				mapRequiredFieldsGrid.setSourceFieldMapping();
+				ProjectConfigutration.getInstance().saveRequiredFieldMappingData();
 				//System.out.println("After mapping datatype of 3rd row is: " + projectModel.getAllProjectFields().get(2).getDataType());
 				/*if(isMappingSuccessful == true){
 					GnosEvent event = new GnosEvent(this, "complete:map-required-fields");
