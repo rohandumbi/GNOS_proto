@@ -175,7 +175,7 @@ public class GNOSApplication extends ApplicationWindow implements GnosEventListe
    }
    
    private void tidyUpOnExit(){
-	   System.out.println("Closing window");
+	   ProjectConfigutration.getInstance().save();
    }
 	
 	

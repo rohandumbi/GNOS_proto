@@ -143,6 +143,11 @@ public class ProjectConfigutration {
 		}
 	}
 	
+	public void save() {
+		saveFieldData();
+		saveRequiredFieldMappingData();
+		//saveExpressionData();
+	}
 	public void saveFieldData() {
 		
 		Connection conn = DBManager.getConnection();
