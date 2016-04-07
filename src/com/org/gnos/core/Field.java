@@ -13,6 +13,7 @@ public class Field {
 		super();
 		this.id = -1;
 		this.name = name;
+		this.dataType = TYPE_NUMBER;
 	}
 	
 	public Field(int id, String name, short dataType) {
