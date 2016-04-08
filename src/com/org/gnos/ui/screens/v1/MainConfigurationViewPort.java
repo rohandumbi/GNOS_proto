@@ -25,6 +25,11 @@ public class MainConfigurationViewPort extends GnosScreen{
 	private ModelDefinitionScreen modelDefinitionScreen;
 	private ProcessRouteDefinitionScreen processRouteDefinitionScreen;
 	private PitGroupDefinitionScreen pitGroupDefinitionScreen;
+	private OpexDefinitionScreen opexDefinitionScreen;
+	private GradeConstraintScreen gradeConstraintScreen;
+	private BenchConstraintScreen benchConstraintScreen;
+	private StockPileDefinitionScreen stockPileDefinitionScreen;
+	
 	private Shell dummyShell;
 	
 	//private Layout mainLayout;
@@ -53,6 +58,18 @@ public class MainConfigurationViewPort extends GnosScreen{
 		
 		pitGroupDefinitionScreen = new PitGroupDefinitionScreen(this.dummyShell, SWT.NONE);
 		pitGroupDefinitionScreen.registerEventListener(this);
+		
+		opexDefinitionScreen = new OpexDefinitionScreen(this.dummyShell, SWT.NONE);
+		opexDefinitionScreen.registerEventListener(this);
+		
+		gradeConstraintScreen = new GradeConstraintScreen(this.dummyShell, SWT.NONE);
+		gradeConstraintScreen.registerEventListener(this);
+		
+		benchConstraintScreen = new BenchConstraintScreen(this.dummyShell, SWT.NONE);
+		benchConstraintScreen.registerEventListener(this);
+		
+		stockPileDefinitionScreen = new StockPileDefinitionScreen(this.dummyShell, SWT.NONE);
+		stockPileDefinitionScreen.registerEventListener(this);
 	}
 	
 	public void loadFieldDatatypeDefinitionScreen(){
@@ -105,7 +122,39 @@ public class MainConfigurationViewPort extends GnosScreen{
 		this.stackLayout.topControl = pitGroupDefinitionScreen;
 		this.layout();
 	}
-
+	
+	public void loadOpexDefinitionScreen(){
+		this.viewPort.setParent(dummyShell);
+		this.viewPort = opexDefinitionScreen;
+		this.viewPort.setParent(this);
+		this.stackLayout.topControl = opexDefinitionScreen;
+		this.layout();
+	}
+	
+	public void loadGradeConstraintDefinitionScreen(){
+		this.viewPort.setParent(dummyShell);
+		this.viewPort = gradeConstraintScreen;
+		this.viewPort.setParent(this);
+		this.stackLayout.topControl = gradeConstraintScreen;
+		this.layout();
+	}
+	
+	public void loadBenchConstraintDefinitionScreen(){
+		this.viewPort.setParent(dummyShell);
+		this.viewPort = benchConstraintScreen;
+		this.viewPort.setParent(this);
+		this.stackLayout.topControl = benchConstraintScreen;
+		this.layout();
+	}
+	
+	public void loadStockpileDefinitionScreen(){
+		this.viewPort.setParent(dummyShell);
+		this.viewPort = stockPileDefinitionScreen;
+		this.viewPort.setParent(this);
+		this.stackLayout.topControl = stockPileDefinitionScreen;
+		this.layout();
+	}
+	
 	private void datatypeDefinitionComplete(){
 		ProjectConfigutration.getInstance().saveFieldData();
 		loadMapRequiredFieldsScreen();
