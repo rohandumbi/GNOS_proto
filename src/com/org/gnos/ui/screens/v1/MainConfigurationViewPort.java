@@ -111,6 +111,7 @@ public class MainConfigurationViewPort extends GnosScreen{
 		this.viewPort = processRouteDefinitionScreen;
 		this.viewPort.setParent(this);
 		this.stackLayout.topControl = processRouteDefinitionScreen;
+		processRouteDefinitionScreen.refreshModelList();
 		this.layout();
 	}
 	

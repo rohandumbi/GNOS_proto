@@ -1,17 +1,23 @@
 package com.org.gnos.ui.screens.v1;
 
-import org.eclipse.swt.widgets.Composite;
-
-import com.org.gnos.events.GnosEvent;
-import com.org.gnos.ui.custom.controls.GnosScreen;
-import org.eclipse.swt.layout.FormLayout;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.List;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import com.org.gnos.events.GnosEvent;
+import com.org.gnos.services.Model;
+import com.org.gnos.services.Models;
+import com.org.gnos.ui.custom.controls.GnosScreen;
+
 public class ProcessRouteDefinitionScreen_V2 extends GnosScreen {
+	private String[] sourceFieldsComboItems;
+	private List modelList;
 
 	public ProcessRouteDefinitionScreen_V2(Composite parent, int style) {
 		super(parent, style);
@@ -44,12 +50,17 @@ public class ProcessRouteDefinitionScreen_V2 extends GnosScreen {
 		lblProcessDiagram.setText("Generated Process Diagram");
 		
 		Composite compositeModelList = new Composite(this, SWT.BORDER);
+		compositeModelList.setLayout(new FillLayout(SWT.HORIZONTAL));
 		FormData fd_compositeModelList = new FormData();
 		fd_compositeModelList.top = new FormAttachment(lblAllModels, 10);
 		fd_compositeModelList.bottom = new FormAttachment(100, -10);
 		fd_compositeModelList.left = new FormAttachment(0, 10);
 		fd_compositeModelList.right = new FormAttachment(labelSectionSeparator, -10);
 		compositeModelList.setLayoutData(fd_compositeModelList);
+		
+		this.modelList = new List(compositeModelList, SWT.BORDER);
+		modelList.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
+		this.modelList.setItems(this.getSourceFieldsComboItems());
 		
 		Composite compositeProcessDiagram = new Composite(this, SWT.BORDER);
 		FormData fd_compositeProcessDiagram = new FormData();
@@ -58,6 +69,21 @@ public class ProcessRouteDefinitionScreen_V2 extends GnosScreen {
 		fd_compositeProcessDiagram.bottom = new FormAttachment(100, -10);
 		fd_compositeProcessDiagram.right = new FormAttachment(100, -10);
 		compositeProcessDiagram.setLayoutData(fd_compositeProcessDiagram);
+	}
+	
+	private String[] getSourceFieldsComboItems(){
+
+		java.util.List<Model> models = Models.getAll();
+		this.sourceFieldsComboItems = new String[models.size()];
+		for(int i=0; i<models.size(); i++){
+			this.sourceFieldsComboItems[i] = models.get(i).getName();
+		}
+
+		return this.sourceFieldsComboItems;
+	}
+	
+	public void refreshModelList(){
+		this.modelList.setItems(this.getSourceFieldsComboItems());
 	}
 
 	@Override
