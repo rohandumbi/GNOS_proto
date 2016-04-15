@@ -35,6 +35,7 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 	private SavedExpressionsGrid savedExpressionsGrid;
 	private List<Field> fields;
 	private List<Expression> allDefinedExpressions;
+	private List<Expression> expressions;
 	private Composite parent;
 	/**
 	 * Create the composite.
@@ -48,6 +49,7 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 		setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		this.parent = parent;
 		this.fields = ProjectConfigutration.getInstance().getFields();
+		this.expressions = ProjectConfigutration.getInstance().getExpressions();
 		this.createContent();
 	}
 	
@@ -149,19 +151,7 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 		fd_buttonSave.right = new FormAttachment(btnAddNewRow, 145, SWT.RIGHT);
 		//fd_buttonMapRqrdFields.right = new FormAttachment(0, 282);
 		buttonSave.setLayoutData(fd_buttonSave);
-		/*buttonSave.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				//TODO mapping complete
-				//projectModel.setAllProjectFields(fieldDatatypeDefinitionGrid.getFieldDatatypes());
-				updateExpressionList();
-				GNOSCSVDataProcessor.getInstance().compute();
-				GNOSCSVDataProcessor.getInstance().dumpToDB();
-				GNOSCSVDataProcessor.getInstance().dumpToCsv();
-				resetExpressionList();
-			}
-		});*/
-		
+
 		/*
 		 * Temporary Export to CSV button
 		 */
@@ -184,7 +174,7 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 		fd_labelSavedExpressions.left = new FormAttachment(0, 10);
 		labelSavedExpressions.setLayoutData(fd_labelSavedExpressions);
 		
-		savedExpressionsGrid = new SavedExpressionsGrid(this, SWT.NONE, this.fields);
+		savedExpressionsGrid = new SavedExpressionsGrid(this, SWT.NONE, this.expressions, this.fields);
 		FormData fd_savedExpressionsGrid = new FormData();
 		fd_savedExpressionsGrid.top = new FormAttachment(labelSavedExpressions, 6);
 		fd_savedExpressionsGrid.left = new FormAttachment(0, 10);
@@ -209,8 +199,8 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 				//projectModel.setAllProjectFields(fieldDatatypeDefinitionGrid.getFieldDatatypes());
 				boolean isUpdateExpressionSuccessful = updateExpressionList();
 				if(isUpdateExpressionSuccessful){
-					GNOSCSVDataProcessor.getInstance().compute();
-					GNOSCSVDataProcessor.getInstance().dumpToDB();
+					//GNOSCSVDataProcessor.getInstance().compute();
+					//GNOSCSVDataProcessor.getInstance().dumpToDB();
 					//GNOSCSVDataProcessor.getInstance().dumpToCsv();
 					List<Composite> allExpressions = expressionBuilderGrid.getAllRowsComposite();
 					savedExpressionsGrid.addRows(allExpressions);
@@ -230,9 +220,9 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 				//projectModel.setAllProjectFields(fieldDatatypeDefinitionGrid.getFieldDatatypes());
 				boolean isUpdateExpressionSuccessful = updateExpressionList();
 				if(isUpdateExpressionSuccessful){
-					GNOSCSVDataProcessor.getInstance().compute();
+					//GNOSCSVDataProcessor.getInstance().compute();
 					//GNOSCSVDataProcessor.getInstance().dumpToDB();
-					GNOSCSVDataProcessor.getInstance().dumpToCsv();
+					//GNOSCSVDataProcessor.getInstance().dumpToCsv();
 					List<Composite> allExpressions = expressionBuilderGrid.getAllRowsComposite();
 					savedExpressionsGrid.addRows(allExpressions);
 					me.layout();

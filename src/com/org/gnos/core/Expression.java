@@ -12,8 +12,9 @@ public class Expression {
 	private String name;
 	private boolean grade;
 	private boolean isComplex;
-	private int value;
-	private Operation operation = null;
+	private String field_left;
+	private String field_right;
+	private short operator;
 	private String condition = null;
 	private String updatedCondition = null;
 	private List conditionColumns = new ArrayList<Integer>();
@@ -27,14 +28,6 @@ public class Expression {
 		super();
 		this.id = id;
 		this.name = name;
-	}
-	
-	public int getValue() {
-		return value;
-	}
-
-	public void setValue(int value) {
-		this.value = value;
 	}
 
 	public int getId() {
@@ -64,16 +57,31 @@ public class Expression {
 	public void setGrade(boolean grade) {
 		this.grade = grade;
 	}
-
-	public Operation getOperation() {
-		return operation;
-	}
-
-	public void setOperation(Operation operation) {
-		this.operation = operation;
-	}
-
 	
+	public String getField_left() {
+		return field_left;
+	}
+
+	public void setField_left(String field_left) {
+		this.field_left = field_left;
+	}
+
+	public String getField_right() {
+		return field_right;
+	}
+
+	public void setField_right(String field_right) {
+		this.field_right = field_right;
+	}
+
+	public short getOperator() {
+		return operator;
+	}
+
+	public void setOperator(short operator) {
+		this.operator = operator;
+	}
+
 	public String getCondition() {
 		return condition;
 	}

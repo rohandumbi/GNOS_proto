@@ -456,8 +456,8 @@ public class ExpressionBuilderGrid extends Composite {
 					operation.setOperand_right(rightOperandIndex);
 					operation.setOperator(operatorIndex);
 
-					expression.setValue(-1);
-					expression.setOperation(operation);
+					//expression.setValue(-1);
+					//expression.setOperation(operation);
 
 				}else{
 					//expression.setValueType(isComplex);
@@ -476,8 +476,8 @@ public class ExpressionBuilderGrid extends Composite {
 						MessageDialog.openError(this.parent.getShell(), "GNOS Error", "Please map a proper value for the expression: " + expressionName);
 						return null;
 					}
-					expression.setValue(index);
-					expression.setOperation(null);
+					//expression.setValue(index);
+					//expression.setOperation(null);
 				}
 			}
 
@@ -485,18 +485,7 @@ public class ExpressionBuilderGrid extends Composite {
 			expression.setComplex(isComplex);
 			//List<Filter> filters = conditionComposite.getExpressionFilters();
 			String condition = textCondition.getText();
-			/*if(condition == null){
-				MessageDialog.openError(this.parent.getShell(), "GNOS Error", "Conditions not defined properly.");
-				return null;
-			}else{
-				//expression.setCondition("[bin]>30 AND [bin] < 70");
-				boolean isConditionValid = expression.setCondition(condition);
-				if(!isConditionValid){
-					MessageDialog.openError(this.parent.getShell(), "GNOS Error", "Conditions not defined properly.");
-					return null;
-				}
 
-			}*/
 			if(condition == null || condition == ""){
 				condition = "[bin]==[bin]";
 				System.out.println("Condition: " + condition);//temporary hack to set everything when no condition

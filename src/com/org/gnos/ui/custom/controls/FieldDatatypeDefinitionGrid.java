@@ -81,7 +81,7 @@ public class FieldDatatypeDefinitionGrid extends Composite {
 		lblDatatypeHeader.setText("DATATYPE");
 	}
 	private void createRows(){
-		Composite presentRow = this.compositeGridHeader;//referring to the header as the 1st row when there are no rows inserted yet
+		Composite presentRow = this.compositeGridHeader;
 		allRows = new ArrayList<Composite>();
 		int i=0;
 		for(Field field : this.allSourceFields){

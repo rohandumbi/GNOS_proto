@@ -4,9 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -24,53 +28,26 @@ public class SavedExpressionsGrid extends Composite {
 	 * @param parent
 	 * @param style
 	 */
-	private List<Field> allSourceFields;
 	private Composite compositeGridHeader;
 	private List<Composite> allRows;
-	private List<String> numericSourceFields;
-	private String[] sourceFieldsComboItems;
 	private Composite presentRow;
-	private List<Expression> expressionList;
-	private String[] arithemeticOperatorsArray;
+	private List<Expression> expressions;
 	private Composite parent;
 	
-	public SavedExpressionsGrid(Composite parent, int style, List<Field> fields) {
+	public SavedExpressionsGrid(Composite parent, int style, List<Expression> expressions, List<Field> fields) {
 		super(parent, style);
 		this.parent = parent;
-		//this.requiredFieldNames = requiredFieldNames;
-		//this.parent = parent;
-		this.allSourceFields = fields;
+		this.expressions = expressions;
 		this.allRows = new ArrayList<Composite>();
-		//this.expressionList = new ArrayList<Expression>();
-		//this.numericSourceFields = new ArrayList<String>();
-		//this.dataTypes = dataTypes;
-		this.arithemeticOperatorsArray = new String[]{"+", "-", "*", "/"};
 		this.createContent(parent);
 	}
+
+	private void createContent(Composite parent){
+		this.setLayout(new FormLayout());
+		this.createHeader();
+		//this.createRows();
+	}
 	
-	/*private String[] getSourceFieldsComboItems(){
-		int i = 0;
-		int sourceFieldSize = this.allSourceFields.length;
-		this.numericSourceFields = new ArrayList<String>();
-		Map dataTypeMap = GNOSCSVDataProcessor.getInstance().getDataTypeMapping();
-		Set<String> keys = dataTypeMap.keySet();
-		Iterator<String> it = keys.iterator();
-		while(it.hasNext()){
-			String key = it.next();
-			String value = (String)dataTypeMap.get(key);
-			
-			if(!"String".equalsIgnoreCase(value)){
-				this.numericSourceFields.add(key);
-			}		
-		}
-		this.sourceFieldsComboItems = new String[this.numericSourceFields.size()];
-		for(i=0; i<this.numericSourceFields.size(); i++){
-			this.sourceFieldsComboItems[i] = this.numericSourceFields.get(i);
-		}
-		return this.sourceFieldsComboItems;
-	}*/
-
-
 	private void createHeader(){
 		compositeGridHeader = new Composite(this, SWT.BORDER);
 		compositeGridHeader.setBackground(SWTResourceManager.getColor(230, 230, 230));
@@ -150,6 +127,69 @@ public class SavedExpressionsGrid extends Composite {
 		this.presentRow = this.compositeGridHeader;//referring to the header as the 1st row when there are no rows inserted yet
 		
 	}
+	public void createRows() {
+		for(Expression expression: expressions) {
+			final Composite compositeRow = new Composite(this, SWT.BORDER);
+			compositeRow.setLayout(new FormLayout());
+			Color backgroundColor = SWTResourceManager.getColor(SWT.COLOR_WHITE);
+			if((this.allRows != null) && (this.allRows.size()%2 != 0)){
+				backgroundColor =  SWTResourceManager.getColor(245, 245, 245);
+			}
+
+			compositeRow.setBackground(backgroundColor);
+			FormData fd_compositeRow = new FormData();
+			fd_compositeRow.left = new FormAttachment(this.presentRow, 0, SWT.LEFT);
+			fd_compositeRow.right = new FormAttachment(this.presentRow, 0, SWT.RIGHT);
+			fd_compositeRow.top = new FormAttachment(this.presentRow);
+
+			Button grade = new Button(compositeRow, SWT.CHECK);
+			FormData fd_grade = new FormData();
+			fd_grade.left = new FormAttachment(0, 10);
+			fd_grade.top = new FormAttachment(compositeRow, 2, SWT.TOP);
+			grade.setLayoutData(fd_grade);
+
+			Text expressionName = new Text(compositeRow, SWT.BORDER);
+			//fd_grade.top = new FormAttachment(expressionName, 2, SWT.TOP);
+			FormData fd_expressionName = new FormData();
+			fd_expressionName.left = new FormAttachment(5, 5);
+			fd_expressionName.top = new FormAttachment(0);
+			fd_expressionName.right = new FormAttachment(20, -5);
+			expressionName.setLayoutData(fd_expressionName);
+
+			Button buttonIsComplex = new Button(compositeRow, SWT.CHECK);
+			FormData fd_buttonIsComplex = new FormData();
+			fd_buttonIsComplex.left = new FormAttachment(24);
+			fd_buttonIsComplex.top = new FormAttachment(0,2);
+			buttonIsComplex.setLayoutData(fd_buttonIsComplex);
+			//final Composite me = this;
+			//this.toggleExpressionType(compositeRow, false);
+
+			buttonIsComplex.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					boolean isSelected = ((Button)e.getSource()).getSelection();
+					System.out.println("Selection: " + isSelected);
+					if(compositeRow.getChildren()[3] instanceof Text){ //temporary hack, need to identify in a better way
+						compositeRow.getChildren()[4].dispose();
+					}else{
+						compositeRow.getChildren()[3].dispose();
+					}
+					//toggleExpressionType(compositeRow, isSelected);
+				}
+			});
+			
+			Text textExpression = new Text(compositeRow, SWT.BORDER);
+			FormData fd_textExpression = new FormData();
+			fd_textExpression.left = new FormAttachment(62, 2);
+			fd_textExpression.right = new FormAttachment(100, -2);
+			textExpression.setLayoutData(fd_textExpression);
+
+			this.presentRow = compositeRow;
+			this.allRows.add(compositeRow);
+			compositeRow.setLayoutData(fd_compositeRow);
+
+		}
+	}
 	
 	public void addRows(List<Composite> compositeSavedExpressionCollection){
 		Composite controlExpressionValue = null;
@@ -204,12 +244,7 @@ public class SavedExpressionsGrid extends Composite {
 		}
 	}
 
-	private void createContent(Composite parent){
-		this.setLayout(new FormLayout());
-		//this.createSourceFieldsComboItems();
-		this.createHeader();
-		
-	}
+
 	
 	public void resetAllRows(){
 		for(Composite existingRow : this.allRows){

@@ -55,8 +55,10 @@ CREATE TABLE expressions (
    project_id INT NOT NULL,
    name VARCHAR(100) NOT NULL,
    grade TINYINT(1),
-   value_type TINYINT(1),
-   value INT NOT NULL,
+   is_complex TINYINT(1),
+   field_left VARCHAR(100) NOT NULL,
+   field_right VARCHAR(100),
+   operator TINYINT(1),
    filter_str VARCHAR(400),
    PRIMARY KEY ( id, project_id )
 );

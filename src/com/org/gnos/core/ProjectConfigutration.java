@@ -112,7 +112,7 @@ public class ProjectConfigutration {
 	}
 	
 	private void loadExpressions() {
-		String sql = "select id, name, grade, value_type, filter_str from expressions where project_id = "+ this.projectId;
+		String sql = "select id, name, grade, is_complex, field_left, field_right, operator, filter_str from expressions where project_id = "+ this.projectId;
 		Statement stmt = null;
 		ResultSet rs = null; 
 		Connection conn = DBManager.getConnection();
@@ -126,7 +126,10 @@ public class ProjectConfigutration {
 				expression = new Expression(rs.getInt(1), rs.getString(2));
 				expression.setGrade(rs.getBoolean(3));
 				expression.setComplex(rs.getBoolean(4));
-				expression.setCondition(rs.getString(5));
+				expression.setField_left(rs.getString(5));
+				expression.setField_right(rs.getString(6));
+				expression.setOperator(rs.getShort(7));
+				expression.setCondition(rs.getString(8));
 				expressions.add(expression);
 			}
 			
@@ -254,8 +257,8 @@ public class ProjectConfigutration {
 	public void saveExpressionData() {
 		
 		Connection conn = DBManager.getConnection();
-		String insert_sql = " insert into expressions (project_id, name, grade, value_type, value, filter_str) values (?, ?, ?, ?, ?, ?)";
-		String update_sql = " update expressions set grade=?,  value_type = ?, value = ?  filter_str = ? where id = ?";
+		String insert_sql = " insert into expressions (project_id, name, grade, is_complex, field_left, field_right, operator, filter_str) values (?, ?, ?, ?, ?, ?, ?, ?)";
+		String update_sql = " update expressions set grade= ?,  is_complex = ?, field_left = ?, field_right = ?, operand = ?,  filter_str = ? where id = ?";
 		PreparedStatement pstmt = null;
 		ResultSet rs = null; 
 		boolean autoCommit = true;
@@ -270,8 +273,10 @@ public class ProjectConfigutration {
 				pstmt.setString(2, expression.getName());
 				pstmt.setBoolean(3, expression.isGrade());
 				pstmt.setBoolean(4, expression.isComplex());
-				pstmt.setInt(5, expression.getValue());
-				pstmt.setString(6, expression.getCondition());
+				pstmt.setString(5, expression.getField_left());
+				pstmt.setString(6, expression.getField_right());
+				pstmt.setShort(7, expression.getOperator());
+				pstmt.setString(8, expression.getCondition());
 				pstmt.executeUpdate();
 				rs = pstmt.getGeneratedKeys();    
 				rs.next();  

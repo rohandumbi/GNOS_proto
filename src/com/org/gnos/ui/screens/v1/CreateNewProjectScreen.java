@@ -103,7 +103,11 @@ public class CreateNewProjectScreen extends Composite implements GnosEventGenera
 		Button btnSubmit = new Button(composite, SWT.NONE);
 		btnSubmit.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				//Create New Project
+
+				if(csvFileName == null){
+					MessageDialog.openError(parent.getShell(), "GNOS Error", "Please provide a valid CSV input file as data input.");
+					return;
+				}
 				HashMap<String, String> attributes = new HashMap<String, String>();
 				
 				attributes.put("projectName", textProjectName.getText());
@@ -111,27 +115,17 @@ public class CreateNewProjectScreen extends Composite implements GnosEventGenera
 				attributes.put("recordFileName", csvFileName);
 				Project project = new Project(textProjectName.getText(), textDescription.getText());
 				project.setFileName(csvFileName);
+				
+				
 				Projects.add(project);
 				attributes.put("projectId", ""+project.getId());
 				GnosEventWithAttributeMap event = new GnosEventWithAttributeMap(this, "createNewProjectScreen:upload-records-complete", attributes);
-				if(csvFileName != null){
-					//uploadFileToDB(csvFileName);
-					fireChildEvent(event);
-				}else{
-					MessageDialog.openError(parent.getShell(), "GNOS Error", "Please provide a valid CSV input file as data input.");
-				}
+				fireChildEvent(event);
 			}
 		});
 		btnSubmit.setFont(SWTResourceManager.getFont("Arial", 12, SWT.NORMAL));
 		btnSubmit.setBounds(230, 409, 181, 33);
 		btnSubmit.setText("Create");
-
-		/*fd_composite.bottom = new FormAttachment(labelCreateNew, 467, SWT.BOTTOM);
-		fd_composite.top = new FormAttachment(labelCreateNew, 32);
-		fd_composite.right = new FormAttachment(100, -91);
-		fd_composite.left = new FormAttachment(0, 92);
-		composite.setLayoutData(fd_composite);*/
-
 
 		int offsetX = -composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).x / 2;
 		int offsetY = -composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y / 2;
