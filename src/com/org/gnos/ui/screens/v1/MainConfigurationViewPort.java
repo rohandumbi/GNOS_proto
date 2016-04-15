@@ -6,7 +6,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
 import com.org.gnos.core.ProjectConfigutration;
-import com.org.gnos.custom.models.ProjectModel;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.ui.custom.controls.GnosScreen;
 
@@ -23,7 +22,7 @@ public class MainConfigurationViewPort extends GnosScreen{
 	private MapRequiredFieldsScreen mapRequiredFieldsScreen;
 	private ExpressionDefinitionScreen expressionDefinitionScreen;
 	private ModelDefinitionScreen modelDefinitionScreen;
-	private ProcessRouteDefinitionScreen processRouteDefinitionScreen;
+	private ProcessRouteDefinitionScreen_V2 processRouteDefinitionScreen;
 	private PitGroupDefinitionScreen pitGroupDefinitionScreen;
 	private OpexDefinitionScreen opexDefinitionScreen;
 	private GradeConstraintScreen gradeConstraintScreen;
@@ -53,7 +52,7 @@ public class MainConfigurationViewPort extends GnosScreen{
 		modelDefinitionScreen = new ModelDefinitionScreen(this.dummyShell, SWT.NONE);
 		modelDefinitionScreen.registerEventListener(this);
 		
-		processRouteDefinitionScreen = new ProcessRouteDefinitionScreen(this.dummyShell, SWT.NONE);
+		processRouteDefinitionScreen = new ProcessRouteDefinitionScreen_V2(this.dummyShell, SWT.NONE);
 		processRouteDefinitionScreen.registerEventListener(this);
 		
 		pitGroupDefinitionScreen = new PitGroupDefinitionScreen(this.dummyShell, SWT.NONE);
