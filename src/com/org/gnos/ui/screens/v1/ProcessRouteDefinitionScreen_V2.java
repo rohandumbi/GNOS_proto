@@ -62,7 +62,7 @@ public class ProcessRouteDefinitionScreen_V2 extends GnosScreen {
 		modelList.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
 		this.modelList.setItems(this.getSourceFieldsComboItems());
 		
-		Composite compositeProcessDiagram = new Composite(this, SWT.BORDER);
+		Composite compositeProcessDiagram = new ProcessDiagramScreen(this, SWT.BORDER);
 		FormData fd_compositeProcessDiagram = new FormData();
 		fd_compositeProcessDiagram.top = new FormAttachment(lblProcessDiagram, 10);
 		fd_compositeProcessDiagram.left = new FormAttachment(labelSectionSeparator, 10);
