@@ -49,7 +49,7 @@ public class GnosConfigurationStepLabel extends Composite implements GnosEventGe
 		labelMapRequiredFields = new Label(this, SWT.NONE);
 		labelMapRequiredFields.setBackground(this.defaultLabelColor);
 		labelMapRequiredFields.setForeground(this.defaultTextColor);
-		labelMapRequiredFields.setFont(SWTResourceManager.getFont("Arial", 11, SWT.NORMAL));
+		labelMapRequiredFields.setFont(SWTResourceManager.getFont("Segoe UI", 11, SWT.NORMAL));
 		labelMapRequiredFields.setText(this.stepName);
 
 		FormData fd_labelMapRequiredFields = new FormData();
@@ -70,7 +70,7 @@ public class GnosConfigurationStepLabel extends Composite implements GnosEventGe
 
 	public void setSelectedState(){
 		this.setBackground(this.selectedLabelColor);
-		labelMapRequiredFields.setFont(SWTResourceManager.getFont("Arial", 11, SWT.BOLD));
+		labelMapRequiredFields.setFont(SWTResourceManager.getFont("Segoe UI", 11, SWT.BOLD));
 		labelMapRequiredFields.setForeground(this.selectedTextColor);
 		labelMapRequiredFields.setBackground(this.selectedLabelColor);
 	}
@@ -78,7 +78,7 @@ public class GnosConfigurationStepLabel extends Composite implements GnosEventGe
 	public void setDeselectedState(){
 		this.setBackground(this.defaultLabelColor);
 		labelMapRequiredFields.setBackground(defaultLabelColor);
-		labelMapRequiredFields.setFont(SWTResourceManager.getFont("Arial", 11, SWT.NORMAL));
+		labelMapRequiredFields.setFont(SWTResourceManager.getFont("Segoe UI", 11, SWT.NORMAL));
 		labelMapRequiredFields.setForeground(this.defaultTextColor);
 	}
 

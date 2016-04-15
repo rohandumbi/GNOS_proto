@@ -6,7 +6,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
 import com.org.gnos.core.ProjectConfigutration;
-import com.org.gnos.custom.models.ProjectModel;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.ui.custom.controls.GnosScreen;
 
@@ -23,7 +22,13 @@ public class MainConfigurationViewPort extends GnosScreen{
 	private MapRequiredFieldsScreen mapRequiredFieldsScreen;
 	private ExpressionDefinitionScreen expressionDefinitionScreen;
 	private ModelDefinitionScreen modelDefinitionScreen;
-	private ProcessRouteDefinitionScreen processRouteDefinitionScreen;
+	private ProcessRouteDefinitionScreen_V2 processRouteDefinitionScreen;
+	private PitGroupDefinitionScreen pitGroupDefinitionScreen;
+	private OpexDefinitionScreen opexDefinitionScreen;
+	private GradeConstraintScreen gradeConstraintScreen;
+	private BenchConstraintScreen benchConstraintScreen;
+	private StockPileDefinitionScreen stockPileDefinitionScreen;
+	
 	private Shell dummyShell;
 	
 	//private Layout mainLayout;
@@ -47,8 +52,23 @@ public class MainConfigurationViewPort extends GnosScreen{
 		modelDefinitionScreen = new ModelDefinitionScreen(this.dummyShell, SWT.NONE);
 		modelDefinitionScreen.registerEventListener(this);
 		
-		processRouteDefinitionScreen = new ProcessRouteDefinitionScreen(this.dummyShell, SWT.NONE);
+		processRouteDefinitionScreen = new ProcessRouteDefinitionScreen_V2(this.dummyShell, SWT.NONE);
 		processRouteDefinitionScreen.registerEventListener(this);
+		
+		pitGroupDefinitionScreen = new PitGroupDefinitionScreen(this.dummyShell, SWT.NONE);
+		pitGroupDefinitionScreen.registerEventListener(this);
+		
+		opexDefinitionScreen = new OpexDefinitionScreen(this.dummyShell, SWT.NONE);
+		opexDefinitionScreen.registerEventListener(this);
+		
+		gradeConstraintScreen = new GradeConstraintScreen(this.dummyShell, SWT.NONE);
+		gradeConstraintScreen.registerEventListener(this);
+		
+		benchConstraintScreen = new BenchConstraintScreen(this.dummyShell, SWT.NONE);
+		benchConstraintScreen.registerEventListener(this);
+		
+		stockPileDefinitionScreen = new StockPileDefinitionScreen(this.dummyShell, SWT.NONE);
+		stockPileDefinitionScreen.registerEventListener(this);
 	}
 	
 	public void loadFieldDatatypeDefinitionScreen(){
@@ -93,7 +113,47 @@ public class MainConfigurationViewPort extends GnosScreen{
 		this.stackLayout.topControl = processRouteDefinitionScreen;
 		this.layout();
 	}
-
+	
+	public void loadPitGroupDefinitionScreen(){
+		this.viewPort.setParent(dummyShell);
+		this.viewPort = pitGroupDefinitionScreen;
+		this.viewPort.setParent(this);
+		this.stackLayout.topControl = pitGroupDefinitionScreen;
+		this.layout();
+	}
+	
+	public void loadOpexDefinitionScreen(){
+		this.viewPort.setParent(dummyShell);
+		this.viewPort = opexDefinitionScreen;
+		this.viewPort.setParent(this);
+		this.stackLayout.topControl = opexDefinitionScreen;
+		this.layout();
+	}
+	
+	public void loadGradeConstraintDefinitionScreen(){
+		this.viewPort.setParent(dummyShell);
+		this.viewPort = gradeConstraintScreen;
+		this.viewPort.setParent(this);
+		this.stackLayout.topControl = gradeConstraintScreen;
+		this.layout();
+	}
+	
+	public void loadBenchConstraintDefinitionScreen(){
+		this.viewPort.setParent(dummyShell);
+		this.viewPort = benchConstraintScreen;
+		this.viewPort.setParent(this);
+		this.stackLayout.topControl = benchConstraintScreen;
+		this.layout();
+	}
+	
+	public void loadStockpileDefinitionScreen(){
+		this.viewPort.setParent(dummyShell);
+		this.viewPort = stockPileDefinitionScreen;
+		this.viewPort.setParent(this);
+		this.stackLayout.topControl = stockPileDefinitionScreen;
+		this.layout();
+	}
+	
 	private void datatypeDefinitionComplete(){
 		ProjectConfigutration.getInstance().saveFieldData();
 		loadMapRequiredFieldsScreen();
@@ -115,6 +175,7 @@ public class MainConfigurationViewPort extends GnosScreen{
 	
 	private void processRouteDefinitionComplete(){
 		//No-Op for the time being
+		loadPitGroupDefinitionScreen();
 	}
 	
 	@Override
