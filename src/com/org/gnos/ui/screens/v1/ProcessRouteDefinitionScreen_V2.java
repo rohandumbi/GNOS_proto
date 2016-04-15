@@ -28,6 +28,7 @@ public class ProcessRouteDefinitionScreen_V2 extends GnosScreen {
 	private List modelList;
 	private ArrayList<String> listAddedModels;
 	private Tree processTree;
+	private ProcessDiagramScreen compositeProcessDiagram;
 
 	public ProcessRouteDefinitionScreen_V2(Composite parent, int style) {
 		super(parent, style);
@@ -77,13 +78,13 @@ public class ProcessRouteDefinitionScreen_V2 extends GnosScreen {
 		modelList.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
 		this.modelList.setItems(this.getSourceFieldsComboItems());
 		
-		Composite compositeProcessDiagram = new ProcessDiagramScreen(this, SWT.BORDER);
+		this.compositeProcessDiagram = new ProcessDiagramScreen(this, SWT.BORDER);
 		FormData fd_compositeProcessDiagram = new FormData();
 		fd_compositeProcessDiagram.top = new FormAttachment(lblProcessDiagram, 10);
 		fd_compositeProcessDiagram.left = new FormAttachment(labelSectionSeparator, 10);
 		fd_compositeProcessDiagram.bottom = new FormAttachment(100, -10);
 		fd_compositeProcessDiagram.right = new FormAttachment(100, -10);
-		compositeProcessDiagram.setLayoutData(fd_compositeProcessDiagram);
+		this.compositeProcessDiagram.setLayoutData(fd_compositeProcessDiagram);
 		
 		Button btnAddModelToProcess = new Button(this, SWT.NONE);
 		btnAddModelToProcess.addSelectionListener(new SelectionAdapter() {
@@ -98,7 +99,11 @@ public class ProcessRouteDefinitionScreen_V2 extends GnosScreen {
 					System.out.println("Model: " + selectedModelName + " has Parent: " + parent);
 					processTree.addNode(selectedModelName, parent);
 					listAddedModels.add(selectedModelName);
+					compositeProcessDiagram.refresh(processTree);
 				}
+				/*
+				 * Test line to test tree DS
+				 */
 				processTree.display("Block");
 			}
 		});
