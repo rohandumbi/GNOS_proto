@@ -1,10 +1,16 @@
 package com.org.gnos.ui.screens.v1;
 
+import java.util.ArrayList;
+
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
@@ -13,16 +19,22 @@ import org.eclipse.wb.swt.SWTResourceManager;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.services.Model;
 import com.org.gnos.services.Models;
+import com.org.gnos.services.Tree;
 import com.org.gnos.ui.custom.controls.GnosScreen;
+import com.org.gnos.ui.custom.controls.ProcessNodeDefinitionDialog;
 
 public class ProcessRouteDefinitionScreen_V2 extends GnosScreen {
 	private String[] sourceFieldsComboItems;
 	private List modelList;
+	private ArrayList<String> listAddedModels;
+	private Tree processTree;
 
 	public ProcessRouteDefinitionScreen_V2(Composite parent, int style) {
 		super(parent, style);
 		setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		setLayout(new FormLayout());
+		this.listAddedModels = new ArrayList<String>();
+		this.listAddedModels.add("Block");
 		
 		Label labelSectionSeparator = new Label(this, SWT.SEPARATOR | SWT.VERTICAL);
 		FormData fd_labelSectionSeparator = new FormData();
@@ -49,7 +61,7 @@ public class ProcessRouteDefinitionScreen_V2 extends GnosScreen {
 		lblProcessDiagram.setLayoutData(fd_lblProcessDiagram);
 		lblProcessDiagram.setText("Generated Process Diagram");
 		
-		Composite compositeModelList = new Composite(this, SWT.BORDER);
+		final Composite compositeModelList = new Composite(this, SWT.BORDER);
 		compositeModelList.setLayout(new FillLayout(SWT.HORIZONTAL));
 		FormData fd_compositeModelList = new FormData();
 		fd_compositeModelList.top = new FormAttachment(lblAllModels, 10);
@@ -69,6 +81,27 @@ public class ProcessRouteDefinitionScreen_V2 extends GnosScreen {
 		fd_compositeProcessDiagram.bottom = new FormAttachment(100, -10);
 		fd_compositeProcessDiagram.right = new FormAttachment(100, -10);
 		compositeProcessDiagram.setLayoutData(fd_compositeProcessDiagram);
+		
+		Button btnAddModelToProcess = new Button(this, SWT.NONE);
+		btnAddModelToProcess.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				// Add model to process implementation
+				String selectedModelName = modelList.getSelection()[0];
+				System.out.println("Selected model: " + selectedModelName);
+				ProcessNodeDefinitionDialog processNodeDefintiDefinitionDialog = new ProcessNodeDefinitionDialog(getShell(), listAddedModels);
+				if (Window.OK == processNodeDefintiDefinitionDialog.open()) {
+					String parent = processNodeDefintiDefinitionDialog.getParentName();
+					System.out.println("Model: " + selectedModelName + " has Parent: " + parent);
+				}
+			}
+		});
+		btnAddModelToProcess.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
+		FormData fd_btnAddModelToProcess = new FormData();
+		fd_btnAddModelToProcess.bottom = new FormAttachment(lblAllModels, 0, SWT.BOTTOM);
+		fd_btnAddModelToProcess.left = new FormAttachment(lblAllModels, 20);
+		btnAddModelToProcess.setLayoutData(fd_btnAddModelToProcess);
+		btnAddModelToProcess.setText("Add to Process");
 	}
 	
 	private String[] getSourceFieldsComboItems(){
