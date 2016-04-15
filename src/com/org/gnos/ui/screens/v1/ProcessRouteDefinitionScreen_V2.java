@@ -36,6 +36,9 @@ public class ProcessRouteDefinitionScreen_V2 extends GnosScreen {
 		this.listAddedModels = new ArrayList<String>();
 		this.listAddedModels.add("Block");
 		
+		this.processTree = new Tree();
+		this.processTree.addNode("Block");
+		
 		Label labelSectionSeparator = new Label(this, SWT.SEPARATOR | SWT.VERTICAL);
 		FormData fd_labelSectionSeparator = new FormData();
 		fd_labelSectionSeparator.top = new FormAttachment(0);
@@ -93,7 +96,10 @@ public class ProcessRouteDefinitionScreen_V2 extends GnosScreen {
 				if (Window.OK == processNodeDefintiDefinitionDialog.open()) {
 					String parent = processNodeDefintiDefinitionDialog.getParentName();
 					System.out.println("Model: " + selectedModelName + " has Parent: " + parent);
+					processTree.addNode(selectedModelName, parent);
+					listAddedModels.add(selectedModelName);
 				}
+				processTree.display("Block");
 			}
 		});
 		btnAddModelToProcess.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
