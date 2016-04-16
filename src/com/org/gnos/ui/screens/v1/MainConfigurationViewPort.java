@@ -22,7 +22,7 @@ public class MainConfigurationViewPort extends GnosScreen{
 	private MapRequiredFieldsScreen mapRequiredFieldsScreen;
 	private ExpressionDefinitionScreen expressionDefinitionScreen;
 	private ModelDefinitionScreen modelDefinitionScreen;
-	private ProcessRouteDefinitionScreen_V2 processRouteDefinitionScreen;
+	private ProcessRouteDefinitionScreen processRouteDefinitionScreen;
 	private PitGroupDefinitionScreen pitGroupDefinitionScreen;
 	private OpexDefinitionScreen opexDefinitionScreen;
 	private GradeConstraintScreen gradeConstraintScreen;
@@ -52,7 +52,7 @@ public class MainConfigurationViewPort extends GnosScreen{
 		modelDefinitionScreen = new ModelDefinitionScreen(this.dummyShell, SWT.NONE);
 		modelDefinitionScreen.registerEventListener(this);
 		
-		processRouteDefinitionScreen = new ProcessRouteDefinitionScreen_V2(this.dummyShell, SWT.NONE);
+		processRouteDefinitionScreen = new ProcessRouteDefinitionScreen(this.dummyShell, SWT.NONE);
 		processRouteDefinitionScreen.registerEventListener(this);
 		
 		pitGroupDefinitionScreen = new PitGroupDefinitionScreen(this.dummyShell, SWT.NONE);
@@ -111,6 +111,7 @@ public class MainConfigurationViewPort extends GnosScreen{
 		this.viewPort = processRouteDefinitionScreen;
 		this.viewPort.setParent(this);
 		this.stackLayout.topControl = processRouteDefinitionScreen;
+		processRouteDefinitionScreen.refreshModelList();
 		this.layout();
 	}
 	
