@@ -193,6 +193,8 @@ public class GNOSApplication extends ApplicationWindow implements GnosEventListe
 			int projectId = Integer.parseInt(event.attributes.get("projectId"));
 			ProjectConfigutration.getInstance().load(projectId);
 			openProjectConfiguration();
+		}else if(e.eventName == "open:homeScreen"){
+			loadProjectScreen();
 		}
 
 	}

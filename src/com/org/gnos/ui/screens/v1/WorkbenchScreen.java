@@ -16,9 +16,14 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.custom.models.ProjectModel;
 import com.org.gnos.events.GnosEvent;
+import com.org.gnos.events.GnosEventWithAttributeMap;
 import com.org.gnos.ui.custom.controls.GnosConfigurationStepLabel;
 import com.org.gnos.ui.custom.controls.GnosScreen;
 import com.org.gnos.utilities.ClickBehavior;
+
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 
 
 public class WorkbenchScreen extends GnosScreen {
@@ -43,13 +48,31 @@ public class WorkbenchScreen extends GnosScreen {
 
 
 	public CLabel labelWorkbenchHeader;
+	private Button btnHome;
+	
 	public WorkbenchScreen(Composite parent, int style){
 		super(parent, style);
 		setFont(SWTResourceManager.getFont("Arial", 11, SWT.BOLD));
 		setToolTipText("");
 		setBackground(SWTResourceManager.getColor(255, 255, 255));
 		setLayout(new FormLayout());
-
+		
+		btnHome = new Button(this, SWT.NONE);
+		btnHome.setImage(SWTResourceManager.getImage(WorkbenchScreen.class, "/com/org/gnos/resources/home24.png"));
+		final WorkbenchScreen me = this;
+		btnHome.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				GnosEvent event = new GnosEvent(me, "open:homeScreen");
+				fireChildEvent(event);
+			}
+		});
+		btnHome.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
+		FormData fd_btnHome = new FormData();
+		fd_btnHome.top = new FormAttachment(0);
+		fd_btnHome.right = new FormAttachment(100, -10);
+		btnHome.setLayoutData(fd_btnHome);
+		
 		labelWorkbenchHeader = new CLabel(this, SWT.NONE);
 		labelWorkbenchHeader.setImage(SWTResourceManager.getImage(WorkbenchScreen.class, "/com/org/gnos/resources/settings16.png"));
 		labelWorkbenchHeader.setForeground(SWTResourceManager.getColor(255, 255, 255));
@@ -62,7 +85,7 @@ public class WorkbenchScreen extends GnosScreen {
 		fd_labelWorkbenchHeader.left = new FormAttachment(0);
 		labelWorkbenchHeader.setLayoutData(fd_labelWorkbenchHeader);
 		labelWorkbenchHeader.setText("Project Import Configuration");
-
+		
 		Label label = new Label(this, SWT.SEPARATOR | SWT.VERTICAL);
 		FormData fd_label = new FormData();
 		fd_label.left = new FormAttachment(0, 260);
@@ -193,6 +216,7 @@ public class WorkbenchScreen extends GnosScreen {
 			}
 		});
 		this.scViewPortContainer.setLayoutData(fd_scViewPortContainer);
+		
 	}
 
 	public void setScrolledCompositeMinSize(){
@@ -204,6 +228,14 @@ public class WorkbenchScreen extends GnosScreen {
 	@Override
 	protected void checkSubclass() {
 		// Disable the check that prevents subclassing of SWT components
+	}
+	
+	private void fireChildEvent(GnosEvent event){
+		int j = listeners.size();
+		int i = 0;
+		for(i=0; i<j; i++){
+			listeners.get(i).onGnosEventFired(event);
+		}
 	}
 
 

@@ -13,17 +13,17 @@ public class Application {
 		// TODO Auto-generated method stub
 		GNOSConfig.load();
 		
-		HelloWorld oHelloWorld = new HelloWorld();
+		/*HelloWorld oHelloWorld = new HelloWorld();
 		oHelloWorld.setBlockOnOpen(true);
-		/*oHelloWorld.open();*/
+		oHelloWorld.open();
 		
 		MultiScreenTest oMultiScreenTest = new MultiScreenTest();
 		oMultiScreenTest.setBlockOnOpen(true);
-		/*oMultiScreenTest.open();*/
+		oMultiScreenTest.open();
 		
 		ScreenController oScreenController = new ScreenController();
 		oScreenController.setBlockOnOpen(true);
-		//oScreenController.open();
+		//oScreenController.open();*/	
 		
 		GNOSApplication oGnosApplication = new GNOSApplication();
 		oGnosApplication.setBlockOnOpen(true);

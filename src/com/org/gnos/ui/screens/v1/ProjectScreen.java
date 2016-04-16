@@ -35,31 +35,38 @@ public class ProjectScreen extends GnosScreen {
 		
 		setLayout(new FormLayout());
 		
+		CLabel labelHome = new CLabel(this, SWT.NONE);
+		labelHome.setForeground(SWTResourceManager.getColor(255, 255, 255));
+		labelHome.setFont(org.eclipse.wb.swt.SWTResourceManager.getFont("Segoe UI", 14, SWT.BOLD));
+		labelHome.setBackground(SWTResourceManager.getColor(0, 102, 204));
+		FormData fd_labelHome = new FormData();
+		fd_labelHome.bottom = new FormAttachment(0, 34);
+		fd_labelHome.right = new FormAttachment(100);
+		fd_labelHome.top = new FormAttachment(0);
+		fd_labelHome.left = new FormAttachment(0);
+		labelHome.setLayoutData(fd_labelHome);
+		labelHome.setText("  Home");
 		
-		Label label = new Label(this, SWT.SEPARATOR | SWT.VERTICAL);
-		FormData fd_label = new FormData();
-		fd_label.left = new FormAttachment(0, 260);
-		fd_label.top = new FormAttachment(0);
-		fd_label.bottom = new FormAttachment(100, 10);
-		fd_label.right = new FormAttachment(0, 262);
-		label.setLayoutData(fd_label);
+		Label labelVerticalSeparator = new Label(this, SWT.SEPARATOR | SWT.VERTICAL);
+		FormData fd_labelVerticalSeparator = new FormData();
+		fd_labelVerticalSeparator.left = new FormAttachment(25);
+		fd_labelVerticalSeparator.top = new FormAttachment(labelHome, 0, SWT.BOTTOM);
+		fd_labelVerticalSeparator.bottom = new FormAttachment(100);
+		//fd_labelVerticalSeparator.right = new FormAttachment(0, 262);
+		labelVerticalSeparator.setLayoutData(fd_labelVerticalSeparator);
 		
-		CLabel labelProject = new CLabel(this, SWT.NONE);
-		labelProject.setForeground(SWTResourceManager.getColor(255, 255, 255));
-		labelProject.setFont(SWTResourceManager.getFont("Arial", 12, SWT.NORMAL));
-		labelProject.setBackground(SWTResourceManager.getColor(0, 102, 204));
-		FormData fd_labelProject = new FormData();
-		fd_labelProject.bottom = new FormAttachment(0, 34);
-		fd_labelProject.right = new FormAttachment(100);
-		fd_labelProject.top = new FormAttachment(0);
-		fd_labelProject.left = new FormAttachment(0);
-		labelProject.setLayoutData(fd_labelProject);
-		labelProject.setText("Projects");
+		CLabel labelList = new CLabel(this, SWT.NONE);
+		labelList.setFont(org.eclipse.wb.swt.SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
+		FormData fd_labelList = new FormData();
+		fd_labelList.top = new FormAttachment(labelHome, 6);
+		fd_labelList.left = new FormAttachment(0, 10);
+		labelList.setLayoutData(fd_labelList);
+		labelList.setText("Available Projects:");
 		
 
 		List<Project> projects = Projects.getAll();
 		final Object me = this;
-		CLabel lastLabel = labelProject;
+		CLabel lastLabel = labelList;
 		for(int i=0; i< projects.size(); i++){
 			CLabel labelProject1 = new CLabel(this, SWT.NONE);
 			labelProject1.setForeground(SWTResourceManager.getColor(255, 255, 255));
@@ -67,7 +74,7 @@ public class ProjectScreen extends GnosScreen {
 			labelProject1.setBackground(SWTResourceManager.getColor(0, 102, 204));
 			FormData fd_labelProject1 = new FormData();
 			fd_labelProject1.bottom = new FormAttachment(lastLabel, 40, SWT.BOTTOM);
-			fd_labelProject1.right = new FormAttachment(label, -6);
+			fd_labelProject1.right = new FormAttachment(labelVerticalSeparator, -6);
 			fd_labelProject1.top = new FormAttachment(lastLabel, 6);
 			fd_labelProject1.left = new FormAttachment(0, 10);
 			labelProject1.setLayoutData(fd_labelProject1);
@@ -90,10 +97,10 @@ public class ProjectScreen extends GnosScreen {
 
 		ScrolledComposite scViewPortContainer = new ScrolledComposite(this, SWT.V_SCROLL | SWT.NONE);
 		FormData fd_scViewPortContainer = new FormData();
-		fd_scViewPortContainer.right = new FormAttachment(labelProject, -6, SWT.RIGHT);
+		fd_scViewPortContainer.right = new FormAttachment(labelHome, -6, SWT.RIGHT);
 		fd_scViewPortContainer.bottom = new FormAttachment(100, -6);
-		fd_scViewPortContainer.top = new FormAttachment(labelProject, 6);
-		fd_scViewPortContainer.left = new FormAttachment(label, 6);
+		fd_scViewPortContainer.top = new FormAttachment(labelHome, 6);
+		fd_scViewPortContainer.left = new FormAttachment(labelVerticalSeparator, 6);
 
 		CreateNewProjectScreen newProjectScreen = new CreateNewProjectScreen(scViewPortContainer, SWT.BORDER);
 
@@ -104,6 +111,7 @@ public class ProjectScreen extends GnosScreen {
 		scViewPortContainer.setLayoutData(fd_scViewPortContainer);
 		
 		newProjectScreen.registerEventListener(this);
+		
 	}
 	
 	private void fireChildEvent(GnosEvent event){
@@ -123,5 +131,4 @@ public class ProjectScreen extends GnosScreen {
 		}
 		
 	}
-
 }
