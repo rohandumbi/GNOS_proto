@@ -44,71 +44,31 @@ public class ExpressionBuilderGrid extends Composite {
 	private List<String> numericSourceFields;
 	private String[] sourceFieldsComboItems;
 	private Composite presentRow;
-	private List<Expression> expressionList;
+	private List<Expression> expressions;
 	private String[] arithemeticOperatorsArray;
 	private Composite parent;
 	private List<String> presentExpressionNames;
+	private Label firstSeparator;
+	private Label secondSeparator;
+	private Label thirdSeparator;
+	private Label fourthSeparator;
 
-	public ExpressionBuilderGrid(Composite parent, int style, List<Field> allSourceFields) {
+	public ExpressionBuilderGrid(Composite parent, int style, List<Field> allSourceFields, List<Expression> expressions) {
 		super(parent, style);
 		this.parent = parent;
-		//this.requiredFieldNames = requiredFieldNames;
-		//this.parent = parent;
 		this.allSourceFields = allSourceFields;
 		this.allRows = new ArrayList<Composite>();
-		//this.expressionList = new ArrayList<Expression>();
-		//this.numericSourceFields = new ArrayList<String>();
-		//this.dataTypes = dataTypes;
+		this.expressions = expressions;
 		this.arithemeticOperatorsArray = new String[]{"+", "-", "*", "/"};
 		this.createContent(parent);
 	}
 	
-	private boolean isExpressionNameDuplicate(String expressionName){
-		boolean isPresentInExpressionGrid = false;
-		boolean isPresentInSavedGrid = false;
-		for(String str: presentExpressionNames) {
-		    if(str.trim().equalsIgnoreCase(expressionName.trim()))
-		    	isPresentInExpressionGrid = true;
-		}
-		if(!isPresentInExpressionGrid){
-			List<Expression> savedExpressions = Expressions.getAll();
-			for(Expression expression : savedExpressions){
-				if(expression.getName().trim().equalsIgnoreCase(expressionName)){
-					isPresentInSavedGrid = true;
-				}
-			}
-		}
-		return isPresentInExpressionGrid||isPresentInSavedGrid;
+	private void createContent(Composite parent){
+		this.setLayout(new FormLayout());
+		//this.createSourceFieldsComboItems();
+		this.createHeader();
+		this.createRows();
 	}
-
-	/*private int getDatatypeCode(String dataType){
-		if(dataType.equalsIgnoreCase("String")){
-			return 1;
-		}else if(dataType.equalsIgnoreCase("Integer")){
-			return 2;
-		}else if(dataType.equalsIgnoreCase("Double")){
-			return 3;
-		}else{
-			return 0;
-		}
-	}*/
-	private String[] getSourceFieldsComboItems(){
-		int i = 0;
-		int sourceFieldSize = this.allSourceFields.size();
-		this.numericSourceFields = new ArrayList<String>();
-		for(Field field: this.allSourceFields){
-			if(field.getDataType() == Field.TYPE_NUMBER){
-				this.numericSourceFields.add(field.getName());
-			}		
-		}
-		this.sourceFieldsComboItems = new String[this.numericSourceFields.size()];
-		for(i=0; i<this.numericSourceFields.size(); i++){
-			this.sourceFieldsComboItems[i] = this.numericSourceFields.get(i);
-		}
-		return this.sourceFieldsComboItems;
-	}
-
-
 	private void createHeader(){
 		compositeGridHeader = new Composite(this, SWT.BORDER);
 		compositeGridHeader.setBackground(SWTResourceManager.getColor(230, 230, 230));
@@ -120,26 +80,26 @@ public class ExpressionBuilderGrid extends Composite {
 		fd_compositeGridHeader.right = new FormAttachment(100);
 		compositeGridHeader.setLayoutData(fd_compositeGridHeader);
 
-		Label firstSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
+		this.firstSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
 		FormData fd_firstSeparator = new FormData();
 		fd_firstSeparator.left = new FormAttachment(5);
-		firstSeparator.setLayoutData(fd_firstSeparator);
+		this.firstSeparator.setLayoutData(fd_firstSeparator);
 
-		Label secondSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
+		this.secondSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
 		FormData fd_secondSeparator = new FormData();
 		fd_secondSeparator.left = new FormAttachment(20);
-		secondSeparator.setLayoutData(fd_secondSeparator);
+		this.secondSeparator.setLayoutData(fd_secondSeparator);
 
 
-		Label thirdSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
+		this.thirdSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
 		FormData fd_thirdSeparator = new FormData();
 		fd_thirdSeparator.left = new FormAttachment(30);
-		thirdSeparator.setLayoutData(fd_thirdSeparator);
+		this.thirdSeparator.setLayoutData(fd_thirdSeparator);
 
-		Label fourthSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
+		this.fourthSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
 		FormData fd_fourthSeparator = new FormData();
 		fd_fourthSeparator.left = new FormAttachment(62);
-		fourthSeparator.setLayoutData(fd_fourthSeparator);
+		this.fourthSeparator.setLayoutData(fd_fourthSeparator);
 
 		Label lblGradeHeader = new Label(compositeGridHeader, SWT.NONE);
 		lblGradeHeader.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
@@ -189,6 +149,101 @@ public class ExpressionBuilderGrid extends Composite {
 
 	}
 
+	private void createRows() {
+		for(Expression expression: expressions){
+			final Composite compositeRow = new Composite(this, SWT.BORDER);
+			compositeRow.setEnabled(false);
+			compositeRow.setData(expression);
+			compositeRow.setLayout(new FormLayout());
+			Color backgroundColor = SWTResourceManager.getColor(SWT.COLOR_WHITE);
+			if((this.allRows != null) && (this.allRows.size()%2 != 0)){
+				backgroundColor =  SWTResourceManager.getColor(245, 245, 245);
+			}
+
+			compositeRow.setBackground(backgroundColor);
+			FormData fd_compositeRow = new FormData();
+			fd_compositeRow.left = new FormAttachment(this.presentRow, 0, SWT.LEFT);
+			fd_compositeRow.right = new FormAttachment(this.presentRow, 0, SWT.RIGHT);
+			fd_compositeRow.top = new FormAttachment(this.presentRow);
+
+			Button grade = new Button(compositeRow, SWT.CHECK);
+			grade.setSelection(expression.isGrade());
+			FormData fd_grade = new FormData();
+			fd_grade.left = new FormAttachment(0, 10);
+			fd_grade.top = new FormAttachment(compositeRow, 2, SWT.TOP);			
+			grade.setLayoutData(fd_grade);
+
+			Text expressionName = new Text(compositeRow, SWT.BORDER);
+			expressionName.setText(expression.getName());
+			FormData fd_expressionName = new FormData();
+			fd_expressionName.left = new FormAttachment(5, 5);
+			fd_expressionName.top = new FormAttachment(0);
+			fd_expressionName.right = new FormAttachment(20, -5);
+			expressionName.setLayoutData(fd_expressionName);
+
+			Button buttonIsComplex = new Button(compositeRow, SWT.CHECK);
+			buttonIsComplex.setSelection(expression.isComplex());
+			FormData fd_buttonIsComplex = new FormData();
+			fd_buttonIsComplex.left = new FormAttachment(24);
+			//fd_buttonIsComplex.right = new FormAttachment(30, -5);
+			fd_buttonIsComplex.top = new FormAttachment(0,2);
+			buttonIsComplex.setLayoutData(fd_buttonIsComplex);
+
+			Text textExpression = new Text(compositeRow, SWT.BORDER);
+			textExpression.setText(expression.getExpr_str());
+			FormData fd_textExpression = new FormData();
+			fd_textExpression.right = new FormAttachment(62, -2);
+			fd_textExpression.left = new FormAttachment(30, 2);
+			textExpression.setLayoutData(fd_textExpression);
+			
+			Text textCondition = new Text(compositeRow, SWT.BORDER);
+			if(expression.getCondition() != null)
+				textCondition.setText(expression.getCondition());
+			FormData fd_textCondition = new FormData();
+			fd_textCondition.left = new FormAttachment(62, 2);
+			fd_textCondition.right = new FormAttachment(100, -2);
+			textCondition.setLayoutData(fd_textCondition);
+
+			this.presentRow = compositeRow;
+			this.allRows.add(compositeRow);
+			compositeRow.setLayoutData(fd_compositeRow);
+		}
+	}
+	
+	private boolean isExpressionNameDuplicate(String expressionName){
+		boolean isPresentInExpressionGrid = false;
+		boolean isPresentInSavedGrid = false;
+		for(String str: presentExpressionNames) {
+		    if(str.trim().equalsIgnoreCase(expressionName.trim()))
+		    	isPresentInExpressionGrid = true;
+		}
+		if(!isPresentInExpressionGrid){
+			List<Expression> savedExpressions = Expressions.getAll();
+			for(Expression expression : savedExpressions){
+				if(expression.getName().trim().equalsIgnoreCase(expressionName)){
+					isPresentInSavedGrid = true;
+				}
+			}
+		}
+		return isPresentInExpressionGrid||isPresentInSavedGrid;
+	}
+
+	private String[] getSourceFieldsComboItems(){
+		int i = 0;
+		int sourceFieldSize = this.allSourceFields.size();
+		this.numericSourceFields = new ArrayList<String>();
+		for(Field field: this.allSourceFields){
+			if(field.getDataType() == Field.TYPE_NUMBER){
+				this.numericSourceFields.add(field.getName());
+			}		
+		}
+		this.sourceFieldsComboItems = new String[this.numericSourceFields.size()];
+		for(i=0; i<this.numericSourceFields.size(); i++){
+			this.sourceFieldsComboItems[i] = this.numericSourceFields.get(i);
+		}
+		return this.sourceFieldsComboItems;
+	}
+	
 	private void toggleExpressionType(Composite compositeRow, boolean isExpression){
 
 		Composite expressionComposite = new Composite(compositeRow, SWT.NONE);
@@ -259,6 +314,7 @@ public class ExpressionBuilderGrid extends Composite {
 	}
 
 	public void addRow(){
+
 		final Composite compositeRow = new Composite(this, SWT.BORDER);
 		compositeRow.setLayout(new FormLayout());
 		Color backgroundColor = SWTResourceManager.getColor(SWT.COLOR_WHITE);
@@ -269,7 +325,6 @@ public class ExpressionBuilderGrid extends Composite {
 		compositeRow.setBackground(backgroundColor);
 		FormData fd_compositeRow = new FormData();
 		fd_compositeRow.left = new FormAttachment(this.presentRow, 0, SWT.LEFT);
-		//fd_compositeRow.bottom = new FormAttachment(this.presentRow, 26, SWT.BOTTOM);
 		fd_compositeRow.right = new FormAttachment(this.presentRow, 0, SWT.RIGHT);
 		fd_compositeRow.top = new FormAttachment(this.presentRow);
 
@@ -286,14 +341,6 @@ public class ExpressionBuilderGrid extends Composite {
 		fd_expressionName.top = new FormAttachment(0);
 		fd_expressionName.right = new FormAttachment(20, -5);
 		expressionName.setLayoutData(fd_expressionName);
-
-		/*Composite expressionComposite = new Composite(compositeRow, SWT.NONE);
-		expressionComposite.setLayout(new FillLayout(SWT.HORIZONTAL));
-		expressionComposite.setBackground(backgroundColor);
-		FormData fd_expressionComposite = new FormData();
-		fd_expressionComposite.right = new FormAttachment(70, -5);
-		fd_expressionComposite.left = new FormAttachment(40, 5);
-		expressionComposite.setLayoutData(fd_expressionComposite);*/
 
 		Button buttonIsComplex = new Button(compositeRow, SWT.CHECK);
 		FormData fd_buttonIsComplex = new FormData();
@@ -328,12 +375,6 @@ public class ExpressionBuilderGrid extends Composite {
 		compositeRow.setLayoutData(fd_compositeRow);
 	}
 
-	private void createContent(Composite parent){
-		this.setLayout(new FormLayout());
-		//this.createSourceFieldsComboItems();
-		this.createHeader();
-
-	}
 
 	public void resetAllRows(){
 		for(Composite existingRow : this.allRows){
@@ -349,10 +390,13 @@ public class ExpressionBuilderGrid extends Composite {
 
 	public List<Expression> getDefinedExpressions(){
 		Control[] rowChildren = null;
-		this.expressionList = new ArrayList<Expression>();
+		List<Expression> expressionList = new ArrayList<Expression>();
 		this.presentExpressionNames = new ArrayList<String>();
 		for(int i = 0; i < allRows.size(); i++){
-			rowChildren = allRows.get(i).getChildren();
+			Composite row = allRows.get(i);
+			Expression expression= (Expression)row.getData();
+			
+			rowChildren = row.getChildren();
 			boolean isGrade = false;
 			boolean isComplex = false;
 			String expressionName = null;
@@ -361,8 +405,6 @@ public class ExpressionBuilderGrid extends Composite {
 			Control controlGrade = rowChildren[0];
 			Control controlExpressionName = rowChildren[1];
 			Control controlIsComplex = rowChildren[2];
-
-			Expression expression= null;
 
 			Control controlExpressionValue = null;
 
@@ -389,7 +431,7 @@ public class ExpressionBuilderGrid extends Composite {
 			if(controlExpressionName instanceof Text){
 				Text textControlExpressionName = (Text)controlExpressionName;
 				expressionName = textControlExpressionName.getText();
-				expression = new Expression(expressionName);
+				
 			}
 
 			if(expressionName == null || expressionName == ""){
@@ -404,7 +446,9 @@ public class ExpressionBuilderGrid extends Composite {
 				presentExpressionNames.add(expressionName);
 			}
 
-
+			if(expression == null){
+				expression = new Expression(expressionName);
+			}
 
 			if(controlExpressionValue instanceof Composite){
 				Composite compositeExpressionValue = (Composite)controlExpressionValue;
@@ -416,51 +460,11 @@ public class ExpressionBuilderGrid extends Composite {
 
 					String leftOperandValue = leftOperand.getText();
 					String rightOperandValue = rightOperand.getText();
+					String operatorValue = operator.getText();
 
-					int leftOperandIndex = -1;
-					int rightOperandIndex = -1;
-
-					/*
-					 * Can't directly take the selection index as the column id because,
-					 * in the field combo only numeric fields are present, whereas in the columns
-					 * table all types of columns are present. Hence searching for the correct index
-					 * of left/right operand by comparing the text value with all column names.
-					 * Some complexity may be reduceable. Later!!!
-					 */
-					for (int j=0; j<this.allSourceFields.size(); j++) {
-						String columnName = this.allSourceFields.get(j).getName();
-
-						if (columnName.equalsIgnoreCase(leftOperandValue)) {
-							leftOperandIndex = j;
-							break;
-						}
-					}
-
-					for (int k=0; k<this.allSourceFields.size(); k++) {
-						String columnName = this.allSourceFields.get(k).getName();
-
-						if (columnName.equalsIgnoreCase(rightOperandValue)) {
-							rightOperandIndex = k;
-							break;
-						}
-					}
-
-					int operatorIndex = operator.getSelectionIndex();
-					if(leftOperandIndex<0 || rightOperandIndex<0 || rightOperandIndex<0){
-						MessageDialog.openError(this.parent.getShell(), "GNOS Error", "Expression value not properly defined: " + expressionName);
-						return null;
-					}
-
-					Operation operation = new Operation();
-					operation.setOperand_left(leftOperandIndex);
-					operation.setOperand_right(rightOperandIndex);
-					operation.setOperator(operatorIndex);
-
-					//expression.setValue(-1);
-					//expression.setOperation(operation);
+					expression.setExpr_str(leftOperandValue + operatorValue + rightOperandValue);
 
 				}else{
-					//expression.setValueType(isComplex);
 					Combo sourceField = (Combo)compositeExpressionValue.getChildren()[0];
 					expressionValue = sourceField.getText();
 					int index = -1;
@@ -476,17 +480,15 @@ public class ExpressionBuilderGrid extends Composite {
 						MessageDialog.openError(this.parent.getShell(), "GNOS Error", "Please map a proper value for the expression: " + expressionName);
 						return null;
 					}
-					//expression.setValue(index);
-					//expression.setOperation(null);
+					expression.setExpr_str(expressionValue);
 				}
 			}
 
 			expression.setGrade(isGrade);
 			expression.setComplex(isComplex);
-			//List<Filter> filters = conditionComposite.getExpressionFilters();
 			String condition = textCondition.getText();
-
-			if(condition == null || condition == ""){
+			expression.setCondition(condition);
+/*			if(condition == null || condition == ""){
 				condition = "[bin]==[bin]";
 				System.out.println("Condition: " + condition);//temporary hack to set everything when no condition
 			}
@@ -495,11 +497,11 @@ public class ExpressionBuilderGrid extends Composite {
 			if(!isConditionValid){
 				MessageDialog.openError(this.parent.getShell(), "GNOS Error", "Conditions not defined properly.");
 				return null;
-			} 
+			} */
 
-			this.expressionList.add(expression);
+			expressionList.add(expression);
 		}
-		return this.expressionList;
+		return expressionList;
 	}
 
 	@Override

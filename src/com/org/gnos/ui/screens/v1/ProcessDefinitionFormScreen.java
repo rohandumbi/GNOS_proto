@@ -26,9 +26,8 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import com.org.gnos.core.Model;
 import com.org.gnos.events.GnosEvent;
-import com.org.gnos.services.Model;
-import com.org.gnos.services.Models;
 import com.org.gnos.services.ProcessNode;
 import com.org.gnos.services.ProcessRoute;
 import com.org.gnos.ui.custom.controls.GnosScreen;
@@ -170,7 +169,7 @@ public class ProcessDefinitionFormScreen extends GnosScreen {
 
 	private String[] getSourceFieldsComboItems(){
 
-		List<Model> models = Models.getAll();
+		List<Model> models = null;//Models.getAll();
 		this.sourceFieldsComboItems = new String[models.size()];
 		for(int i=0; i<models.size(); i++){
 			this.sourceFieldsComboItems[i] = models.get(i).getName();
@@ -260,7 +259,7 @@ public class ProcessDefinitionFormScreen extends GnosScreen {
 		for(Control definedModelStep : definedModelSteps){
 			Composite definedModelStepComposite = (Composite)definedModelStep;
 			Combo modelSelection = (Combo)definedModelStepComposite.getChildren()[1]; //Combo is always 2nd child
-			List<Model> allModels = Models.getAll();
+			List<Model> allModels = null;//Models.getAll();
 			ProcessNode processNode = new ProcessNode();
 			int modelSelectionIndex = modelSelection.getSelectionIndex();
 			processNode.setModel(allModels.get(modelSelectionIndex));

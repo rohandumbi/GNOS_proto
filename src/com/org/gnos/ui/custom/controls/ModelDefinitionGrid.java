@@ -20,9 +20,9 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.core.Expression;
 import com.org.gnos.core.Field;
+import com.org.gnos.core.Model;
+import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.services.Expressions;
-import com.org.gnos.services.Model;
-import com.org.gnos.services.Models;
 
 public class ModelDefinitionGrid extends Composite {
 
@@ -31,53 +31,34 @@ public class ModelDefinitionGrid extends Composite {
 	 * @param parent
 	 * @param style
 	 */
-	private List<Field> allSourceFields;
 	private Composite compositeGridHeader;
 	private List<Composite> allRows;
-	private List<String> numericSourceFields;
 	private String[] sourceFieldsComboItems;
 	private Composite presentRow;
 	private List<Model> modelList;
-	private String[] arithemeticOperatorsArray;
 	private Composite parent;
 	private List<String> presentmodelNames;
 
-	public ModelDefinitionGrid(Composite parent, int style, List<Field> allSourceFields) {
+	public ModelDefinitionGrid(Composite parent, int style) {
 		super(parent, style);
 		this.parent = parent;
-		//this.requiredFieldNames = requiredFieldNames;
-		//this.parent = parent;
-		this.allSourceFields = allSourceFields;
 		this.allRows = new ArrayList<Composite>();
-		//this.expressionList = new ArrayList<Expression>();
-		//this.numericSourceFields = new ArrayList<String>();
-		//this.dataTypes = dataTypes;
-		this.arithemeticOperatorsArray = new String[]{"+", "-", "*", "/"};
 		this.createContent(parent);
 	}
 	
 	private boolean isModelNameDuplicate(String modelName){
 		boolean isPresentInModelGrid = false;
-		boolean isPresentInSavedGrid = false;
 		for(String str: presentmodelNames) {
 		    if(str.trim().equalsIgnoreCase(modelName.trim()))
 		    	isPresentInModelGrid = true;
 		}
-		if(!isPresentInModelGrid){
-			List<Model> savedModels = Models.getAll();
-			for(Model model : savedModels){
-				if(model.getName().trim().equalsIgnoreCase(modelName)){
-					isPresentInSavedGrid = true;
-				}
-			}
-		}
-		return isPresentInModelGrid||isPresentInSavedGrid;
+		return isPresentInModelGrid;
 	}
 
 	
-	private String[] getSourceFieldsComboItems(){
+	private String[] getExpressionComboItems(){
 		
-		List<Expression> expressions = Expressions.getAll();
+		List<Expression> expressions = ProjectConfigutration.getInstance().getExpressions();
 		this.sourceFieldsComboItems = new String[expressions.size()];
 		for(int i=0; i<expressions.size(); i++){
 			this.sourceFieldsComboItems[i] = expressions.get(i).getName();
@@ -171,7 +152,7 @@ public class ModelDefinitionGrid extends Composite {
 		fd_comboExpressionDefinition.left = new FormAttachment(33, 5);
 		comboModelDefinition.setLayoutData(fd_comboExpressionDefinition);
 		comboModelDefinition.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
-		comboModelDefinition.setItems(getSourceFieldsComboItems());
+		comboModelDefinition.setItems(getExpressionComboItems());
 		comboModelDefinition.setText("Field Value");
 		comboModelDefinition.addListener(SWT.MouseDown, new Listener(){
 			@Override
@@ -179,7 +160,7 @@ public class ModelDefinitionGrid extends Composite {
 				// TODO Auto-generated method stub
 				//System.out.println("detected combo click");
 				comboModelDefinition.removeAll();
-				comboModelDefinition.setItems(getSourceFieldsComboItems());
+				comboModelDefinition.setItems(getExpressionComboItems());
 				comboModelDefinition.getParent().layout();
 				comboModelDefinition.setListVisible(true);
 			}
@@ -217,13 +198,13 @@ public class ModelDefinitionGrid extends Composite {
 
 	public List<Model> getDefinedModels(){
 		Control[] rowChildren = null;
-		//this.expressionList = new ArrayList<Expression>();
 		this.modelList = new ArrayList<Model>();
 		this.presentmodelNames = new ArrayList<String>();
+		List<Expression> expressions = ProjectConfigutration.getInstance().getExpressions();
 		for(int i = 0; i < allRows.size(); i++){
 			rowChildren = allRows.get(i).getChildren();
 			String modelName = null;
-			int modelValue = -1;
+			String modelValue = null;
 			String modelCondition = null;
 			Model model = null;
 
@@ -232,33 +213,39 @@ public class ModelDefinitionGrid extends Composite {
 			Text modelConditionText = (Text)rowChildren[2];
 			
 			modelName = modelNameText.getText();
-			modelValue = modelValueCombo.getSelectionIndex();
+			modelValue = modelValueCombo.getText();
 			modelCondition = modelConditionText.getText();
 			
 			if(modelName == null || modelName == ""){
 				MessageDialog.openError(this.parent.getShell(), "GNOS Error", "Please enter a valid name for model.");
 				return null;
-			}else if(modelValue<0){
+			}else if(modelValue == null){
 				MessageDialog.openError(this.parent.getShell(), "GNOS Error", "Please enter a valid value for model " + modelName);
 				return null;
 			}
-			if(modelCondition == null || modelCondition == ""){
+
+/*			if(modelCondition == null || modelCondition == ""){
 				modelCondition = "[bin]==[bin]";
 				System.out.println("Condition: " + modelCondition);//temporary hack to set everything when no condition
-			}
+			}*/
 			
 			if(isModelNameDuplicate(modelName)){
 				MessageDialog.openError(this.parent.getShell(), "GNOS Error", "Model name: " + modelName + " already exists. Please use a unique model name.");
 				return null;
 			}else{
 				model = new Model(modelName);
-				model.setValue(modelValue);
-				boolean isConditionValid = model.setCondition(modelCondition);
-				System.out.println("Condition: " + isConditionValid);
+				for(Expression expression: expressions) {
+					if(expression.getName().equals(modelValue)){
+						model.setExpression(expression);
+						break;
+					}
+				}
+				model.setCondition(modelCondition);
+/*				System.out.println("Condition: " + isConditionValid);
 				if(!isConditionValid){
 					MessageDialog.openError(this.parent.getShell(), "GNOS Error", "Conditions not defined properly.");
 					return null;
-				} 
+				} */
 				//model.setCondition(modelCondition);
 				presentmodelNames.add(modelName);
 				this.modelList.add(model);

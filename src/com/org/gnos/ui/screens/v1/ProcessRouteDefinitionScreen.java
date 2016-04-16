@@ -1,7 +1,5 @@
 package com.org.gnos.ui.screens.v1;
 
-import java.util.List;
-
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -15,15 +13,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.events.GnosEvent;
-import com.org.gnos.services.Model;
-import com.org.gnos.services.Models;
-import com.org.gnos.services.ProcessNode;
 import com.org.gnos.services.ProcessRoute;
 import com.org.gnos.services.ProcessRoutes;
 import com.org.gnos.ui.custom.controls.GnosScreen;
 import com.org.gnos.ui.custom.controls.ProcessDefinitionDialog;
 import com.org.gnos.ui.graph.GraphContainer;
-import org.eclipse.swt.widgets.Label;
 
 public class ProcessRouteDefinitionScreen extends GnosScreen {
 

@@ -1,5 +1,7 @@
 package com.org.gnos.services;
 
+import com.org.gnos.core.Model;
+
 public class ProcessNode {
 	private Model model;
 	private int id;

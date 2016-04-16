@@ -56,19 +56,18 @@ CREATE TABLE expressions (
    name VARCHAR(100) NOT NULL,
    grade TINYINT(1),
    is_complex TINYINT(1),
-   field_left VARCHAR(100) NOT NULL,
-   field_right VARCHAR(100),
-   operator TINYINT(1),
+   expr_str VARCHAR(200) NOT NULL,
    filter_str VARCHAR(400),
    PRIMARY KEY ( id, project_id )
 );
 
-DROP TABLE IF EXISTS model_definition;
+DROP TABLE IF EXISTS models;
 
-CREATE TABLE model_definition(
+CREATE TABLE models(
    id INT NOT NULL AUTO_INCREMENT,
    project_id INT NOT NULL,
    name  VARCHAR(100) NOT NULL,
-   field_id INT NOT NULL,
+   expr_id INT NOT NULL,
+   filter_str VARCHAR(400),
    PRIMARY KEY ( id )
 );

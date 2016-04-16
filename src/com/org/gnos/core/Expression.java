@@ -12,15 +12,14 @@ public class Expression {
 	private String name;
 	private boolean grade;
 	private boolean isComplex;
-	private String field_left;
-	private String field_right;
-	private short operator;
+	private String expr_str;
 	private String condition = null;
 	private String updatedCondition = null;
 	private List conditionColumns = new ArrayList<Integer>();
 	
 	public Expression(String name) {
 		super();
+		this.id = -1;
 		this.name = name;
 	}
 	
@@ -57,29 +56,13 @@ public class Expression {
 	public void setGrade(boolean grade) {
 		this.grade = grade;
 	}
-	
-	public String getField_left() {
-		return field_left;
+
+	public String getExpr_str() {
+		return expr_str;
 	}
 
-	public void setField_left(String field_left) {
-		this.field_left = field_left;
-	}
-
-	public String getField_right() {
-		return field_right;
-	}
-
-	public void setField_right(String field_right) {
-		this.field_right = field_right;
-	}
-
-	public short getOperator() {
-		return operator;
-	}
-
-	public void setOperator(short operator) {
-		this.operator = operator;
+	public void setExpr_str(String expr_str) {
+		this.expr_str = expr_str;
 	}
 
 	public String getCondition() {
@@ -88,7 +71,7 @@ public class Expression {
 
 	public boolean setCondition(String condition) {
 		if(condition == null || condition.trim().length() == 0) return false;
-		String updatedConditionStr = "";
+/*		String updatedConditionStr = "";
 		String pattern = "(\\.?\\])";
 		String[] splits = condition.split(pattern);
 		String[] columns = GNOSCSVDataProcessor.getInstance().getHeaderColumns();
@@ -112,7 +95,7 @@ public class Expression {
 				updatedConditionStr += splits[i];
 			}			
 		}
-		this.updatedCondition = updatedConditionStr;
+		this.updatedCondition = updatedConditionStr;*/
 		this.condition = condition;
 		
 		

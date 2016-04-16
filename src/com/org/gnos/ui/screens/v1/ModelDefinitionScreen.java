@@ -16,21 +16,16 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.core.Field;
+import com.org.gnos.core.Model;
 import com.org.gnos.core.ProjectConfigutration;
-import com.org.gnos.custom.models.ProjectModel;
 import com.org.gnos.events.GnosEvent;
-import com.org.gnos.services.Model;
-import com.org.gnos.services.Models;
 import com.org.gnos.services.csv.GNOSCSVDataProcessor;
 import com.org.gnos.ui.custom.controls.GnosScreen;
 import com.org.gnos.ui.custom.controls.ModelDefinitionGrid;
-import com.org.gnos.ui.custom.controls.SavedModelsGrid;
 
 public class ModelDefinitionScreen extends GnosScreen {
 
 	private ModelDefinitionGrid modelDefinitionGrid;
-	private SavedModelsGrid savedModelsGrid;
-	private List<Field> fields;
 	private List<Model> allDefinedModels;
 	private Composite parent;
 	/**
@@ -44,7 +39,6 @@ public class ModelDefinitionScreen extends GnosScreen {
 		setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
 		setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		this.parent = parent;
-		this.fields = ProjectConfigutration.getInstance().getFields();
 		this.createContent();
 	}
 	
@@ -72,7 +66,7 @@ public class ModelDefinitionScreen extends GnosScreen {
 		labelScreenDescription.setLayoutData(fd_labelScreenDescription);
 		labelScreenDescription.setText("Define your own models. Add filters.");
 		
-		modelDefinitionGrid = new ModelDefinitionGrid(this, SWT.NONE, this.fields);
+		modelDefinitionGrid = new ModelDefinitionGrid(this, SWT.NONE);
 		FormData fd_expressionBuilderGrid = new FormData();
 		fd_expressionBuilderGrid.top = new FormAttachment(labelScreenDescription, 6);
 		fd_expressionBuilderGrid.left = new FormAttachment(0, 10);
@@ -146,96 +140,19 @@ public class ModelDefinitionScreen extends GnosScreen {
 		fd_buttonSave.right = new FormAttachment(btnAddNewRow, 145, SWT.RIGHT);
 		//fd_buttonMapRqrdFields.right = new FormAttachment(0, 282);
 		buttonSave.setLayoutData(fd_buttonSave);
-		/*buttonSave.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				//TODO mapping complete
-				//projectModel.setAllProjectFields(fieldDatatypeDefinitionGrid.getFieldDatatypes());
-				updateExpressionList();
-				GNOSCSVDataProcessor.getInstance().compute();
-				GNOSCSVDataProcessor.getInstance().dumpToDB();
-				GNOSCSVDataProcessor.getInstance().dumpToCsv();
-				resetExpressionList();
-			}
-		});*/
-		
-		/*
-		 * Temporary Export to CSV button
-		 */
-		Button buttonExportToCSV = new Button(this, SWT.NONE);
-		buttonExportToCSV.setText("SAVE TO CSV");
-		FormData fd_buttonExportToCSV = new FormData();
-		fd_buttonExportToCSV.top = new FormAttachment(modelDefinitionGrid, 10, SWT.BOTTOM);
-		fd_buttonExportToCSV.left = new FormAttachment(buttonSave, 5, SWT.RIGHT);
-		fd_buttonExportToCSV.right = new FormAttachment(buttonSave, 145, SWT.RIGHT);
-		//fd_buttonMapRqrdFields.right = new FormAttachment(0, 282);
-		buttonExportToCSV.setLayoutData(fd_buttonExportToCSV);
-		
-		Label labelSavedExpressions = new Label(this, SWT.NONE);
-		labelSavedExpressions.setText("Saved Models");
-		labelSavedExpressions.setForeground(SWTResourceManager.getColor(0, 191, 255));
-		labelSavedExpressions.setFont(SWTResourceManager.getFont("Arial", 9, SWT.BOLD));
-		labelSavedExpressions.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		FormData fd_labelSavedExpressions = new FormData();
-		fd_labelSavedExpressions.top = new FormAttachment(buttonSave, 10);
-		fd_labelSavedExpressions.left = new FormAttachment(0, 10);
-		labelSavedExpressions.setLayoutData(fd_labelSavedExpressions);
-		
-		savedModelsGrid = new SavedModelsGrid(this, SWT.NONE, this.fields);
-		FormData fd_savedExpressionsGrid = new FormData();
-		fd_savedExpressionsGrid.top = new FormAttachment(labelSavedExpressions, 6);
-		fd_savedExpressionsGrid.left = new FormAttachment(0, 10);
-		fd_savedExpressionsGrid.right = new FormAttachment(100, -10);
-		savedModelsGrid.setLayoutData(fd_savedExpressionsGrid);
-		
-		savedModelsGrid.addControlListener(new ControlAdapter() {
-		    public void controlResized(ControlEvent e) {
-		        //System.out.println("Expression builder grid resized");
-		    	Composite parent = self.getParent();
-		    	if((parent.getParent() !=null) && parent.getParent().getParent() instanceof WorkbenchScreen){//hack for the time being
-		    		 WorkbenchScreen workbenchScreen = (WorkbenchScreen)parent.getParent().getParent();
-					 workbenchScreen.setScrolledCompositeMinSize();
-		    	}
-		    }
-		});
 		
 		buttonSave.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				//TODO mapping complete
-				//projectModel.setAllProjectFields(fieldDatatypeDefinitionGrid.getFieldDatatypes());
 				boolean isUpdateExpressionSuccessful = updateModelList();
 				if(isUpdateExpressionSuccessful){
-					GNOSCSVDataProcessor.getInstance().compute();
-					//GNOSCSVDataProcessor.getInstance().dumpToDB();
-					List<Composite> allModels = modelDefinitionGrid.getAllRowsComposite();
-					savedModelsGrid.addRows(allModels);
+					//GNOSCSVDataProcessor.getInstance().compute();
+					//List<Composite> allModels = modelDefinitionGrid.getAllRowsComposite();
 					me.layout();
 					parent.layout(true, true);
 					resetModelList();
-				}
-				//System.out.println("After mapping datatype of 3rd row is: " + projectModel.getAllProjectFields().get(2).getDataType());
-				
-			}
-		});
-		
-		buttonExportToCSV.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				//TODO mapping complete
-				//projectModel.setAllProjectFields(fieldDatatypeDefinitionGrid.getFieldDatatypes());
-				boolean isUpdateExpressionSuccessful = updateModelList();
-				if(isUpdateExpressionSuccessful){
-					GNOSCSVDataProcessor.getInstance().compute();
-					//GNOSCSVDataProcessor.getInstance().dumpToCsv();
-					List<Composite> allModels = modelDefinitionGrid.getAllRowsComposite();
-					savedModelsGrid.addRows(allModels);
-					me.layout();
-					parent.layout(true, true);
-					resetModelList();
-				}
-				//System.out.println("After mapping datatype of 3rd row is: " + projectModel.getAllProjectFields().get(2).getDataType());
-				
+				}				
 			}
 		});
 	}
@@ -246,10 +163,8 @@ public class ModelDefinitionScreen extends GnosScreen {
 		if(this.allDefinedModels == null){
 			return false;
 		}
-		for(Model model: this.allDefinedModels){
-			//Expressions expressions = new Expressions();
-			Models.add(model);
-		}
+		ProjectConfigutration.getInstance().setModels(this.allDefinedModels);
+		ProjectConfigutration.getInstance().saveModelData();
 		return true;
 	}
 	

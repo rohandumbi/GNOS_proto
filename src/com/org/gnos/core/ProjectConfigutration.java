@@ -24,6 +24,7 @@ public class ProjectConfigutration {
 	private List<Field> fields = new ArrayList<Field>();
 	private Map<String, String> requiredFieldMapping = new LinkedHashMap<String, String>();
 	private List<Expression> expressions = new ArrayList<Expression>();
+	private List<Model> models = new ArrayList<Model>();
 	
 	private Map<String, String> savedRequiredFieldMapping;
 	
@@ -112,7 +113,7 @@ public class ProjectConfigutration {
 	}
 	
 	private void loadExpressions() {
-		String sql = "select id, name, grade, is_complex, field_left, field_right, operator, filter_str from expressions where project_id = "+ this.projectId;
+		String sql = "select id, name, grade, is_complex, expr_str, filter_str from expressions where project_id = "+ this.projectId;
 		Statement stmt = null;
 		ResultSet rs = null; 
 		Connection conn = DBManager.getConnection();
@@ -126,11 +127,47 @@ public class ProjectConfigutration {
 				expression = new Expression(rs.getInt(1), rs.getString(2));
 				expression.setGrade(rs.getBoolean(3));
 				expression.setComplex(rs.getBoolean(4));
-				expression.setField_left(rs.getString(5));
-				expression.setField_right(rs.getString(6));
-				expression.setOperator(rs.getShort(7));
-				expression.setCondition(rs.getString(8));
+				expression.setExpr_str(rs.getString(5));
+				expression.setCondition(rs.getString(6));
 				expressions.add(expression);
+			}
+			
+		} catch(SQLException e){
+			e.printStackTrace();
+		} finally {
+			try {
+				if(stmt != null) stmt.close();
+				if(rs != null) rs.close();
+				if(conn != null) DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	private void loadModels() {
+		String sql = "select id, name, expr_id, filter_str from models where project_id = "+ this.projectId;
+		Statement stmt = null;
+		ResultSet rs = null; 
+		Connection conn = DBManager.getConnection();
+		
+		try {
+			stmt = conn.createStatement();
+			stmt.execute(sql);
+			rs = stmt.getResultSet();
+			Model model = null;
+			while(rs.next()){
+				model = new Model(rs.getInt(1), rs.getString(2));
+				int expressionId = rs.getInt(3);
+				for(Expression expression: expressions){
+					if(expression.getId() == expressionId){
+						model.setExpression(expression);
+						break;
+					}
+				}
+				
+				model.setCondition(rs.getString(4));
+				models.add(model);
 			}
 			
 		} catch(SQLException e){
@@ -149,7 +186,7 @@ public class ProjectConfigutration {
 	public void save() {
 		saveFieldData();
 		saveRequiredFieldMappingData();
-		//saveExpressionData();
+		saveExpressionData();
 	}
 	public void saveFieldData() {
 		
@@ -257,9 +294,11 @@ public class ProjectConfigutration {
 	public void saveExpressionData() {
 		
 		Connection conn = DBManager.getConnection();
-		String insert_sql = " insert into expressions (project_id, name, grade, is_complex, field_left, field_right, operator, filter_str) values (?, ?, ?, ?, ?, ?, ?, ?)";
-		String update_sql = " update expressions set grade= ?,  is_complex = ?, field_left = ?, field_right = ?, operand = ?,  filter_str = ? where id = ?";
+		String insert_sql = " insert into expressions (project_id, name, grade, is_complex, expr_str, filter_str) values (?, ?, ?, ?, ?, ?)";
+		String update_sql = " update expressions set grade= ?,  is_complex = ?, expr_str = ?,  filter_str = ? where id = ?";
 		PreparedStatement pstmt = null;
+		PreparedStatement pstmt1 = null;
+		
 		ResultSet rs = null; 
 		boolean autoCommit = true;
 
@@ -267,20 +306,28 @@ public class ProjectConfigutration {
 			autoCommit = conn.getAutoCommit();
 			conn.setAutoCommit(false);
 			pstmt = conn.prepareStatement(insert_sql, Statement.RETURN_GENERATED_KEYS);
-			
+			pstmt1 = conn.prepareStatement(update_sql);
 			for(Expression expression: expressions) {
-				pstmt.setInt(1, projectId);
-				pstmt.setString(2, expression.getName());
-				pstmt.setBoolean(3, expression.isGrade());
-				pstmt.setBoolean(4, expression.isComplex());
-				pstmt.setString(5, expression.getField_left());
-				pstmt.setString(6, expression.getField_right());
-				pstmt.setShort(7, expression.getOperator());
-				pstmt.setString(8, expression.getCondition());
-				pstmt.executeUpdate();
-				rs = pstmt.getGeneratedKeys();    
-				rs.next();  
-				expression.setId(rs.getInt(1));
+				if(expression.getId() == -1){
+					pstmt.setInt(1, projectId);
+					pstmt.setString(2, expression.getName());
+					pstmt.setBoolean(3, expression.isGrade());
+					pstmt.setBoolean(4, expression.isComplex());
+					pstmt.setString(5, expression.getExpr_str());
+					pstmt.setString(6, expression.getCondition());
+					pstmt.executeUpdate();
+					rs = pstmt.getGeneratedKeys();    
+					rs.next();  
+					expression.setId(rs.getInt(1));
+				} else {
+					pstmt1.setBoolean(1, expression.isGrade());
+					pstmt1.setBoolean(2, expression.isComplex());
+					pstmt1.setString(3, expression.getExpr_str());
+					pstmt1.setString(4, expression.getCondition());
+					pstmt1.setInt(5, expression.getId());
+					pstmt1.executeUpdate();
+				}
+
 			}
 
 			conn.commit();
@@ -300,6 +347,55 @@ public class ProjectConfigutration {
 		
 	}
 	
+	public void saveModelData() {
+		
+		Connection conn = DBManager.getConnection();
+		String insert_sql = " insert into models (project_id, name, expr_id, filter_str) values (?, ?, ?, ?)";
+		String update_sql = " update models set expr_id= ? , filter_str = ? where id = ?";
+		PreparedStatement pstmt = null;
+		PreparedStatement pstmt1 = null;
+		
+		ResultSet rs = null; 
+		boolean autoCommit = true;
+
+		try {
+			autoCommit = conn.getAutoCommit();
+			conn.setAutoCommit(false);
+			pstmt = conn.prepareStatement(insert_sql, Statement.RETURN_GENERATED_KEYS);
+			pstmt1 = conn.prepareStatement(update_sql);
+			for(Model model: models) {
+				if(model.getId() == -1){
+					pstmt.setInt(1, projectId);
+					pstmt.setString(2, model.getName());
+					pstmt.setInt(3, model.getExpression().getId());
+					pstmt.setString(4, model.getCondition());
+					pstmt.executeUpdate();
+					rs = pstmt.getGeneratedKeys();    
+					rs.next();  
+					model.setId(rs.getInt(1));
+				} else {
+					pstmt1.setInt(1, model.getExpression().getId());
+					pstmt1.setString(2, model.getCondition());
+					pstmt1.setInt(3, model.getId());
+					pstmt1.executeUpdate();
+				}
+			}
+			conn.commit();
+			
+		} catch(SQLException e){
+			e.printStackTrace();
+		} finally {
+			try {
+				conn.setAutoCommit(autoCommit);
+				if(pstmt != null) pstmt.close();
+				if(rs != null) rs.close();
+				if(conn != null) DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+	}
 	public List<Field> getFields() {
 		return fields;
 	}
@@ -323,6 +419,12 @@ public class ProjectConfigutration {
 	public void setExpressions(List<Expression> expressions) {
 		this.expressions = expressions;
 	}
-	
-	
+
+	public List<Model> getModels() {
+		return models;
+	}
+
+	public void setModels(List<Model> models) {
+		this.models = models;
+	}
 }
