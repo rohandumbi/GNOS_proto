@@ -390,7 +390,6 @@ public class ExpressionBuilderGrid extends Composite {
 
 	public List<Expression> getDefinedExpressions(){
 		Control[] rowChildren = null;
-		List<Expression> expressionList = new ArrayList<Expression>();
 		this.presentExpressionNames = new ArrayList<String>();
 		for(int i = 0; i < allRows.size(); i++){
 			Composite row = allRows.get(i);
@@ -435,8 +434,7 @@ public class ExpressionBuilderGrid extends Composite {
 			}
 
 			if(expressionName == null || expressionName == ""){
-				MessageDialog.openError(this.parent.getShell(), "GNOS Error", "Please enter a valid name for expression.");
-				return null;
+				continue;
 			}
 			
 			if(isExpressionNameDuplicate(expressionName)){
@@ -448,6 +446,7 @@ public class ExpressionBuilderGrid extends Composite {
 
 			if(expression == null){
 				expression = new Expression(expressionName);
+				this.expressions.add(expression);
 			}
 
 			if(controlExpressionValue instanceof Composite){
@@ -498,10 +497,8 @@ public class ExpressionBuilderGrid extends Composite {
 				MessageDialog.openError(this.parent.getShell(), "GNOS Error", "Conditions not defined properly.");
 				return null;
 			} */
-
-			expressionList.add(expression);
 		}
-		return expressionList;
+		return this.expressions;
 	}
 
 	@Override

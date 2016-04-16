@@ -24,14 +24,14 @@ public class FieldDatatypeDefinitionGrid extends Composite {
 	 * @param parent
 	 * @param style
 	 */
-	private List<Field> allSourceFields;
+	private List<Field> fields;
 	private String[] dataTypes;
 	private Composite compositeGridHeader;
 	private List<Composite> allRows;
 	
-	public FieldDatatypeDefinitionGrid(Composite parent, int style, List<Field> allSourceFields, String[] dataTypes) {
+	public FieldDatatypeDefinitionGrid(Composite parent, int style, List<Field> fields, String[] dataTypes) {
 		super(parent, style);
-		this.allSourceFields = allSourceFields;
+		this.fields = fields;
 		this.dataTypes = dataTypes;
 		this.createContent(parent);
 	}
@@ -84,7 +84,7 @@ public class FieldDatatypeDefinitionGrid extends Composite {
 		Composite presentRow = this.compositeGridHeader;
 		allRows = new ArrayList<Composite>();
 		int i=0;
-		for(Field field : this.allSourceFields){
+		for(Field field : this.fields){
 			Composite compositeRow = new Composite(this, SWT.BORDER);
 			Color backgroundColor = SWTResourceManager.getColor(SWT.COLOR_WHITE);
 			if(i%2 != 0){
@@ -119,7 +119,6 @@ public class FieldDatatypeDefinitionGrid extends Composite {
 			} else {
 				comboDatatype.select(0);
 			}
-			
 			FormData fd_comboDatatype = new FormData();
 			fd_comboDatatype.left = new FormAttachment(50, 12);
 			fd_comboDatatype.right = new FormAttachment(80);
@@ -136,7 +135,7 @@ public class FieldDatatypeDefinitionGrid extends Composite {
 		this.setLayout(new FormLayout());
 		this.createHeader();
 		this.createRows();
-		this.setFieldDatatypes();//setting the data type mapping with default standards
+		
 	}
 	
 	
@@ -144,16 +143,9 @@ public class FieldDatatypeDefinitionGrid extends Composite {
 		Control[] rowChildren = null;
 		for(int i = 0; i < allRows.size(); i++){
 			rowChildren = allRows.get(i).getChildren();
-			Control compositeFieldName = rowChildren[0];
 			Control compositeDatatype = rowChildren[1];
-			
-			String fieldName = null;
 			String datatypeName = null;
 			Field field = (Field)allRows.get(i).getData();
-			if(compositeFieldName instanceof Label){
-				Label labelFieldName = (Label)compositeFieldName;
-				fieldName = labelFieldName.getText();
-			}
 			if(compositeDatatype instanceof Combo){
 				Combo comboDatatype = (Combo)compositeDatatype;
 				datatypeName = comboDatatype.getText();

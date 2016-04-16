@@ -76,7 +76,6 @@ public class ModelDefinitionScreen extends GnosScreen {
 		final Composite self = this;
 		modelDefinitionGrid.addControlListener(new ControlAdapter() {
 		    public void controlResized(ControlEvent e) {
-		        //System.out.println("Expression builder grid resized");
 		    	Composite parent = self.getParent();
 		    	if((parent.getParent() !=null) && parent.getParent().getParent() instanceof WorkbenchScreen){//hack for the time being
 		    		 WorkbenchScreen workbenchScreen = (WorkbenchScreen)parent.getParent().getParent();
@@ -161,7 +160,6 @@ public class ModelDefinitionScreen extends GnosScreen {
 		if(this.allDefinedModels == null){
 			return false;
 		}
-		ProjectConfigutration.getInstance().setModels(this.allDefinedModels);
 		ProjectConfigutration.getInstance().saveModelData();
 		return true;
 	}

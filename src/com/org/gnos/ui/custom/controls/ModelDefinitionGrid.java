@@ -35,7 +35,7 @@ public class ModelDefinitionGrid extends Composite {
 	private List<Composite> allRows;
 	private String[] sourceFieldsComboItems;
 	private Composite presentRow;
-	private List<Model> modelList;
+	private List<Model> models;
 	private Composite parent;
 	private List<String> presentmodelNames;
 
@@ -43,12 +43,12 @@ public class ModelDefinitionGrid extends Composite {
 		super(parent, style);
 		this.parent = parent;
 		this.allRows = new ArrayList<Composite>();
+		this.models = ProjectConfigutration.getInstance().getModels();
 		this.createContent(parent);
 	}
 	
 	private void createContent(Composite parent){
 		this.setLayout(new FormLayout());
-		//this.createSourceFieldsComboItems();
 		this.createHeader();
 		this.createRows();
 	}
@@ -129,9 +129,10 @@ public class ModelDefinitionGrid extends Composite {
 	}
 
 	private void createRows() {
-		this.modelList = ProjectConfigutration.getInstance().getModels();
-		for(Model model: this.modelList) {
+		
+		for(Model model: this.models) {
 			final Composite compositeRow = new Composite(this, SWT.BORDER);
+			compositeRow.setData(model);
 			compositeRow.setLayout(new FormLayout());
 			Color backgroundColor = SWTResourceManager.getColor(SWT.COLOR_WHITE);
 			if((this.allRows != null) && (this.allRows.size()%2 != 0)){
@@ -246,15 +247,15 @@ public class ModelDefinitionGrid extends Composite {
 
 	public List<Model> getDefinedModels(){
 		Control[] rowChildren = null;
-		this.modelList = new ArrayList<Model>();
 		this.presentmodelNames = new ArrayList<String>();
 		List<Expression> expressions = ProjectConfigutration.getInstance().getExpressions();
 		for(int i = 0; i < allRows.size(); i++){
-			rowChildren = allRows.get(i).getChildren();
+			Composite row = allRows.get(i);
+			rowChildren = row.getChildren();
 			String modelName = null;
 			String modelValue = null;
 			String modelCondition = null;
-			Model model = null;
+			Model model = (Model)row.getData();
 
 			Text modelNameText = (Text)rowChildren[0];
 			Control modelValueComp = rowChildren[1];
@@ -276,17 +277,16 @@ public class ModelDefinitionGrid extends Composite {
 				MessageDialog.openError(this.parent.getShell(), "GNOS Error", "Please enter a valid value for model " + modelName);
 				return null;
 			}
-
-/*			if(modelCondition == null || modelCondition == ""){
-				modelCondition = "[bin]==[bin]";
-				System.out.println("Condition: " + modelCondition);//temporary hack to set everything when no condition
-			}*/
 			
 			if(isModelNameDuplicate(modelName)){
 				MessageDialog.openError(this.parent.getShell(), "GNOS Error", "Model name: " + modelName + " already exists. Please use a unique model name.");
 				return null;
 			}else{
-				model = new Model(modelName);
+				if(model == null){
+					model = new Model(modelName);
+					this.models.add(model);
+				}
+				
 				for(Expression expression: expressions) {
 					if(expression.getName().equals(modelValue)){
 						model.setExpression(expression);
@@ -294,18 +294,12 @@ public class ModelDefinitionGrid extends Composite {
 					}
 				}
 				model.setCondition(modelCondition);
-/*				System.out.println("Condition: " + isConditionValid);
-				if(!isConditionValid){
-					MessageDialog.openError(this.parent.getShell(), "GNOS Error", "Conditions not defined properly.");
-					return null;
-				} */
-				//model.setCondition(modelCondition);
 				presentmodelNames.add(modelName);
-				this.modelList.add(model);
+				
 			}
 		}
 			
-		return this.modelList;
+		return this.models;
 	}
 
 	@Override
