@@ -46,6 +46,13 @@ public class ModelDefinitionGrid extends Composite {
 		this.createContent(parent);
 	}
 	
+	private void createContent(Composite parent){
+		this.setLayout(new FormLayout());
+		//this.createSourceFieldsComboItems();
+		this.createHeader();
+		this.createRows();
+	}
+	
 	private boolean isModelNameDuplicate(String modelName){
 		boolean isPresentInModelGrid = false;
 		for(String str: presentmodelNames) {
@@ -121,7 +128,55 @@ public class ModelDefinitionGrid extends Composite {
 
 	}
 
+	private void createRows() {
+		this.modelList = ProjectConfigutration.getInstance().getModels();
+		for(Model model: this.modelList) {
+			final Composite compositeRow = new Composite(this, SWT.BORDER);
+			compositeRow.setLayout(new FormLayout());
+			Color backgroundColor = SWTResourceManager.getColor(SWT.COLOR_WHITE);
+			if((this.allRows != null) && (this.allRows.size()%2 != 0)){
+				backgroundColor =  SWTResourceManager.getColor(245, 245, 245);
+			}
 
+			compositeRow.setBackground(backgroundColor);
+			FormData fd_compositeRow = new FormData();
+			fd_compositeRow.left = new FormAttachment(this.presentRow, 0, SWT.LEFT);
+			//fd_compositeRow.bottom = new FormAttachment(this.presentRow, 26, SWT.BOTTOM);
+			fd_compositeRow.right = new FormAttachment(this.presentRow, 0, SWT.RIGHT);
+			fd_compositeRow.top = new FormAttachment(this.presentRow);
+
+
+			Text modelName = new Text(compositeRow, SWT.BORDER);
+			modelName.setText(model.getName());
+			FormData fd_modelName = new FormData();
+			fd_modelName.left = new FormAttachment(0, 10);
+			fd_modelName.top = new FormAttachment(0);
+			fd_modelName.right = new FormAttachment(20, -5);
+			
+			modelName.setLayoutData(fd_modelName);
+			
+			Text expressionName = new Text(compositeRow, SWT.BORDER);
+			expressionName.setText(model.getExpression().getName());
+			FormData fd_expressionDefinition = new FormData();
+			fd_expressionDefinition.right = new FormAttachment(60, -5);
+			fd_expressionDefinition.left = new FormAttachment(33, 5);
+			expressionName.setLayoutData(fd_expressionDefinition);
+			expressionName.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
+
+
+			Text textCondition = new Text(compositeRow, SWT.BORDER);
+			if(model.getCondition() != null) textCondition.setText(model.getCondition());
+			FormData fd_textCondition = new FormData();
+			fd_textCondition.left = new FormAttachment(66, 2);
+			fd_textCondition.right = new FormAttachment(100, -2);
+			textCondition.setLayoutData(fd_textCondition);
+
+			this.presentRow = compositeRow;
+			this.allRows.add(compositeRow);
+			compositeRow.setLayoutData(fd_compositeRow);
+		}
+	}
+	
 	public void addRow(){
 		final Composite compositeRow = new Composite(this, SWT.BORDER);
 		compositeRow.setLayout(new FormLayout());
@@ -177,13 +232,6 @@ public class ModelDefinitionGrid extends Composite {
 		compositeRow.setLayoutData(fd_compositeRow);
 	}
 
-	private void createContent(Composite parent){
-		this.setLayout(new FormLayout());
-		//this.createSourceFieldsComboItems();
-		this.createHeader();
-
-	}
-
 	public void resetAllRows(){
 		for(Composite existingRow : this.allRows){
 			existingRow.setEnabled(false);
@@ -209,11 +257,16 @@ public class ModelDefinitionGrid extends Composite {
 			Model model = null;
 
 			Text modelNameText = (Text)rowChildren[0];
-			Combo modelValueCombo = (Combo)rowChildren[1];
+			Control modelValueComp = rowChildren[1];
 			Text modelConditionText = (Text)rowChildren[2];
 			
 			modelName = modelNameText.getText();
-			modelValue = modelValueCombo.getText();
+			if(modelValueComp instanceof Text){
+				modelValue = ((Text)modelValueComp).getText();
+			} else {
+				modelValue = ((Combo)modelValueComp).getText();
+			}
+			
 			modelCondition = modelConditionText.getText();
 			
 			if(modelName == null || modelName == ""){

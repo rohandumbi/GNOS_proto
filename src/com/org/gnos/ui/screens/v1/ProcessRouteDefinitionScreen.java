@@ -1,5 +1,7 @@
 package com.org.gnos.ui.screens.v1;
 
+import java.util.ArrayList;
+
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -14,9 +16,10 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import com.org.gnos.core.Model;
+import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.events.GnosEvent;
-import com.org.gnos.services.ProcessRoute;
-import com.org.gnos.services.ProcessRoutes;
+import com.org.gnos.services.Tree;
 import com.org.gnos.ui.custom.controls.GnosScreen;
 import com.org.gnos.ui.custom.controls.ProcessNodeDefinitionDialog;
 
@@ -114,7 +117,7 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 	
 	private String[] getSourceFieldsComboItems(){
 		
-		java.util.List<Model> models = Models.getAll();
+		java.util.List<Model> models = ProjectConfigutration.getInstance().getModels();
 		this.sourceFieldsComboItems = new String[models.size()];
 		for(int i=0; i<models.size(); i++){
 			this.sourceFieldsComboItems[i] = models.get(i).getName();

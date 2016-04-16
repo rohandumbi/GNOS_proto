@@ -50,10 +50,12 @@ public class ProjectConfigutration {
 		fields = new ArrayList<Field>();
 		requiredFieldMapping = new HashMap<String, String>();
 		expressions = new ArrayList<Expression>();
+		models = new ArrayList<Model>();
 		
 		loadFieldData();
 		loadFieldMappingData();
 		loadExpressions();
+		loadModels();
 	}
 
 	private void loadFieldData() {

@@ -97,7 +97,7 @@ public class ModelDefinitionScreen extends GnosScreen {
 		});
 		FormData fd_btnAddNewRow = new FormData();
 		btnAddNewRow.setLayoutData(fd_btnAddNewRow);
-		btnAddNewRow.setText("ADD NEW MODEL");
+		btnAddNewRow.setText("ADD");
 		btnAddNewRow.setSize(145, SWT.DEFAULT);
 		//int offsetX = -btnAddNewRow.computeSize(SWT.DEFAULT, SWT.DEFAULT).x / 2;
 		fd_btnAddNewRow.top = new FormAttachment(modelDefinitionGrid, 10, SWT.BOTTOM);
@@ -111,13 +111,11 @@ public class ModelDefinitionScreen extends GnosScreen {
 		fd_buttonNext.top = new FormAttachment(modelDefinitionGrid, 10, SWT.BOTTOM);
 		fd_buttonNext.right = new FormAttachment(btnAddNewRow, -5, SWT.LEFT);
 		fd_buttonNext.left = new FormAttachment(btnAddNewRow, -145, SWT.LEFT);
-		//fd_buttonMapRqrdFields.right = new FormAttachment(0, 282);
 		buttonNext.setLayoutData(fd_buttonNext);
 		buttonNext.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				//TODO mapping complete
-				//updateHeadersWithRequiredFieldsMapping();
 				boolean isUpdateExpressionSuccessful = updateModelList();
 				if(isUpdateExpressionSuccessful == true){
 					GnosEvent event = new GnosEvent(this, "complete:model-defintion");
