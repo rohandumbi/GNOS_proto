@@ -161,6 +161,9 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 				//TODO mapping complete
 				//projectModel.setAllProjectFields(fieldDatatypeDefinitionGrid.getFieldDatatypes());
 				boolean isUpdateExpressionSuccessful = updateExpressionList();
+				if(isUpdateExpressionSuccessful){
+					resetExpressionList();
+				}
 				/*if(isUpdateExpressionSuccessful){
 					//GNOSCSVDataProcessor.getInstance().compute();
 					//GNOSCSVDataProcessor.getInstance().dumpToDB();

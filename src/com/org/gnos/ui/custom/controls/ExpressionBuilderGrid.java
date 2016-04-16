@@ -376,12 +376,19 @@ public class ExpressionBuilderGrid extends Composite {
 	}
 
 
-	public void resetAllRows(){
+	/*public void resetAllRows(){
 		for(Composite existingRow : this.allRows){
 			existingRow.setEnabled(false);
 		}
 		this.allRows = new ArrayList<Composite>();
 		this.presentRow = compositeGridHeader;
+	}*/
+	
+	public void resetAllRows(){
+		for(Composite existingRow : this.allRows){
+			existingRow.setEnabled(false);
+		}
+		this.allRows = new ArrayList<Composite>();
 	}
 
 	public List<Composite> getAllRowsComposite(){

@@ -238,7 +238,7 @@ public class ModelDefinitionGrid extends Composite {
 			existingRow.setEnabled(false);
 		}
 		this.allRows = new ArrayList<Composite>();
-		this.presentRow = compositeGridHeader;
+		//this.presentRow = compositeGridHeader;
 	}
 
 	public List<Composite> getAllRowsComposite(){
