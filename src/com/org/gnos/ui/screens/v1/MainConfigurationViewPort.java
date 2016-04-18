@@ -176,7 +176,7 @@ public class MainConfigurationViewPort extends GnosScreen{
 	
 	private void processRouteDefinitionComplete(){
 		//No-Op for the time being
-		loadPitGroupDefinitionScreen();
+		loadOpexDefinitionScreen();
 	}
 	
 	@Override

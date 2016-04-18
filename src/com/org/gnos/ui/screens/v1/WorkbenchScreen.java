@@ -143,30 +143,30 @@ public class WorkbenchScreen extends GnosScreen {
 		gnosStepProcessRouteDefinitionLabel.setLayoutData(fd_gnosStepProcessRouteDefinitionLabel);
 		gnosStepProcessRouteDefinitionLabel.registerEventListener(this);
 		
-		gnosStepPitGroupDefinitionLabel = new GnosConfigurationStepLabel(this, SWT.NONE, "Pit Group Definition");
-		FormData fd_gnosStepPitGroupDefinitionLabel = new FormData();
-		fd_gnosStepPitGroupDefinitionLabel.bottom = new FormAttachment(gnosStepProcessRouteDefinitionLabel, 40, SWT.BOTTOM);
-		fd_gnosStepPitGroupDefinitionLabel.right = new FormAttachment(label, -6);
-		fd_gnosStepPitGroupDefinitionLabel.top = new FormAttachment(gnosStepProcessRouteDefinitionLabel);
-		fd_gnosStepPitGroupDefinitionLabel.left = new FormAttachment(gnosStepProcessRouteDefinitionLabel, 0, SWT.LEFT);
-		gnosStepPitGroupDefinitionLabel.setLayoutData(fd_gnosStepPitGroupDefinitionLabel);
-		gnosStepPitGroupDefinitionLabel.registerEventListener(this);
-		
 		gnosStepOpexDefinitionLabel = new GnosConfigurationStepLabel(this, SWT.NONE, "OPEX Definition");
 		FormData fd_gnosStepOpexDefinitionLabel = new FormData();
-		fd_gnosStepOpexDefinitionLabel.bottom = new FormAttachment(gnosStepPitGroupDefinitionLabel, 40, SWT.BOTTOM);
+		fd_gnosStepOpexDefinitionLabel.bottom = new FormAttachment(gnosStepProcessRouteDefinitionLabel, 40, SWT.BOTTOM);
 		fd_gnosStepOpexDefinitionLabel.right = new FormAttachment(label, -6);
-		fd_gnosStepOpexDefinitionLabel.top = new FormAttachment(gnosStepPitGroupDefinitionLabel);
-		fd_gnosStepOpexDefinitionLabel.left = new FormAttachment(gnosStepPitGroupDefinitionLabel, 0, SWT.LEFT);
+		fd_gnosStepOpexDefinitionLabel.top = new FormAttachment(gnosStepProcessRouteDefinitionLabel);
+		fd_gnosStepOpexDefinitionLabel.left = new FormAttachment(gnosStepProcessRouteDefinitionLabel, 0, SWT.LEFT);
 		gnosStepOpexDefinitionLabel.setLayoutData(fd_gnosStepOpexDefinitionLabel);
 		gnosStepOpexDefinitionLabel.registerEventListener(this);
 		
+		gnosStepPitGroupDefinitionLabel = new GnosConfigurationStepLabel(this, SWT.NONE, "Pit Group Definition");
+		FormData fd_gnosStepPitGroupDefinitionLabel = new FormData();
+		fd_gnosStepPitGroupDefinitionLabel.bottom = new FormAttachment(gnosStepOpexDefinitionLabel, 40, SWT.BOTTOM);
+		fd_gnosStepPitGroupDefinitionLabel.right = new FormAttachment(label, -6);
+		fd_gnosStepPitGroupDefinitionLabel.top = new FormAttachment(gnosStepOpexDefinitionLabel);
+		fd_gnosStepPitGroupDefinitionLabel.left = new FormAttachment(gnosStepOpexDefinitionLabel, 0, SWT.LEFT);
+		gnosStepPitGroupDefinitionLabel.setLayoutData(fd_gnosStepPitGroupDefinitionLabel);
+		gnosStepPitGroupDefinitionLabel.registerEventListener(this);
+		
 		gnosStepGradeConstraintsDefinitionLabel = new GnosConfigurationStepLabel(this, SWT.NONE, "Grade Constraint Definition");
 		FormData fd_gnosStepGradeConstraintsDefinitionLabel = new FormData();
-		fd_gnosStepGradeConstraintsDefinitionLabel.bottom = new FormAttachment(gnosStepOpexDefinitionLabel, 40, SWT.BOTTOM);
+		fd_gnosStepGradeConstraintsDefinitionLabel.bottom = new FormAttachment(gnosStepPitGroupDefinitionLabel, 40, SWT.BOTTOM);
 		fd_gnosStepGradeConstraintsDefinitionLabel.right = new FormAttachment(label, -6);
-		fd_gnosStepGradeConstraintsDefinitionLabel.top = new FormAttachment(gnosStepOpexDefinitionLabel);
-		fd_gnosStepGradeConstraintsDefinitionLabel.left = new FormAttachment(gnosStepOpexDefinitionLabel, 0, SWT.LEFT);
+		fd_gnosStepGradeConstraintsDefinitionLabel.top = new FormAttachment(gnosStepPitGroupDefinitionLabel);
+		fd_gnosStepGradeConstraintsDefinitionLabel.left = new FormAttachment(gnosStepPitGroupDefinitionLabel, 0, SWT.LEFT);
 		gnosStepGradeConstraintsDefinitionLabel.setLayoutData(fd_gnosStepGradeConstraintsDefinitionLabel);
 		gnosStepGradeConstraintsDefinitionLabel.registerEventListener(this);
 		

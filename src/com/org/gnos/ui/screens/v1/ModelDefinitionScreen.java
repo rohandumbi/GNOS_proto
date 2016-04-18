@@ -50,14 +50,14 @@ public class ModelDefinitionScreen extends GnosScreen {
 		labelScreenName.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		FormData fd_labelScreenName = new FormData();
 		//fd_labelScreenName.bottom = new FormAttachment(100, -461);
-		fd_labelScreenName.top = new FormAttachment(0, 20);
+		fd_labelScreenName.top = new FormAttachment(0, 10);
 		fd_labelScreenName.left = new FormAttachment(0, 10);
 		labelScreenName.setLayoutData(fd_labelScreenName);
-		labelScreenName.setFont(SWTResourceManager.getFont("Arial", 9, SWT.BOLD));
+		labelScreenName.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.BOLD));
 		labelScreenName.setText("Model Definition");
 		
 		Label labelScreenDescription = new Label(this, SWT.NONE);
-		labelScreenDescription.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
+		labelScreenDescription.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		labelScreenDescription.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		FormData fd_labelScreenDescription = new FormData();
 		fd_labelScreenDescription.top = new FormAttachment(labelScreenName, 10, SWT.BOTTOM);
