@@ -1,32 +1,34 @@
 package com.org.gnos.ui.screens.v1;
 
-import org.eclipse.swt.widgets.Composite;
-
-import com.org.gnos.events.GnosEvent;
-import com.org.gnos.ui.custom.controls.GnosScreen;
-import com.org.gnos.ui.custom.controls.OpexDefinitionGrid;
-
-import org.eclipse.swt.layout.FormLayout;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.wb.swt.SWTResourceManager;
-import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.wb.swt.SWTResourceManager;
+
+import com.org.gnos.events.GnosEvent;
+import com.org.gnos.services.TimePeriod;
+import com.org.gnos.ui.custom.controls.GnosScreen;
+import com.org.gnos.ui.custom.controls.OpexDefinitionGrid;
 
 public class OpexDefinitionScreen extends GnosScreen {
 
 	private Composite parent;
 	private Text textStartYear;
 	private Text textNumberOfIncrements;
+	private ScrolledComposite scGridContainer;
+	private OpexDefinitionGrid opexDefinitionGrid;
+	private Label labelScreenName;
 	/**
 	 * Create the composite.
 	 * @param parent
@@ -44,7 +46,7 @@ public class OpexDefinitionScreen extends GnosScreen {
 	
 	private void createContent(){
 		setLayout(new FormLayout());
-		Label labelScreenName = new Label(this, SWT.NONE);
+		labelScreenName = new Label(this, SWT.NONE);
 		labelScreenName.setForeground(SWTResourceManager.getColor(0, 191, 255));
 		labelScreenName.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		FormData fd_labelScreenName = new FormData();
@@ -99,6 +101,10 @@ public class OpexDefinitionScreen extends GnosScreen {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				//TODO implement time period add
+				int startingYear = Integer.parseInt(textStartYear.getText());
+				int numberOfIncrements = Integer.parseInt(textNumberOfIncrements.getText());
+				TimePeriod timePeriod = new TimePeriod(startingYear, numberOfIncrements);
+				initializeOpexGrid(timePeriod);
 			}
 		});
 		FormData fd_btnAddTimePeriod = new FormData();
@@ -108,27 +114,53 @@ public class OpexDefinitionScreen extends GnosScreen {
 		fd_btnAddTimePeriod.bottom = new FormAttachment(textNumberOfIncrements, 0, SWT.BOTTOM);
 		btnAddTimePeriod.setText("Save");
 		
-		final ScrolledComposite scrolledComposite = new ScrolledComposite(this, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		FormData fd_scrolledComposite = new FormData();
-		fd_scrolledComposite.top = new FormAttachment(textStartYear, 10, SWT.BOTTOM);
-		fd_scrolledComposite.left = new FormAttachment(labelScreenName, 0, SWT.LEFT);
-		fd_scrolledComposite.bottom = new FormAttachment(100, -10);
-		fd_scrolledComposite.right = new FormAttachment(100, -10);
+	}
+	
+	private void initializeOpexGrid(TimePeriod timePeriod){
+		if(scGridContainer != null){
+			scGridContainer.dispose();
+		}
+		scGridContainer = new ScrolledComposite(this, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		FormData fd_scGridContainer = new FormData(500,500);// temp hack else size of scrolled composite keeps on increasing
+		fd_scGridContainer.top = new FormAttachment(textStartYear, 10, SWT.BOTTOM);
+		fd_scGridContainer.left = new FormAttachment(labelScreenName, 0, SWT.LEFT);
+		fd_scGridContainer.bottom = new FormAttachment(100, -10);
+		fd_scGridContainer.right = new FormAttachment(100, -35);
 		
-		OpexDefinitionGrid opexDefinitionGrid = new OpexDefinitionGrid(scrolledComposite, SWT.None);
-		scrolledComposite.setContent(opexDefinitionGrid);
-		scrolledComposite.addControlListener(new ControlAdapter() {
+		scGridContainer.addControlListener(new ControlAdapter() {
 			public void controlResized(ControlEvent e) {
-				System.out.println("MVCP resized");
-				Rectangle r = scrolledComposite.getClientArea();
+				System.out.println("OPEX grid resized");
+				Rectangle r = scGridContainer.getClientArea();
 				//scViewPortContainer.setMinSize(mainConfigurationViewPort.computeSize(r.width, SWT.DEFAULT));
-				scrolledComposite.setMinSize(scrolledComposite.computeSize(r.width, SWT.DEFAULT, true));
+				scGridContainer.setMinSize(scGridContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT, true));
 			}
 		});
 		
-		scrolledComposite.setExpandHorizontal(true);
-		scrolledComposite.setExpandVertical(true);
-		scrolledComposite.setLayoutData(fd_scrolledComposite);
+		opexDefinitionGrid = new OpexDefinitionGrid(scGridContainer, SWT.None, timePeriod);
+		scGridContainer.setContent(opexDefinitionGrid);
+		//Rectangle r = scGridContainer.getClientArea();
+		scGridContainer.setMinSize(scGridContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT, true));
+		
+		scGridContainer.setExpandHorizontal(true);
+		scGridContainer.setExpandVertical(true);
+		scGridContainer.setLayoutData(fd_scGridContainer);
+		
+		
+		Button btnAddRow = new Button(this, SWT.NONE);
+		btnAddRow.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				//TO DO implement row add
+			}
+		});
+		btnAddRow.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.BOLD));
+		FormData fd_btnAddRow = new FormData();
+		fd_btnAddRow.top = new FormAttachment(textStartYear, 10, SWT.BOTTOM);
+		fd_btnAddRow.right = new FormAttachment(100, -5);
+		btnAddRow.setLayoutData(fd_btnAddRow);
+		btnAddRow.setText("+");
+		
+		this.layout();
 	}
 
 	@Override

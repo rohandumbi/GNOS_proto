@@ -23,6 +23,7 @@ import com.org.gnos.core.Field;
 import com.org.gnos.core.Model;
 import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.services.Expressions;
+import com.org.gnos.services.TimePeriod;
 
 public class OpexDefinitionGrid extends Composite {
 
@@ -38,12 +39,14 @@ public class OpexDefinitionGrid extends Composite {
 	private List<Model> models;
 	private Composite parent;
 	private List<String> presentmodelNames;
+	private TimePeriod timePeriod;
 
-	public OpexDefinitionGrid(Composite parent, int style) {
+	public OpexDefinitionGrid(Composite parent, int style, TimePeriod timePeriod) {
 		super(parent, style);
 		this.parent = parent;
 		this.allRows = new ArrayList<Composite>();
 		this.models = ProjectConfigutration.getInstance().getModels();
+		this.timePeriod = timePeriod;
 		this.createContent(parent);
 	}
 	
@@ -86,46 +89,72 @@ public class OpexDefinitionGrid extends Composite {
 		fd_compositeGridHeader.right = new FormAttachment(100);
 		compositeGridHeader.setLayoutData(fd_compositeGridHeader);
 
+		Label lblClassification = new Label(compositeGridHeader, SWT.NONE);
+		lblClassification.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
+		FormData fd_lblClassification = new FormData();
+		fd_lblClassification.top = new FormAttachment(0,2);
+		fd_lblClassification.left = new FormAttachment(0, 6);
+		lblClassification.setLayoutData(fd_lblClassification);
+		lblClassification.setText("Classification");
+		lblClassification.setBackground(SWTResourceManager.getColor(230, 230, 230));
+		
 		Label firstSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
 		FormData fd_firstSeparator = new FormData();
-		fd_firstSeparator.left = new FormAttachment(33);
+		fd_firstSeparator.left = new FormAttachment(lblClassification, 6);
 		firstSeparator.setLayoutData(fd_firstSeparator);
 
 		Label secondSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
 		FormData fd_secondSeparator = new FormData();
-		fd_secondSeparator.left = new FormAttachment(66);
 		secondSeparator.setLayoutData(fd_secondSeparator);
 
+		Label lblUse = new Label(compositeGridHeader, SWT.NONE);
+		fd_secondSeparator.left = new FormAttachment(lblUse, 10);
+		lblUse.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
+		FormData fd_lblUse = new FormData();
+		fd_lblUse.top = new FormAttachment(lblClassification, 0, SWT.TOP);
+		fd_lblUse.left = new FormAttachment(firstSeparator, 6);
+		lblUse.setLayoutData(fd_lblUse);
+		lblUse.setText("Use");
+		lblUse.setBackground(SWTResourceManager.getColor(230, 230, 230));
 
-		Label lblGradeHeader = new Label(compositeGridHeader, SWT.NONE);
-		lblGradeHeader.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
-		FormData fd_lblGradeHeader = new FormData();
-		fd_lblGradeHeader.top = new FormAttachment(0,2);
-		fd_lblGradeHeader.left = new FormAttachment(0, 10);
-		lblGradeHeader.setLayoutData(fd_lblGradeHeader);
-		lblGradeHeader.setText("IDENTIFIER/NAME");
-		lblGradeHeader.setBackground(SWTResourceManager.getColor(230, 230, 230));
-
-		Label lblExpressionNameHeader = new Label(compositeGridHeader, SWT.NONE);
-		lblExpressionNameHeader.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
-		FormData fd_lblExpressionNameHeader = new FormData();
-		fd_lblExpressionNameHeader.top = new FormAttachment(0,2);
-		fd_lblExpressionNameHeader.left = new FormAttachment(firstSeparator, 10);
-		lblExpressionNameHeader.setLayoutData(fd_lblExpressionNameHeader);
-		lblExpressionNameHeader.setText("FIELD");
-		lblExpressionNameHeader.setBackground(SWTResourceManager.getColor(230, 230, 230));
-
-		Label lblExpressionTypeHeader = new Label(compositeGridHeader, SWT.NONE);
-		lblExpressionTypeHeader.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
-		FormData fd_lblExpressionTypeHeader = new FormData();
-		fd_lblExpressionTypeHeader.top = new FormAttachment(0,2);
-		fd_lblExpressionTypeHeader.left = new FormAttachment(secondSeparator, 10);
-		lblExpressionTypeHeader.setLayoutData(fd_lblExpressionTypeHeader);
-		lblExpressionTypeHeader.setText("CONDITION");
-		lblExpressionTypeHeader.setBackground(SWTResourceManager.getColor(230, 230, 230));
+		Label lblIdentifier = new Label(compositeGridHeader, SWT.NONE);
+		lblIdentifier.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
+		FormData fd_lblIdentifier = new FormData();
+		fd_lblIdentifier.top = new FormAttachment(lblClassification, 0, SWT.TOP);
+		fd_lblIdentifier.left = new FormAttachment(secondSeparator, 35);
+		lblIdentifier.setLayoutData(fd_lblIdentifier);
+		lblIdentifier.setText("Identifier");
+		lblIdentifier.setBackground(SWTResourceManager.getColor(230, 230, 230));
 
 		this.presentRow = this.compositeGridHeader;//referring to the header as the 1st row when there are no rows inserted yet
+		
+		/*Label thirdSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
+		FormData fd_thirdSeparator = new FormData();
+		fd_thirdSeparator.left = new FormAttachment(lblIdentifier, 35);
+		thirdSeparator.setLayoutData(fd_thirdSeparator);*/
+		this.addHeaderColumns(lblIdentifier);
 
+	}
+	
+	private void addHeaderColumns(Control reference){
+		Control previousColumn = reference;
+		for(int i=0; i<this.timePeriod.getIncrements(); i++){
+			Label separator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
+			FormData fd_separator = new FormData();
+			fd_separator.left = new FormAttachment(previousColumn, 25);
+			separator.setLayoutData(fd_separator);
+			
+			Label lblYear = new Label(compositeGridHeader, SWT.NONE);
+			lblYear.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
+			FormData fd_lblYear = new FormData();
+			fd_lblYear.left = new FormAttachment(separator, 25);
+			fd_lblYear.top = new FormAttachment(0, 2);
+			lblYear.setText(String.valueOf(this.timePeriod.getStartYear() + i));
+			lblYear.setBackground(SWTResourceManager.getColor(230, 230, 230));
+			lblYear.setLayoutData(fd_lblYear);
+			
+			previousColumn = lblYear;
+		}
 	}
 
 	private void createRows() {
