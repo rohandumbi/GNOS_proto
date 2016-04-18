@@ -1,11 +1,13 @@
 package com.org.gnos.ui.screens.v1;
 
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -79,6 +81,7 @@ public class OpexDefinitionScreen extends GnosScreen {
 		FormData fd_textStartYear = new FormData();
 		fd_textStartYear.top = new FormAttachment(lblStartYear, -2, SWT.TOP);
 		fd_textStartYear.left = new FormAttachment(lblStartYear, 8);
+		fd_textStartYear.right = new FormAttachment(lblStartYear, 58, SWT.RIGHT);
 		textStartYear.setLayoutData(fd_textStartYear);
 		
 		Label lblNumberOfIncrements = new Label(this, SWT.NONE);
@@ -94,6 +97,7 @@ public class OpexDefinitionScreen extends GnosScreen {
 		FormData fd_textNumberOfIncrements = new FormData();
 		fd_textNumberOfIncrements.top = new FormAttachment(textStartYear, -2, SWT.TOP);
 		fd_textNumberOfIncrements.left = new FormAttachment(lblNumberOfIncrements, 8);
+		fd_textNumberOfIncrements.right = new FormAttachment(lblNumberOfIncrements, 58, SWT.RIGHT);
 		textNumberOfIncrements.setLayoutData(fd_textNumberOfIncrements);
 		
 		Button btnAddTimePeriod = new Button(this, SWT.NONE);
@@ -127,26 +131,13 @@ public class OpexDefinitionScreen extends GnosScreen {
 		fd_scGridContainer.bottom = new FormAttachment(100, -10);
 		fd_scGridContainer.right = new FormAttachment(100, -35);
 		
-		/*scGridContainer.addControlListener(new ControlAdapter() {
-			public void controlResized(ControlEvent e) {
-				System.out.println("OPEX grid resized");
-				//Rectangle r = scGridContainer.getClientArea();
-				//scViewPortContainer.setMinSize(mainConfigurationViewPort.computeSize(r.width, SWT.DEFAULT));
-				//scGridContainer.setMinSize(scGridContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT, true));
-				resizeGridContainer();
-			}
-		});*/
-		
 		opexDefinitionGrid = new OpexDefinitionGrid(scGridContainer, SWT.None, timePeriod);
 		scGridContainer.setContent(opexDefinitionGrid);
-		//Rectangle r = scGridContainer.getClientArea();
-		//scGridContainer.setMinSize(scGridContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT, true));
 		
 		scGridContainer.setExpandHorizontal(true);
 		scGridContainer.setExpandVertical(true);
 		scGridContainer.setLayoutData(fd_scGridContainer);
 		
-		//resizeGridContainer();
 		Rectangle r = scGridContainer.getClientArea();
 		scGridContainer.setMinSize(scGridContainer.computeSize(SWT.DEFAULT, r.height, true));
 		
@@ -157,9 +148,12 @@ public class OpexDefinitionScreen extends GnosScreen {
 			public void widgetSelected(SelectionEvent e) {
 				//TO DO implement row add
 				opexDefinitionGrid.addRow();
-				//resizeGridContainer();
 				Rectangle r = opexDefinitionGrid.getClientArea();
-				scGridContainer.setMinSize(scGridContainer.computeSize(r.width, SWT.DEFAULT, true));
+				int gridWidth = r.width;
+				
+				int scrollableHeight = scGridContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).y;
+				Point point = new Point(gridWidth, scrollableHeight);
+				scGridContainer.setMinSize(point);
 			}
 		});
 		btnAddRow.setFont(SWTResourceManager.getFont("Segoe UI", 16, SWT.BOLD));
@@ -172,10 +166,6 @@ public class OpexDefinitionScreen extends GnosScreen {
 		this.layout();
 	}
 	
-	private void resizeGridContainer(){
-		scGridContainer.setMinSize(scGridContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT, true));
-	}
-
 	@Override
 	protected void checkSubclass() {
 		// Disable the check that prevents subclassing of SWT components
