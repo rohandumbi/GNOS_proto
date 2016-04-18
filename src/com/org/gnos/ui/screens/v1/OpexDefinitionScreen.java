@@ -127,23 +127,28 @@ public class OpexDefinitionScreen extends GnosScreen {
 		fd_scGridContainer.bottom = new FormAttachment(100, -10);
 		fd_scGridContainer.right = new FormAttachment(100, -35);
 		
-		scGridContainer.addControlListener(new ControlAdapter() {
+		/*scGridContainer.addControlListener(new ControlAdapter() {
 			public void controlResized(ControlEvent e) {
 				System.out.println("OPEX grid resized");
-				Rectangle r = scGridContainer.getClientArea();
+				//Rectangle r = scGridContainer.getClientArea();
 				//scViewPortContainer.setMinSize(mainConfigurationViewPort.computeSize(r.width, SWT.DEFAULT));
-				scGridContainer.setMinSize(scGridContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT, true));
+				//scGridContainer.setMinSize(scGridContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT, true));
+				resizeGridContainer();
 			}
-		});
+		});*/
 		
 		opexDefinitionGrid = new OpexDefinitionGrid(scGridContainer, SWT.None, timePeriod);
 		scGridContainer.setContent(opexDefinitionGrid);
 		//Rectangle r = scGridContainer.getClientArea();
-		scGridContainer.setMinSize(scGridContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT, true));
+		//scGridContainer.setMinSize(scGridContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT, true));
 		
 		scGridContainer.setExpandHorizontal(true);
 		scGridContainer.setExpandVertical(true);
 		scGridContainer.setLayoutData(fd_scGridContainer);
+		
+		//resizeGridContainer();
+		Rectangle r = scGridContainer.getClientArea();
+		scGridContainer.setMinSize(scGridContainer.computeSize(SWT.DEFAULT, r.height, true));
 		
 		
 		Button btnAddRow = new Button(this, SWT.NONE);
@@ -151,6 +156,10 @@ public class OpexDefinitionScreen extends GnosScreen {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				//TO DO implement row add
+				opexDefinitionGrid.addRow();
+				//resizeGridContainer();
+				Rectangle r = opexDefinitionGrid.getClientArea();
+				scGridContainer.setMinSize(scGridContainer.computeSize(r.width, SWT.DEFAULT, true));
 			}
 		});
 		btnAddRow.setFont(SWTResourceManager.getFont("Segoe UI", 16, SWT.BOLD));
@@ -161,6 +170,10 @@ public class OpexDefinitionScreen extends GnosScreen {
 		btnAddRow.setText("+");
 		
 		this.layout();
+	}
+	
+	private void resizeGridContainer(){
+		scGridContainer.setMinSize(scGridContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT, true));
 	}
 
 	@Override

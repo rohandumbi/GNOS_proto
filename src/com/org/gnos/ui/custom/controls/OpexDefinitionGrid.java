@@ -9,6 +9,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -19,10 +20,8 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.core.Expression;
-import com.org.gnos.core.Field;
 import com.org.gnos.core.Model;
 import com.org.gnos.core.ProjectConfigutration;
-import com.org.gnos.services.Expressions;
 import com.org.gnos.services.TimePeriod;
 
 public class OpexDefinitionGrid extends Composite {
@@ -40,12 +39,14 @@ public class OpexDefinitionGrid extends Composite {
 	private Composite parent;
 	private List<String> presentmodelNames;
 	private TimePeriod timePeriod;
+	private Label firstSeparator;
+	private Label secondSeparator;
 
 	public OpexDefinitionGrid(Composite parent, int style, TimePeriod timePeriod) {
 		super(parent, style);
 		this.parent = parent;
 		this.allRows = new ArrayList<Composite>();
-		this.models = ProjectConfigutration.getInstance().getModels();
+		//this.models = ProjectConfigutration.getInstance().getModels();
 		this.timePeriod = timePeriod;
 		this.createContent(parent);
 	}
@@ -66,12 +67,12 @@ public class OpexDefinitionGrid extends Composite {
 	}
 
 	
-	private String[] getExpressionComboItems(){
+	private String[] getIdentifierComboItems(){
 		
-		List<Expression> expressions = ProjectConfigutration.getInstance().getExpressions();
-		this.sourceFieldsComboItems = new String[expressions.size()];
-		for(int i=0; i<expressions.size(); i++){
-			this.sourceFieldsComboItems[i] = expressions.get(i).getName();
+		List<Model> models = ProjectConfigutration.getInstance().getModels();
+		this.sourceFieldsComboItems = new String[models.size()];
+		for(int i=0; i<models.size(); i++){
+			this.sourceFieldsComboItems[i] = models.get(i).getName();
 		}
 				
 		return this.sourceFieldsComboItems;
@@ -93,22 +94,17 @@ public class OpexDefinitionGrid extends Composite {
 		lblClassification.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		FormData fd_lblClassification = new FormData();
 		fd_lblClassification.top = new FormAttachment(0,2);
-		fd_lblClassification.left = new FormAttachment(0, 6);
+		fd_lblClassification.left = new FormAttachment(0, 10);
 		lblClassification.setLayoutData(fd_lblClassification);
 		lblClassification.setText("Classification");
 		lblClassification.setBackground(SWTResourceManager.getColor(230, 230, 230));
 		
-		Label firstSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
+		firstSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
 		FormData fd_firstSeparator = new FormData();
-		fd_firstSeparator.left = new FormAttachment(lblClassification, 6);
+		fd_firstSeparator.left = new FormAttachment(lblClassification, 10);
 		firstSeparator.setLayoutData(fd_firstSeparator);
-
-		Label secondSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
-		FormData fd_secondSeparator = new FormData();
-		secondSeparator.setLayoutData(fd_secondSeparator);
-
+		
 		Label lblUse = new Label(compositeGridHeader, SWT.NONE);
-		fd_secondSeparator.left = new FormAttachment(lblUse, 10);
 		lblUse.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		FormData fd_lblUse = new FormData();
 		fd_lblUse.top = new FormAttachment(lblClassification, 0, SWT.TOP);
@@ -116,6 +112,11 @@ public class OpexDefinitionGrid extends Composite {
 		lblUse.setLayoutData(fd_lblUse);
 		lblUse.setText("Use");
 		lblUse.setBackground(SWTResourceManager.getColor(230, 230, 230));
+
+		secondSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
+		FormData fd_secondSeparator = new FormData();
+		fd_secondSeparator.left = new FormAttachment(lblUse, 10);
+		secondSeparator.setLayoutData(fd_secondSeparator);
 
 		Label lblIdentifier = new Label(compositeGridHeader, SWT.NONE);
 		lblIdentifier.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
@@ -127,16 +128,11 @@ public class OpexDefinitionGrid extends Composite {
 		lblIdentifier.setBackground(SWTResourceManager.getColor(230, 230, 230));
 
 		this.presentRow = this.compositeGridHeader;//referring to the header as the 1st row when there are no rows inserted yet
-		
-		/*Label thirdSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
-		FormData fd_thirdSeparator = new FormData();
-		fd_thirdSeparator.left = new FormAttachment(lblIdentifier, 35);
-		thirdSeparator.setLayoutData(fd_thirdSeparator);*/
-		this.addHeaderColumns(lblIdentifier);
+		this.addTimePeriodHeaderColumns(lblIdentifier);
 
 	}
 	
-	private void addHeaderColumns(Control reference){
+	private void addTimePeriodHeaderColumns(Control reference){
 		Control previousColumn = reference;
 		for(int i=0; i<this.timePeriod.getIncrements(); i++){
 			Label separator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
@@ -157,7 +153,7 @@ public class OpexDefinitionGrid extends Composite {
 		}
 	}
 
-	private void createRows() {
+	/*private void createRows() {
 		
 		for(Model model: this.models) {
 			final Composite compositeRow = new Composite(this, SWT.BORDER);
@@ -205,7 +201,7 @@ public class OpexDefinitionGrid extends Composite {
 			this.allRows.add(compositeRow);
 			compositeRow.setLayoutData(fd_compositeRow);
 		}
-	}
+	}*/
 	
 	public void addRow(){
 		final Composite compositeRow = new Composite(this, SWT.BORDER);
@@ -223,43 +219,51 @@ public class OpexDefinitionGrid extends Composite {
 		fd_compositeRow.top = new FormAttachment(this.presentRow);
 
 
-		Text modelName = new Text(compositeRow, SWT.BORDER);
-		//fd_grade.top = new FormAttachment(expressionName, 2, SWT.TOP);
-		FormData fd_modelName = new FormData();
-		fd_modelName.left = new FormAttachment(0, 10);
-		fd_modelName.top = new FormAttachment(0);
-		fd_modelName.right = new FormAttachment(20, -5);
-		modelName.setLayoutData(fd_modelName);
+		Combo comboClassification = new Combo(compositeRow, SWT.NONE);
+		comboClassification.setItems(new String[]{"PCost", "Rev"});
+		comboClassification.setText("Select Type");
+		FormData fd_comboClassification = new FormData();
+		fd_comboClassification.left = new FormAttachment(0, 2);
+		fd_comboClassification.top = new FormAttachment(0);
+		//fd_comboClassification.right = new FormAttachment(20, -5);
+		comboClassification.setLayoutData(fd_comboClassification);
 		
-		final Combo comboModelDefinition = new Combo(compositeRow, SWT.NONE);
-		FormData fd_comboExpressionDefinition = new FormData();
-		fd_comboExpressionDefinition.right = new FormAttachment(60, -5);
-		fd_comboExpressionDefinition.left = new FormAttachment(33, 5);
-		comboModelDefinition.setLayoutData(fd_comboExpressionDefinition);
-		comboModelDefinition.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
-		comboModelDefinition.setItems(getExpressionComboItems());
-		comboModelDefinition.setText("Field Value");
-		comboModelDefinition.addListener(SWT.MouseDown, new Listener(){
-			@Override
-			public void handleEvent(Event event) {
-				// TODO Auto-generated method stub
-				//System.out.println("detected combo click");
-				comboModelDefinition.removeAll();
-				comboModelDefinition.setItems(getExpressionComboItems());
-				comboModelDefinition.getParent().layout();
-				comboModelDefinition.setListVisible(true);
-			}
-		});
-
-		Text textCondition = new Text(compositeRow, SWT.BORDER);
-		FormData fd_textCondition = new FormData();
-		fd_textCondition.left = new FormAttachment(66, 2);
-		fd_textCondition.right = new FormAttachment(100, -2);
-		textCondition.setLayoutData(fd_textCondition);
-
+		Button btnUse = new Button(compositeRow, SWT.CHECK);
+		FormData fd_btnUse = new FormData();
+		fd_btnUse.left = new FormAttachment(comboClassification, 10, SWT.RIGHT);
+		fd_btnUse.top = new FormAttachment(0, 2);
+		btnUse.setLayoutData(fd_btnUse);
+		
+		Combo comboIdentifier = new Combo(compositeRow, SWT.NONE);
+		comboIdentifier.setItems(this.getIdentifierComboItems());
+		comboIdentifier.setText("Select Model");
+		FormData fd_comboIdentifier = new FormData();
+		fd_comboIdentifier.left = new FormAttachment(btnUse, 21);
+		fd_comboIdentifier.right = new FormAttachment(btnUse, 135);
+		fd_comboIdentifier.top = new FormAttachment(0);
+		comboIdentifier.setLayoutData(fd_comboIdentifier);
+		
+		this.addTimePeriodRowMembers(compositeRow, comboIdentifier);
+		
 		this.presentRow = compositeRow;
 		this.allRows.add(compositeRow);
 		compositeRow.setLayoutData(fd_compositeRow);
+		this.layout();
+	}
+	
+	private void addTimePeriodRowMembers(Composite parent, Control reference){
+		Control previousMember = reference;
+		for(int i=0; i<this.timePeriod.getIncrements(); i++){
+			Text yearlyValue = new Text(parent, SWT.BORDER);
+			FormData fd_yearlyValue = new FormData();
+			/*
+			 * Hacky calculation at the moment
+			 */
+			fd_yearlyValue.left = new FormAttachment(previousMember, 3);
+			fd_yearlyValue.right = new FormAttachment(previousMember, 76, SWT.RIGHT);
+			yearlyValue.setLayoutData(fd_yearlyValue);
+			previousMember = yearlyValue;
+		}
 	}
 
 	public void resetAllRows(){
