@@ -153,7 +153,7 @@ public class OpexDefinitionScreen extends GnosScreen {
 				//TO DO implement row add
 			}
 		});
-		btnAddRow.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.BOLD));
+		btnAddRow.setFont(SWTResourceManager.getFont("Segoe UI", 16, SWT.BOLD));
 		FormData fd_btnAddRow = new FormData();
 		fd_btnAddRow.top = new FormAttachment(textStartYear, 10, SWT.BOTTOM);
 		fd_btnAddRow.right = new FormAttachment(100, -5);
