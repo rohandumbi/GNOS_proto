@@ -241,7 +241,6 @@ public class ProjectConfigutration {
 			e.printStackTrace();
 		} finally {
 			processTree.setNodes((HashMap)nodes);
-			processTree.display("Block");
 			try {
 				if(stmt != null) stmt.close();
 				if(rs != null) rs.close();
