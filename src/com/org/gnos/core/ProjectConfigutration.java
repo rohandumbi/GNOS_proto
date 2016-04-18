@@ -27,7 +27,7 @@ public class ProjectConfigutration {
 	private Map<String, String> requiredFieldMapping = new LinkedHashMap<String, String>();
 	private List<Expression> expressions = new ArrayList<Expression>();
 	private List<Model> models = new ArrayList<Model>();	
-	private Tree processTree = new Tree();
+	private Tree processTree = null;
 	
 	private Map<String, String> savedRequiredFieldMapping;
 	
@@ -226,9 +226,9 @@ public class ProjectConfigutration {
 								pNode = new Node(pModel.getName());
 								pNode.setSaved(true);
 								nodes.put(pModel.getName(), pNode);
-								pNode.addChild(node.getIdentifier());
-								node.setParent(pModel.getName());
-							}
+							} 
+							pNode.addChild(node.getIdentifier());
+							node.setParent(pModel.getName());
 							
 						}
 					}

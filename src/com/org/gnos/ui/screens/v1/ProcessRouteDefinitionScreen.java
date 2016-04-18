@@ -1,6 +1,9 @@
 package com.org.gnos.ui.screens.v1;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
@@ -36,7 +39,7 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 		setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		setLayout(new FormLayout());
 		this.listAddedModels = new ArrayList<String>();
-		this.listAddedModels.add("Block");
+		
 
 		this.processTree = ProjectConfigutration.getInstance().getProcessTree();
 		if(this.processTree == null) {
@@ -44,6 +47,17 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 			Node rootNode = new Node("Block");
 			rootNode.setSaved(true);
 			this.processTree.getNodes().put("Block", rootNode);
+			ProjectConfigutration.getInstance().setProcessTree(processTree);
+			this.listAddedModels.add("Block");
+		} else {
+			Map<String, Node> nodes = this.processTree.getNodes();
+			Set<String> keys = nodes.keySet();
+			Iterator<String> it = keys.iterator();
+			
+			while (it.hasNext()) {
+				String key = it.next();
+				this.listAddedModels.add(key);
+			}
 		}
 		
 		Label labelScreenName = new Label(this, SWT.NONE);

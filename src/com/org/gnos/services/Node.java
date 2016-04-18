@@ -5,6 +5,7 @@ import java.util.ArrayList;
 public class Node {
 	private String identifier;
 	private String parent;
+
 	private ArrayList<String> children;
     private boolean saved;
 
@@ -35,13 +36,13 @@ public class Node {
 	public void setSaved(boolean saved) {
 		this.saved = saved;
 	}
-    
+   
     public String getParent() {
 		return parent;
 	}
 
 	public void setParent(String parent) {
 		this.parent = parent;
-	}
+	} 
     
 }
