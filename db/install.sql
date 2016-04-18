@@ -71,3 +71,11 @@ CREATE TABLE models(
    filter_str VARCHAR(400),
    PRIMARY KEY ( id )
 );
+
+DROP TABLE IF EXISTS process_route_defn; 
+
+CREATE TABLE process_route_defn(
+   project_id INT NOT NULL,
+   model_id INT NOT NULL,
+   parent_model_id INT
+);

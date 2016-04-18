@@ -19,6 +19,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
 import com.org.gnos.core.Model;
 import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.events.GnosEvent;
+import com.org.gnos.services.Node;
 import com.org.gnos.services.Tree;
 import com.org.gnos.ui.custom.controls.GnosScreen;
 import com.org.gnos.ui.custom.controls.ProcessNodeDefinitionDialog;
@@ -37,8 +38,13 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 		this.listAddedModels = new ArrayList<String>();
 		this.listAddedModels.add("Block");
 
-		this.processTree = new Tree();
-		this.processTree.addNode("Block");
+		this.processTree = ProjectConfigutration.getInstance().getProcessTree();
+		if(this.processTree == null) {
+			this.processTree = new Tree();
+			Node rootNode = new Node("Block");
+			rootNode.setSaved(true);
+			this.processTree.getNodes().put("Block", rootNode);
+		}
 		
 		Label labelScreenName = new Label(this, SWT.NONE);
 		labelScreenName.setForeground(SWTResourceManager.getColor(0, 191, 255));
@@ -107,6 +113,9 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 		fd_compositeProcessDiagram.bottom = new FormAttachment(100, -10);
 		fd_compositeProcessDiagram.right = new FormAttachment(100, -10);
 		this.compositeProcessDiagram.setLayoutData(fd_compositeProcessDiagram);
+		
+
+		this.compositeProcessDiagram.refresh(processTree);
 
 		Button btnAddModelToProcess = new Button(this, SWT.NONE);
 		btnAddModelToProcess.addSelectionListener(new SelectionAdapter() {

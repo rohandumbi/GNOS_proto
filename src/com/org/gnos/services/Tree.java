@@ -26,6 +26,10 @@ public class Tree {
         return nodes;
     }
 
+    public void setNodes(HashMap<String, Node> nodes) {
+        this.nodes = nodes;
+    }
+    
     public TraversalStrategy getTraversalStrategy() {
         return traversalStrategy;
     }
@@ -38,9 +42,10 @@ public class Tree {
     public Node addNode(String identifier) {
         return this.addNode(identifier, null);
     }
-
+    
     public Node addNode(String identifier, String parent) {
         Node node = new Node(identifier);
+        node.setParent(parent);
         nodes.put(identifier, node);
 
         if (parent != null) {

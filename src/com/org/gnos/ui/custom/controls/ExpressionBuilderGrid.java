@@ -436,8 +436,7 @@ public class ExpressionBuilderGrid extends Composite {
 
 			if(controlExpressionName instanceof Text){
 				Text textControlExpressionName = (Text)controlExpressionName;
-				expressionName = textControlExpressionName.getText();
-				
+				expressionName = textControlExpressionName.getText();				
 			}
 
 			if(expressionName == null || expressionName == ""){
@@ -459,7 +458,6 @@ public class ExpressionBuilderGrid extends Composite {
 			if(controlExpressionValue instanceof Composite){
 				Composite compositeExpressionValue = (Composite)controlExpressionValue;
 				if(isComplex == true){
-					//expression.setValueType(isComplex);
 					Combo leftOperand = (Combo)compositeExpressionValue.getChildren()[0];
 					Combo operator = (Combo)compositeExpressionValue.getChildren()[1];
 					Combo rightOperand = (Combo)compositeExpressionValue.getChildren()[2];

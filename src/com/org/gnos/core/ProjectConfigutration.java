@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.Set;
 
 import com.org.gnos.db.DBManager;
+import com.org.gnos.services.Node;
+import com.org.gnos.services.Tree;
 
 
 public class ProjectConfigutration {
@@ -24,7 +26,8 @@ public class ProjectConfigutration {
 	private List<Field> fields = new ArrayList<Field>();
 	private Map<String, String> requiredFieldMapping = new LinkedHashMap<String, String>();
 	private List<Expression> expressions = new ArrayList<Expression>();
-	private List<Model> models = new ArrayList<Model>();
+	private List<Model> models = new ArrayList<Model>();	
+	private Tree processTree = new Tree();
 	
 	private Map<String, String> savedRequiredFieldMapping;
 	
@@ -51,11 +54,13 @@ public class ProjectConfigutration {
 		requiredFieldMapping = new HashMap<String, String>();
 		expressions = new ArrayList<Expression>();
 		models = new ArrayList<Model>();
+		processTree = new Tree();
 		
 		loadFieldData();
 		loadFieldMappingData();
 		loadExpressions();
 		loadModels();
+		loadProcessTree();
 	}
 
 	private void loadFieldData() {
@@ -185,10 +190,74 @@ public class ProjectConfigutration {
 		}
 	}
 	
+	public void loadProcessTree() {
+		String sql = "select model_id, parent_model_id from process_route_defn where project_id = "+ this.projectId;
+		Statement stmt = null;
+		ResultSet rs = null; 
+		Connection conn = DBManager.getConnection();
+		Map<String, Node> nodes = new HashMap<String, Node>();
+		Node rootNode = new Node("Block");
+		rootNode.setSaved(true);
+		nodes.put("Block", rootNode);
+		try {
+			stmt = conn.createStatement();
+			stmt.execute(sql);
+			rs = stmt.getResultSet();
+			
+			while(rs.next()) {
+				int modelId = rs.getInt(1);
+				int parentModelId = rs.getInt(2);
+				Model model = this.getModelById(modelId);
+				if(model != null) {
+					Node node = nodes.get(model.getName());
+					if(node == null){
+						node = new Node(model.getName());
+						node.setSaved(true);
+						nodes.put(model.getName(), node);
+					}
+					if(parentModelId == -1){
+						rootNode.addChild(node.getIdentifier());
+						node.setParent("Block");
+					} else {
+						Model pModel = this.getModelById(parentModelId);
+						if(pModel != null) {
+							Node pNode = nodes.get(pModel.getName());
+							if(pNode == null){
+								pNode = new Node(pModel.getName());
+								pNode.setSaved(true);
+								nodes.put(pModel.getName(), pNode);
+								pNode.addChild(node.getIdentifier());
+								node.setParent(pModel.getName());
+							}
+							
+						}
+					}
+
+					
+					
+				}
+			}		
+		} catch(SQLException e){
+			e.printStackTrace();
+		} finally {
+			processTree.setNodes((HashMap)nodes);
+			processTree.display("Block");
+			try {
+				if(stmt != null) stmt.close();
+				if(rs != null) rs.close();
+				if(conn != null) DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	public void save() {
 		saveFieldData();
 		saveRequiredFieldMappingData();
 		saveExpressionData();
+		saveModelData();
+		saveProcessTree();
 	}
 	public void saveFieldData() {
 		
@@ -398,6 +467,75 @@ public class ProjectConfigutration {
 		}
 		
 	}
+	
+	public void saveProcessTree() {
+		Connection conn = DBManager.getConnection();
+		String insert_sql = " insert into process_route_defn (project_id, model_id, parent_model_id) values (?, ?, ?)";
+		PreparedStatement pstmt = null;
+		Map<String, Node> nodes = processTree.getNodes();
+		boolean autoCommit = true;
+
+		if(nodes == null) return ;
+		
+		try {
+			autoCommit = conn.getAutoCommit();
+			conn.setAutoCommit(false);
+			pstmt = conn.prepareStatement(insert_sql);
+			
+			Set<String> keys = nodes.keySet();
+			Iterator<String> it = keys.iterator();
+			
+			while (it.hasNext()) {
+				String key = it.next();
+				Node  node = nodes.get(key);
+				if(node.isSaved()) continue;
+				int modelId = this.getModelByName(node.getIdentifier()).getId(); 
+				Model parentModel = this.getModelByName(node.getParent()); 
+				
+				pstmt.setInt(1, this.projectId);
+				pstmt.setInt(2, modelId);
+				if(parentModel == null){
+					pstmt.setInt(3, -1);
+				} else {
+					pstmt.setInt(3, parentModel.getId());
+				}
+				pstmt.executeUpdate();
+				node.setSaved(true);
+				
+			}
+			conn.commit();
+			
+		} catch(SQLException e){
+			e.printStackTrace();
+		} finally {
+			try {
+				conn.setAutoCommit(autoCommit);
+				if(pstmt != null) pstmt.close();
+				if(conn != null) DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	public Model getModelById(int modelId) {
+		for(Model model:models){
+			if(model.getId() == modelId) {
+				return model;
+			}
+		}
+		return null;
+	}
+	
+	public Model getModelByName(String name) {
+		if(name == null) return null;
+		for(Model model:models){
+			if(model.getName().equals(name)) {
+				return model;
+			}
+		}
+		return null;
+	}
+	
 	public List<Field> getFields() {
 		return fields;
 	}
@@ -429,4 +567,13 @@ public class ProjectConfigutration {
 	public void setModels(List<Model> models) {
 		this.models = models;
 	}
+
+	public Tree getProcessTree() {
+		return processTree;
+	}
+
+	public void setProcessTree(Tree processTree) {
+		this.processTree = processTree;
+	}
+
 }
