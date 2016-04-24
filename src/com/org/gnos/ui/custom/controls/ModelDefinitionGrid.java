@@ -19,10 +19,8 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.core.Expression;
-import com.org.gnos.core.Field;
 import com.org.gnos.core.Model;
 import com.org.gnos.core.ProjectConfigutration;
-import com.org.gnos.services.Expressions;
 
 public class ModelDefinitionGrid extends Composite {
 

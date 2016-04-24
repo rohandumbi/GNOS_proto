@@ -16,6 +16,7 @@ import java.util.Set;
 
 import com.org.gnos.db.DBManager;
 import com.org.gnos.services.Node;
+import com.org.gnos.services.PitBenchProcessor;
 import com.org.gnos.services.Tree;
 
 
@@ -29,16 +30,13 @@ public class ProjectConfigutration {
 	private List<Model> models = new ArrayList<Model>();	
 	private Tree processTree = null;
 	
+	private boolean newProject = true;
 	private Map<String, String> savedRequiredFieldMapping;
 	
 	private int projectId = -1;
 	
 	public static ProjectConfigutration getInstance() {
 		return instance;
-	}
-	
-	public void setProjectId(int projectId){
-		this.projectId = projectId;
 	}
 	
 	public void load(int projectId){
@@ -48,6 +46,7 @@ public class ProjectConfigutration {
 			return;
 		}
 		this.projectId = projectId;
+		this.newProject = false;
 		
 		// Reinitializing the structures
 		fields = new ArrayList<Field>();
@@ -310,6 +309,9 @@ public class ProjectConfigutration {
 	
 	public void saveRequiredFieldMappingData() {
 		
+		if(this.newProject) {
+			new PitBenchProcessor().updatePitBenchData(projectId);
+		}
 		Connection conn = DBManager.getConnection();
 		String insert_sql = " insert into required_field_mapping (project_id, field_name, mapped_field_name) values (?, ?, ?)";
 		String update_sql = " update required_field_mapping set mapped_field_name = ? where project_id = ? AND field_name = ? ";
@@ -535,6 +537,14 @@ public class ProjectConfigutration {
 		return null;
 	}
 	
+	public int getProjectId(){
+		return this.projectId;
+	}
+	
+	public void setProjectId(int projectId){
+		this.projectId = projectId;
+	}
+		
 	public List<Field> getFields() {
 		return fields;
 	}

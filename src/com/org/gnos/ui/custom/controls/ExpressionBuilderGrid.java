@@ -1,10 +1,7 @@
 package com.org.gnos.ui.custom.controls;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
@@ -27,9 +24,6 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.core.Expression;
 import com.org.gnos.core.Field;
-import com.org.gnos.services.Expressions;
-import com.org.gnos.services.Operation;
-import com.org.gnos.services.csv.GNOSCSVDataProcessor;
 
 public class ExpressionBuilderGrid extends Composite {
 
@@ -217,14 +211,6 @@ public class ExpressionBuilderGrid extends Composite {
 		    if(str.trim().equalsIgnoreCase(expressionName.trim()))
 		    	isPresentInExpressionGrid = true;
 		}
-		if(!isPresentInExpressionGrid){
-			List<Expression> savedExpressions = Expressions.getAll();
-			for(Expression expression : savedExpressions){
-				if(expression.getName().trim().equalsIgnoreCase(expressionName)){
-					isPresentInSavedGrid = true;
-				}
-			}
-		}
 		return isPresentInExpressionGrid||isPresentInSavedGrid;
 	}
 
@@ -375,15 +361,6 @@ public class ExpressionBuilderGrid extends Composite {
 		compositeRow.setLayoutData(fd_compositeRow);
 	}
 
-
-	/*public void resetAllRows(){
-		for(Composite existingRow : this.allRows){
-			existingRow.setEnabled(false);
-		}
-		this.allRows = new ArrayList<Composite>();
-		this.presentRow = compositeGridHeader;
-	}*/
-	
 	public void resetAllRows(){
 		for(Composite existingRow : this.allRows){
 			existingRow.setEnabled(false);
@@ -411,18 +388,8 @@ public class ExpressionBuilderGrid extends Composite {
 			Control controlGrade = rowChildren[0];
 			Control controlExpressionName = rowChildren[1];
 			Control controlIsComplex = rowChildren[2];
-
-			Control controlExpressionValue = null;
-
-			Text textCondition = null;
-
-			if(rowChildren[3] instanceof Text){ //temporary hack, need to identify in a better way
-				controlExpressionValue = rowChildren[4];
-				textCondition = (Text)rowChildren[3];
-			}else{
-				controlExpressionValue = rowChildren[3];
-				textCondition = (Text)rowChildren[4];
-			}
+			Control controlExpressionValue = rowChildren[3];
+			Text textCondition = (Text)rowChildren[4];
 
 			if(controlGrade instanceof Button){
 				Button buttonControlGrade = (Button)controlGrade;

@@ -19,6 +19,8 @@ import com.org.gnos.core.Expression;
 import com.org.gnos.core.Field;
 import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.events.GnosEvent;
+import com.org.gnos.services.ExpressionProcessor;
+import com.org.gnos.services.csv.GNOSCSVDataProcessor;
 import com.org.gnos.ui.custom.controls.ExpressionBuilderGrid;
 import com.org.gnos.ui.custom.controls.GnosScreen;
 
@@ -118,8 +120,6 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 		buttonExpressionDefinition.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				//TODO mapping complete
-				//updateHeadersWithRequiredFieldsMapping();
 				boolean isUpdateExpressionSuccessful = updateExpressionList();
 				if(isUpdateExpressionSuccessful == true){
 					GnosEvent event = new GnosEvent(this, "complete:expression-defintion");
@@ -147,7 +147,7 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 		 * Temporary Export to CSV button
 		 */
 		Button buttonExportToCSV = new Button(this, SWT.NONE);
-		buttonExportToCSV.setText("SAVE TO CSV");
+		buttonExportToCSV.setText("Compute");
 		FormData fd_buttonExportToCSV = new FormData();
 		fd_buttonExportToCSV.top = new FormAttachment(expressionBuilderGrid, 10, SWT.BOTTOM);
 		fd_buttonExportToCSV.left = new FormAttachment(buttonSave, 5, SWT.RIGHT);
@@ -163,39 +163,24 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 				boolean isUpdateExpressionSuccessful = updateExpressionList();
 				if(isUpdateExpressionSuccessful){
 					resetExpressionList();
-				}
-				/*if(isUpdateExpressionSuccessful){
-					//GNOSCSVDataProcessor.getInstance().compute();
-					//GNOSCSVDataProcessor.getInstance().dumpToDB();
-					//GNOSCSVDataProcessor.getInstance().dumpToCsv();
-					List<Composite> allExpressions = expressionBuilderGrid.getAllRowsComposite();
-					savedExpressionsGrid.addRows(allExpressions);
-					me.layout();
-					parent.layout(true, true);
-					resetExpressionList();
-				} */
-				//System.out.println("After mapping datatype of 3rd row is: " + projectModel.getAllProjectFields().get(2).getDataType());
-				
+				}				
 			}
 		});
 		
 		buttonExportToCSV.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				//TODO mapping complete
-				//projectModel.setAllProjectFields(fieldDatatypeDefinitionGrid.getFieldDatatypes());
 				boolean isUpdateExpressionSuccessful = updateExpressionList();
 				if(isUpdateExpressionSuccessful){
-					//GNOSCSVDataProcessor.getInstance().compute();
-					//GNOSCSVDataProcessor.getInstance().dumpToDB();
-					//GNOSCSVDataProcessor.getInstance().dumpToCsv();
+/*					GNOSCSVDataProcessor.getInstance().compute();
+					GNOSCSVDataProcessor.getInstance().dumpToDB();
+					GNOSCSVDataProcessor.getInstance().dumpToCsv();
 					List<Composite> allExpressions = expressionBuilderGrid.getAllRowsComposite();
 					me.layout();
 					parent.layout(true, true);
-					resetExpressionList();
+					resetExpressionList();*/
+					(new ExpressionProcessor()).store();
 				}
-				//System.out.println("After mapping datatype of 3rd row is: " + projectModel.getAllProjectFields().get(2).getDataType());
-				
 			}
 		});
 	}

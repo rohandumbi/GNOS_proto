@@ -18,7 +18,6 @@ import org.eclipse.swt.widgets.Shell;
 import com.org.gnos.application.GNOSConfig;
 import com.org.gnos.core.Field;
 import com.org.gnos.core.ProjectConfigutration;
-import com.org.gnos.db.models.Projects;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.events.GnosEventWithAttributeMap;
 import com.org.gnos.events.interfaces.GnosEventListener;
@@ -30,10 +29,9 @@ public class GNOSApplication extends ApplicationWindow implements GnosEventListe
 	private Composite container;
 	private StackLayout stackLayout;
 	private GnosScreen viewPort;
-	private Shell dummyShell;
 	
-	private ProjectScreen projectScreen;
-	private WorkbenchScreen workbenchScreen;
+	private GnosScreen projectScreen;
+	private GnosScreen workbenchScreen;
 	private GNOSCSVDataProcessor gnosCsvDataProcessor;
 	/**
 	 * Create the application window.
@@ -83,15 +81,17 @@ public class GNOSApplication extends ApplicationWindow implements GnosEventListe
 	}
 	
 	private void loadCSVFile(String fileName) {
+		ProjectConfigutration projectConfigutration = ProjectConfigutration.getInstance();
 		gnosCsvDataProcessor = GNOSCSVDataProcessor.getInstance();
 		gnosCsvDataProcessor.processCsv(fileName);
+		gnosCsvDataProcessor.dumpToDB(projectConfigutration.getProjectId());
 		String[] columns = gnosCsvDataProcessor.getHeaderColumns();
 		List<Field> fields = new ArrayList<Field>();
 		for(int i=0;i < columns.length; i++ ){
 			Field  field = new Field(columns[i]);
 			fields.add(field);
 		}
-		ProjectConfigutration.getInstance().setFields(fields);
+		projectConfigutration.setFields(fields);
 	}
 	private void openProjectConfiguration(){
 		loadWorkBenchScreen();
@@ -185,8 +185,8 @@ public class GNOSApplication extends ApplicationWindow implements GnosEventListe
 		if(e.eventName == "project:created") {			
 			GnosEventWithAttributeMap event = (GnosEventWithAttributeMap)e;
 			String fileName = event.attributes.get("recordFileName");
-			loadCSVFile(fileName);
 			ProjectConfigutration.getInstance().setProjectId(Integer.parseInt(event.attributes.get("projectId")));
+			loadCSVFile(fileName);
 			openProjectConfiguration();
 		} else if(e.eventName == "project:opened") {
 			GnosEventWithAttributeMap event = (GnosEventWithAttributeMap)e;
