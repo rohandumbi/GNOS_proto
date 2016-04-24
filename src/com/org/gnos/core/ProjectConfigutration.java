@@ -1,5 +1,7 @@
 package com.org.gnos.core;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,6 +17,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.org.gnos.db.DBManager;
+import com.org.gnos.services.EquationGenerator;
 import com.org.gnos.services.Node;
 import com.org.gnos.services.PitBenchProcessor;
 import com.org.gnos.services.Tree;
@@ -256,6 +259,12 @@ public class ProjectConfigutration {
 		saveExpressionData();
 		saveModelData();
 		saveProcessTree();
+		try {
+			new EquationGenerator().generate();
+		} catch ( IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	public void saveFieldData() {
 		
