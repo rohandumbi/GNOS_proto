@@ -278,63 +278,6 @@ public class OpexDefinitionGrid extends Composite {
 		return this.allRows;
 	}
 
-	public List<Model> getDefinedModels(){
-		Control[] rowChildren = null;
-		this.presentmodelNames = new ArrayList<String>();
-		List<Expression> expressions = ProjectConfigutration.getInstance().getExpressions();
-		for(int i = 0; i < allRows.size(); i++){
-			Composite row = allRows.get(i);
-			rowChildren = row.getChildren();
-			String modelName = null;
-			String modelValue = null;
-			String modelCondition = null;
-			Model model = (Model)row.getData();
-
-			Text modelNameText = (Text)rowChildren[0];
-			Control modelValueComp = rowChildren[1];
-			Text modelConditionText = (Text)rowChildren[2];
-			
-			modelName = modelNameText.getText();
-			if(modelValueComp instanceof Text){
-				modelValue = ((Text)modelValueComp).getText();
-			} else {
-				modelValue = ((Combo)modelValueComp).getText();
-			}
-			
-			modelCondition = modelConditionText.getText();
-			
-			if(modelName == null || modelName == ""){
-				MessageDialog.openError(this.parent.getShell(), "GNOS Error", "Please enter a valid name for model.");
-				return null;
-			}else if(modelValue == null){
-				MessageDialog.openError(this.parent.getShell(), "GNOS Error", "Please enter a valid value for model " + modelName);
-				return null;
-			}
-			
-			if(isModelNameDuplicate(modelName)){
-				MessageDialog.openError(this.parent.getShell(), "GNOS Error", "Model name: " + modelName + " already exists. Please use a unique model name.");
-				return null;
-			}else{
-				if(model == null){
-					model = new Model(modelName);
-					this.models.add(model);
-				}
-				
-				for(Expression expression: expressions) {
-					if(expression.getName().equals(modelValue)){
-						model.setExpression(expression);
-						break;
-					}
-				}
-				model.setCondition(modelCondition);
-				presentmodelNames.add(modelName);
-				
-			}
-		}
-			
-		return this.models;
-	}
-
 	@Override
 	protected void checkSubclass() {
 		// Disable the check that prevents subclassing of SWT components

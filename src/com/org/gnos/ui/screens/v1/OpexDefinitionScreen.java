@@ -3,8 +3,6 @@ package com.org.gnos.ui.screens.v1;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
@@ -25,7 +23,6 @@ import com.org.gnos.ui.custom.controls.OpexDefinitionGrid;
 
 public class OpexDefinitionScreen extends GnosScreen {
 
-	private Composite parent;
 	private Text textStartYear;
 	private Text textNumberOfIncrements;
 	private ScrolledComposite scGridContainer;
@@ -41,7 +38,6 @@ public class OpexDefinitionScreen extends GnosScreen {
 		setForeground(SWTResourceManager.getColor(30, 144, 255));
 		setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		this.parent = parent;
 		this.createContent();
 
 	}
@@ -104,7 +100,6 @@ public class OpexDefinitionScreen extends GnosScreen {
 		btnAddTimePeriod.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				//TODO implement time period add
 				int startingYear = Integer.parseInt(textStartYear.getText());
 				int numberOfIncrements = Integer.parseInt(textNumberOfIncrements.getText());
 				TimePeriod timePeriod = new TimePeriod(startingYear, numberOfIncrements);

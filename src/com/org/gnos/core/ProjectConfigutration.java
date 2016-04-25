@@ -1,6 +1,5 @@
 package com.org.gnos.core;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -30,7 +29,8 @@ public class ProjectConfigutration {
 	private List<Field> fields = new ArrayList<Field>();
 	private Map<String, String> requiredFieldMapping = new LinkedHashMap<String, String>();
 	private List<Expression> expressions = new ArrayList<Expression>();
-	private List<Model> models = new ArrayList<Model>();	
+	private List<Model> models = new ArrayList<Model>();
+	private List<OpexData> opexDataList = new ArrayList<OpexData>();
 	private Tree processTree = null;
 	
 	private boolean newProject = true;
@@ -57,12 +57,14 @@ public class ProjectConfigutration {
 		expressions = new ArrayList<Expression>();
 		models = new ArrayList<Model>();
 		processTree = new Tree();
+		opexDataList = new ArrayList<OpexData>();
 		
 		loadFieldData();
 		loadFieldMappingData();
 		loadExpressions();
 		loadModels();
 		loadProcessTree();
+		loadOpexData();
 	}
 
 	private void loadFieldData() {
@@ -70,7 +72,6 @@ public class ProjectConfigutration {
 		Statement stmt = null;
 		ResultSet rs = null; 
 		Connection conn = DBManager.getConnection();
-		Date currDate = new Date();
 		try {
 			stmt = conn.createStatement();
 			stmt.execute(sql);
@@ -253,12 +254,51 @@ public class ProjectConfigutration {
 		}
 	}
 	
+	public void loadOpexData() {
+		String sql = "select id, model_id, in_use, is_revenue, year, value from opex_defn, model_year_mapping where id= opex_id and project_id = "+ this.projectId + " order by id";
+		Statement stmt = null;
+		ResultSet rs = null; 
+		Connection conn = DBManager.getConnection();
+		try {
+			stmt = conn.createStatement();
+			stmt.execute(sql);
+			rs = stmt.getResultSet();
+			OpexData od;
+			while(rs.next()) {
+				int id = rs.getInt(1);
+				int modelId = rs.getInt(2);
+				Model model = this.getModelById(modelId);
+				
+				od = getOpexDataById(id);
+				if(od == null) {
+					od = new OpexData(model);
+					od.setId(id);
+					od.setInUse(rs.getBoolean(3));
+					od.setRevenue(rs.getBoolean(4));
+					this.opexDataList.add(od);
+				}
+				od.addYear(rs.getInt(5), rs.getInt(6));			
+			}		
+		} catch(SQLException e){
+			e.printStackTrace();
+		} finally {
+			try {
+				if(stmt != null) stmt.close();
+				if(rs != null) rs.close();
+				if(conn != null) DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	public void save() {
 		saveFieldData();
 		saveRequiredFieldMappingData();
 		saveExpressionData();
 		saveModelData();
 		saveProcessTree();
+		saveOpexData();
 		try {
 			new EquationGenerator().generate();
 		} catch ( IOException e) {
@@ -527,6 +567,58 @@ public class ProjectConfigutration {
 			}
 		}
 	}
+	
+	public void saveOpexData() {
+		Connection conn = DBManager.getConnection();
+		String insert_sql = "insert into opex_defn (project_id, scenario_id, model_id, in_use, is_revenue) values (?, ?, ?, ?, ?)";
+		String mapping_sql = "insert into model_year_mapping (opex_id, year, value) values (?, ?, ?)";
+		PreparedStatement pstmt = null;
+		PreparedStatement pstmt1 = null;
+		ResultSet rs;
+		boolean autoCommit = true;
+		
+		try {
+			autoCommit = conn.getAutoCommit();
+			conn.setAutoCommit(false);
+			pstmt = conn.prepareStatement(insert_sql, Statement.RETURN_GENERATED_KEYS);
+			pstmt1 = conn.prepareStatement(mapping_sql);
+			
+			for(OpexData od: this.opexDataList) {
+				pstmt.setInt(1, projectId);
+				pstmt.setInt(2, 1);
+				pstmt.setInt(3, od.getModel().getId());
+				pstmt.setBoolean(4, od.isInUse());
+				pstmt.setBoolean(5, od.isRevenue());
+				pstmt.executeUpdate();
+				rs = pstmt.getGeneratedKeys();
+				od.setId(rs.getInt(1));
+				
+				Set keys = od.getCostData().keySet();
+				Iterator<Integer> it = keys.iterator();
+				while(it.hasNext()){
+					int key = it.next();
+					pstmt1.setInt(1, od.getId());
+					pstmt1.setInt(2, key);
+					pstmt1.setInt(3, od.getCostData().get(key));
+					pstmt1.executeUpdate();
+				}
+				
+			}
+			conn.commit();
+			
+		} catch(SQLException e){
+			e.printStackTrace();
+		} finally {
+			try {
+				conn.setAutoCommit(autoCommit);
+				if(pstmt != null) pstmt.close();
+				if(conn != null) DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	public Model getModelById(int modelId) {
 		for(Model model:models){
 			if(model.getId() == modelId) {
@@ -541,6 +633,16 @@ public class ProjectConfigutration {
 		for(Model model:models){
 			if(model.getName().equals(name)) {
 				return model;
+			}
+		}
+		return null;
+	}
+	
+	public OpexData getOpexDataById(int id){
+		if(this.opexDataList == null) return null;
+		for(OpexData od: this.opexDataList) {
+			if(od.getId() == id) {
+				return od;
 			}
 		}
 		return null;

@@ -79,3 +79,23 @@ CREATE TABLE process_route_defn(
    model_id INT NOT NULL,
    parent_model_id INT
 );
+
+DROP TABLE IF EXISTS opex_defn; 
+
+CREATE TABLE opex_defn(
+   id INT NOT NULL AUTO_INCREMENT,
+   project_id INT NOT NULL,
+   scenario_id INT NOT NULL,
+   model_id INT NOT NULL,
+   in_use TINYINT NOT NULL default 1,
+   is_revenue TINYINT NOT NULL default 1,
+   PRIMARY KEY ( id )
+);
+
+DROP TABLE IF EXISTS model_year_mapping; 
+
+CREATE TABLE model_year_mapping(
+   opex_id INT NOT NULL;
+   year INT NOT NULL,
+   value INT NOT NULL
+);
