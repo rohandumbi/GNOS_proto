@@ -1,5 +1,6 @@
 package com.org.gnos.core;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class OpexData {
@@ -14,6 +15,7 @@ public class OpexData {
 		super();
 		this.id = -1;
 		this.model = model;
+		this.costData = new LinkedHashMap<Integer, Integer>();
 	}
 	
 	public int getId() {
