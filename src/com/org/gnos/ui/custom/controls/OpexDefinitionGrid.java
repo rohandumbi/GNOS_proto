@@ -46,7 +46,7 @@ public class OpexDefinitionGrid extends Composite {
 		super(parent, style);
 		this.parent = parent;
 		this.allRows = new ArrayList<Composite>();
-		//this.models = ProjectConfigutration.getInstance().getModels();
+		this.opexDataList = ProjectConfigutration.getInstance().getOpexDataList();
 		this.timePeriod = timePeriod;
 		this.createContent(parent);
 	}

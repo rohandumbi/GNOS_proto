@@ -696,4 +696,12 @@ public class ProjectConfigutration {
 		this.processTree = processTree;
 	}
 
+	public List<OpexData> getOpexDataList() {
+		return opexDataList;
+	}
+
+	public void setOpexDataList(List<OpexData> opexDataList) {
+		this.opexDataList = opexDataList;
+	}
+
 }

@@ -91,6 +91,7 @@ public class MapRequiredFieldsScreen extends GnosScreen {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				boolean isMappingSuccessful = mapRequiredFieldsGrid.setSourceFieldMapping();
+				ProjectConfigutration.getInstance().saveRequiredFieldMappingData();
 				if(isMappingSuccessful == true){
 					GnosEvent event = new GnosEvent(this, "complete:map-required-fields");
 					triggerGnosEvent(event);
