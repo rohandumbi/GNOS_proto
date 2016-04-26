@@ -591,6 +591,7 @@ public class ProjectConfigutration {
 				pstmt.setBoolean(5, od.isRevenue());
 				pstmt.executeUpdate();
 				rs = pstmt.getGeneratedKeys();
+				rs.next();
 				od.setId(rs.getInt(1));
 				
 				Set keys = od.getCostData().keySet();
