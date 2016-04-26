@@ -574,7 +574,7 @@ public class ProjectConfigutration {
 		String mapping_sql = "insert into model_year_mapping (opex_id, year, value) values (?, ?, ?)";
 		PreparedStatement pstmt = null;
 		PreparedStatement pstmt1 = null;
-		ResultSet rs;
+		ResultSet rs = null;
 		boolean autoCommit = true;
 		
 		try {
@@ -591,19 +591,20 @@ public class ProjectConfigutration {
 				pstmt.setBoolean(5, od.isRevenue());
 				pstmt.executeUpdate();
 				rs = pstmt.getGeneratedKeys();
-				rs.next();
-				od.setId(rs.getInt(1));
-				
-				Set keys = od.getCostData().keySet();
-				Iterator<Integer> it = keys.iterator();
-				while(it.hasNext()){
-					int key = it.next();
-					pstmt1.setInt(1, od.getId());
-					pstmt1.setInt(2, key);
-					pstmt1.setInt(3, od.getCostData().get(key));
-					pstmt1.executeUpdate();
-				}
-				
+				if(rs.next());{
+					int id = rs.getInt(1);
+					od.setId(id);
+					
+					Set keys = od.getCostData().keySet();
+					Iterator<Integer> it = keys.iterator();
+					while(it.hasNext()){
+						int key = it.next();
+						pstmt1.setInt(1, od.getId());
+						pstmt1.setInt(2, key);
+						pstmt1.setInt(3, od.getCostData().get(key));
+						pstmt1.executeUpdate();
+					}
+				}		
 			}
 			conn.commit();
 			
