@@ -2,6 +2,7 @@ package com.org.gnos.ui.custom.controls;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -298,6 +299,28 @@ public class OpexDefinitionGrid extends Composite {
 	}
 	
 	public boolean saveOpexData(){
+		this.opexDataList = new ArrayList<OpexData>();
+		for(Composite rowOpexData : this.allRows){
+			Control[] rowChildren = rowOpexData.getChildren();
+			Combo comboClassification = (Combo)rowChildren[0];
+			Button isInUse = (Button)rowChildren[1];
+			Combo comboModel = (Combo)rowChildren[2];
+			Map<Integer, Integer> mapCostData = new LinkedHashMap<Integer, Integer>();
+			for(int i=0; i<this.timePeriod.getIncrements(); i++){
+				mapCostData.put((this.timePeriod.getStartYear() + i), Integer.valueOf(((Text)rowChildren[3+i]).getText()));
+			}
+			boolean inUse = isInUse.getSelection();
+			boolean isRevenue = (comboClassification.getSelectionIndex() == 1);//0=cost; 1=revenue
+			String modelName = comboModel.getText();
+			Model model = ProjectConfigutration.getInstance().getModelByName(modelName);
+			
+			System.out.println("\n Model: " + modelName + " inUse " + inUse + " isRevenue " + isRevenue);
+			OpexData opexData = new OpexData(model);
+			opexData.setCostData(mapCostData);
+			opexData.setInUse(inUse);
+			opexData.setRevenue(isRevenue);
+			this.opexDataList.add(opexData);
+		}
 		ProjectConfigutration.getInstance().setOpexDataList(this.opexDataList);
 		return true;
 	}
