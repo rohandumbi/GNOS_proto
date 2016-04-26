@@ -388,8 +388,21 @@ public class ExpressionBuilderGrid extends Composite {
 			Control controlGrade = rowChildren[0];
 			Control controlExpressionName = rowChildren[1];
 			Control controlIsComplex = rowChildren[2];
-			Control controlExpressionValue = rowChildren[3];
-			Text textCondition = (Text)rowChildren[4];
+			Control controlExpressionValue = null;
+			Text textCondition = null;
+			
+			/*
+			 * The order of expression composite changes dynamically. If its type is toggled,
+			 * it disposes its original 3rd index and becomes 4th indexed row child.
+			 * Below is hacky way to determine that.
+			 */
+			if((Control)rowChildren[4] instanceof Text){
+				controlExpressionValue = rowChildren[3];
+				textCondition = (Text)rowChildren[4];
+			}else{
+				textCondition = (Text)rowChildren[3];
+				controlExpressionValue = rowChildren[4];
+			}
 
 			if(controlGrade instanceof Button){
 				Button buttonControlGrade = (Button)controlGrade;
