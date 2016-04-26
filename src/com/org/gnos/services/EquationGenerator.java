@@ -108,6 +108,7 @@ public class EquationGenerator {
 		modelOpexDataMapping = new LinkedHashMap<Integer, List<CostRevenueData>>();
 		
 		for(OpexData opexData: opexDataList) {
+			if(!opexData.isInUse()) continue;
 			int modelId = opexData.getModel().getId();
 			List<CostRevenueData> yearCostData = modelOpexDataMapping.get(modelId);
 			if(yearCostData == null) {
