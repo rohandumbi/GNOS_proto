@@ -158,6 +158,21 @@ public class OpexDefinitionScreen extends GnosScreen {
 		btnAddRow.setLayoutData(fd_btnAddRow);
 		btnAddRow.setText("+");
 		
+		Button btnSaveOpexData = new Button(this, SWT.NONE);
+		btnSaveOpexData.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				//TO DO implement row add
+				opexDefinitionGrid.saveOpexData();
+			}
+		});
+		btnSaveOpexData.setFont(SWTResourceManager.getFont("Segoe UI", 16, SWT.BOLD));
+		btnSaveOpexData.setImage(SWTResourceManager.getImage(OpexDefinitionScreen.class, "/com/org/gnos/resources/save.png"));
+		FormData fd_btnSaveOpexData = new FormData();
+		fd_btnSaveOpexData.top = new FormAttachment(btnAddRow, 5, SWT.BOTTOM);
+		fd_btnSaveOpexData.right = new FormAttachment(100, -5);
+		btnSaveOpexData.setLayoutData(fd_btnSaveOpexData);
+		
 		this.layout();
 	}
 	

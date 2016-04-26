@@ -32,7 +32,7 @@ public class EquationGenerator {
 		Tree processtree = projectConfiguration.getProcessTree();
 		
 		int bufferSize = 8 * 1024;
-		output = new BufferedOutputStream(new FileOutputStream("c:\\output.txt"), bufferSize);
+		output = new BufferedOutputStream(new FileOutputStream("output.txt"), bufferSize);
 		nodes = processtree.getNodes();
 		Iterator<Node> it = processtree.iterator("Block");
 		Node rootNode = it.next(); // this is first node.. so this must be block node. skipping this.
