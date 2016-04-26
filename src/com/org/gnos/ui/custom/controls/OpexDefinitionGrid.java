@@ -296,6 +296,11 @@ public class OpexDefinitionGrid extends Composite {
 			previousMember = yearlyValue;
 		}
 	}
+	
+	public boolean saveOpexData(){
+		ProjectConfigutration.getInstance().setOpexDataList(this.opexDataList);
+		return true;
+	}
 
 	public void resetAllRows(){
 		for(Composite existingRow : this.allRows){
