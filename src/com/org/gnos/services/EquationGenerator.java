@@ -48,7 +48,13 @@ public class EquationGenerator {
 		List<String> childrens = node.getChildren();
 		Model model = projectConfiguration.getModelByName(node.getIdentifier());
 		if(model != null){
-			condition = condition + model.getCondition();
+			if(condition.trim().length() > 0 && model.getCondition().trim().length() > 0) {
+				condition = condition + " AND " +model.getCondition();
+			} else if(model.getCondition().trim().length() > 0) {
+				condition = model.getCondition();
+			}
+			
+			System.out.println("Condition :"+condition);
 			buildEquation(model, condition, depth);
 			depth++;
 		}
