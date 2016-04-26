@@ -1,6 +1,9 @@
 package com.org.gnos.ui.screens.v1;
 
 
+import java.util.List;
+import java.util.Map;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -16,6 +19,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import com.org.gnos.core.OpexData;
+import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.services.TimePeriod;
 import com.org.gnos.ui.custom.controls.GnosScreen;
@@ -28,6 +33,7 @@ public class OpexDefinitionScreen extends GnosScreen {
 	private ScrolledComposite scGridContainer;
 	private OpexDefinitionGrid opexDefinitionGrid;
 	private Label labelScreenName;
+	private List<OpexData> opexDataList;
 	/**
 	 * Create the composite.
 	 * @param parent
@@ -112,6 +118,25 @@ public class OpexDefinitionScreen extends GnosScreen {
 		btnAddTimePeriod.setLayoutData(fd_btnAddTimePeriod);
 		fd_btnAddTimePeriod.bottom = new FormAttachment(textNumberOfIncrements, 0, SWT.BOTTOM);
 		btnAddTimePeriod.setText("Save");
+		
+		/*
+		 * If there is an existing Opex data for the project
+		 */
+		this.opexDataList = ProjectConfigutration.getInstance().getOpexDataList();
+		if(this.opexDataList.size() > 0){
+			OpexData opexData = this.opexDataList.get(0);
+			Map<Integer, Integer> mapCostData = opexData.getCostData();
+			int numberOfIncrements = mapCostData.size();
+			int startYear = 0;
+			for(Integer key : mapCostData.keySet()){
+				startYear = key;
+				break;
+			}
+			textNumberOfIncrements.setText(String.valueOf(numberOfIncrements));
+			textStartYear.setText(String.valueOf(startYear));
+			TimePeriod savedTimePeriod = new TimePeriod(startYear, numberOfIncrements);
+			initializeOpexGrid(savedTimePeriod);
+		}
 		
 	}
 	

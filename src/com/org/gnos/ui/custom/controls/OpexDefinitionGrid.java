@@ -42,6 +42,7 @@ public class OpexDefinitionGrid extends Composite {
 	private TimePeriod timePeriod;
 	private Label firstSeparator;
 	private Label secondSeparator;
+	private Label lblClassification;
 
 	public OpexDefinitionGrid(Composite parent, int style, TimePeriod timePeriod) {
 		super(parent, style);
@@ -91,7 +92,7 @@ public class OpexDefinitionGrid extends Composite {
 		fd_compositeGridHeader.right = new FormAttachment(100);
 		compositeGridHeader.setLayoutData(fd_compositeGridHeader);
 
-		Label lblClassification = new Label(compositeGridHeader, SWT.NONE);
+		lblClassification = new Label(compositeGridHeader, SWT.NONE);
 		lblClassification.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		FormData fd_lblClassification = new FormData();
 		fd_lblClassification.top = new FormAttachment(0,2);
@@ -183,7 +184,7 @@ public class OpexDefinitionGrid extends Composite {
 			FormData fd_comboClassification = new FormData();
 			fd_comboClassification.left = new FormAttachment(0, 2);
 			fd_comboClassification.top = new FormAttachment(0);
-			//fd_comboClassification.right = new FormAttachment(20, -5);
+			fd_comboClassification.right = new FormAttachment(0, 89);
 			comboClassification.setLayoutData(fd_comboClassification);
 			
 			Button btnUse = new Button(compositeRow, SWT.CHECK);
@@ -202,7 +203,7 @@ public class OpexDefinitionGrid extends Composite {
 					break;
 				}
 			}
-			comboIdentifier.setText("Select Model");
+			//comboIdentifier.setText("Select Model");
 			FormData fd_comboIdentifier = new FormData();
 			fd_comboIdentifier.left = new FormAttachment(btnUse, 21);
 			fd_comboIdentifier.right = new FormAttachment(btnUse, 135);
@@ -215,7 +216,7 @@ public class OpexDefinitionGrid extends Composite {
 			Iterator<Integer> it = keys.iterator();
 			while(it.hasNext()){
 				int value = yearData.get(it.next());
-				Text yearlyValue = new Text(parent, SWT.BORDER);
+				Text yearlyValue = new Text(compositeRow, SWT.BORDER);
 				yearlyValue.setText(String.valueOf(value));
 				FormData fd_yearlyValue = new FormData();
 				/*
