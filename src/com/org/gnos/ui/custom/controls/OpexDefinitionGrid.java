@@ -16,7 +16,9 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
@@ -194,7 +196,7 @@ public class OpexDefinitionGrid extends Composite {
 			fd_btnUse.top = new FormAttachment(0, 2);
 			btnUse.setLayoutData(fd_btnUse);
 			
-			Combo comboIdentifier = new Combo(compositeRow, SWT.NONE);
+			final Combo comboIdentifier = new Combo(compositeRow, SWT.NONE);
 			String[] items = this.getIdentifierComboItems();
 			comboIdentifier.setItems(items);
 			for(int i=0; i< items.length; i++){
@@ -209,6 +211,17 @@ public class OpexDefinitionGrid extends Composite {
 			fd_comboIdentifier.right = new FormAttachment(btnUse, 135);
 			fd_comboIdentifier.top = new FormAttachment(0);
 			comboIdentifier.setLayoutData(fd_comboIdentifier);
+			comboIdentifier.addListener(SWT.MouseDown, new Listener(){
+				@Override
+				public void handleEvent(Event event) {
+					// TODO Auto-generated method stub
+					//System.out.println("detected combo click");
+					comboIdentifier.removeAll();
+					comboIdentifier.setItems(getIdentifierComboItems());
+					comboIdentifier.getParent().layout();
+					comboIdentifier.setListVisible(true);
+				}
+			});
 			
 			Control previousMember = comboIdentifier;
 			Map<Integer, Integer> yearData = od.getCostData();
@@ -257,7 +270,7 @@ public class OpexDefinitionGrid extends Composite {
 		FormData fd_comboClassification = new FormData();
 		fd_comboClassification.left = new FormAttachment(0, 2);
 		fd_comboClassification.top = new FormAttachment(0);
-		//fd_comboClassification.right = new FormAttachment(20, -5);
+		fd_comboClassification.right = new FormAttachment(0, 89);
 		comboClassification.setLayoutData(fd_comboClassification);
 		
 		Button btnUse = new Button(compositeRow, SWT.CHECK);
@@ -266,10 +279,21 @@ public class OpexDefinitionGrid extends Composite {
 		fd_btnUse.top = new FormAttachment(0, 2);
 		btnUse.setLayoutData(fd_btnUse);
 		
-		Combo comboIdentifier = new Combo(compositeRow, SWT.NONE);
+		final Combo comboIdentifier = new Combo(compositeRow, SWT.NONE);
 		String[] items = this.getIdentifierComboItems();
 		comboIdentifier.setItems(items);
 		comboIdentifier.setText("Select Model");
+		comboIdentifier.addListener(SWT.MouseDown, new Listener(){
+			@Override
+			public void handleEvent(Event event) {
+				// TODO Auto-generated method stub
+				//System.out.println("detected combo click");
+				comboIdentifier.removeAll();
+				comboIdentifier.setItems(getIdentifierComboItems());
+				comboIdentifier.getParent().layout();
+				comboIdentifier.setListVisible(true);
+			}
+		});
 		FormData fd_comboIdentifier = new FormData();
 		fd_comboIdentifier.left = new FormAttachment(btnUse, 21);
 		fd_comboIdentifier.right = new FormAttachment(btnUse, 135);
