@@ -584,6 +584,7 @@ public class ProjectConfigutration {
 			pstmt1 = conn.prepareStatement(mapping_sql);
 			
 			for(OpexData od: this.opexDataList) {
+				if(od.getId() > 0 ) continue;
 				pstmt.setInt(1, projectId);
 				pstmt.setInt(2, 1);
 				pstmt.setInt(3, od.getModel().getId());
