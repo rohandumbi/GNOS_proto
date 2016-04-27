@@ -300,29 +300,40 @@ public class OpexDefinitionGrid extends Composite {
 	}
 	
 	public boolean saveOpexData(){
-		this.opexDataList = new ArrayList<OpexData>();
+		//this.opexDataList = new ArrayList<OpexData>();
+		int i = 0;
 		for(Composite rowOpexData : this.allRows){
 			Control[] rowChildren = rowOpexData.getChildren();
 			Combo comboClassification = (Combo)rowChildren[0];
 			Button isInUse = (Button)rowChildren[1];
 			Combo comboModel = (Combo)rowChildren[2];
 			Map<Integer, Integer> mapCostData = new LinkedHashMap<Integer, Integer>();
-			for(int i=0; i<this.timePeriod.getIncrements(); i++){
-				mapCostData.put((this.timePeriod.getStartYear() + i), Integer.valueOf(((Text)rowChildren[3+i]).getText()));
+			for(int j=0; j<this.timePeriod.getIncrements(); j++){
+				mapCostData.put((this.timePeriod.getStartYear() + j), Integer.valueOf(((Text)rowChildren[3+j]).getText()));
 			}
 			boolean inUse = isInUse.getSelection();
 			boolean isRevenue = (comboClassification.getSelectionIndex() == 1);//0=cost; 1=revenue
 			String modelName = comboModel.getText();
 			Model model = ProjectConfigutration.getInstance().getModelByName(modelName);
 			
-			System.out.println("\n Model: " + modelName + " inUse " + inUse + " isRevenue " + isRevenue);
-			OpexData opexData = new OpexData(model);
-			opexData.setCostData(mapCostData);
-			opexData.setInUse(inUse);
-			opexData.setRevenue(isRevenue);
-			this.opexDataList.add(opexData);
+			if(rowOpexData.getData() == null){
+				System.out.println("\n Model: " + modelName + " inUse " + inUse + " isRevenue " + isRevenue);
+				OpexData opexData = new OpexData(model);
+				opexData.setCostData(mapCostData);
+				opexData.setInUse(inUse);
+				opexData.setRevenue(isRevenue);
+				this.opexDataList.add(opexData);
+			}else{
+				OpexData opexData = (OpexData)rowOpexData.getData();
+				opexData.setModel(model);
+				opexData.setCostData(mapCostData);
+				opexData.setInUse(inUse);
+				opexData.setRevenue(isRevenue);
+			}
+			//this.opexDataList.get(i).setCostData(mapCostData);
+			i++;
 		}
-		ProjectConfigutration.getInstance().setOpexDataList(this.opexDataList);
+		//ProjectConfigutration.getInstance().setOpexDataList(this.opexDataList);
 		return true;
 	}
 
