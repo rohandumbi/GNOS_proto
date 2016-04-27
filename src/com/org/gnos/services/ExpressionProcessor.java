@@ -36,7 +36,12 @@ public class ExpressionProcessor {
 			stmt = conn.createStatement();
 			for(Expression expr: this.expressions){
 				String columnName = expr.getName().replaceAll("\\s+","_").toLowerCase();
-				stmt.executeUpdate(alter_sql+ columnName +" VARCHAR(50) NOT NULL default 0");
+				try {
+					stmt.executeUpdate(alter_sql+ columnName +" VARCHAR(50) NOT NULL default 0");
+				} catch (SQLException  e) {
+					System.out.println(e.getMessage());
+				}
+				
 			}
 			
 		} catch (SQLException e) {
