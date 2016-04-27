@@ -70,7 +70,7 @@ public class EquationGenerator {
 		String expr_name = expr.getName().replaceAll("\\s+","_").toLowerCase();
 		String sql = "select id, pit_no, "+expr_name+" from gnos_data_"+projectConfiguration.getProjectId() ;
 		if(condition != null  && condition.trim().length() > 0) {
-			sql = sql + condition;
+			sql = sql + " where "+ condition;
 		}
 		
 		Connection conn = DBManager.getConnection();
