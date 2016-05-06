@@ -1,4 +1,4 @@
-package com.org.gnos.db.models;
+package com.org.gnos.db.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.org.gnos.db.DBManager;
+import com.org.gnos.db.model.Project;
 
 
 public class Projects {

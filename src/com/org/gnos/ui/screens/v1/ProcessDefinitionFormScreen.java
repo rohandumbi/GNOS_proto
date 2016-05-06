@@ -26,7 +26,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import com.org.gnos.core.Model;
+import com.org.gnos.db.model.Model;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.services.ProcessNode;
 import com.org.gnos.services.ProcessRoute;

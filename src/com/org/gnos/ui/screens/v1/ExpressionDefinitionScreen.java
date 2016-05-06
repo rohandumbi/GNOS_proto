@@ -15,12 +15,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import com.org.gnos.core.Expression;
-import com.org.gnos.core.Field;
 import com.org.gnos.core.ProjectConfigutration;
+import com.org.gnos.db.model.Expression;
+import com.org.gnos.db.model.Field;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.services.ExpressionProcessor;
-import com.org.gnos.services.csv.GNOSCSVDataProcessor;
 import com.org.gnos.ui.custom.controls.ExpressionBuilderGrid;
 import com.org.gnos.ui.custom.controls.GnosScreen;
 

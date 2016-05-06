@@ -15,11 +15,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import com.org.gnos.core.Field;
-import com.org.gnos.core.Model;
 import com.org.gnos.core.ProjectConfigutration;
+import com.org.gnos.db.model.Model;
 import com.org.gnos.events.GnosEvent;
-import com.org.gnos.services.csv.GNOSCSVDataProcessor;
 import com.org.gnos.ui.custom.controls.GnosScreen;
 import com.org.gnos.ui.custom.controls.ModelDefinitionGrid;
 

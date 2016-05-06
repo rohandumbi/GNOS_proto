@@ -1,4 +1,4 @@
-package com.org.gnos.db.models;
+package com.org.gnos.db.model;
 
 import java.util.Date;
 

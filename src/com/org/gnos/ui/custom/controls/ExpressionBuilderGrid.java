@@ -22,8 +22,8 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import com.org.gnos.core.Expression;
-import com.org.gnos.core.Field;
+import com.org.gnos.db.model.Expression;
+import com.org.gnos.db.model.Field;
 
 public class ExpressionBuilderGrid extends Composite {
 

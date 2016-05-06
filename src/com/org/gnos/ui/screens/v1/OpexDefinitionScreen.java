@@ -19,8 +19,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import com.org.gnos.core.OpexData;
 import com.org.gnos.core.ProjectConfigutration;
+import com.org.gnos.db.model.OpexData;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.services.TimePeriod;
 import com.org.gnos.ui.custom.controls.GnosScreen;

@@ -6,9 +6,9 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
 
-import com.org.gnos.core.Expression;
 import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.db.DBManager;
+import com.org.gnos.db.model.Expression;
 
 public class ExpressionProcessor {
 	
