@@ -148,8 +148,6 @@ public class GNOSCSVDataProcessor {
 		return data;
 	}
 
-
-
 	public static GNOSCSVDataProcessor getInstance() {
 		return instance;
 	}

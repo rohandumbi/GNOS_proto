@@ -13,8 +13,8 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
-import com.org.gnos.db.models.Project;
-import com.org.gnos.db.models.Projects;
+import com.org.gnos.db.dao.Projects;
+import com.org.gnos.db.model.Project;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.events.GnosEventWithAttributeMap;
 import com.org.gnos.ui.custom.controls.GnosScreen;

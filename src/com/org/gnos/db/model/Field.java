@@ -1,4 +1,4 @@
-package com.org.gnos.core;
+package com.org.gnos.db.model;
 
 public class Field {
 

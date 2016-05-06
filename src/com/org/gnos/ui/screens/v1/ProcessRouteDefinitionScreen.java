@@ -19,8 +19,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import com.org.gnos.core.Model;
 import com.org.gnos.core.ProjectConfigutration;
+import com.org.gnos.db.model.Model;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.services.Node;
 import com.org.gnos.services.Tree;

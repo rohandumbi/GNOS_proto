@@ -1,10 +1,7 @@
-package com.org.gnos.core;
+package com.org.gnos.db.model;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import com.org.gnos.services.Operation;
-import com.org.gnos.services.csv.GNOSCSVDataProcessor;
 
 public class Expression {
 	

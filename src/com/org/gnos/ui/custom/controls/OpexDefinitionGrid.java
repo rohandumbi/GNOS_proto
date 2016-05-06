@@ -22,9 +22,9 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import com.org.gnos.core.Model;
-import com.org.gnos.core.OpexData;
 import com.org.gnos.core.ProjectConfigutration;
+import com.org.gnos.db.model.Model;
+import com.org.gnos.db.model.OpexData;
 import com.org.gnos.services.TimePeriod;
 
 public class OpexDefinitionGrid extends Composite {

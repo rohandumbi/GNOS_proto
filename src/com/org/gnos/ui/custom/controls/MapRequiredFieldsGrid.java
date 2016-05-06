@@ -17,9 +17,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import com.org.gnos.core.Field;
 import com.org.gnos.core.ProjectConfigutration;
-import com.org.gnos.services.csv.GNOSCSVDataProcessor;
+import com.org.gnos.db.model.Field;
 
 public class MapRequiredFieldsGrid extends Composite {
 

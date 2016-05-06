@@ -16,8 +16,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 import com.org.gnos.application.GNOSConfig;
-import com.org.gnos.core.Field;
 import com.org.gnos.core.ProjectConfigutration;
+import com.org.gnos.db.model.Field;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.events.GnosEventWithAttributeMap;
 import com.org.gnos.events.interfaces.GnosEventListener;

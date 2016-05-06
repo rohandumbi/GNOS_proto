@@ -14,11 +14,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.org.gnos.core.Expression;
-import com.org.gnos.core.Model;
-import com.org.gnos.core.OpexData;
 import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.db.DBManager;
+import com.org.gnos.db.model.Expression;
+import com.org.gnos.db.model.Model;
+import com.org.gnos.db.model.OpexData;
 
 public class EquationGenerator {
 
