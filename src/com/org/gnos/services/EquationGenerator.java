@@ -40,7 +40,6 @@ public class EquationGenerator {
 		traverseNode(rootNode,"", 1);
 		output.flush();
 		output.close();
-		System.out.println("Inside generate");
 	}
 
 	private void traverseNode(Node node, String condition, int depth) {

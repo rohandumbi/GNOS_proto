@@ -26,7 +26,7 @@ CREATE TABLE required_field_mapping(
    project_id INT NOT NULL,
    field_name VARCHAR(100) NOT NULL,
    mapped_field_name VARCHAR(100) NOT NULL,
-   PRIMARY KEY ( project_id, field_name )
+   UNIQUE KEY ( project_id, field_name )
 );
 
 DROP TABLE IF EXISTS pit;
@@ -35,7 +35,7 @@ CREATE TABLE pit(
    pit_id INT NOT NULL AUTO_INCREMENT,
    project_id INT NOT NULL,
    pit_name VARCHAR(100) NOT NULL,
-   PRIMARY KEY ( pit_id, project_id )
+   UNIQUE KEY ( pit_id, project_id )
 );
 
 DROP TABLE IF EXISTS block;
@@ -45,7 +45,7 @@ CREATE TABLE block(
    pit_id INT NOT NULL,
    project_id INT NOT NULL,
    block_no INT NOT NULL,
-   PRIMARY KEY ( block_no, pit_id, project_id )
+   UNIQUE KEY ( block_no, pit_id, project_id )
 );
 
 DROP TABLE IF EXISTS expressions;
