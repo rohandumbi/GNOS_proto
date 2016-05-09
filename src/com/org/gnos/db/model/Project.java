@@ -11,28 +11,12 @@ public class Project {
 	private Date modifiedDate;
 	private String fileName;
 	
-	public Project(String name, String desc) {
+	public Project() {
 		super();
-		this.name = name;
-		this.desc = desc;
-		
 		Date curr_date = new Date();
-		
 		this.createdDate = curr_date;
 		this.modifiedDate = curr_date;
 	}
-	
-	
-	public Project(int id, String name, String desc, String fileName, Date createdDate, Date modifiedDate) {
-		super();
-		this.id = id;
-		this.name = name;
-		this.desc = desc;
-		this.fileName = fileName;
-		this.createdDate = createdDate;
-		this.modifiedDate = modifiedDate;
-	}
-
 
 	public int getId() {
 		return id;
@@ -54,6 +38,9 @@ public class Project {
 	}
 	public Date getCreatedDate() {
 		return createdDate;
+	}
+	public void setCreatedDate(Date createdDate) {
+		this.createdDate = createdDate;
 	}
 	public Date getModifiedDate() {
 		return modifiedDate;

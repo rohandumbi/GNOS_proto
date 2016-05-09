@@ -16,7 +16,6 @@ import java.util.Set;
 
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.dao.FieldDAO;
-import com.org.gnos.db.dao.ProjectDAO;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Field;
 import com.org.gnos.db.model.Model;

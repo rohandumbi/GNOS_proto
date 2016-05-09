@@ -16,7 +16,7 @@ public class GNOSCSVDataProcessor {
 	private List<String[]> data = new ArrayList<String[]>();
 	
 	public boolean processCsv(String fileName){
-		
+		System.out.println("CSV Processing started");
 		CSVReader reader = null;
 		
 		try {
