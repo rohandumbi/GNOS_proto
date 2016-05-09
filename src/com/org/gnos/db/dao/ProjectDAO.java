@@ -14,7 +14,7 @@ import com.org.gnos.db.DBManager;
 import com.org.gnos.db.model.Project;
 
 
-public class Projects {
+public class ProjectDAO {
 
 	private static List<Project> projects ;
 	private static Project activeProject;
@@ -94,7 +94,7 @@ public class Projects {
 	}
 
 	public static void setActiveProject(Project activeProject) {
-		Projects.activeProject = activeProject;
+		ProjectDAO.activeProject = activeProject;
 	}
 	
 }

@@ -13,7 +13,7 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
-import com.org.gnos.db.dao.Projects;
+import com.org.gnos.db.dao.ProjectDAO;
 import com.org.gnos.db.model.Project;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.events.GnosEventWithAttributeMap;
@@ -64,7 +64,7 @@ public class ProjectScreen extends GnosScreen {
 		labelList.setText("Available Projects:");
 		
 
-		List<Project> projects = Projects.getAll();
+		List<Project> projects = ProjectDAO.getAll();
 		final Object me = this;
 		CLabel lastLabel = labelList;
 		for(int i=0; i< projects.size(); i++){
