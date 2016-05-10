@@ -11,7 +11,6 @@ import com.org.gnos.application.GNOSConfig;
 public class DBConnectionPool implements IConnectionPool {
 
 	private List<Connection> connections = new ArrayList<Connection>();
-	private List<Connection> connectionsInUse = new ArrayList<Connection>();
 	
 	private int min_connections = 1;
 	private int max_connections = 1;
@@ -38,7 +37,7 @@ public class DBConnectionPool implements IConnectionPool {
 	public void destroy() {
 		for(int i=0; i < connections.size(); i++) {
 			try {
-				connections.get(i).close();
+				((DBConnection)connections.get(i)).closeConnection();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -50,31 +49,30 @@ public class DBConnectionPool implements IConnectionPool {
 	public synchronized Connection getConnection() {
 		Connection conn = null;
 		for(int i=0; i < connections.size(); i++) {
-			if(!connectionsInUse.contains(connections.get(i))){
+			if(!((DBConnection)connections.get(i)).isInUse()) {
 				conn = connections.get(i);
-				connectionsInUse.add(conn);
-				break;
 			}
 		} 
 		
 		if(conn == null && connections.size() < max_connections){
 			conn = createConnection();
 		}
+		((DBConnection)conn).setInUse(true);
 		return conn;
 	}
 	
 	@Override
 	public synchronized void releaseConnection(Connection conn) {		
-		if(connectionsInUse.contains(conn)){
-			connectionsInUse.remove(conn);
-		}
+		((DBConnection)conn).setInUse(false);
 	}
 	
 	private Connection createConnection(){
 		Connection conn = null;
 		try {
+			System.out.println("Creating new connection");
 			conn = DriverManager.getConnection(url, user, password);
-			connections.add(conn);
+			Connection connection = new DBConnection(conn);
+			connections.add(connection);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
