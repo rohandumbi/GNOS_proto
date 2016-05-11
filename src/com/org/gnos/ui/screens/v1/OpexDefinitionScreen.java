@@ -24,6 +24,7 @@ import com.org.gnos.db.model.OpexData;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.services.TimePeriod;
 import com.org.gnos.ui.custom.controls.GnosScreen;
+import com.org.gnos.ui.custom.controls.MiningStockpileCostGrid;
 import com.org.gnos.ui.custom.controls.OpexDefinitionGrid;
 
 public class OpexDefinitionScreen extends GnosScreen {
@@ -31,7 +32,9 @@ public class OpexDefinitionScreen extends GnosScreen {
 	private Text textStartYear;
 	private Text textNumberOfIncrements;
 	private ScrolledComposite scGridContainer;
+	private ScrolledComposite scFixedCostGridContainer;
 	private OpexDefinitionGrid opexDefinitionGrid;
+	private MiningStockpileCostGrid miningStockpileCostGrid;
 	private Label labelScreenName;
 	private List<OpexData> opexDataList;
 	/**
@@ -136,6 +139,7 @@ public class OpexDefinitionScreen extends GnosScreen {
 			textStartYear.setText(String.valueOf(startYear));
 			TimePeriod savedTimePeriod = new TimePeriod(startYear, numberOfIncrements);
 			initializeOpexGrid(savedTimePeriod);
+			initializeMiningStockpileCostGrid(savedTimePeriod);
 		}
 		
 	}
@@ -148,10 +152,11 @@ public class OpexDefinitionScreen extends GnosScreen {
 		FormData fd_scGridContainer = new FormData(500,500);// temp hack else size of scrolled composite keeps on increasing
 		fd_scGridContainer.top = new FormAttachment(textStartYear, 10, SWT.BOTTOM);
 		fd_scGridContainer.left = new FormAttachment(labelScreenName, 0, SWT.LEFT);
-		fd_scGridContainer.bottom = new FormAttachment(100, -10);
+		fd_scGridContainer.bottom = new FormAttachment(100, -300);
+		//fd_scGridContainer.bottom = new FormAttachment(50);
 		fd_scGridContainer.right = new FormAttachment(100, -35);
 		
-		opexDefinitionGrid = new OpexDefinitionGrid(scGridContainer, SWT.None, timePeriod);
+		final OpexDefinitionGrid opexDefinitionGrid = new OpexDefinitionGrid(scGridContainer, SWT.None, timePeriod);
 		scGridContainer.setContent(opexDefinitionGrid);
 		
 		scGridContainer.setExpandHorizontal(true);
@@ -195,6 +200,68 @@ public class OpexDefinitionScreen extends GnosScreen {
 		btnSaveOpexData.setImage(SWTResourceManager.getImage(OpexDefinitionScreen.class, "/com/org/gnos/resources/save.png"));
 		FormData fd_btnSaveOpexData = new FormData();
 		fd_btnSaveOpexData.top = new FormAttachment(btnAddRow, 5, SWT.BOTTOM);
+		fd_btnSaveOpexData.right = new FormAttachment(100, -5);
+		btnSaveOpexData.setLayoutData(fd_btnSaveOpexData);
+		
+		this.layout();
+	}
+	
+	private void initializeMiningStockpileCostGrid(TimePeriod timePeriod){
+		if(scFixedCostGridContainer != null){
+			scFixedCostGridContainer.dispose();
+		}
+		scFixedCostGridContainer = new ScrolledComposite(this, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		FormData fd_scFixedCostGridContainer = new FormData(500,500);// temp hack else size of scrolled composite keeps on increasing
+		fd_scFixedCostGridContainer.top = new FormAttachment(scGridContainer, 10, SWT.BOTTOM);
+		fd_scFixedCostGridContainer.left = new FormAttachment(labelScreenName, 0, SWT.LEFT);
+		fd_scFixedCostGridContainer.bottom = new FormAttachment(scGridContainer, 300, SWT.BOTTOM);
+		//fd_scFixedCostGridContainer.bottom = new FormAttachment(70);
+		fd_scFixedCostGridContainer.right = new FormAttachment(100, -35);
+		
+		miningStockpileCostGrid = new MiningStockpileCostGrid(scFixedCostGridContainer, SWT.None, timePeriod);
+		scFixedCostGridContainer.setContent(miningStockpileCostGrid);
+		
+		scFixedCostGridContainer.setExpandHorizontal(true);
+		scFixedCostGridContainer.setExpandVertical(true);
+		scFixedCostGridContainer.setLayoutData(fd_scFixedCostGridContainer);
+		
+		Rectangle r = scFixedCostGridContainer.getClientArea();
+		scFixedCostGridContainer.setMinSize(scFixedCostGridContainer.computeSize(SWT.DEFAULT, r.height, true));
+		
+		
+		/*Button btnAddRow = new Button(this, SWT.NONE);
+		btnAddRow.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				//TO DO implement row add
+				opexDefinitionGrid.addRow();
+				Rectangle r = opexDefinitionGrid.getClientArea();
+				int gridWidth = r.width;
+				
+				int scrollableHeight = scGridContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).y;
+				Point point = new Point(gridWidth, scrollableHeight);
+				scGridContainer.setMinSize(point);
+			}
+		});
+		btnAddRow.setFont(SWTResourceManager.getFont("Segoe UI", 16, SWT.BOLD));
+		FormData fd_btnAddRow = new FormData();
+		fd_btnAddRow.top = new FormAttachment(textStartYear, 10, SWT.BOTTOM);
+		fd_btnAddRow.right = new FormAttachment(100, -5);
+		btnAddRow.setLayoutData(fd_btnAddRow);
+		btnAddRow.setText("+");*/
+		
+		Button btnSaveOpexData = new Button(this, SWT.NONE);
+		btnSaveOpexData.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				//TO DO implement row add
+				//opexDefinitionGrid.saveOpexData();
+			}
+		});
+		btnSaveOpexData.setFont(SWTResourceManager.getFont("Segoe UI", 16, SWT.BOLD));
+		btnSaveOpexData.setImage(SWTResourceManager.getImage(OpexDefinitionScreen.class, "/com/org/gnos/resources/save.png"));
+		FormData fd_btnSaveOpexData = new FormData();
+		fd_btnSaveOpexData.top = new FormAttachment(scFixedCostGridContainer, 2, SWT.TOP);
 		fd_btnSaveOpexData.right = new FormAttachment(100, -5);
 		btnSaveOpexData.setLayoutData(fd_btnSaveOpexData);
 		
