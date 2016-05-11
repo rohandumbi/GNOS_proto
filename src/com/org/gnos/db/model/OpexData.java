@@ -7,6 +7,7 @@ public class OpexData {
 
 	private int id;
 	private Model model;
+	private Expression expression;
 	private boolean inUse;
 	private boolean isRevenue;
 	private Map<Integer, Integer> costData;
@@ -29,6 +30,13 @@ public class OpexData {
 	}
 	public void setModel(Model model) {
 		this.model = model;
+	}
+	public Expression getExpression() {
+		return expression;
+	}
+
+	public void setExpression(Expression expression) {
+		this.expression = expression;
 	}
 	public boolean isInUse() {
 		return inUse;

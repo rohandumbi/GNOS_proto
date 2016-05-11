@@ -602,6 +602,25 @@ public class ProjectConfigutration {
 		}
 	}
 	
+	public Expression getExpressionById(int expressionId) {
+		for(Expression expression:expressions){
+			if(expression.getId() == expressionId) {
+				return expression;
+			}
+		}
+		return null;
+	}
+	
+	public Expression getExpressionByName(String name) {
+		if(name == null) return null;
+		for(Expression expression:expressions){
+			if(expression.getName().equals(name)) {
+				return expression;
+			}
+		}
+		return null;
+	}
+	
 	public Model getModelById(int modelId) {
 		for(Model model:models){
 			if(model.getId() == modelId) {
