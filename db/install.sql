@@ -87,6 +87,7 @@ CREATE TABLE opex_defn(
    project_id INT NOT NULL,
    scenario_id INT NOT NULL,
    model_id INT NOT NULL,
+   expression_id INT NOT NULL,
    in_use TINYINT NOT NULL default 1,
    is_revenue TINYINT NOT NULL default 1,
    PRIMARY KEY ( id )

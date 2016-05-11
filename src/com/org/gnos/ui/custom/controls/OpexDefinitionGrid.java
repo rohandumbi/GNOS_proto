@@ -252,7 +252,36 @@ public class OpexDefinitionGrid extends Composite {
 				}
 			});
 			
-			Control previousMember = comboIdentifier;
+			
+			
+			final Combo comboExpression = new Combo(compositeRow, SWT.NONE);
+			String[] expressionItems = this.getExpressionComboItems();
+			comboExpression.setItems(expressionItems);
+			for(int i=0; i< expressionItems.length; i++){
+				if(expressionItems[i].equals(od.getExpression().getName())) {
+					comboExpression.select(i);
+					break;
+				}
+			}
+			//comboExpression.setText("Select Expression");
+			comboExpression.addListener(SWT.MouseDown, new Listener(){
+				@Override
+				public void handleEvent(Event event) {
+					// TODO Auto-generated method stub
+					//System.out.println("detected combo click");
+					comboExpression.removeAll();
+					comboExpression.setItems(getExpressionComboItems());
+					comboExpression.getParent().layout();
+					comboExpression.setListVisible(true);
+				}
+			});
+			FormData fd_comboExpression = new FormData();
+			fd_comboExpression.left = new FormAttachment(comboIdentifier, 4);
+			fd_comboExpression.right = new FormAttachment(comboIdentifier, 120, SWT.RIGHT);
+			fd_comboExpression.top = new FormAttachment(0);
+			comboExpression.setLayoutData(fd_comboExpression);
+			
+			Control previousMember = comboExpression;
 			Map<Integer, Integer> yearData = od.getCostData();
 			Set keys = yearData.keySet();
 			Iterator<Integer> it = keys.iterator();

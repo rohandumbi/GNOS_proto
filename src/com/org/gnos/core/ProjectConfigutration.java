@@ -235,7 +235,7 @@ public class ProjectConfigutration {
 	}
 	
 	public void loadOpexData() {
-		String sql = "select id, model_id, in_use, is_revenue, year, value from opex_defn, model_year_mapping where id= opex_id and project_id = "+ this.projectId + " order by id";
+		String sql = "select id, model_id, expression_id, in_use, is_revenue, year, value from opex_defn, model_year_mapping where id= opex_id and project_id = "+ this.projectId + " order by id";
 		Statement stmt = null;
 		ResultSet rs = null; 
 		Connection conn = DBManager.getConnection();
@@ -247,17 +247,19 @@ public class ProjectConfigutration {
 			while(rs.next()) {
 				int id = rs.getInt(1);
 				int modelId = rs.getInt(2);
+				int expressionId = rs.getInt(3);
 				Model model = this.getModelById(modelId);
-				
+				Expression expression = this.getExpressionById(expressionId);
 				od = getOpexDataById(id);
 				if(od == null) {
 					od = new OpexData(model);
+					od.setExpression(expression);
 					od.setId(id);
-					od.setInUse(rs.getBoolean(3));
-					od.setRevenue(rs.getBoolean(4));
+					od.setInUse(rs.getBoolean(4));
+					od.setRevenue(rs.getBoolean(5));
 					this.opexDataList.add(od);
 				}
-				od.addYear(rs.getInt(5), rs.getInt(6));			
+				od.addYear(rs.getInt(6), rs.getInt(7));			
 			}		
 		} catch(SQLException e){
 			e.printStackTrace();
@@ -550,7 +552,7 @@ public class ProjectConfigutration {
 	
 	public void saveOpexData() {
 		Connection conn = DBManager.getConnection();
-		String insert_sql = "insert into opex_defn (project_id, scenario_id, model_id, in_use, is_revenue) values (?, ?, ?, ?, ?)";
+		String insert_sql = "insert into opex_defn (project_id, scenario_id, model_id, expression_id, in_use, is_revenue) values (?, ?, ?, ?, ?, ?)";
 		String mapping_sql = "insert into model_year_mapping (opex_id, year, value) values (?, ?, ?)";
 		PreparedStatement pstmt = null;
 		PreparedStatement pstmt1 = null;
@@ -568,8 +570,9 @@ public class ProjectConfigutration {
 				pstmt.setInt(1, projectId);
 				pstmt.setInt(2, 1);
 				pstmt.setInt(3, od.getModel().getId());
-				pstmt.setBoolean(4, od.isInUse());
-				pstmt.setBoolean(5, od.isRevenue());
+				pstmt.setInt(4, od.getExpression().getId());
+				pstmt.setBoolean(5, od.isInUse());
+				pstmt.setBoolean(6, od.isRevenue());
 				pstmt.executeUpdate();
 				rs = pstmt.getGeneratedKeys();
 				if(rs.next());{
