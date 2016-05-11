@@ -67,17 +67,17 @@ public class DBConnectionPool implements IConnectionPool {
 	}
 	
 	private Connection createConnection(){
-		Connection conn = null;
+		Connection dbconnection = null;
 		try {
 			System.out.println("Creating new connection");
-			conn = DriverManager.getConnection(url, user, password);
-			Connection connection = new DBConnection(conn);
-			connections.add(connection);
+			Connection conn = DriverManager.getConnection(url, user, password);
+			dbconnection = new DBConnection(conn);
+			connections.add(dbconnection);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return conn;
+		return dbconnection;
 	}
 
 

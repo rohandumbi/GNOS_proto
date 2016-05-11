@@ -19,6 +19,7 @@ public class ProjectDAO {
 
 	private static final String SQL_LIST_ORDER_BY_MODIFIED_DATE = "select id, name, description, fileName, created_date, modified_date from  project order by modified_date";
 	private static final String SQL_INSERT = "insert into project (name, description, fileName, created_date, modified_date) values (?, ?, ?, ?,?)";
+	private static final String SQL_DELETE = "delete from project where id = ?";
 	
 	public List<Project> getAll() {
 		
@@ -75,6 +76,28 @@ public class ProjectDAO {
 		}
 		return true;
 	}
+	
+	public void delete(Project project){
+		
+		Object[] values = { 
+	            project.getId()
+	        };
+
+	        try (
+	            Connection connection = DBManager.getConnection();
+	            PreparedStatement statement = prepareStatement(connection, SQL_DELETE, false, values);
+	        ) {
+	            int affectedRows = statement.executeUpdate();
+	            if (affectedRows == 0) {
+	                //throw new DAOException("Deleting user failed, no rows affected.");
+	            } else {
+	            	project.setId(-1);
+	            }
+	        } catch (SQLException e) {
+	            //throw new DAOException(e);
+	        }
+	}
+	
 	private Project map(ResultSet rs) throws SQLException {
 		Project project = new Project();
 		project.setId(rs.getInt("id"));
