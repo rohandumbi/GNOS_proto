@@ -23,6 +23,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.core.ProjectConfigutration;
+import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.OpexData;
 import com.org.gnos.services.TimePeriod;
@@ -37,6 +38,7 @@ public class OpexDefinitionGrid extends Composite {
 	private Composite compositeGridHeader;
 	private List<Composite> allRows;
 	private String[] sourceFieldsComboItems;
+	private String[] sourceExpressionComboItems;
 	private Composite presentRow;
 	private List<OpexData> opexDataList;
 	private Composite parent;
@@ -44,6 +46,7 @@ public class OpexDefinitionGrid extends Composite {
 	private TimePeriod timePeriod;
 	private Label firstSeparator;
 	private Label secondSeparator;
+	private Label thirdSeparator;
 	private Label lblClassification;
 
 	public OpexDefinitionGrid(Composite parent, int style, TimePeriod timePeriod) {
@@ -80,6 +83,17 @@ public class OpexDefinitionGrid extends Composite {
 		}
 				
 		return this.sourceFieldsComboItems;
+	}
+	
+	private String[] getExpressionComboItems(){
+		
+		List<Expression> models = ProjectConfigutration.getInstance().getExpressions();
+		this.sourceExpressionComboItems = new String[models.size()];
+		for(int i=0; i<models.size(); i++){
+			this.sourceExpressionComboItems[i] = models.get(i).getName();
+		}
+				
+		return this.sourceExpressionComboItems;
 	}
 
 
@@ -130,9 +144,24 @@ public class OpexDefinitionGrid extends Composite {
 		lblIdentifier.setLayoutData(fd_lblIdentifier);
 		lblIdentifier.setText("Identifier");
 		lblIdentifier.setBackground(SWTResourceManager.getColor(230, 230, 230));
+		
+		thirdSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
+		FormData fd_thirdSeparator = new FormData();
+		fd_thirdSeparator.left = new FormAttachment(lblIdentifier, 25);
+		thirdSeparator.setLayoutData(fd_thirdSeparator);
+		
+		Label lblExpression = new Label(compositeGridHeader, SWT.NONE);
+		lblExpression.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
+		FormData fd_lblExpression = new FormData();
+		fd_lblExpression.top = new FormAttachment(lblClassification, 0, SWT.TOP);
+		fd_lblExpression.left = new FormAttachment(thirdSeparator, 35);
+		lblExpression.setLayoutData(fd_lblExpression);
+		lblExpression.setText("Expression");
+		lblExpression.setBackground(SWTResourceManager.getColor(230, 230, 230));
+
 
 		this.presentRow = this.compositeGridHeader;//referring to the header as the 1st row when there are no rows inserted yet
-		this.addTimePeriodHeaderColumns(lblIdentifier);
+		this.addTimePeriodHeaderColumns(lblExpression);
 
 	}
 	
@@ -300,7 +329,29 @@ public class OpexDefinitionGrid extends Composite {
 		fd_comboIdentifier.top = new FormAttachment(0);
 		comboIdentifier.setLayoutData(fd_comboIdentifier);
 		
-		this.addTimePeriodRowMembers(compositeRow, comboIdentifier);
+		
+		final Combo comboExpression = new Combo(compositeRow, SWT.NONE);
+		String[] expressionItems = this.getExpressionComboItems();
+		comboExpression.setItems(expressionItems);
+		comboExpression.setText("Select Expression");
+		comboExpression.addListener(SWT.MouseDown, new Listener(){
+			@Override
+			public void handleEvent(Event event) {
+				// TODO Auto-generated method stub
+				//System.out.println("detected combo click");
+				comboExpression.removeAll();
+				comboExpression.setItems(getExpressionComboItems());
+				comboExpression.getParent().layout();
+				comboExpression.setListVisible(true);
+			}
+		});
+		FormData fd_comboExpression = new FormData();
+		fd_comboExpression.left = new FormAttachment(comboIdentifier, 4);
+		fd_comboExpression.right = new FormAttachment(comboIdentifier, 120, SWT.RIGHT);
+		fd_comboExpression.top = new FormAttachment(0);
+		comboExpression.setLayoutData(fd_comboExpression);
+		
+		this.addTimePeriodRowMembers(compositeRow, comboExpression);
 		
 		this.presentRow = compositeRow;
 		this.allRows.add(compositeRow);
@@ -331,29 +382,34 @@ public class OpexDefinitionGrid extends Composite {
 			Combo comboClassification = (Combo)rowChildren[0];
 			Button isInUse = (Button)rowChildren[1];
 			Combo comboModel = (Combo)rowChildren[2];
+			Combo comboExpression = (Combo)rowChildren[3];
 			Map<Integer, Integer> mapCostData = new LinkedHashMap<Integer, Integer>();
 			for(int j=0; j<this.timePeriod.getIncrements(); j++){
-				mapCostData.put((this.timePeriod.getStartYear() + j), Integer.valueOf(((Text)rowChildren[3+j]).getText()));
+				mapCostData.put((this.timePeriod.getStartYear() + j), Integer.valueOf(((Text)rowChildren[4+j]).getText())); // cost input data starts from 4th indexed row child.
 			}
 			boolean inUse = isInUse.getSelection();
 			boolean isRevenue = (comboClassification.getSelectionIndex() == 1);//0=cost; 1=revenue
 			String modelName = comboModel.getText();
-			Model model = ProjectConfigutration.getInstance().getModelByName(modelName);
+			String expressionName = comboExpression.getText();
 			
+			Model model = ProjectConfigutration.getInstance().getModelByName(modelName);
+			Expression expression = ProjectConfigutration.getInstance().getExpressionByName(expressionName);
+			OpexData opexData;
 			if(rowOpexData.getData() == null){
+				//new row data, not update of previously saved rowOpexData.
 				System.out.println("\n Model: " + modelName + " inUse " + inUse + " isRevenue " + isRevenue);
-				OpexData opexData = new OpexData(model);
-				opexData.setCostData(mapCostData);
-				opexData.setInUse(inUse);
-				opexData.setRevenue(isRevenue);
+				opexData = new OpexData(model);
 				this.opexDataList.add(opexData);
 			}else{
-				OpexData opexData = (OpexData)rowOpexData.getData();
+				//update of previously saved rowOpexData.
+				opexData = (OpexData)rowOpexData.getData();
 				opexData.setModel(model);
-				opexData.setCostData(mapCostData);
-				opexData.setInUse(inUse);
-				opexData.setRevenue(isRevenue);
 			}
+			
+			opexData.setCostData(mapCostData);
+			opexData.setInUse(inUse);
+			opexData.setRevenue(isRevenue);
+			opexData.setExpression(expression);
 			//this.opexDataList.get(i).setCostData(mapCostData);
 			i++;
 		}
