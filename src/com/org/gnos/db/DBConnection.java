@@ -244,9 +244,8 @@ public class DBConnection implements Connection {
 	}
 
 	@Override
-	public PreparedStatement prepareStatement(String arg0) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+	public PreparedStatement prepareStatement(String sql) throws SQLException {
+		return this.conn.prepareStatement(sql);
 	}
 
 	@Override
