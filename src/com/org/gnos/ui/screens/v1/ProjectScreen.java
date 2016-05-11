@@ -64,7 +64,7 @@ public class ProjectScreen extends GnosScreen {
 		labelList.setText("Available Projects:");
 		
 
-		List<Project> projects = ProjectDAO.getAll();
+		List<Project> projects = new ProjectDAO().getAll();
 		final Object me = this;
 		CLabel lastLabel = labelList;
 		for(int i=0; i< projects.size(); i++){

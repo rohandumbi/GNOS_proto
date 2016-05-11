@@ -113,11 +113,13 @@ public class CreateNewProjectScreen extends Composite implements GnosEventGenera
 				attributes.put("projectName", textProjectName.getText());
 				attributes.put("projectDescription", textDescription.getText());
 				attributes.put("recordFileName", csvFileName);
-				Project project = new Project(textProjectName.getText(), textDescription.getText());
+				Project project = new Project();
+				project.setName(textProjectName.getText());
+				project.setDesc(textDescription.getText());
 				project.setFileName(csvFileName);
 				
 				
-				ProjectDAO.add(project);
+				new ProjectDAO().create(project);
 				attributes.put("projectId", ""+project.getId());
 				GnosEventWithAttributeMap event = new GnosEventWithAttributeMap(this, "createNewProjectScreen:upload-records-complete", attributes);
 				fireChildEvent(event);
