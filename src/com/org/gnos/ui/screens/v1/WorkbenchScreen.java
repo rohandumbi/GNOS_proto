@@ -14,6 +14,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.custom.models.ProjectModel;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.events.GnosEventWithAttributeMap;
@@ -49,6 +50,7 @@ public class WorkbenchScreen extends GnosScreen {
 
 	public CLabel labelWorkbenchHeader;
 	private Button btnHome;
+	private Button btnSave;
 	
 	public WorkbenchScreen(Composite parent, int style){
 		super(parent, style);
@@ -72,6 +74,20 @@ public class WorkbenchScreen extends GnosScreen {
 		fd_btnHome.top = new FormAttachment(0);
 		fd_btnHome.right = new FormAttachment(100, -10);
 		btnHome.setLayoutData(fd_btnHome);
+		
+		btnSave = new Button(this, SWT.NONE);
+		btnSave.setImage(SWTResourceManager.getImage(WorkbenchScreen.class, "/com/org/gnos/resources/save-disk.png"));
+		btnSave.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				ProjectConfigutration.getInstance().save();
+			}
+		});
+		btnSave.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
+		FormData fd_btnSave = new FormData();
+		fd_btnSave.top = new FormAttachment(0);
+		fd_btnSave.right = new FormAttachment(btnHome, -10, SWT.LEFT);
+		btnSave.setLayoutData(fd_btnSave);
 		
 		labelWorkbenchHeader = new CLabel(this, SWT.NONE);
 		labelWorkbenchHeader.setImage(SWTResourceManager.getImage(WorkbenchScreen.class, "/com/org/gnos/resources/settings16.png"));
