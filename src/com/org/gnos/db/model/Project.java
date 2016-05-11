@@ -13,6 +13,7 @@ public class Project {
 	
 	public Project() {
 		super();
+		this.id = -1;
 		Date curr_date = new Date();
 		this.createdDate = curr_date;
 		this.modifiedDate = curr_date;
