@@ -114,6 +114,7 @@ public class OpexDefinitionScreen extends GnosScreen {
 				int numberOfIncrements = Integer.parseInt(textNumberOfIncrements.getText());
 				TimePeriod timePeriod = new TimePeriod(startingYear, numberOfIncrements);
 				initializeOpexGrid(timePeriod);
+				initializeMiningStockpileCostGrid(timePeriod);
 			}
 		});
 		FormData fd_btnAddTimePeriod = new FormData();
@@ -121,7 +122,7 @@ public class OpexDefinitionScreen extends GnosScreen {
 		fd_btnAddTimePeriod.left = new FormAttachment(textNumberOfIncrements, 6);
 		btnAddTimePeriod.setLayoutData(fd_btnAddTimePeriod);
 		fd_btnAddTimePeriod.bottom = new FormAttachment(textNumberOfIncrements, 0, SWT.BOTTOM);
-		btnAddTimePeriod.setText("Save");
+		btnAddTimePeriod.setText("Next");
 		
 		/*
 		 * If there is an existing Opex data for the project
