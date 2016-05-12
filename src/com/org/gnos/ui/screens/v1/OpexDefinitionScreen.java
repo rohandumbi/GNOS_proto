@@ -20,6 +20,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.core.ProjectConfigutration;
+import com.org.gnos.db.model.FixedOpexCost;
 import com.org.gnos.db.model.OpexData;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.services.TimePeriod;
@@ -228,34 +229,14 @@ public class OpexDefinitionScreen extends GnosScreen {
 		Rectangle r = scFixedCostGridContainer.getClientArea();
 		scFixedCostGridContainer.setMinSize(scFixedCostGridContainer.computeSize(SWT.DEFAULT, r.height, true));
 		
-		
-		/*Button btnAddRow = new Button(this, SWT.NONE);
-		btnAddRow.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				//TO DO implement row add
-				opexDefinitionGrid.addRow();
-				Rectangle r = opexDefinitionGrid.getClientArea();
-				int gridWidth = r.width;
-				
-				int scrollableHeight = scGridContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).y;
-				Point point = new Point(gridWidth, scrollableHeight);
-				scGridContainer.setMinSize(point);
-			}
-		});
-		btnAddRow.setFont(SWTResourceManager.getFont("Segoe UI", 16, SWT.BOLD));
-		FormData fd_btnAddRow = new FormData();
-		fd_btnAddRow.top = new FormAttachment(textStartYear, 10, SWT.BOTTOM);
-		fd_btnAddRow.right = new FormAttachment(100, -5);
-		btnAddRow.setLayoutData(fd_btnAddRow);
-		btnAddRow.setText("+");*/
-		
 		Button btnSaveOpexData = new Button(this, SWT.NONE);
 		btnSaveOpexData.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				//TO DO implement row add
 				//opexDefinitionGrid.saveOpexData();
+				@SuppressWarnings("unused")
+				FixedOpexCost[] fixedOpexCost = miningStockpileCostGrid.getCostData();//indexing fixed; 0-OreMiningCost, 1-WasteMiningCost, 2-StockpilingCost, 3-StockpileReclaimingCost
 			}
 		});
 		btnSaveOpexData.setFont(SWTResourceManager.getFont("Segoe UI", 16, SWT.BOLD));
@@ -264,7 +245,6 @@ public class OpexDefinitionScreen extends GnosScreen {
 		fd_btnSaveOpexData.top = new FormAttachment(scFixedCostGridContainer, 2, SWT.TOP);
 		fd_btnSaveOpexData.right = new FormAttachment(100, -5);
 		btnSaveOpexData.setLayoutData(fd_btnSaveOpexData);
-		
 		this.layout();
 	}
 	
