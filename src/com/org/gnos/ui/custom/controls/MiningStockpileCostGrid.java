@@ -48,6 +48,7 @@ public class MiningStockpileCostGrid extends Composite {
 	private Label secondSeparator;
 	private Label thirdSeparator;
 	private Label lblClassification;
+	private String[] costCategories = new String[]{"Ore mining cost", "Waste mining cost", "Stockpile cost", "Stockpile reclaiming cost"};
 
 	public MiningStockpileCostGrid(Composite parent, int style, TimePeriod timePeriod) {
 		super(parent, style);
@@ -61,7 +62,7 @@ public class MiningStockpileCostGrid extends Composite {
 	private void createContent(Composite parent){
 		this.setLayout(new FormLayout());
 		this.createHeader();
-		this.createRows();
+		//this.createRows();
 		this.addRows();
 	}
 	
@@ -283,7 +284,36 @@ public class MiningStockpileCostGrid extends Composite {
 	}
 	
 	private void addRows(){
-		
+		for(int i=0; i<4; i++){
+			Color backgroundColor = SWTResourceManager.getColor(SWT.COLOR_WHITE);
+			if((i%2 != 0)){
+				backgroundColor =  SWTResourceManager.getColor(245, 245, 245);
+			}
+			Composite compositeRow = new Composite(this, SWT.BORDER);
+			compositeRow.setLayout(new FormLayout());
+			compositeRow.setBackground(backgroundColor);
+			FormData fd_compositeRow = new FormData();
+			fd_compositeRow.left = new FormAttachment(this.presentRow, 0, SWT.LEFT);
+			fd_compositeRow.bottom = new FormAttachment(this.presentRow, 26, SWT.BOTTOM);
+			fd_compositeRow.right = new FormAttachment(this.presentRow, 0, SWT.RIGHT);
+			fd_compositeRow.top = new FormAttachment(this.presentRow);
+			compositeRow.setLayoutData(fd_compositeRow);
+			
+			Label labelCategory = new Label(compositeRow, SWT.NONE);
+			labelCategory.setBackground(backgroundColor);
+			labelCategory.setText(this.costCategories[i]);
+			FormData fd_labelCategory = new FormData();
+			fd_labelCategory.left = new FormAttachment(0);
+			fd_labelCategory.top = new FormAttachment(0);
+			fd_labelCategory.right = new FormAttachment(0, 168);
+			labelCategory.setLayoutData(fd_labelCategory);
+			
+			this.addTimePeriodRowMembers(compositeRow, labelCategory);
+			
+			this.allRows.add(compositeRow);
+			this.presentRow = compositeRow;
+			this.layout();
+		}
 	}
 	
 	public void addRow(){
