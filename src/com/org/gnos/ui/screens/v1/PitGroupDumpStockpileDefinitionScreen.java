@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -21,10 +22,11 @@ import org.eclipse.wb.swt.SWTResourceManager;
 import com.org.gnos.core.Node;
 import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.core.Tree;
-import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.Pit;
+import com.org.gnos.db.model.PitGroup;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.ui.custom.controls.GnosScreen;
+import com.org.gnos.ui.custom.controls.GroupCreationDialog;
 
 public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 	private String[] sourcePitItems;
@@ -37,12 +39,14 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 	private Tree processTree;
 	private ProcessDiagramScreen compositeProcessDiagram;
 	private ArrayList<Pit> listOfPits;
+	private ArrayList<PitGroup> listOfPitGroups;
 
 	public PitGroupDumpStockpileDefinitionScreen(Composite parent, int style) {
 		super(parent, style);
 		setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		setLayout(new FormLayout());
 		this.listOfPits = ProjectConfigutration.getInstance().getPitList();
+		this.listOfPitGroups = new ArrayList<PitGroup>();
 		
 		this.listAddedModels = new ArrayList<String>();
 		
@@ -153,7 +157,7 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 		fd_compositePitList.left = new FormAttachment(0, 10);
 		fd_compositePitList.right = new FormAttachment(labelFirstSeparator, -10);
 		compositePitList.setLayoutData(fd_compositePitList);
-		this.pitList = new List(compositePitList, SWT.BORDER);
+		this.pitList = new List(compositePitList, SWT.BORDER|SWT.MULTI|SWT.V_SCROLL);
 		this.pitList.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		this.pitList.setItems(this.getSourcePitItems());
 		//this.pitList.setItems(new String[]{"pit 1","pit 2","pit 3","pit 4","pit 5","pit 6","pit 7","pit 8","pit 9","pit 10","pit 11","pit 12","pit 13","pit 14","pit 15","pit 16","pit 17","pit 18",});
@@ -169,7 +173,7 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 		fd_compositeGroupList.left = new FormAttachment(0, 10);
 		fd_compositeGroupList.right = new FormAttachment(labelFirstSeparator, -10);
 		compositeGroupList.setLayoutData(fd_compositeGroupList);
-		this.groupList = new List(compositeGroupList, SWT.BORDER);
+		this.groupList = new List(compositeGroupList, SWT.BORDER|SWT.MULTI|SWT.V_SCROLL);
 		this.groupList.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		//this.pitList.setItems(this.getSourceFieldsComboItems());
 		//this.pitList.setItems(new String[]{"dump 1","dump 2","dump 3","dump 4","dump 5","dump 6","dump 7","dump 8","dump 9","dump 10"});
@@ -185,7 +189,7 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 		fd_compositeDumpList.left = new FormAttachment(labelSecondSeparator, 10);
 		fd_compositeDumpList.right = new FormAttachment(100, -10);
 		compositeDumpList.setLayoutData(fd_compositeDumpList);
-		this.dumpList = new List(compositeDumpList, SWT.BORDER);
+		this.dumpList = new List(compositeDumpList, SWT.BORDER|SWT.MULTI|SWT.V_SCROLL);
 		this.dumpList.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		//this.pitList.setItems(this.getSourceFieldsComboItems());
 		this.dumpList.setItems(new String[]{"dump 1","dump 2","dump 3","dump 4","dump 5","dump 6","dump 7","dump 8","dump 9","dump 10"});
@@ -202,7 +206,7 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 		fd_compositeStockpileList.left = new FormAttachment(labelSecondSeparator, 10);
 		fd_compositeStockpileList.right = new FormAttachment(100, -10);
 		compositeStockpileList.setLayoutData(fd_compositeStockpileList);
-		this.stockpileList = new List(compositeStockpileList, SWT.BORDER);
+		this.stockpileList = new List(compositeStockpileList, SWT.BORDER|SWT.MULTI|SWT.V_SCROLL);
 		this.stockpileList.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		//this.pitList.setItems(this.getSourceFieldsComboItems());
 		this.stockpileList.setItems(new String[]{"stockpile 1","stockpile 2","stockpile 3","stockpile 4","stockpile 5","stockpile 6","stockpile 7","stockpile 8","stockpile 9","stockpile 10"});;
@@ -232,8 +236,17 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 				// Add model to process implementation
 				
 				//TODO add pit to group handler
-				
-				
+				GroupCreationDialog dialog = new GroupCreationDialog(getShell());
+				if (Window.OK == dialog.open()) {
+					String groupName = dialog.getCreatedGroupName();
+					PitGroup pitGroup = new PitGroup(groupName);
+					String[] selectedPitNames = pitList.getSelection();
+					for(String selectedPitName: selectedPitNames){
+						pitGroup.addPit(getPitByNameFromPitList(selectedPitName));
+					}
+					listOfPitGroups.add(pitGroup);
+					
+				}
 				/*String selectedModelName = pitList.getSelection()[0];
 				System.out.println("Selected model: " + selectedModelName);
 				ProcessNodeDefinitionDialog processNodeDefintiDefinitionDialog = new ProcessNodeDefinitionDialog(getShell(), listAddedModels);
@@ -313,10 +326,32 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 		
 		this.sourcePitItems = new String[listOfPits.size()];
 		for(int i=0; i<listOfPits.size(); i++){
-			this.sourcePitItems[i] = listOfPits.get(i).getPit_name();
+			this.sourcePitItems[i] = listOfPits.get(i).getPitName();
 	}
 
 		return this.sourcePitItems;
+	}
+	
+	private Pit getPitByNameFromPitList(String pitName){
+		Pit desiredPit = null;
+		for(Pit pit: this.listOfPits){
+			if(pit.getPitName().equals(pitName)){
+				desiredPit = pit;
+				break;
+			}
+		}
+		return desiredPit;
+	}
+	
+	private PitGroup getPitGroupByNameFromPitGroupList(String pitGroupName){
+		PitGroup desiredPitGroup = null;
+		for(PitGroup pitGroup: this.listOfPitGroups){
+			if(pitGroup.getName().equals(pitGroupName)){
+				desiredPitGroup = pitGroup;
+				break;
+			}
+		}
+		return desiredPitGroup;
 	}
 
 	public void refreshModelList(){

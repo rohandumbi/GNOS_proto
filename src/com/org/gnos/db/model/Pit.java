@@ -1,17 +1,17 @@
 package com.org.gnos.db.model;
 
 public class Pit {
-	private int pit_no;
-	private String pit_name;
+	private int pitNumber;
+	private String pitName;
 	
 	public Pit(int pit_no, String pit_name){
-		this.pit_no = pit_no;
-		this.pit_name = pit_name;
+		this.pitNumber = pit_no;
+		this.pitName = pit_name;
 	}
-	public int getPit_no() {
-		return pit_no;
+	public int getPitNumber() {
+		return pitNumber;
 	}
-	public String getPit_name() {
-		return pit_name;
+	public String getPitName() {
+		return pitName;
 	}
 }
