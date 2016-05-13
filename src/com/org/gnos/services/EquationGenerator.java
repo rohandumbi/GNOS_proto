@@ -19,6 +19,8 @@ import com.org.gnos.db.DBManager;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.OpexData;
+import com.org.gnos.core.Tree;
+import com.org.gnos.core.Node;
 
 public class EquationGenerator {
 
@@ -33,18 +35,18 @@ public class EquationGenerator {
 		
 		int bufferSize = 8 * 1024;
 		output = new BufferedOutputStream(new FileOutputStream("output.txt"), bufferSize);
-		nodes = processtree.getNodes();
+/*		nodes = processtree.getNodes();
 		Iterator<Node> it = processtree.iterator("Block");
 		Node rootNode = it.next(); // this is first node.. so this must be block node. skipping this.
 		parseOpexData();
 		traverseNode(rootNode,"", 1);
 		output.flush();
-		output.close();
+		output.close();*/
 	}
 
 	private void traverseNode(Node node, String condition, int depth) {
-		System.out.println("traverseNode "+depth+ node.getIdentifier());
-		List<String> childrens = node.getChildren();
+/*		System.out.println("traverseNode "+depth+ node.getIdentifier());
+		List<String> childrens = node.getChildrens();
 		Model model = projectConfiguration.getModelByName(node.getIdentifier());
 		if(model != null){
 			if(condition.trim().length() > 0 && model.getCondition().trim().length() > 0) {
@@ -60,7 +62,7 @@ public class EquationGenerator {
 		
 		for(int i=0; i < childrens.size(); i++){
 			traverseNode(nodes.get(childrens.get(i)), condition, depth);		
-		}		
+		}	*/	
 	}
 	
 	private void buildEquation(Model model, String condition, int depth) {

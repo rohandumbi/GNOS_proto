@@ -1,6 +1,8 @@
 package com.org.gnos.services;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
@@ -23,12 +25,13 @@ public class ExpressionProcessor {
 		
 		modifyTable(projectId);
 		processExpressions(projectId);
+		loadBlockData(projectId);
 		
 	}
 	
 	private void modifyTable(int projectId){
 		Connection conn = DBManager.getConnection();
-		String  alter_sql = "ALTER  TABLE gnos_data_"+projectId+" ADD COLUMN ";
+		String  alter_sql = "ALTER  TABLE gnos_computed_data_"+projectId+" ADD COLUMN ";
 		Statement stmt = null;
 		
 		
@@ -73,12 +76,13 @@ public class ExpressionProcessor {
 			for(Expression expr: this.expressions){
 				String columnName = expr.getName().replaceAll("\\s+","_").toLowerCase();
 				if(expr.isGrade()) {
-					sql = "update gnos_data_"+projectId+"  set "+columnName +" = "+ expr.getExpr_str();
+					sql = "update gnos_data_"+projectId+" a, gnos_computed_data_"+projectId+" b set b."+columnName +" = "+ expr.getExpr_str();
 				} else {
-					sql = "update gnos_data_"+projectId+"  set "+columnName +" = ("+ expr.getExpr_str() +") / "+tonnes_wt_alias;
+					sql = "update gnos_data_"+projectId+" a, gnos_computed_data_"+projectId+" b set b."+columnName +" = ("+ expr.getExpr_str() +") / "+tonnes_wt_alias;
 				}
+				sql = sql+ " where a.id = b.block_no ";
 				if(expr.getCondition() != null) {
-					sql = sql+ " where "+expr.getCondition();
+					sql = sql+ " AND "+expr.getCondition();
 				}
 				System.out.println("sql :"+sql);
 				stmt.executeUpdate(sql);
@@ -97,6 +101,20 @@ public class ExpressionProcessor {
 				e.printStackTrace();
 			}
 			
+		}
+	}
+	
+	private void loadBlockData(int projectId) {
+		String sql = "select * from gnos_computed_data_"+projectId +" order by block_no";
+		try(
+				Connection conn = DBManager.getConnection();
+				Statement stmt = conn.createStatement();
+				ResultSet resultSet = stmt.executeQuery(sql);
+			) {
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 }

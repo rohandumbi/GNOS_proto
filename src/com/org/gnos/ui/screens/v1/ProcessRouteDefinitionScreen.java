@@ -19,11 +19,11 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import com.org.gnos.core.Node;
 import com.org.gnos.core.ProjectConfigutration;
+import com.org.gnos.core.Tree;
 import com.org.gnos.db.model.Model;
 import com.org.gnos.events.GnosEvent;
-import com.org.gnos.services.Node;
-import com.org.gnos.services.Tree;
 import com.org.gnos.ui.custom.controls.GnosScreen;
 import com.org.gnos.ui.custom.controls.ProcessNodeDefinitionDialog;
 
@@ -39,16 +39,11 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 		setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		setLayout(new FormLayout());
 		this.listAddedModels = new ArrayList<String>();
-		
-
+		this.listAddedModels.add("Block");
 		this.processTree = ProjectConfigutration.getInstance().getProcessTree();
 		if(this.processTree == null) {
 			this.processTree = new Tree();
-			Node rootNode = new Node("Block");
-			rootNode.setSaved(true);
-			this.processTree.getNodes().put("Block", rootNode);
 			ProjectConfigutration.getInstance().setProcessTree(processTree);
-			this.listAddedModels.add("Block");
 		} else {
 			Map<String, Node> nodes = this.processTree.getNodes();
 			Set<String> keys = nodes.keySet();
@@ -142,14 +137,12 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 				if (Window.OK == processNodeDefintiDefinitionDialog.open()) {
 					String parent = processNodeDefintiDefinitionDialog.getParentName();
 					System.out.println("Model: " + selectedModelName + " has Parent: " + parent);
-					processTree.addNode(selectedModelName, parent);
+					Node node = new Node(ProjectConfigutration.getInstance().getModelByName(selectedModelName));
+					Node parentNode = processTree.getNodeByName(parent);
+					processTree.addNode(node, parentNode);
 					listAddedModels.add(selectedModelName);
 					compositeProcessDiagram.refresh(processTree);
 				}
-				/*
-				 * Test line to test tree DS
-				 */
-				processTree.display("Block");
 			}
 		});
 		btnAddModelToProcess.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));

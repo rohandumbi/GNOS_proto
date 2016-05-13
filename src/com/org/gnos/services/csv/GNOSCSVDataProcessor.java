@@ -2,6 +2,7 @@ package com.org.gnos.services.csv;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -45,8 +46,11 @@ public class GNOSCSVDataProcessor {
 	
 	public void dumpToDB(int projectId) {
 		Connection conn = DBManager.getConnection();
+		String computed_data_insert_sql = "insert into gnos_computed_data_"+projectId+ " (block_no) values (?)";
 		boolean autoCommit = true;
 		PreparedStatement ps = null;
+		PreparedStatement ps1 = null;
+		ResultSet rs = null;
 		try {
 			autoCommit = conn.getAutoCommit();
 			conn.setAutoCommit(false);
@@ -67,20 +71,24 @@ public class GNOSCSVDataProcessor {
             }
             buff.append(" ("+names.toString() +") ");
             buff.append(" values ("+values.toString() +") ");
-            ps = conn.prepareStatement(buff.toString());
+            ps = conn.prepareStatement(buff.toString(), Statement.RETURN_GENERATED_KEYS);
+            ps1 = conn.prepareStatement(computed_data_insert_sql);
             for(int i=0; i < data.size() ; i++) {
             	String[] row = data.get(i);
             	int j=0;
             	for(; j < row.length ; j++) {
             		ps.setString(j+1, row[j]);
             	}
-            	ps.addBatch();
-            	
+            	ps.executeUpdate();
+				rs = ps.getGeneratedKeys();    
+				rs.next();  
+				ps1.setInt(1, rs.getInt(1));
+				ps1.executeUpdate();
             	if (++count % batchSize == 0) {
-                    ps.executeBatch();
+            		conn.commit();
                 }
             }
-            ps.executeBatch();
+            //ps.executeBatch();
             conn.commit();
             
 		}  
@@ -103,40 +111,39 @@ public class GNOSCSVDataProcessor {
 	}
 	
 	private void dropTable(int projectId, Connection conn) throws SQLException {
-		String  sql = "DROP TABLE IF EXISTS gnos_data_"+projectId+"; ";
-		
-		Statement stmt = null;
-		try {
-			stmt = conn.createStatement();
-			stmt.executeUpdate(sql);
-		} finally {
-			if(stmt != null){
-				stmt.close();
-			}
-		}
+		String  data_table_sql = "DROP TABLE IF EXISTS gnos_data_"+projectId+"; ";
+		String  computed_data_table_sql = "DROP TABLE IF EXISTS gnos_computed_data_"+projectId+"; ";
+
+		try (
+				Statement stmt = conn.createStatement();
+			)
+		{
+			stmt.executeUpdate(data_table_sql);
+			stmt.executeUpdate(computed_data_table_sql);
+		} 
 		
 	}
 	
 	private void createTable(int projectId, Connection conn) throws SQLException {
 		dropTable(projectId, conn);
-		String  sql = "CREATE TABLE gnos_data_"+projectId+" (id INT NOT NULL AUTO_INCREMENT, ";
+		String  data_sql = "CREATE TABLE gnos_data_"+projectId+" (id INT NOT NULL AUTO_INCREMENT, ";
 		
 		for(int i =0; i< columns.length; i++){
 			String columnName = columns[i].replaceAll("\\s+","_").toLowerCase();
-			sql += columnName +" VARCHAR(50)";
-			sql += ", ";
+			data_sql += columnName +" VARCHAR(50)";
+			data_sql += ", ";
 		}
-		sql += "pit_no INT, bench_no INT, PRIMARY KEY ( id ) );";
-		System.out.println("Sql =>"+sql);
-		Statement stmt = null;
-		try {
-			stmt = conn.createStatement();
-			stmt.executeUpdate(sql);
-		} finally {
-			if(stmt != null){
-				stmt.close();
-			}
-		}
+		data_sql += " PRIMARY KEY ( id ) );";
+		
+		String  computed_data_sql = "CREATE TABLE gnos_computed_data_"+projectId+" (block_no INT NOT NULL, pit_no INT, bench_no INT, PRIMARY KEY ( block_no )) ";
+		System.out.println("Sql =>"+data_sql);
+		try (
+				Statement stmt = conn.createStatement();
+			)
+		{			
+			stmt.executeUpdate(data_sql);
+			stmt.executeUpdate(computed_data_sql);
+		} 
 		
 	}
 	

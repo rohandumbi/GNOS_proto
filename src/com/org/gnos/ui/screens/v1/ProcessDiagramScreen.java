@@ -1,10 +1,10 @@
 package com.org.gnos.ui.screens.v1;
 
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Composite;
 
-import com.org.gnos.services.Tree;
+import com.org.gnos.core.Tree;
 import com.org.gnos.ui.graph.GraphContainer;
 
 public class ProcessDiagramScreen extends Composite{

@@ -1,13 +1,10 @@
 package com.org.gnos.ui.graph;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.List;
 
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.zest.core.widgets.Graph;
 import org.eclipse.zest.core.widgets.GraphConnection;
@@ -16,10 +13,8 @@ import org.eclipse.zest.core.widgets.ZestStyles;
 import org.eclipse.zest.layouts.LayoutStyles;
 import org.eclipse.zest.layouts.algorithms.TreeLayoutAlgorithm;
 
-import com.org.gnos.services.Node;
-import com.org.gnos.services.ProcessNode;
-import com.org.gnos.services.ProcessRoute;
-import com.org.gnos.services.Tree;
+import com.org.gnos.core.Node;
+import com.org.gnos.core.Tree;
 
 public class GraphContainer extends Composite {
 
@@ -27,7 +22,6 @@ public class GraphContainer extends Composite {
 	private Graph graph;
 	private GraphNode rootNode;
 	private GraphNode presentNode;
-	private HashMap<String, Node> processNodes;
 	/**
 	 * Create the composite.
 	 * @param parent
@@ -46,9 +40,7 @@ public class GraphContainer extends Composite {
 		}
 		this.graph = new Graph(this, SWT.NONE);
 		this.layout();
-		//processTree.display("Block");
-		this.processNodes = processTree.getNodes();
-		if(this.processNodes == null || this.processNodes.size() == 0) return;
+		//if(this.processNodes == null || this.processNodes.size() == 0) return;
 		this.graph.setLayoutAlgorithm(new TreeLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);
 		// Selection listener on graphConnect or GraphNode is not supported
 		// see https://bugs.eclipse.org/bugs/show_bug.cgi?id=236528
@@ -59,21 +51,21 @@ public class GraphContainer extends Composite {
 			}
 
 		});
-		this.displayProcess("Block");
+		this.displayProcess(processTree.getRoot());
 	}
 	
-	public void displayProcess(String identifier) {
-		this.displayProcess(identifier, null);
+	public void displayProcess(Node rootnode) {
+		this.displayProcess(rootnode, null);
     }
 
     
-    public void displayProcess(String identifier, GraphNode parent){
-    	ArrayList<String> children = processNodes.get(identifier).getChildren();
-    	GraphNode graphNode = new GraphNode(this.graph, SWT.NONE, identifier);
+    public void displayProcess(Node node, GraphNode parent){
+    	List<Node> children = node.getChildrens();
+    	GraphNode graphNode = new GraphNode(this.graph, SWT.NONE, node.getIdentifier());
     	if(parent != null){
     		new GraphConnection(this.graph, ZestStyles.CONNECTIONS_DIRECTED, parent, graphNode);
     	}
-    	for (String child : children) {
+    	for (Node child : children) {
             // Recursive call
             this.displayProcess(child, graphNode);
         }

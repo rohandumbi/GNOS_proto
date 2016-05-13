@@ -21,9 +21,7 @@ import com.org.gnos.db.model.Field;
 import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.OpexData;
 import com.org.gnos.services.EquationGenerator;
-import com.org.gnos.services.Node;
 import com.org.gnos.services.PitBenchProcessor;
-import com.org.gnos.services.Tree;
 
 
 public class ProjectConfigutration {
@@ -174,14 +172,11 @@ public class ProjectConfigutration {
 	}
 	
 	public void loadProcessTree() {
-		String sql = "select model_id, parent_model_id from process_route_defn where project_id = "+ this.projectId;
+		String sql = "select model_id, parent_model_id from process_route_defn where project_id = "+ this.projectId +" order by model_id ";
 		Statement stmt = null;
 		ResultSet rs = null; 
 		Connection conn = DBManager.getConnection();
 		Map<String, Node> nodes = new HashMap<String, Node>();
-		Node rootNode = new Node("Block");
-		rootNode.setSaved(true);
-		nodes.put("Block", rootNode);
 		try {
 			stmt = conn.createStatement();
 			stmt.execute(sql);
@@ -194,24 +189,23 @@ public class ProjectConfigutration {
 				if(model != null) {
 					Node node = nodes.get(model.getName());
 					if(node == null){
-						node = new Node(model.getName());
+						node = new Node(model);
 						node.setSaved(true);
 						nodes.put(model.getName(), node);
 					}
 					if(parentModelId == -1){
-						rootNode.addChild(node.getIdentifier());
-						node.setParent("Block");
+						processTree.addNode(node, null);
 					} else {
 						Model pModel = this.getModelById(parentModelId);
 						if(pModel != null) {
 							Node pNode = nodes.get(pModel.getName());
 							if(pNode == null){
-								pNode = new Node(pModel.getName());
+								pNode = new Node(pModel);
 								pNode.setSaved(true);
 								nodes.put(pModel.getName(), pNode);
 							} 
-							pNode.addChild(node.getIdentifier());
-							node.setParent(pModel.getName());
+							pNode.addChildren(node);
+							node.setParent(pNode);
 							
 						}
 					}
@@ -223,7 +217,7 @@ public class ProjectConfigutration {
 		} catch(SQLException e){
 			e.printStackTrace();
 		} finally {
-			processTree.setNodes((HashMap)nodes);
+			//processTree.setNodes((HashMap)nodes);
 			try {
 				if(stmt != null) stmt.close();
 				if(rs != null) rs.close();
@@ -522,7 +516,7 @@ public class ProjectConfigutration {
 				Node  node = nodes.get(key);
 				if(node.isSaved()) continue;
 				int modelId = this.getModelByName(node.getIdentifier()).getId(); 
-				Model parentModel = this.getModelByName(node.getParent()); 
+				Model parentModel = node.getParent().getData(); 
 				
 				pstmt.setInt(1, this.projectId);
 				pstmt.setInt(2, modelId);

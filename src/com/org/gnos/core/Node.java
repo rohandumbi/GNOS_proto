@@ -10,6 +10,7 @@ public class Node {
 	private Node parent;
 	private List<Node> childrens ;
 	private Model data ;
+	private boolean saved = false;
 	
 	public Node(Model data) {
 		this.data = data;
@@ -42,5 +43,13 @@ public class Node {
 	
 	public void addChildren(Node node){
 		this.childrens.add(node);
+	}
+
+	public boolean isSaved() {
+		return saved;
+	}
+
+	public void setSaved(boolean saved) {
+		this.saved = saved;
 	}
 }
