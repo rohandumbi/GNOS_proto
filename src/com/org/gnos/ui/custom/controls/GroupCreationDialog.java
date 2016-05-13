@@ -5,6 +5,7 @@ import java.util.List;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -44,7 +45,7 @@ public class GroupCreationDialog extends Dialog {
 		lblGroupName.setLayoutData(fd_lblSelectParent);
 		lblGroupName.setText("Group Name:");
 		
-		this.textGroupName = new Text(container, SWT.NONE);
+		this.textGroupName = new Text(container, SWT.BORDER);
 		this.textGroupName.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
 		//String[] comboParentItems = availableParents.toArray(new String[availableParents.size()]);
 		//comboParent.setItems(comboParentItems);
@@ -68,10 +69,10 @@ public class GroupCreationDialog extends Dialog {
 		createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
 	}
 
-	/*@Override
+	@Override
 	protected Point getInitialSize() {
-		return new Point(980, 650);
-	}*/
+		return new Point(490, 325);
+	}
 
 	@Override
 	protected void okPressed() {
