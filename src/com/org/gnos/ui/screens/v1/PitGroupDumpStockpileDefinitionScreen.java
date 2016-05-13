@@ -22,11 +22,12 @@ import com.org.gnos.core.Node;
 import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.core.Tree;
 import com.org.gnos.db.model.Model;
+import com.org.gnos.db.model.Pit;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.ui.custom.controls.GnosScreen;
 
 public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
-	private String[] sourceFieldsComboItems;
+	private String[] sourcePitItems;
 	private List pitList;
 	private List groupList;
 	private List dumpList;
@@ -35,11 +36,14 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 	private ArrayList<String> listAddedModels;
 	private Tree processTree;
 	private ProcessDiagramScreen compositeProcessDiagram;
+	private ArrayList<Pit> listOfPits;
 
 	public PitGroupDumpStockpileDefinitionScreen(Composite parent, int style) {
 		super(parent, style);
 		setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		setLayout(new FormLayout());
+		this.listOfPits = ProjectConfigutration.getInstance().getPitList();
+		
 		this.listAddedModels = new ArrayList<String>();
 		
 
@@ -62,7 +66,6 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 		labelScreenName.setForeground(SWTResourceManager.getColor(0, 191, 255));
 		labelScreenName.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		FormData fd_labelScreenName = new FormData();
-		//fd_labelScreenName.bottom = new FormAttachment(100, -461);
 		fd_labelScreenName.top = new FormAttachment(0, 10);
 		fd_labelScreenName.left = new FormAttachment(0, 10);
 		labelScreenName.setLayoutData(fd_labelScreenName);
@@ -75,7 +78,6 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 		FormData fd_labelScreenDescription = new FormData();
 		fd_labelScreenDescription.top = new FormAttachment(labelScreenName, 10, SWT.BOTTOM);
 		fd_labelScreenDescription.left = new FormAttachment(0, 10);
-		//fd_labelScreenDescription.right = new FormAttachment(0, 866);
 		labelScreenDescription.setLayoutData(fd_labelScreenDescription);
 		labelScreenDescription.setText("Define your pit gourps, dumps and stockpiles");
 	
@@ -153,8 +155,8 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 		compositePitList.setLayoutData(fd_compositePitList);
 		this.pitList = new List(compositePitList, SWT.BORDER);
 		this.pitList.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
-		//this.pitList.setItems(this.getSourceFieldsComboItems());
-		this.pitList.setItems(new String[]{"pit 1","pit 2","pit 3","pit 4","pit 5","pit 6","pit 7","pit 8","pit 9","pit 10","pit 11","pit 12","pit 13","pit 14","pit 15","pit 16","pit 17","pit 18",});
+		this.pitList.setItems(this.getSourcePitItems());
+		//this.pitList.setItems(new String[]{"pit 1","pit 2","pit 3","pit 4","pit 5","pit 6","pit 7","pit 8","pit 9","pit 10","pit 11","pit 12","pit 13","pit 14","pit 15","pit 16","pit 17","pit 18",});
 		
 		/*
 		 * Group List
@@ -307,19 +309,18 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 		btnAddStockpileToGroup.setText("Add to Group");
 	}
 	
-	private String[] getSourceFieldsComboItems(){
+	private String[] getSourcePitItems(){
 		
-		java.util.List<Model> models = ProjectConfigutration.getInstance().getModels();
-		this.sourceFieldsComboItems = new String[models.size()];
-		for(int i=0; i<models.size(); i++){
-			this.sourceFieldsComboItems[i] = models.get(i).getName();
+		this.sourcePitItems = new String[listOfPits.size()];
+		for(int i=0; i<listOfPits.size(); i++){
+			this.sourcePitItems[i] = listOfPits.get(i).getPit_name();
 	}
 
-		return this.sourceFieldsComboItems;
+		return this.sourcePitItems;
 	}
 
 	public void refreshModelList(){
-		this.pitList.setItems(this.getSourceFieldsComboItems());
+		this.pitList.setItems(this.getSourcePitItems());
 	}
 
 	@Override

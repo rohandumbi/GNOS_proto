@@ -20,6 +20,7 @@ import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Field;
 import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.OpexData;
+import com.org.gnos.db.model.Pit;
 import com.org.gnos.services.EquationGenerator;
 import com.org.gnos.services.PitBenchProcessor;
 
@@ -169,6 +170,43 @@ public class ProjectConfigutration {
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public ArrayList<Pit> getPitList(){
+		ArrayList<Pit> pitList = new ArrayList<Pit>();
+		String dataTableName = "gnos_data_" + this.projectId;
+		String computedDataTableName = "gnos_computed_data_" + this.projectId;
+		String sql = "select  distinct a.pit_name, b.pit_no from " + dataTableName + " a, " + computedDataTableName  + " b where a.id = b.block_no";
+		Statement stmt = null;
+		ResultSet rs = null; 
+		Connection conn = DBManager.getConnection();
+		
+		try {
+			stmt = conn.createStatement();
+			stmt.execute(sql);
+			rs = stmt.getResultSet();
+			
+			while(rs.next()) {
+				String pit_name  = rs.getString(1);
+				int pit_no = rs.getInt(2);
+				
+				Pit pit = new Pit(pit_no, pit_name);
+				pitList.add(pit);
+			}		
+		} catch(SQLException e){
+			e.printStackTrace();
+		} finally {
+			//processTree.setNodes((HashMap)nodes);
+			try {
+				if(stmt != null) stmt.close();
+				if(rs != null) rs.close();
+				if(conn != null) DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return pitList;
 	}
 	
 	public void loadProcessTree() {
