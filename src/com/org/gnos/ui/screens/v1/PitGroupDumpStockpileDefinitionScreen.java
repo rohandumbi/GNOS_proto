@@ -45,13 +45,13 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 		this.listAddedModels = new ArrayList<String>();
 		
 
-		this.processTree = ProjectConfigutration.getInstance().getProcessTree();
+		//this.processTree = ProjectConfigutration.getInstance().getProcessTree();
 		if(this.processTree == null) {
 			this.processTree = new Tree();
 			Node rootNode = new Node("Block");
 			rootNode.setSaved(true);
 			this.processTree.getNodes().put("Block", rootNode);
-			ProjectConfigutration.getInstance().setProcessTree(processTree);
+			//ProjectConfigutration.getInstance().setProcessTree(processTree);
 			this.listAddedModels.add("Block");
 		} else {
 			Map<String, Node> nodes = this.processTree.getNodes();
@@ -224,7 +224,7 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 		this.compositeProcessDiagram.setLayoutData(fd_compositeProcessDiagram);
 		
 
-		this.compositeProcessDiagram.refresh(processTree);
+		//this.compositeProcessDiagram.refresh(processTree);
 
 		/*
 		 * Add pit to group button
