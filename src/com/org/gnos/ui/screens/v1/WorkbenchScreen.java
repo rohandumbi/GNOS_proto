@@ -168,7 +168,7 @@ public class WorkbenchScreen extends GnosScreen {
 		gnosStepOpexDefinitionLabel.setLayoutData(fd_gnosStepOpexDefinitionLabel);
 		gnosStepOpexDefinitionLabel.registerEventListener(this);
 		
-		gnosStepPitGroupDefinitionLabel = new GnosConfigurationStepLabel(this, SWT.NONE, "Pit Group Definition");
+		gnosStepPitGroupDefinitionLabel = new GnosConfigurationStepLabel(this, SWT.NONE, "PitGroup Dump and Stockpile");
 		FormData fd_gnosStepPitGroupDefinitionLabel = new FormData();
 		fd_gnosStepPitGroupDefinitionLabel.bottom = new FormAttachment(gnosStepOpexDefinitionLabel, 40, SWT.BOTTOM);
 		fd_gnosStepPitGroupDefinitionLabel.right = new FormAttachment(label, -6);
@@ -346,7 +346,7 @@ public class WorkbenchScreen extends GnosScreen {
 			gnosStepStockpileDefinitionLabel.setDeselectedState();
 			
 			mainConfigurationViewPort.loadProcessRouteDefinitionScreen();
-		}else if(e.eventName == "Pit Group Definition"){
+		}else if(e.eventName == "PitGroup Dump and Stockpile"){
 			gnosStepPitGroupDefinitionLabel.setSelectedState();
 			
 			gnosStepDefineFieldTypeLabel.setDeselectedState();
