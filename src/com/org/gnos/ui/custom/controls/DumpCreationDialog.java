@@ -18,17 +18,17 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.services.ProcessRoute;
 
-public class StockpileCreationDialog extends Dialog {
+public class DumpCreationDialog extends Dialog {
 
 	//private ProcessDefinitionFormScreen processDefinitionFormScreen;
 	private ProcessRoute definedProcessRoute;
-	private Text textStockpileName;
-	private String createdStockpileName;
+	private Text textDumpName;
+	private String createdDumpName;
 	private String associatedPitGroupName;
 	private Combo comboPitGroup;
 	private String[] pitGroupNames;
 	
-	public StockpileCreationDialog(Shell parentShell, String[] pitGroupNames) {
+	public DumpCreationDialog(Shell parentShell, String[] pitGroupNames) {
 		super(parentShell);
 		this.pitGroupNames = pitGroupNames;
 	}
@@ -43,15 +43,15 @@ public class StockpileCreationDialog extends Dialog {
 		fd_lblStockpileName.top = new FormAttachment(0, 10);
 		fd_lblStockpileName.left = new FormAttachment(0, 10);
 		lblStockpileName.setLayoutData(fd_lblStockpileName);
-		lblStockpileName.setText("Stockpile Name:");
+		lblStockpileName.setText("Dump Name:");
 		
-		this.textStockpileName = new Text(container, SWT.BORDER);
-		this.textStockpileName.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
+		this.textDumpName = new Text(container, SWT.BORDER);
+		this.textDumpName.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
 		FormData fd_textStockpileName = new FormData();
 		fd_textStockpileName.top = new FormAttachment(0, 10);
 		fd_textStockpileName.left = new FormAttachment(lblStockpileName, 6);
 		fd_textStockpileName.right = new FormAttachment(100, -10);
-		this.textStockpileName.setLayoutData(fd_textStockpileName);
+		this.textDumpName.setLayoutData(fd_textStockpileName);
 		
 		Label lblPitGroupName = new Label(container, SWT.NONE);
 		lblPitGroupName.setText("Pit Group:");
@@ -63,15 +63,15 @@ public class StockpileCreationDialog extends Dialog {
 		
 		this.comboPitGroup = new Combo(container, SWT.NONE);
 		FormData fd_comboPitGroup = new FormData();
-		fd_comboPitGroup.left = new FormAttachment(textStockpileName, 0, SWT.LEFT);
-		fd_comboPitGroup.top = new FormAttachment(textStockpileName, 12);
+		fd_comboPitGroup.left = new FormAttachment(textDumpName, 0, SWT.LEFT);
+		fd_comboPitGroup.top = new FormAttachment(textDumpName, 12);
 		fd_comboPitGroup.right = new FormAttachment(100, -10);
 		this.comboPitGroup.setLayoutData(fd_comboPitGroup);
 		this.comboPitGroup.setItems(pitGroupNames);
 		
 		
 		
-		container.getShell().setText("Stockpile Details");
+		container.getShell().setText("Dump Details");
 		//this.processDefinitionFormScreen = new ProcessDefinitionFormScreen(container, SWT.NONE);
 		this.setDialogLocation();
 		return container;
@@ -92,7 +92,7 @@ public class StockpileCreationDialog extends Dialog {
 	protected void okPressed() {
 		System.out.println("OK Pressed");
 		//this.definedProcessRoute = this.processDefinitionFormScreen.getDefinedProcess();
-		this.createdStockpileName = textStockpileName.getText();
+		this.createdDumpName = textDumpName.getText();
 		this.associatedPitGroupName = comboPitGroup.getText();
 		super.okPressed();
 	}
@@ -111,8 +111,8 @@ public class StockpileCreationDialog extends Dialog {
 		return this.definedProcessRoute;
 	}
 	
-	public String getCreatedStockpilepName(){
-		return this.createdStockpileName;
+	public String getCreatedDumpName(){
+		return this.createdDumpName;
 	}
 	public String getAssociatedPitGroupName(){
 		return this.associatedPitGroupName;

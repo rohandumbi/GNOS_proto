@@ -22,10 +22,12 @@ import org.eclipse.wb.swt.SWTResourceManager;
 import com.org.gnos.core.Node;
 import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.core.Tree;
+import com.org.gnos.db.model.Dump;
 import com.org.gnos.db.model.Pit;
 import com.org.gnos.db.model.PitGroup;
 import com.org.gnos.db.model.Stockpile;
 import com.org.gnos.events.GnosEvent;
+import com.org.gnos.ui.custom.controls.DumpCreationDialog;
 import com.org.gnos.ui.custom.controls.GnosScreen;
 import com.org.gnos.ui.custom.controls.GroupCreationDialog;
 import com.org.gnos.ui.custom.controls.StockpileCreationDialog;
@@ -44,6 +46,7 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 	private ArrayList<Pit> listOfPits;
 	private ArrayList<PitGroup> listOfPitGroups;
 	private ArrayList<Stockpile> listOfStockpiles;
+	private ArrayList<Dump> listOfDumps;
 
 	public PitGroupDumpStockpileDefinitionScreen(Composite parent, int style) {
 		super(parent, style);
@@ -52,6 +55,7 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 		this.listOfPits = ProjectConfigutration.getInstance().getPitList();
 		this.listOfPitGroups = new ArrayList<PitGroup>();
 		this.listOfStockpiles = new ArrayList<Stockpile>();
+		this.listOfDumps = new ArrayList<Dump>();
 		
 		this.listAddedModels = new ArrayList<String>();
 		
@@ -197,7 +201,7 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 		this.dumpList = new List(compositeDumpList, SWT.BORDER|SWT.MULTI|SWT.V_SCROLL);
 		this.dumpList.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		//this.pitList.setItems(this.getSourceFieldsComboItems());
-		this.dumpList.setItems(new String[]{"dump 1","dump 2","dump 3","dump 4","dump 5","dump 6","dump 7","dump 8","dump 9","dump 10"});
+		//this.dumpList.setItems(new String[]{"dump 1","dump 2","dump 3","dump 4","dump 5","dump 6","dump 7","dump 8","dump 9","dump 10"});
 		
 		
 		/*
@@ -272,9 +276,9 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 		btnAddPitToGroup.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		FormData fd_btnAddPitToGroup = new FormData();
 		fd_btnAddPitToGroup.bottom = new FormAttachment(lblAllPits, 5, SWT.BOTTOM);
-		fd_btnAddPitToGroup.left = new FormAttachment(lblAllPits, 10);
+		fd_btnAddPitToGroup.left = new FormAttachment(lblAllPits, 2);
 		btnAddPitToGroup.setLayoutData(fd_btnAddPitToGroup);
-		btnAddPitToGroup.setText("Add to Group");
+		btnAddPitToGroup.setText("Add");
 		
 		/*
 		 * Add group to group button
@@ -289,9 +293,9 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 		btnAddGroupToGroup.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		FormData fd_btnAddGroupToGroup = new FormData();
 		fd_btnAddGroupToGroup.bottom = new FormAttachment(lblAllGroups, 5, SWT.BOTTOM);
-		fd_btnAddGroupToGroup.left = new FormAttachment(lblAllGroups, 10);
+		fd_btnAddGroupToGroup.left = new FormAttachment(lblAllGroups, 2);
 		btnAddGroupToGroup.setLayoutData(fd_btnAddGroupToGroup);
-		btnAddGroupToGroup.setText("Add to Group");
+		btnAddGroupToGroup.setText("Add");
 		
 		/*
 		 * Add dump to group button
@@ -301,14 +305,22 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				//TODO add group to group handler
+				DumpCreationDialog dialog = new DumpCreationDialog(getShell(), getSourcePitGroupItems());
+				if (Window.OK == dialog.open()) {
+					String dumpName = dialog.getCreatedDumpName();
+					String associatedPitGroupName = dialog.getAssociatedPitGroupName();
+					Dump dump = new Dump(dumpName, getPitGroupByNameFromPitGroupList(associatedPitGroupName));
+					listOfDumps.add(dump);
+					dumpList.add(dumpName);
+				}
 			}
 		});
 		btnAddDumpToGroup.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		FormData fd_btnAddDumpToGroup = new FormData();
 		fd_btnAddDumpToGroup.bottom = new FormAttachment(lblAllDumps, 5, SWT.BOTTOM);
-		fd_btnAddDumpToGroup.left = new FormAttachment(lblAllDumps, 10);
+		fd_btnAddDumpToGroup.left = new FormAttachment(lblAllDumps, 2);
 		btnAddDumpToGroup.setLayoutData(fd_btnAddDumpToGroup);
-		btnAddDumpToGroup.setText("Add to Group");
+		btnAddDumpToGroup.setText("Add");
 		
 		/*
 		 * Add stockpile to group button
@@ -331,9 +343,9 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 		btnAddStockpileToGroup.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		FormData fd_btnAddStockpileToGroup = new FormData();
 		fd_btnAddStockpileToGroup.bottom = new FormAttachment(lblAllStockpiles, 5, SWT.BOTTOM);
-		fd_btnAddStockpileToGroup.left = new FormAttachment(lblAllStockpiles, 10);
+		fd_btnAddStockpileToGroup.left = new FormAttachment(lblAllStockpiles, 2);
 		btnAddStockpileToGroup.setLayoutData(fd_btnAddStockpileToGroup);
-		btnAddStockpileToGroup.setText("Add to Group");
+		btnAddStockpileToGroup.setText("Add");
 	}
 	
 	private String[] getSourcePitItems(){
