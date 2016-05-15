@@ -28,18 +28,23 @@ import com.org.gnos.db.model.OpexData;
 
 public class EquationGenerator {
 
+	static final int BYTES_PER_LINE = 128;
+	
 	private BufferedOutputStream output;
 	private ProjectConfigutration projectConfiguration;
 	private Map<Integer, List<CostRevenueData>> modelOpexDataMapping;
 	
 	private Set<Integer> processedBlocks;
+	private int bytesWritten = 0;
 	
 	public void generate() throws IOException {
 		projectConfiguration = ProjectConfigutration.getInstance();
 		processedBlocks = new HashSet<Integer>();
 
 		int bufferSize = 8 * 1024;
+		
 		output = new BufferedOutputStream(new FileOutputStream("output.txt"), bufferSize);
+		bytesWritten = 0;
 		parseOpexData();
 		buildProcessBlockVariables();
 		buildWasteBlockVariables();
@@ -47,7 +52,7 @@ public class EquationGenerator {
 		output.close();
 	}
 
-	private void buildProcessBlockVariables() throws IOException {
+	private void buildProcessBlockVariables() {
 		Tree processtree = projectConfiguration.getProcessTree();
 		List<Node> porcesses = processtree.getLeafNodes();
 		List<Block> processBlocks = new ArrayList<>();
@@ -68,7 +73,7 @@ public class EquationGenerator {
 	
 	
 	
-	private void buildProcessVariables(Node process, List<Block> blocks, int processNumber) throws IOException {
+	private void buildProcessVariables(Node process, List<Block> blocks, int processNumber) {
 		FixedOpexCost[] fixedOpexCost = ProjectConfigutration.getInstance().getFixedCost();
 		Map<Integer, Integer> oreMiningCostMap = fixedOpexCost[0].getCostData();
 		Set keys = oreMiningCostMap.keySet();
@@ -85,14 +90,14 @@ public class EquationGenerator {
 				if(value > 0){
 					eq = " +"+eq;
 				} 
-				output.write(eq.getBytes());
+				write(eq);
 				
 			}
 			count ++;
 		}
 	}
 	
-	private void buildStockpileVariables(List<Block> blocks) throws IOException {
+	private void buildStockpileVariables(List<Block> blocks) {
 		FixedOpexCost[] fixedOpexCost = ProjectConfigutration.getInstance().getFixedCost();
 		Map<Integer, Integer> oreMiningCostMap = fixedOpexCost[0].getCostData();
 		Map<Integer, Integer> stockPilingCostMap = fixedOpexCost[2].getCostData();
@@ -106,7 +111,7 @@ public class EquationGenerator {
 			for(Block block: blocks) {				
 				String eq = " -"+cost+"p"+block.getPitNo()+"x"+block.getBlockNo()+"s"+getStockPileForPit(block.getPitNo())+"t"+count;
 
-				output.write(eq.getBytes());
+				write(eq);
 			}
 			count++;
 		}
@@ -125,7 +130,7 @@ public class EquationGenerator {
 			
 			for(Block block: wasteblocks) {
 				String eq = " -"+cost+"p"+block.getPitNo()+"x"+block.getBlockNo()+"w"+getDumpForPit(block.getPitNo())+"t"+count;
-				output.write(eq.getBytes());
+				write(eq);
 			}
 			count++;
 		}
@@ -291,19 +296,16 @@ public class EquationGenerator {
 						if(value >= 0){
 							ueq = "+"+ ueq;
 						} 
-						output.write(ueq.getBytes());
+						write(ueq);
 						count++;
 					}
 				} else {
 					String ueq = "+0"+ eq +"t1 ";
-					output.write(ueq.getBytes());
+					write(ueq);
 				}
 			}
 		} catch (SQLException e) {
 			System.out.println("Error "+ e.getMessage());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 	
@@ -355,6 +357,24 @@ public class EquationGenerator {
 			}
 		}
 		
+	}
+	
+	private void write(String s) {
+
+		try {
+			byte[] bytes = s.getBytes();
+			if(bytes.length + bytesWritten > BYTES_PER_LINE){
+				output.write("\r\n".getBytes());
+				output.flush();
+				bytesWritten = 0;
+			}
+			output.write(bytes);
+			bytesWritten = bytesWritten + bytes.length;
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 	}
 	
 	private class CostRevenueData {

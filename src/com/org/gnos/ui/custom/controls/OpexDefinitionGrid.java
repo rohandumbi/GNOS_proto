@@ -258,9 +258,11 @@ public class OpexDefinitionGrid extends Composite {
 			String[] expressionItems = this.getExpressionComboItems();
 			comboExpression.setItems(expressionItems);
 			for(int i=0; i< expressionItems.length; i++){
-				if(expressionItems[i].equals(od.getExpression().getName())) {
-					comboExpression.select(i);
-					break;
+				if(od.getExpression() != null) {
+					if(expressionItems[i].equals(od.getExpression().getName())) {
+						comboExpression.select(i);
+						break;
+					}
 				}
 			}
 			//comboExpression.setText("Select Expression");

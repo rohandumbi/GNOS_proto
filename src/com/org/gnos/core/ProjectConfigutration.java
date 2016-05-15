@@ -380,6 +380,7 @@ public class ProjectConfigutration {
 		saveModelData();
 		saveProcessTree();
 		saveOpexData();
+		saveFixedCostData();
 		try {
 			new EquationGenerator().generate();
 		} catch (IOException e) {
