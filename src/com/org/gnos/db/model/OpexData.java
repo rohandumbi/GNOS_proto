@@ -10,7 +10,7 @@ public class OpexData {
 	private Expression expression;
 	private boolean inUse;
 	private boolean isRevenue;
-	private Map<Integer, Integer> costData;
+	private LinkedHashMap<Integer, Integer> costData;
 	
 	public OpexData(Model model) {
 		super();
@@ -53,7 +53,7 @@ public class OpexData {
 	public Map<Integer, Integer> getCostData() {
 		return costData;
 	}
-	public void setCostData(Map<Integer, Integer> costData) {
+	public void setCostData(LinkedHashMap<Integer, Integer> costData) {
 		this.costData = costData;
 	}
 	

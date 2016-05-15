@@ -1,6 +1,7 @@
 package com.org.gnos.ui.custom.controls;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,10 +39,11 @@ public class MiningStockpileCostGrid extends Composite {
 	private Label firstSeparator;
 	private Label lblClassification;
 	private String[] costCategories = new String[]{"Ore mining cost", "Waste mining cost", "Stockpile cost", "Stockpile reclaiming cost"};
+	private FixedOpexCost[] existingFixedOpexCost;
 
 	public MiningStockpileCostGrid(Composite parent, int style, TimePeriod timePeriod) {
 		super(parent, style);
-		FixedOpexCost[] fixedOpexCostData = ProjectConfigutration.getInstance().getFixedCost();
+		this.existingFixedOpexCost = ProjectConfigutration.getInstance().getFixedCost();
 		this.allRows = new ArrayList<Composite>();
 		this.timePeriod = timePeriod;
 		this.createContent(parent);
@@ -142,9 +144,11 @@ public class MiningStockpileCostGrid extends Composite {
 			fd_labelCategory.top = new FormAttachment(0);
 			fd_labelCategory.right = new FormAttachment(0, 168);
 			labelCategory.setLayoutData(fd_labelCategory);
-			
-			this.addTimePeriodRowMembers(compositeRow, labelCategory);
-			
+			if(this.existingFixedOpexCost != null){
+				this.addTimePeriodRowMembers(compositeRow, labelCategory, this.existingFixedOpexCost[i]);
+			}else{
+				this.addTimePeriodRowMembers(compositeRow, labelCategory);
+			}
 			this.allRows.add(compositeRow);
 			this.presentRow = compositeRow;
 			this.layout();
@@ -158,6 +162,24 @@ public class MiningStockpileCostGrid extends Composite {
 		for(int i=0; i<this.timePeriod.getIncrements(); i++){
 			Text yearlyValue = new Text(parent, SWT.BORDER);
 			FormData fd_yearlyValue = new FormData();
+			/*
+			 * Hacky calculation at the moment
+			 */
+			fd_yearlyValue.left = new FormAttachment(previousMember, 3);
+			fd_yearlyValue.right = new FormAttachment(previousMember, 76, SWT.RIGHT);
+			yearlyValue.setLayoutData(fd_yearlyValue);
+			previousMember = yearlyValue;
+		}
+	}
+	
+	private void addTimePeriodRowMembers(Composite parent, Control reference, FixedOpexCost fixedOpexCost){
+		Control previousMember = reference;
+		Map<Integer, Integer> fixedOpexCostData = fixedOpexCost.getCostData();
+		for(int i=0; i<this.timePeriod.getIncrements(); i++){
+			Text yearlyValue = new Text(parent, SWT.BORDER);
+			FormData fd_yearlyValue = new FormData();
+			Integer intValue = (Integer)fixedOpexCostData.get(this.timePeriod.getStartYear() + i);
+			yearlyValue.setText(Integer.toString(intValue));
 			/*
 			 * Hacky calculation at the moment
 			 */
@@ -186,7 +208,7 @@ public class MiningStockpileCostGrid extends Composite {
 				fixedOpexCost = new StockpileReclaimingCost();
 			}
 			
-			Map<Integer, Integer> mapCostData = new LinkedHashMap<Integer, Integer>();
+			HashMap<Integer, Integer> mapCostData = new LinkedHashMap<Integer, Integer>();
 			for(int j=0; j<this.timePeriod.getIncrements(); j++){
 				mapCostData.put((this.timePeriod.getStartYear() + j), Integer.valueOf(((Text)rowChildren[1+j]).getText())); // cost input data starts from 1st indexed row child.
 			}
