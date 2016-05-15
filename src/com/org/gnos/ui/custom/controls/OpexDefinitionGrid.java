@@ -258,7 +258,9 @@ public class OpexDefinitionGrid extends Composite {
 			String[] expressionItems = this.getExpressionComboItems();
 			comboExpression.setItems(expressionItems);
 			for(int i=0; i< expressionItems.length; i++){
-				if(expressionItems[i].equals(od.getExpression().getName())) {
+				if(od.getExpression() == null){
+					comboExpression.setEnabled(false);
+				}else if(expressionItems[i].equals(od.getExpression().getName())) {
 					comboExpression.select(i);
 					break;
 				}
@@ -412,7 +414,7 @@ public class OpexDefinitionGrid extends Composite {
 			Button isInUse = (Button)rowChildren[1];
 			Combo comboModel = (Combo)rowChildren[2];
 			Combo comboExpression = (Combo)rowChildren[3];
-			Map<Integer, Integer> mapCostData = new LinkedHashMap<Integer, Integer>();
+			LinkedHashMap<Integer, Integer> mapCostData = new LinkedHashMap<Integer, Integer>();
 			for(int j=0; j<this.timePeriod.getIncrements(); j++){
 				mapCostData.put((this.timePeriod.getStartYear() + j), Integer.valueOf(((Text)rowChildren[4+j]).getText())); // cost input data starts from 4th indexed row child.
 			}

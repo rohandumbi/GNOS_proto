@@ -1,10 +1,10 @@
 package com.org.gnos.db.model;
 
-import java.util.Map;
+import java.util.HashMap;
 
 public class FixedOpexCost {
 	protected int id;
-	protected Map<Integer, Integer> costData;
+	protected HashMap<Integer, Integer> costData;
 	
 	public int getId() {
 		return id;
@@ -13,11 +13,11 @@ public class FixedOpexCost {
 		this.id = id;
 	}
 	
-	public Map<Integer, Integer> getCostData() {
+	public HashMap<Integer, Integer> getCostData() {
 		return costData;
 	}
 
-	public void setCostData(Map<Integer, Integer> costData) {
+	public void setCostData(HashMap<Integer, Integer> costData) {
 		this.costData = costData;
 	}
 

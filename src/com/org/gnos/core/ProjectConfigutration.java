@@ -280,7 +280,7 @@ public class ProjectConfigutration {
 
 	public void loadOpexData() {
 		String sql = "select id, model_id, expression_id, in_use, is_revenue, year, value from opex_defn, model_year_mapping where id= opex_id and project_id = "
-				+ this.projectId + " order by id";
+				+ this.projectId + " order by id, year";
 		Statement stmt = null;
 		ResultSet rs = null;
 		Connection conn = DBManager.getConnection();
