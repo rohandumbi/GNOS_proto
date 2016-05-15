@@ -1,9 +1,12 @@
 package com.org.gnos.test;
 
+import java.io.IOException;
+
 import com.org.gnos.application.GNOSConfig;
 import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.db.dao.ProjectDAO;
 import com.org.gnos.db.model.Project;
+import com.org.gnos.services.EquationGenerator;
 import com.org.gnos.services.csv.GNOSCSVDataProcessor;
 
 public class TestApplication {
@@ -43,9 +46,15 @@ public class TestApplication {
 		TestApplication application = new TestApplication();
 		
 		GNOSConfig.load();
-		application.test();
+		//application.test();
+		ProjectConfigutration.getInstance().load(1);
 
-		
+		try {
+			new EquationGenerator().generate();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 	}
 

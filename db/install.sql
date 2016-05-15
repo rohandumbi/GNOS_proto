@@ -100,3 +100,13 @@ CREATE TABLE model_year_mapping(
    year INT NOT NULL,
    value INT NOT NULL
 );
+
+DROP TABLE IF EXISTS fixedcost_year_mapping; 
+
+CREATE TABLE fixedcost_year_mapping(
+   project_id INT NOT NULL,
+   scenario_id INT NOT NULL,
+   cost_head int NOT NULL,
+   year INT NOT NULL,
+   value INT NOT NULL
+);

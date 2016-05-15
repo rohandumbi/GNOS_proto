@@ -5,64 +5,261 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.org.gnos.core.Block;
+import com.org.gnos.core.Node;
 import com.org.gnos.core.ProjectConfigutration;
+import com.org.gnos.core.Tree;
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.model.Expression;
+import com.org.gnos.db.model.FixedOpexCost;
 import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.OpexData;
-import com.org.gnos.core.Tree;
-import com.org.gnos.core.Node;
 
 public class EquationGenerator {
 
 	private BufferedOutputStream output;
 	private ProjectConfigutration projectConfiguration;
-	private Map<String, Node> nodes;
 	private Map<Integer, List<CostRevenueData>> modelOpexDataMapping;
+	
+	private Set<Integer> processedBlocks;
 	
 	public void generate() throws IOException {
 		projectConfiguration = ProjectConfigutration.getInstance();
-		Tree processtree = projectConfiguration.getProcessTree();
-		
+		processedBlocks = new HashSet<Integer>();
+
 		int bufferSize = 8 * 1024;
 		output = new BufferedOutputStream(new FileOutputStream("output.txt"), bufferSize);
-/*		nodes = processtree.getNodes();
-		Iterator<Node> it = processtree.iterator("Block");
-		Node rootNode = it.next(); // this is first node.. so this must be block node. skipping this.
 		parseOpexData();
-		traverseNode(rootNode,"", 1);
+		buildProcessBlockVariables();
+		buildWasteBlockVariables();
 		output.flush();
-		output.close();*/
+		output.close();
 	}
 
-	private void traverseNode(Node node, String condition, int depth) {
-/*		System.out.println("traverseNode "+depth+ node.getIdentifier());
-		List<String> childrens = node.getChildrens();
-		Model model = projectConfiguration.getModelByName(node.getIdentifier());
-		if(model != null){
-			if(condition.trim().length() > 0 && model.getCondition().trim().length() > 0) {
-				condition = condition + " AND " +model.getCondition();
-			} else if(model.getCondition().trim().length() > 0) {
-				condition = model.getCondition();
-			}
+	private void buildProcessBlockVariables() throws IOException {
+		Tree processtree = projectConfiguration.getProcessTree();
+		List<Node> porcesses = processtree.getLeafNodes();
+		List<Block> processBlocks = new ArrayList<>();
+		int processNumber = 1;
+		for(Node process: porcesses) {
+			String condition = buildCondition(process) ;
+			List<Block> blocks = findBlocks(condition);
+			processBlocks.addAll(blocks);
+			buildProcessVariables(process, blocks, processNumber);
+			processNumber++;
 			
-			System.out.println("Condition :"+condition);
-			buildEquation(model, condition, depth);
-			depth++;
+		}
+		buildStockpileVariables(processBlocks);
+	}
+	
+	
+	
+	
+	
+	
+	private void buildProcessVariables(Node process, List<Block> blocks, int processNumber) throws IOException {
+		FixedOpexCost[] fixedOpexCost = ProjectConfigutration.getInstance().getFixedCost();
+		Map<Integer, Integer> oreMiningCostMap = fixedOpexCost[0].getCostData();
+		Set keys = oreMiningCostMap.keySet();
+		Iterator<Integer> it = keys.iterator();
+		while(it.hasNext()){
+			int count = 1;
+			int year = it.next();
+			int miningcost = oreMiningCostMap.get(year);
+			
+			for(Block block: blocks) {
+				float processValue = getProcessValue(block, process.getData(), year);
+				float value = processValue - miningcost;
+				String eq = " "+value+"p"+block.getPitNo()+"x"+block.getBlockNo()+"p"+processNumber+"t"+count;
+				if(value > 0){
+					eq = " +"+eq;
+				} 
+				output.write(eq.getBytes());
+				
+			}
+			count ++;
+		}
+	}
+	
+	private void buildStockpileVariables(List<Block> blocks) throws IOException {
+		FixedOpexCost[] fixedOpexCost = ProjectConfigutration.getInstance().getFixedCost();
+		Map<Integer, Integer> oreMiningCostMap = fixedOpexCost[0].getCostData();
+		Map<Integer, Integer> stockPilingCostMap = fixedOpexCost[2].getCostData();
+		Set keys = stockPilingCostMap.keySet();
+		Iterator<Integer> it = keys.iterator();
+		while(it.hasNext()){
+			int count = 1;
+			int year = it.next();
+			int cost = stockPilingCostMap.get(year)+oreMiningCostMap.get(year);
+			
+			for(Block block: blocks) {				
+				String eq = " -"+cost+"p"+block.getPitNo()+"x"+block.getBlockNo()+"s"+getStockPileForPit(block.getPitNo())+"t"+count;
+
+				output.write(eq.getBytes());
+			}
+			count++;
+		}
+	}
+	
+	private void buildWasteBlockVariables() throws IOException {
+		List<Block> wasteblocks = findWasteBlocks();
+		FixedOpexCost[] fixedOpexCost = ProjectConfigutration.getInstance().getFixedCost();
+		Map<Integer, Integer> wasteMiningCostMap = fixedOpexCost[1].getCostData();
+		Set keys = wasteMiningCostMap.keySet();
+		Iterator<Integer> it = keys.iterator();
+		while(it.hasNext()){
+			int count = 1;		
+			int year = it.next();
+			int cost = wasteMiningCostMap.get(year);
+			
+			for(Block block: wasteblocks) {
+				String eq = " -"+cost+"p"+block.getPitNo()+"x"+block.getBlockNo()+"w"+getDumpForPit(block.getPitNo())+"t"+count;
+				output.write(eq.getBytes());
+			}
+			count++;
+		}
+	}
+	
+	private String buildCondition(Node node) {
+		String condition = "";
+
+		Model model = node.getData();
+		if(hasValue(model.getCondition())){
+			condition = model.getCondition();
+		}
+		if(hasValue(model.getExpression().getCondition())) {
+			if(hasValue(condition)) {
+				condition = condition + " AND "+ model.getExpression().getCondition();
+			} else {
+				condition =  model.getExpression().getCondition();
+			}
+		}
+		boolean continueLoop = true;
+		Node currNode = node;
+		do{
+			Node parent = currNode.getParent();
+			if(parent == null) {
+				continueLoop = false;
+			} else {
+				Model pModel = parent.getData();
+				if(hasValue(pModel.getCondition())){
+					condition = pModel.getCondition();
+				}
+				if(pModel.getExpression() != null && hasValue(pModel.getExpression().getCondition())) {
+					if(hasValue(condition)) {
+						condition = condition + " AND "+ pModel.getExpression().getCondition();
+					} else {
+						condition =  pModel.getExpression().getCondition();
+					}
+				}
+			}
+			currNode = parent;
+		}
+		while(continueLoop);
+		System.out.println("Condition :"+condition);
+		return condition;
+	}
+	
+	private List<Block> findBlocks(String condition) {
+		List<Block> blocks = new ArrayList<Block>();
+		String sql = "select b.* from gnos_data_"+projectConfiguration.getProjectId()+" a, gnos_computed_data_"+projectConfiguration.getProjectId()+" b where a.id = b.block_no";
+		if(hasValue(condition)) {
+			sql += " AND "+condition;
 		}
 		
-		for(int i=0; i < childrens.size(); i++){
-			traverseNode(nodes.get(childrens.get(i)), condition, depth);		
-		}	*/	
+		try (
+				Connection conn = DBManager.getConnection();
+				Statement stmt  = conn.createStatement();
+				ResultSet rs = stmt.executeQuery(sql);			
+			)
+		{
+			ResultSetMetaData md = rs.getMetaData();
+			int columnCount = md.getColumnCount();
+			while(rs.next()){
+				
+				Block block = new Block();
+				block.setBlockNo(rs.getInt("block_no"));
+				for(int i=1; i<=columnCount; i++){
+					block.addField(md.getColumnName(i), rs.getString(i));
+				}
+				blocks.add(block);
+				processedBlocks.add(block.getBlockNo());
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return blocks;
+	}
+	
+	private List<Block> findWasteBlocks() {
+		List<Block> blocks = new ArrayList<Block>();
+		String sql = "select * from gnos_computed_data_"+projectConfiguration.getProjectId();
+		
+		try (
+				Connection conn = DBManager.getConnection();
+				Statement stmt  = conn.createStatement();
+				ResultSet rs = stmt.executeQuery(sql);
+			)
+		{
+			ResultSetMetaData md = rs.getMetaData();
+			int columnCount = md.getColumnCount();
+			while(rs.next()){
+				int blockNo = rs.getInt("block_no");
+				if(processedBlocks.contains(blockNo)) continue;
+
+				Block block = new Block();
+				block.setBlockNo(blockNo);
+				for(int i=1; i<=columnCount; i++){
+					block.addField(md.getColumnName(i), rs.getString(i));
+				}
+				blocks.add(block);
+				processedBlocks.add(block.getBlockNo());
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return blocks;
+	}
+	
+	private float getProcessValue(Block b, Model model, int year) {
+		float value = 0;
+		if(model == null) return value;
+		
+		List<CostRevenueData> costYearData = modelOpexDataMapping.get(model.getId());
+		if(costYearData == null) return value;
+
+		for(CostRevenueData crd: costYearData) {
+			if(crd.year == year){
+				value = crd.revenue * b.getRatioField(crd.expressionName) - crd.cost;
+			} 
+		}
+		return value;
+	}
+	
+	private boolean hasValue(String s) {
+		return (s !=null && s.trim().length() >0);
+	}
+	
+	private int getStockPileForPit(int pitNo){
+		return pitNo;
+	}
+	private int getDumpForPit(int pitNo){
+		return pitNo;
 	}
 	
 	private void buildEquation(Model model, String condition, int depth) {
@@ -131,6 +328,7 @@ public class EquationGenerator {
 				
 					if(opexData.isRevenue()) {
 						crd.revenue = costData.get(crd.year);
+						crd.expressionName = opexData.getExpression().getName().replaceAll("\\s+","_");
 					} else {
 						crd.cost = costData.get(crd.year);
 					}
@@ -146,6 +344,7 @@ public class EquationGenerator {
 						if(crd.year == year) {
 							if(opexData.isRevenue()) {
 								crd.revenue = costData.get(crd.year);
+								crd.expressionName = opexData.getExpression().getName().replaceAll("\\s+","_");
 							} else {
 								crd.cost = costData.get(crd.year);
 							}
@@ -162,5 +361,6 @@ public class EquationGenerator {
 		int year;
 		int cost;
 		int revenue;
+		String expressionName;
 	}
 }

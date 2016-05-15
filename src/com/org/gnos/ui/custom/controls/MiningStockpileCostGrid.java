@@ -16,6 +16,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.db.model.FixedOpexCost;
 import com.org.gnos.db.model.OreMiningCost;
 import com.org.gnos.db.model.StockpileReclaimingCost;
@@ -40,6 +41,7 @@ public class MiningStockpileCostGrid extends Composite {
 
 	public MiningStockpileCostGrid(Composite parent, int style, TimePeriod timePeriod) {
 		super(parent, style);
+		FixedOpexCost[] fixedOpexCostData = ProjectConfigutration.getInstance().getFixedCost();
 		this.allRows = new ArrayList<Composite>();
 		this.timePeriod = timePeriod;
 		this.createContent(parent);

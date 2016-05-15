@@ -18,12 +18,16 @@ import com.org.gnos.db.DBManager;
 import com.org.gnos.db.dao.FieldDAO;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Field;
+import com.org.gnos.db.model.FixedOpexCost;
 import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.OpexData;
+import com.org.gnos.db.model.OreMiningCost;
 import com.org.gnos.db.model.Pit;
+import com.org.gnos.db.model.StockpileReclaimingCost;
+import com.org.gnos.db.model.StockpilingCost;
+import com.org.gnos.db.model.WasteMiningCost;
 import com.org.gnos.services.EquationGenerator;
 import com.org.gnos.services.PitBenchProcessor;
-
 
 public class ProjectConfigutration {
 
@@ -34,26 +38,28 @@ public class ProjectConfigutration {
 	private List<Expression> expressions = new ArrayList<Expression>();
 	private List<Model> models = new ArrayList<Model>();
 	private List<OpexData> opexDataList = new ArrayList<OpexData>();
+	private FixedOpexCost[] fixedCost;
 	private Tree processTree = null;
-	
+
 	private boolean newProject = true;
 	private Map<String, String> savedRequiredFieldMapping;
-	
+
 	private int projectId = -1;
-	
+
 	public static ProjectConfigutration getInstance() {
 		return instance;
 	}
-	
-	public void load(int projectId){
-		
-		if(projectId == -1) {
-			System.err.println("Can not load project unless projectId is present");
+
+	public void load(int projectId) {
+
+		if (projectId == -1) {
+			System.err
+					.println("Can not load project unless projectId is present");
 			return;
 		}
 		this.projectId = projectId;
 		this.newProject = false;
-		
+
 		// Reinitializing the structures
 		fields = new ArrayList<Field>();
 		requiredFieldMapping = new HashMap<String, String>();
@@ -61,13 +67,14 @@ public class ProjectConfigutration {
 		models = new ArrayList<Model>();
 		processTree = new Tree();
 		opexDataList = new ArrayList<OpexData>();
-		
+
 		loadFieldData();
 		loadFieldMappingData();
 		loadExpressions();
 		loadModels();
 		loadProcessTree();
 		loadOpexData();
+		loadFixedCost();
 	}
 
 	private void loadFieldData() {
@@ -75,44 +82,49 @@ public class ProjectConfigutration {
 	}
 
 	private void loadFieldMappingData() {
-		String sql = "select field_name, mapped_field_name from required_field_mapping where project_id = "+ this.projectId;
+		String sql = "select field_name, mapped_field_name from required_field_mapping where project_id = "
+				+ this.projectId;
 		Statement stmt = null;
-		ResultSet rs = null; 
+		ResultSet rs = null;
 		Connection conn = DBManager.getConnection();
-		
+
 		try {
 			stmt = conn.createStatement();
 			stmt.execute(sql);
 			rs = stmt.getResultSet();
-			while(rs.next()){
+			while (rs.next()) {
 				requiredFieldMapping.put(rs.getString(1), rs.getString(2));
 			}
 			savedRequiredFieldMapping = requiredFieldMapping;
-		} catch(SQLException e){
+		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			try {
-				if(stmt != null) stmt.close();
-				if(rs != null) rs.close();
-				if(conn != null) DBManager.releaseConnection(conn);
+				if (stmt != null)
+					stmt.close();
+				if (rs != null)
+					rs.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 		}
 	}
-	
+
 	private void loadExpressions() {
-		String sql = "select id, name, grade, is_complex, expr_str, filter_str from expressions where project_id = "+ this.projectId;
+		String sql = "select id, name, grade, is_complex, expr_str, filter_str from expressions where project_id = "
+				+ this.projectId;
 		Statement stmt = null;
-		ResultSet rs = null; 
+		ResultSet rs = null;
 		Connection conn = DBManager.getConnection();
-		
+
 		try {
 			stmt = conn.createStatement();
 			stmt.execute(sql);
 			rs = stmt.getResultSet();
 			Expression expression = null;
-			while(rs.next()){
+			while (rs.next()) {
 				expression = new Expression(rs.getInt(1), rs.getString(2));
 				expression.setGrade(rs.getBoolean(3));
 				expression.setComplex(rs.getBoolean(4));
@@ -120,192 +132,247 @@ public class ProjectConfigutration {
 				expression.setCondition(rs.getString(6));
 				expressions.add(expression);
 			}
-			
-		} catch(SQLException e){
+
+		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			try {
-				if(stmt != null) stmt.close();
-				if(rs != null) rs.close();
-				if(conn != null) DBManager.releaseConnection(conn);
+				if (stmt != null)
+					stmt.close();
+				if (rs != null)
+					rs.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 		}
 	}
-	
+
 	private void loadModels() {
-		String sql = "select id, name, expr_id, filter_str from models where project_id = "+ this.projectId;
+		String sql = "select id, name, expr_id, filter_str from models where project_id = "
+				+ this.projectId;
 		Statement stmt = null;
-		ResultSet rs = null; 
+		ResultSet rs = null;
 		Connection conn = DBManager.getConnection();
-		
+
 		try {
 			stmt = conn.createStatement();
 			stmt.execute(sql);
 			rs = stmt.getResultSet();
 			Model model = null;
-			while(rs.next()){
+			while (rs.next()) {
 				model = new Model(rs.getInt(1), rs.getString(2));
 				int expressionId = rs.getInt(3);
-				for(Expression expression: expressions){
-					if(expression.getId() == expressionId){
+				for (Expression expression : expressions) {
+					if (expression.getId() == expressionId) {
 						model.setExpression(expression);
 						break;
 					}
 				}
-				
+
 				model.setCondition(rs.getString(4));
 				models.add(model);
 			}
-			
-		} catch(SQLException e){
+
+		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			try {
-				if(stmt != null) stmt.close();
-				if(rs != null) rs.close();
-				if(conn != null) DBManager.releaseConnection(conn);
+				if (stmt != null)
+					stmt.close();
+				if (rs != null)
+					rs.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 		}
 	}
-	
-	public ArrayList<Pit> getPitList(){
+
+	public ArrayList<Pit> getPitList() {
 		ArrayList<Pit> pitList = new ArrayList<Pit>();
 		String dataTableName = "gnos_data_" + this.projectId;
 		String computedDataTableName = "gnos_computed_data_" + this.projectId;
-		String sql = "select  distinct a.pit_name, b.pit_no from " + dataTableName + " a, " + computedDataTableName  + " b where a.id = b.block_no";
-		Statement stmt = null;
-		ResultSet rs = null; 
-		Connection conn = DBManager.getConnection();
-		
-		try {
-			stmt = conn.createStatement();
-			stmt.execute(sql);
-			rs = stmt.getResultSet();
-			
-			while(rs.next()) {
-				String pit_name  = rs.getString(1);
+		String sql = "select  distinct a.pit_name, b.pit_no from "
+				+ dataTableName + " a, " + computedDataTableName
+				+ " b where a.id = b.block_no";
+
+		try (Connection conn = DBManager.getConnection();
+				Statement stmt = conn.createStatement();
+				ResultSet rs = stmt.executeQuery(sql);
+
+		) {
+
+			while (rs.next()) {
+				String pit_name = rs.getString(1);
 				int pit_no = rs.getInt(2);
-				
+
 				Pit pit = new Pit(pit_no, pit_name);
 				pitList.add(pit);
-			}		
-		} catch(SQLException e){
-			e.printStackTrace();
-		} finally {
-			//processTree.setNodes((HashMap)nodes);
-			try {
-				if(stmt != null) stmt.close();
-				if(rs != null) rs.close();
-				if(conn != null) DBManager.releaseConnection(conn);
-			} catch (SQLException e) {
-				e.printStackTrace();
 			}
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
-		
+
 		return pitList;
 	}
-	
+
 	public void loadProcessTree() {
-		String sql = "select model_id, parent_model_id from process_route_defn where project_id = "+ this.projectId +" order by model_id ";
+		String sql = "select model_id, parent_model_id from process_route_defn where project_id = "
+				+ this.projectId + " order by model_id ";
 		Statement stmt = null;
-		ResultSet rs = null; 
+		ResultSet rs = null;
 		Connection conn = DBManager.getConnection();
 		Map<String, Node> nodes = new HashMap<String, Node>();
 		try {
 			stmt = conn.createStatement();
 			stmt.execute(sql);
 			rs = stmt.getResultSet();
-			
-			while(rs.next()) {
+
+			while (rs.next()) {
 				int modelId = rs.getInt(1);
 				int parentModelId = rs.getInt(2);
 				Model model = this.getModelById(modelId);
-				if(model != null) {
+				if (model != null) {
 					Node node = nodes.get(model.getName());
-					if(node == null){
+					if (node == null) {
 						node = new Node(model);
 						node.setSaved(true);
 						nodes.put(model.getName(), node);
 					}
-					if(parentModelId == -1){
+					if (parentModelId == -1) {
 						processTree.addNode(node, null);
 					} else {
 						Model pModel = this.getModelById(parentModelId);
-						if(pModel != null) {
+						if (pModel != null) {
 							Node pNode = nodes.get(pModel.getName());
-							if(pNode == null){
+							if (pNode == null) {
 								pNode = new Node(pModel);
 								pNode.setSaved(true);
 								nodes.put(pModel.getName(), pNode);
-							} 
+							}
 							pNode.addChildren(node);
 							node.setParent(pNode);
-							
+
 						}
 					}
 
-					
-					
 				}
-			}		
-		} catch(SQLException e){
+			}
+		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
-			//processTree.setNodes((HashMap)nodes);
+			// processTree.setNodes((HashMap)nodes);
 			try {
-				if(stmt != null) stmt.close();
-				if(rs != null) rs.close();
-				if(conn != null) DBManager.releaseConnection(conn);
+				if (stmt != null)
+					stmt.close();
+				if (rs != null)
+					rs.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 		}
 	}
-	
+
 	public void loadOpexData() {
-		String sql = "select id, model_id, expression_id, in_use, is_revenue, year, value from opex_defn, model_year_mapping where id= opex_id and project_id = "+ this.projectId + " order by id";
+		String sql = "select id, model_id, expression_id, in_use, is_revenue, year, value from opex_defn, model_year_mapping where id= opex_id and project_id = "
+				+ this.projectId + " order by id";
 		Statement stmt = null;
-		ResultSet rs = null; 
+		ResultSet rs = null;
 		Connection conn = DBManager.getConnection();
 		try {
 			stmt = conn.createStatement();
 			stmt.execute(sql);
 			rs = stmt.getResultSet();
 			OpexData od;
-			while(rs.next()) {
+			while (rs.next()) {
 				int id = rs.getInt(1);
 				int modelId = rs.getInt(2);
 				int expressionId = rs.getInt(3);
 				Model model = this.getModelById(modelId);
-				Expression expression = this.getExpressionById(expressionId);
+				
 				od = getOpexDataById(id);
-				if(od == null) {
-					od = new OpexData(model);
-					od.setExpression(expression);
+				if (od == null) {
+					od = new OpexData(model);					
 					od.setId(id);
 					od.setInUse(rs.getBoolean(4));
 					od.setRevenue(rs.getBoolean(5));
+					if(od.isRevenue()){
+						Expression expression = this.getExpressionById(expressionId);
+						od.setExpression(expression);
+					}
+					
 					this.opexDataList.add(od);
 				}
-				od.addYear(rs.getInt(6), rs.getInt(7));			
-			}		
-		} catch(SQLException e){
+				od.addYear(rs.getInt(6), rs.getInt(7));
+			}
+		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			try {
-				if(stmt != null) stmt.close();
-				if(rs != null) rs.close();
-				if(conn != null) DBManager.releaseConnection(conn);
+				if (stmt != null)
+					stmt.close();
+				if (rs != null)
+					rs.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 		}
 	}
-	
+
+	public void loadFixedCost() {
+		String sql = "select cost_head, year, value, value from fixedcost_year_mapping where project_id = "
+				+ this.projectId + " order by cost_head";
+		fixedCost = new FixedOpexCost[4];
+		Statement stmt = null;
+		ResultSet rs = null;
+		Connection conn = DBManager.getConnection();
+		try {
+			stmt = conn.createStatement();
+			stmt.execute(sql);
+			rs = stmt.getResultSet();
+			while (rs.next()) {
+				int costHead = rs.getInt(1);
+				int year = rs.getInt(2);
+				int value = rs.getInt(3);
+				FixedOpexCost fixedOpexCost = fixedCost[costHead];
+				if (fixedOpexCost == null) {
+					if (costHead == 0) {
+						fixedOpexCost = new OreMiningCost();
+					} else if (costHead == 1) {
+						fixedOpexCost = new WasteMiningCost();
+					} else if (costHead == 2) {
+						fixedOpexCost = new StockpilingCost();
+					} else if (costHead == 3) {
+						fixedOpexCost = new StockpileReclaimingCost();
+					}
+					fixedCost[costHead] = fixedOpexCost;
+				}
+
+				fixedOpexCost.getCostData().put(year, value);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (stmt != null)
+					stmt.close();
+				if (rs != null)
+					rs.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
 	public void save() {
 		saveFieldData();
 		saveRequiredFieldMappingData();
@@ -315,35 +382,37 @@ public class ProjectConfigutration {
 		saveOpexData();
 		try {
 			new EquationGenerator().generate();
-		} catch ( IOException e) {
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
+
 	public void saveFieldData() {
-		
+
 		Connection conn = DBManager.getConnection();
 		String insert_sql = " insert into fields (project_id, name, data_type) values (?, ?, ?)";
 		String update_sql = " update fields set data_type = ?  where id = ? ";
 		PreparedStatement pstmt = null;
 		PreparedStatement pstmt1 = null;
-		ResultSet rs = null; 
+		ResultSet rs = null;
 		boolean autoCommit = true;
 
 		try {
 			autoCommit = conn.getAutoCommit();
 			conn.setAutoCommit(false);
-			pstmt = conn.prepareStatement(insert_sql, Statement.RETURN_GENERATED_KEYS);
+			pstmt = conn.prepareStatement(insert_sql,
+					Statement.RETURN_GENERATED_KEYS);
 			pstmt1 = conn.prepareStatement(update_sql);
-			
-			for(Field field: fields) {
-				if(field.getId() == -1){
+
+			for (Field field : fields) {
+				if (field.getId() == -1) {
 					pstmt.setInt(1, projectId);
 					pstmt.setString(2, field.getName());
 					pstmt.setShort(3, field.getDataType());
 					pstmt.executeUpdate();
-					rs = pstmt.getGeneratedKeys();    
-					rs.next();  
+					rs = pstmt.getGeneratedKeys();
+					rs.next();
 					field.setId(rs.getInt(1));
 				} else {
 					pstmt1.setShort(1, field.getDataType());
@@ -354,25 +423,28 @@ public class ProjectConfigutration {
 			}
 
 			conn.commit();
-			
-		} catch(SQLException e){
+
+		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			try {
 				conn.setAutoCommit(autoCommit);
-				if(pstmt != null) pstmt.close();
-				if(rs != null) rs.close();
-				if(conn != null) DBManager.releaseConnection(conn);
+				if (pstmt != null)
+					pstmt.close();
+				if (rs != null)
+					rs.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 		}
-		
+
 	}
-	
+
 	public void saveRequiredFieldMappingData() {
-		
-		if(this.newProject) {
+
+		if (this.newProject) {
 			new PitBenchProcessor().updatePitBenchData(projectId);
 		}
 		Connection conn = DBManager.getConnection();
@@ -384,66 +456,69 @@ public class ProjectConfigutration {
 		try {
 			autoCommit = conn.getAutoCommit();
 			conn.setAutoCommit(false);
-			if(savedRequiredFieldMapping == null || savedRequiredFieldMapping.size() == 0) {
+			if (savedRequiredFieldMapping == null
+					|| savedRequiredFieldMapping.size() == 0) {
 				pstmt = conn.prepareStatement(insert_sql);
 				Set keys = requiredFieldMapping.keySet();
 				Iterator<String> it = keys.iterator();
-				while(it.hasNext()) {
+				while (it.hasNext()) {
 					String key = it.next();
 					pstmt.setInt(1, projectId);
 					pstmt.setString(2, key);
 					pstmt.setString(3, requiredFieldMapping.get(key));
-					pstmt.executeUpdate();   
+					pstmt.executeUpdate();
 				}
 			} else {
 				pstmt = conn.prepareStatement(update_sql);
 				Set keys = requiredFieldMapping.keySet();
 				Iterator<String> it = keys.iterator();
-				while(it.hasNext()) {
-					String key = it.next();				
+				while (it.hasNext()) {
+					String key = it.next();
 					pstmt.setString(1, requiredFieldMapping.get(key));
 					pstmt.setInt(2, projectId);
 					pstmt.setString(3, key);
-					
-					pstmt.executeUpdate();   
+
+					pstmt.executeUpdate();
 				}
 			}
 
-
 			conn.commit();
 			savedRequiredFieldMapping = requiredFieldMapping;
-		} catch(SQLException e){
+		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			try {
 				conn.setAutoCommit(autoCommit);
-				if(pstmt != null) pstmt.close();
-				if(conn != null) DBManager.releaseConnection(conn);
+				if (pstmt != null)
+					pstmt.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 		}
-		
+
 	}
-	
+
 	public void saveExpressionData() {
-		
+
 		Connection conn = DBManager.getConnection();
 		String insert_sql = " insert into expressions (project_id, name, grade, is_complex, expr_str, filter_str) values (?, ?, ?, ?, ?, ?)";
 		String update_sql = " update expressions set grade= ?,  is_complex = ?, expr_str = ?,  filter_str = ? where id = ?";
 		PreparedStatement pstmt = null;
 		PreparedStatement pstmt1 = null;
-		
-		ResultSet rs = null; 
+
+		ResultSet rs = null;
 		boolean autoCommit = true;
 
 		try {
 			autoCommit = conn.getAutoCommit();
 			conn.setAutoCommit(false);
-			pstmt = conn.prepareStatement(insert_sql, Statement.RETURN_GENERATED_KEYS);
+			pstmt = conn.prepareStatement(insert_sql,
+					Statement.RETURN_GENERATED_KEYS);
 			pstmt1 = conn.prepareStatement(update_sql);
-			for(Expression expression: expressions) {
-				if(expression.getId() == -1){
+			for (Expression expression : expressions) {
+				if (expression.getId() == -1) {
 					pstmt.setInt(1, projectId);
 					pstmt.setString(2, expression.getName());
 					pstmt.setBoolean(3, expression.isGrade());
@@ -451,8 +526,8 @@ public class ProjectConfigutration {
 					pstmt.setString(5, expression.getExpr_str());
 					pstmt.setString(6, expression.getCondition());
 					pstmt.executeUpdate();
-					rs = pstmt.getGeneratedKeys();    
-					rs.next();  
+					rs = pstmt.getGeneratedKeys();
+					rs.next();
 					expression.setId(rs.getInt(1));
 				} else {
 					pstmt1.setBoolean(1, expression.isGrade());
@@ -466,47 +541,51 @@ public class ProjectConfigutration {
 			}
 
 			conn.commit();
-			
-		} catch(SQLException e){
+
+		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			try {
 				conn.setAutoCommit(autoCommit);
-				if(pstmt != null) pstmt.close();
-				if(rs != null) rs.close();
-				if(conn != null) DBManager.releaseConnection(conn);
+				if (pstmt != null)
+					pstmt.close();
+				if (rs != null)
+					rs.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 		}
-		
+
 	}
-	
+
 	public void saveModelData() {
-		
+
 		Connection conn = DBManager.getConnection();
 		String insert_sql = " insert into models (project_id, name, expr_id, filter_str) values (?, ?, ?, ?)";
 		String update_sql = " update models set expr_id= ? , filter_str = ? where id = ?";
 		PreparedStatement pstmt = null;
 		PreparedStatement pstmt1 = null;
-		
-		ResultSet rs = null; 
+
+		ResultSet rs = null;
 		boolean autoCommit = true;
 
 		try {
 			autoCommit = conn.getAutoCommit();
 			conn.setAutoCommit(false);
-			pstmt = conn.prepareStatement(insert_sql, Statement.RETURN_GENERATED_KEYS);
+			pstmt = conn.prepareStatement(insert_sql,
+					Statement.RETURN_GENERATED_KEYS);
 			pstmt1 = conn.prepareStatement(update_sql);
-			for(Model model: models) {
-				if(model.getId() == -1){
+			for (Model model : models) {
+				if (model.getId() == -1) {
 					pstmt.setInt(1, projectId);
 					pstmt.setString(2, model.getName());
 					pstmt.setInt(3, model.getExpression().getId());
 					pstmt.setString(4, model.getCondition());
 					pstmt.executeUpdate();
-					rs = pstmt.getGeneratedKeys();    
-					rs.next();  
+					rs = pstmt.getGeneratedKeys();
+					rs.next();
 					model.setId(rs.getInt(1));
 				} else {
 					pstmt1.setInt(1, model.getExpression().getId());
@@ -516,22 +595,25 @@ public class ProjectConfigutration {
 				}
 			}
 			conn.commit();
-			
-		} catch(SQLException e){
+
+		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			try {
 				conn.setAutoCommit(autoCommit);
-				if(pstmt != null) pstmt.close();
-				if(rs != null) rs.close();
-				if(conn != null) DBManager.releaseConnection(conn);
+				if (pstmt != null)
+					pstmt.close();
+				if (rs != null)
+					rs.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 		}
-		
+
 	}
-	
+
 	public void saveProcessTree() {
 		Connection conn = DBManager.getConnection();
 		String insert_sql = " insert into process_route_defn (project_id, model_id, parent_model_id) values (?, ?, ?)";
@@ -539,49 +621,53 @@ public class ProjectConfigutration {
 		Map<String, Node> nodes = processTree.getNodes();
 		boolean autoCommit = true;
 
-		if(nodes == null) return ;
-		
+		if (nodes == null)
+			return;
+
 		try {
 			autoCommit = conn.getAutoCommit();
 			conn.setAutoCommit(false);
 			pstmt = conn.prepareStatement(insert_sql);
-			
+
 			Set<String> keys = nodes.keySet();
 			Iterator<String> it = keys.iterator();
-			
+
 			while (it.hasNext()) {
 				String key = it.next();
-				Node  node = nodes.get(key);
-				if(node.isSaved()) continue;
-				int modelId = this.getModelByName(node.getIdentifier()).getId(); 
-				Model parentModel = node.getParent().getData(); 
-				
+				Node node = nodes.get(key);
+				if (node.isSaved())
+					continue;
+				int modelId = this.getModelByName(node.getIdentifier()).getId();
+				Model parentModel = node.getParent().getData();
+
 				pstmt.setInt(1, this.projectId);
 				pstmt.setInt(2, modelId);
-				if(parentModel == null){
+				if (parentModel == null) {
 					pstmt.setInt(3, -1);
 				} else {
 					pstmt.setInt(3, parentModel.getId());
 				}
 				pstmt.executeUpdate();
 				node.setSaved(true);
-				
+
 			}
 			conn.commit();
-			
-		} catch(SQLException e){
+
+		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			try {
 				conn.setAutoCommit(autoCommit);
-				if(pstmt != null) pstmt.close();
-				if(conn != null) DBManager.releaseConnection(conn);
+				if (pstmt != null)
+					pstmt.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 		}
 	}
-	
+
 	public void saveOpexData() {
 		Connection conn = DBManager.getConnection();
 		String insert_sql = "insert into opex_defn (project_id, scenario_id, model_id, expression_id, in_use, is_revenue) values (?, ?, ?, ?, ?, ?)";
@@ -590,15 +676,17 @@ public class ProjectConfigutration {
 		PreparedStatement pstmt1 = null;
 		ResultSet rs = null;
 		boolean autoCommit = true;
-		
+
 		try {
 			autoCommit = conn.getAutoCommit();
 			conn.setAutoCommit(false);
-			pstmt = conn.prepareStatement(insert_sql, Statement.RETURN_GENERATED_KEYS);
+			pstmt = conn.prepareStatement(insert_sql,
+					Statement.RETURN_GENERATED_KEYS);
 			pstmt1 = conn.prepareStatement(mapping_sql);
-			
-			for(OpexData od: this.opexDataList) {
-				if(od.getId() > 0 ) continue;
+
+			for (OpexData od : this.opexDataList) {
+				if (od.getId() > 0)
+					continue;
 				pstmt.setInt(1, projectId);
 				pstmt.setInt(2, 1);
 				pstmt.setInt(3, od.getModel().getId());
@@ -607,92 +695,143 @@ public class ProjectConfigutration {
 				pstmt.setBoolean(6, od.isRevenue());
 				pstmt.executeUpdate();
 				rs = pstmt.getGeneratedKeys();
-				if(rs.next());{
+				if (rs.next())
+					;
+				{
 					int id = rs.getInt(1);
 					od.setId(id);
-					
+
 					Set keys = od.getCostData().keySet();
 					Iterator<Integer> it = keys.iterator();
-					while(it.hasNext()){
+					while (it.hasNext()) {
 						int key = it.next();
 						pstmt1.setInt(1, od.getId());
 						pstmt1.setInt(2, key);
 						pstmt1.setInt(3, od.getCostData().get(key));
 						pstmt1.executeUpdate();
 					}
-				}		
+				}
 			}
 			conn.commit();
-			
-		} catch(SQLException e){
+
+		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			try {
 				conn.setAutoCommit(autoCommit);
-				if(pstmt != null) pstmt.close();
-				if(conn != null) DBManager.releaseConnection(conn);
+				if (pstmt != null)
+					pstmt.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 		}
 	}
-	
+
+	public void saveFixedCostData() {
+		Connection conn = DBManager.getConnection();
+		String insert_sql = "insert into fixedcost_year_mapping (project_id, scenario_id, cost_head, year, value) values (?, ?, ?, ?, ?)";
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		boolean autoCommit = true;
+
+		try {
+			autoCommit = conn.getAutoCommit();
+			conn.setAutoCommit(false);
+			pstmt = conn.prepareStatement(insert_sql,
+					Statement.RETURN_GENERATED_KEYS);
+
+			for (int i = 0; i < fixedCost.length; i++) {
+				FixedOpexCost fixedOpexCost = fixedCost[i];
+				Set keys = fixedOpexCost.getCostData().keySet();
+				Iterator<Integer> it = keys.iterator();
+				while (it.hasNext()) {
+					int key = it.next();
+					pstmt.setInt(1, projectId);
+					pstmt.setInt(2, 1);
+					pstmt.setInt(3, i);
+					pstmt.setInt(4, key);
+					pstmt.setInt(5, fixedOpexCost.getCostData().get(key));
+					pstmt.executeUpdate();
+				}
+			}
+			conn.commit();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				conn.setAutoCommit(autoCommit);
+				if (pstmt != null)
+					pstmt.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
 	public Expression getExpressionById(int expressionId) {
-		for(Expression expression:expressions){
-			if(expression.getId() == expressionId) {
+		for (Expression expression : expressions) {
+			if (expression.getId() == expressionId) {
 				return expression;
 			}
 		}
 		return null;
 	}
-	
+
 	public Expression getExpressionByName(String name) {
-		if(name == null) return null;
-		for(Expression expression:expressions){
-			if(expression.getName().equals(name)) {
+		if (name == null)
+			return null;
+		for (Expression expression : expressions) {
+			if (expression.getName().equals(name)) {
 				return expression;
 			}
 		}
 		return null;
 	}
-	
+
 	public Model getModelById(int modelId) {
-		for(Model model:models){
-			if(model.getId() == modelId) {
+		for (Model model : models) {
+			if (model.getId() == modelId) {
 				return model;
 			}
 		}
 		return null;
 	}
-	
+
 	public Model getModelByName(String name) {
-		if(name == null) return null;
-		for(Model model:models){
-			if(model.getName().equals(name)) {
+		if (name == null)
+			return null;
+		for (Model model : models) {
+			if (model.getName().equals(name)) {
 				return model;
 			}
 		}
 		return null;
 	}
-	
-	public OpexData getOpexDataById(int id){
-		if(this.opexDataList == null) return null;
-		for(OpexData od: this.opexDataList) {
-			if(od.getId() == id) {
+
+	public OpexData getOpexDataById(int id) {
+		if (this.opexDataList == null)
+			return null;
+		for (OpexData od : this.opexDataList) {
+			if (od.getId() == id) {
 				return od;
 			}
 		}
 		return null;
 	}
-	
-	public int getProjectId(){
+
+	public int getProjectId() {
 		return this.projectId;
 	}
-	
-	public void setProjectId(int projectId){
+
+	public void setProjectId(int projectId) {
 		this.projectId = projectId;
 	}
-		
+
 	public List<Field> getFields() {
 		return fields;
 	}
@@ -735,6 +874,14 @@ public class ProjectConfigutration {
 
 	public List<OpexData> getOpexDataList() {
 		return opexDataList;
+	}
+
+	public FixedOpexCost[] getFixedCost() {
+		return fixedCost;
+	}
+
+	public void setFixedCost(FixedOpexCost[] fixedCost) {
+		this.fixedCost = fixedCost;
 	}
 
 	public void setOpexDataList(List<OpexData> opexDataList) {
