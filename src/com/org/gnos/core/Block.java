@@ -5,6 +5,7 @@ import java.util.Map;
 
 public class Block {
 
+	private int id;
 	private int blockNo;
 	private int pitNo;
 	private int benchNo;
@@ -14,6 +15,15 @@ public class Block {
 	public Block() {
 		fields = new HashMap<String, String>();
 	}
+	
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
 	public int getBlockNo() {
 		return blockNo;
 	}

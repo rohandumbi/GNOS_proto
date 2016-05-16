@@ -112,7 +112,7 @@ public class EquationGenerator {
 			int year = it.next();
 			int cost = stockPilingCostMap.get(year)+oreMiningCostMap.get(year);
 			
-			for(Block block: blocks) {				
+			for(Block block: blocks) {			
 				String eq = " -"+cost+"p"+block.getPitNo()+"x"+block.getBlockNo()+"s"+getStockPileForPit(block.getPitNo())+"t"+count;
 
 				write(eq);
@@ -183,7 +183,7 @@ public class EquationGenerator {
 	
 	private List<Block> findBlocks(String condition) {
 		List<Block> blocks = new ArrayList<Block>();
-		String sql = "select b.* from gnos_data_"+projectConfiguration.getProjectId()+" a, gnos_computed_data_"+projectConfiguration.getProjectId()+" b where a.id = b.block_no";
+		String sql = "select b.* from gnos_data_"+projectConfiguration.getProjectId()+" a, gnos_computed_data_"+projectConfiguration.getProjectId()+" b where a.id = b.row_id";
 		if(hasValue(condition)) {
 			sql += " AND "+condition;
 		}
@@ -199,6 +199,7 @@ public class EquationGenerator {
 			while(rs.next()){
 				
 				Block block = new Block();
+				block.setId(rs.getInt("row_id"));
 				block.setBlockNo(rs.getInt("block_no"));
 				for(int i=1; i<=columnCount; i++){
 					block.addField(md.getColumnName(i), rs.getString(i));
@@ -231,6 +232,7 @@ public class EquationGenerator {
 				if(processedBlocks.contains(blockNo)) continue;
 
 				Block block = new Block();
+				block.setId(rs.getInt("row_id"));
 				block.setBlockNo(blockNo);
 				for(int i=1; i<=columnCount; i++){
 					block.addField(md.getColumnName(i), rs.getString(i));
@@ -270,48 +272,6 @@ public class EquationGenerator {
 	}
 	private int getDumpForPit(int pitNo){
 		return pitNo;
-	}
-	
-	private void buildEquation(Model model, String condition, int depth) {
-		Expression expr = model.getExpression();
-		int modelId = model.getId();
-		String expr_name = expr.getName().replaceAll("\\s+","_").toLowerCase();
-		String sql = "select id, pit_no, "+expr_name+" from gnos_data_"+projectConfiguration.getProjectId() ;
-		if(condition != null  && condition.trim().length() > 0) {
-			sql = sql + " where "+ condition;
-		}
-		
-		Connection conn = DBManager.getConnection();
-		Statement stmt;
-		ResultSet rs;
-		
-		try {
-			stmt = conn.createStatement();
-			rs = stmt.executeQuery(sql);
-			while(rs.next()){
-				float exprvalue = Float.parseFloat(rs.getString(3));
-				String eq = "p"+rs.getString(2)+"x"+rs.getString(1)+"p"+depth;
-				List<CostRevenueData> costYearData = modelOpexDataMapping.get(modelId);
-				if(costYearData != null){
-					int count = 1 ;
-					for(CostRevenueData crd: costYearData) {
-						String ueq ;
-						float value = crd.revenue * exprvalue - crd.cost;
-						ueq = value+ eq + "t"+count +" ";
-						if(value >= 0){
-							ueq = "+"+ ueq;
-						} 
-						write(ueq);
-						count++;
-					}
-				} else {
-					String ueq = "+0"+ eq +"t1 ";
-					write(ueq);
-				}
-			}
-		} catch (SQLException e) {
-			System.out.println("Error "+ e.getMessage());
-		}
 	}
 	
 	private void parseOpexData () {

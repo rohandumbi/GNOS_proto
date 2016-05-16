@@ -80,7 +80,7 @@ public class ExpressionProcessor {
 				} else {
 					sql = "update gnos_data_"+projectId+" a, gnos_computed_data_"+projectId+" b set b."+columnName +" = ("+ expr.getExpr_str() +") / "+tonnes_wt_alias;
 				}
-				sql = sql+ " where a.id = b.block_no ";
+				sql = sql+ " where a.id = b.row_id ";
 				if(expr.getCondition() != null) {
 					sql = sql+ " AND "+expr.getCondition();
 				}

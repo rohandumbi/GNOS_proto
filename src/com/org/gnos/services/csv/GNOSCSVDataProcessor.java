@@ -46,7 +46,7 @@ public class GNOSCSVDataProcessor {
 	
 	public void dumpToDB(int projectId) {
 		Connection conn = DBManager.getConnection();
-		String computed_data_insert_sql = "insert into gnos_computed_data_"+projectId+ " (block_no) values (?)";
+		String computed_data_insert_sql = "insert into gnos_computed_data_"+projectId+ " (row_id) values (?)";
 		boolean autoCommit = true;
 		PreparedStatement ps = null;
 		PreparedStatement ps1 = null;
@@ -135,7 +135,7 @@ public class GNOSCSVDataProcessor {
 		}
 		data_sql += " PRIMARY KEY ( id ) );";
 		
-		String  computed_data_sql = "CREATE TABLE gnos_computed_data_"+projectId+" (block_no INT NOT NULL, pit_no INT, bench_no INT, PRIMARY KEY ( block_no )) ";
+		String  computed_data_sql = "CREATE TABLE gnos_computed_data_"+projectId+" (row_id INT NOT NULL, block_no INT, pit_no INT, bench_no INT, PRIMARY KEY ( row_id )) ";
 		System.out.println("Sql =>"+data_sql);
 		try (
 				Statement stmt = conn.createStatement();

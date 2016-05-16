@@ -71,7 +71,8 @@ public class PitBenchProcessor {
 		Map<String, String> requiredFieldMap = ProjectConfigutration.getInstance().getRequiredFieldMapping();
 		String pitNameAlias = requiredFieldMap.get("pit_name");
 		String benchNameAlias = requiredFieldMap.get("bench_rl");
-		String update_sql = " update   gnos_data_"+projectId+" a, gnos_computed_data_"+projectId+" b set b.pit_no = ?, b.bench_no = ? where a.id = b.block_no AND a."+pitNameAlias+" = ? AND a."+benchNameAlias+" = ? ";
+		String blockNoAlias = requiredFieldMap.get("block");
+		String update_sql = " update   gnos_data_"+projectId+" a, gnos_computed_data_"+projectId+" b set b.pit_no = ?, b.bench_no = ? , b.block_no = a."+blockNoAlias+" where a.id = b.row_id AND a."+pitNameAlias+" = ? AND a."+benchNameAlias+" = ? ";
 		PreparedStatement pstmt = null;
 		boolean autoCommit = true;
 

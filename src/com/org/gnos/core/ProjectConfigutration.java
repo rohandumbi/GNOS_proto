@@ -196,7 +196,7 @@ public class ProjectConfigutration {
 		String computedDataTableName = "gnos_computed_data_" + this.projectId;
 		String sql = "select  distinct a.pit_name, b.pit_no from "
 				+ dataTableName + " a, " + computedDataTableName
-				+ " b where a.id = b.block_no";
+				+ " b where a.id = b.row_id";
 
 		try (Connection conn = DBManager.getConnection();
 				Statement stmt = conn.createStatement();
