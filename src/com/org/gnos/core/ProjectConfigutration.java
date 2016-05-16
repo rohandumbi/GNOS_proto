@@ -688,13 +688,16 @@ public class ProjectConfigutration {
 				pstmt.setInt(1, projectId);
 				pstmt.setInt(2, 1);
 				pstmt.setInt(3, od.getModel().getId());
-				pstmt.setInt(4, od.getExpression().getId());
+				if(od.getExpression() != null){
+					pstmt.setInt(4, od.getExpression().getId());
+				}else{
+					pstmt.setNull(4, java.sql.Types.INTEGER);
+				}
 				pstmt.setBoolean(5, od.isInUse());
 				pstmt.setBoolean(6, od.isRevenue());
 				pstmt.executeUpdate();
 				rs = pstmt.getGeneratedKeys();
 				if (rs.next())
-					;
 				{
 					int id = rs.getInt(1);
 					od.setId(id);
