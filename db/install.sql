@@ -98,7 +98,7 @@ DROP TABLE IF EXISTS model_year_mapping;
 CREATE TABLE model_year_mapping(
    opex_id INT NOT NULL,
    year INT NOT NULL,
-   value INT NOT NULL,
+   value FLOAT NOT NULL,
    unique key( opex_id, year)
 );
 

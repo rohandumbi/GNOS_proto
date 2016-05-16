@@ -130,7 +130,7 @@ public class OpexDefinitionScreen extends GnosScreen {
 		this.opexDataList = ProjectConfigutration.getInstance().getOpexDataList();
 		if(this.opexDataList.size() > 0){
 			OpexData opexData = this.opexDataList.get(0);
-			Map<Integer, Integer> mapCostData = opexData.getCostData();
+			Map<Integer, Float> mapCostData = opexData.getCostData();
 			int numberOfIncrements = mapCostData.size();
 			int startYear = 0;
 			for(Integer key : mapCostData.keySet()){

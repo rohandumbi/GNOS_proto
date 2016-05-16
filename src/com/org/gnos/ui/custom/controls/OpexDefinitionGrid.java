@@ -295,11 +295,11 @@ public class OpexDefinitionGrid extends Composite {
 			});
 
 			Control previousMember = comboExpression;
-			Map<Integer, Integer> yearData = od.getCostData();
+			Map<Integer, Float> yearData = od.getCostData();
 			Set keys = yearData.keySet();
 			Iterator<Integer> it = keys.iterator();
 			while(it.hasNext()){
-				int value = yearData.get(it.next());
+				float value = yearData.get(it.next());
 				Text yearlyValue = new Text(compositeRow, SWT.BORDER);
 				yearlyValue.setText(String.valueOf(value));
 				FormData fd_yearlyValue = new FormData();
@@ -435,9 +435,9 @@ public class OpexDefinitionGrid extends Composite {
 			Button isInUse = (Button)rowChildren[1];
 			Combo comboModel = (Combo)rowChildren[2];
 			Combo comboExpression = (Combo)rowChildren[3];
-			LinkedHashMap<Integer, Integer> mapCostData = new LinkedHashMap<Integer, Integer>();
+			LinkedHashMap<Integer, Float> mapCostData = new LinkedHashMap<Integer, Float>();
 			for(int j=0; j<this.timePeriod.getIncrements(); j++){
-				mapCostData.put((this.timePeriod.getStartYear() + j), Integer.valueOf(((Text)rowChildren[4+j]).getText())); // cost input data starts from 4th indexed row child.
+				mapCostData.put((this.timePeriod.getStartYear() + j), Float.valueOf(((Text)rowChildren[4+j]).getText())); // cost input data starts from 4th indexed row child.
 			}
 			boolean inUse = isInUse.getSelection();
 			boolean isRevenue = (comboClassification.getSelectionIndex() == 1);//0=cost; 1=revenue

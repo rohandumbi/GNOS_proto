@@ -10,13 +10,13 @@ public class OpexData {
 	private Expression expression;
 	private boolean inUse;
 	private boolean isRevenue;
-	private LinkedHashMap<Integer, Integer> costData;
+	private LinkedHashMap<Integer, Float> costData;
 	
 	public OpexData(Model model) {
 		super();
 		this.id = -1;
 		this.model = model;
-		this.costData = new LinkedHashMap<Integer, Integer>();
+		this.costData = new LinkedHashMap<Integer, Float>();
 	}
 	
 	public int getId() {
@@ -50,14 +50,14 @@ public class OpexData {
 	public void setRevenue(boolean isRevenue) {
 		this.isRevenue = isRevenue;
 	}
-	public Map<Integer, Integer> getCostData() {
+	public Map<Integer, Float> getCostData() {
 		return costData;
 	}
-	public void setCostData(LinkedHashMap<Integer, Integer> costData) {
+	public void setCostData(LinkedHashMap<Integer, Float> costData) {
 		this.costData = costData;
 	}
 	
-	public void addYear(int year, int value) {
+	public void addYear(int year, float value) {
 		this.costData.put(year, value);
 	}
 	

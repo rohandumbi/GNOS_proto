@@ -307,7 +307,7 @@ public class ProjectConfigutration {
 					
 					this.opexDataList.add(od);
 				}
-				od.addYear(rs.getInt(6), rs.getInt(7));
+				od.addYear(rs.getInt(6), rs.getFloat(7));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -707,7 +707,7 @@ public class ProjectConfigutration {
 						int key = it.next();
 						pstmt1.setInt(1, od.getId());
 						pstmt1.setInt(2, key);
-						pstmt1.setInt(3, od.getCostData().get(key));
+						pstmt1.setFloat(3, od.getCostData().get(key));
 						pstmt1.executeUpdate();
 					}
 				}

@@ -286,7 +286,7 @@ public class EquationGenerator {
 				yearCostData = new ArrayList<CostRevenueData>();
 				modelOpexDataMapping.put(modelId, yearCostData);
 					
-				Map<Integer, Integer> costData = opexData.getCostData();
+				Map<Integer, Float> costData = opexData.getCostData();
 				Set<Integer> keys = costData.keySet();
 				Iterator<Integer> it = keys.iterator();
 				while(it.hasNext()){
@@ -302,7 +302,7 @@ public class EquationGenerator {
 					yearCostData.add(crd);
 				}
 			} else {
-				Map<Integer, Integer> costData = opexData.getCostData();
+				Map<Integer, Float> costData = opexData.getCostData();
 				Set<Integer> keys = costData.keySet();
 				Iterator<Integer> it = keys.iterator();
 				while(it.hasNext()){
@@ -344,8 +344,8 @@ public class EquationGenerator {
 	
 	private class CostRevenueData {
 		int year;
-		int cost;
-		int revenue;
+		float cost;
+		float revenue;
 		String expressionName;
 	}
 }
