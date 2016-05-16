@@ -36,6 +36,7 @@ public class EquationGenerator {
 	
 	private Set<Integer> processedBlocks;
 	private int bytesWritten = 0;
+	private float discount_rate = (float)0.08; //this has to be made an input variable later
 	
 	public void generate() {
 		projectConfiguration = ProjectConfigutration.getInstance();
@@ -45,7 +46,7 @@ public class EquationGenerator {
 		try {
 			output = new BufferedOutputStream(new FileOutputStream("output.txt"), bufferSize);
 			bytesWritten = 0;
-			parseOpexData();
+			//parseOpexData();
 			buildProcessBlockVariables();
 			buildWasteBlockVariables();
 			output.flush();
@@ -62,6 +63,7 @@ public class EquationGenerator {
 		Set<Block> processBlocks = new HashSet<Block>();
 		int processNumber = 1;
 		for(Node process: porcesses) {
+			System.out.println("Equation Generation: process name - "+process.getIdentifier());
 			String condition = buildCondition(process) ;
 			List<Block> blocks = findBlocks(condition);
 			processBlocks.addAll(blocks);
@@ -72,24 +74,18 @@ public class EquationGenerator {
 		buildStockpileVariables(processBlocks);
 	}
 	
-	
-	
-	
-	
-	
 	private void buildProcessVariables(Node process, List<Block> blocks, int processNumber) {
 		FixedOpexCost[] fixedOpexCost = ProjectConfigutration.getInstance().getFixedCost();
 		Map<Integer, Float> oreMiningCostMap = fixedOpexCost[0].getCostData();
-		Set keys = oreMiningCostMap.keySet();
-		Iterator<Integer> it = keys.iterator();
+		Set<Integer> keys = oreMiningCostMap.keySet();
 		int count = 1;
-		while(it.hasNext()){
-			int year = it.next();
+		for(int year: keys){
 			float miningcost = oreMiningCostMap.get(year);
 			
 			for(Block block: blocks) {
 				float processValue = getProcessValue(block, process.getData(), year);
 				float value = processValue - miningcost;
+				value = (float) (value * (1 / Math.pow ((1 + discount_rate), count)));
 				String eq = " "+value+"p"+block.getPitNo()+"x"+block.getBlockNo()+"p"+processNumber+"t"+count;
 				if(value > 0){
 					eq = " +"+eq;
@@ -105,13 +101,10 @@ public class EquationGenerator {
 		FixedOpexCost[] fixedOpexCost = ProjectConfigutration.getInstance().getFixedCost();
 		Map<Integer, Float> oreMiningCostMap = fixedOpexCost[0].getCostData();
 		Map<Integer, Float> stockPilingCostMap = fixedOpexCost[2].getCostData();
-		Set keys = stockPilingCostMap.keySet();
-		Iterator<Integer> it = keys.iterator();
+		Set<Integer> keys = stockPilingCostMap.keySet();
 		int count = 1;
-		while(it.hasNext()){			
-			int year = it.next();
-			float cost = stockPilingCostMap.get(year)+oreMiningCostMap.get(year);
-			
+		for(int year: keys){
+			float cost = stockPilingCostMap.get(year)+oreMiningCostMap.get(year);			
 			for(Block block: blocks) {			
 				String eq = " -"+cost+"p"+block.getPitNo()+"x"+block.getBlockNo()+"s"+getStockPileForPit(block.getPitNo())+"t"+count;
 
@@ -125,14 +118,11 @@ public class EquationGenerator {
 		List<Block> wasteblocks = findWasteBlocks();
 		FixedOpexCost[] fixedOpexCost = ProjectConfigutration.getInstance().getFixedCost();
 		Map<Integer, Float> wasteMiningCostMap = fixedOpexCost[1].getCostData();
-		Set keys = wasteMiningCostMap.keySet();
-		Iterator<Integer> it = keys.iterator();
+		Set<Integer> keys = wasteMiningCostMap.keySet();
+
 		int count = 1;	
-		while(it.hasNext()){
-	
-			int year = it.next();
-			float cost = wasteMiningCostMap.get(year);
-			
+		for(int year: keys){
+			float cost = wasteMiningCostMap.get(year);		
 			for(Block block: wasteblocks) {
 				String eq = " -"+cost+"p"+block.getPitNo()+"x"+block.getBlockNo()+"w"+getDumpForPit(block.getPitNo())+"t"+count;
 				write(eq);
@@ -251,15 +241,21 @@ public class EquationGenerator {
 	private float getProcessValue(Block b, Model model, int year) {
 		float value = 0;
 		if(model == null) return value;
-		
-		List<CostRevenueData> costYearData = modelOpexDataMapping.get(model.getId());
-		if(costYearData == null) return value;
-
-		for(CostRevenueData crd: costYearData) {
-			if(crd.year == year){
-				value = crd.revenue * b.getRatioField(crd.expressionName) - crd.cost;
-			} 
+		float revenue = 0;
+		float pcost = 0;
+		List<OpexData> opexDataList = projectConfiguration.getOpexDataList();
+		for(OpexData opexData: opexDataList) {
+			if(opexData.getModel().getId() == model.getId()){
+				if(opexData.isRevenue()){
+					String expressionName = opexData.getExpression().getName().replaceAll("\\s+","_");
+					float expr_value = b.getRatioField(expressionName);
+					revenue = revenue + expr_value * opexData.getCostData().get(year);
+				} else {
+					pcost = pcost + opexData.getCostData().get(year);
+				}
+			}
 		}
+		value = revenue - pcost;
 		return value;
 	}
 	
@@ -348,4 +344,6 @@ public class EquationGenerator {
 		float revenue;
 		String expressionName;
 	}
+	
+	
 }

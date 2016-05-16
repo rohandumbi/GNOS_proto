@@ -252,7 +252,7 @@ public class ProjectConfigutration {
 								pNode.setSaved(true);
 								nodes.put(pModel.getName(), pNode);
 							}
-							pNode.addChildren(node);
+							processTree.addNode(node, pNode);
 							node.setParent(pNode);
 
 						}
