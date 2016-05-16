@@ -49,12 +49,7 @@ public class TestApplication {
 		//application.test();
 		ProjectConfigutration.getInstance().load(1);
 
-		try {
-			new EquationGenerator().generate();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		new EquationGenerator().generate();
 
 	}
 

@@ -381,12 +381,9 @@ public class ProjectConfigutration {
 		saveProcessTree();
 		saveOpexData();
 		saveFixedCostData();
-		try {
-			new EquationGenerator().generate();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
+		new EquationGenerator().generate();
+		
 	}
 
 	public void saveFieldData() {

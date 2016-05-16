@@ -37,19 +37,23 @@ public class EquationGenerator {
 	private Set<Integer> processedBlocks;
 	private int bytesWritten = 0;
 	
-	public void generate() throws IOException {
+	public void generate() {
 		projectConfiguration = ProjectConfigutration.getInstance();
 		processedBlocks = new HashSet<Integer>();
 
 		int bufferSize = 8 * 1024;
-		
-		output = new BufferedOutputStream(new FileOutputStream("output.txt"), bufferSize);
-		bytesWritten = 0;
-		parseOpexData();
-		buildProcessBlockVariables();
-		buildWasteBlockVariables();
-		output.flush();
-		output.close();
+		try {
+			output = new BufferedOutputStream(new FileOutputStream("output.txt"), bufferSize);
+			bytesWritten = 0;
+			parseOpexData();
+			buildProcessBlockVariables();
+			buildWasteBlockVariables();
+			output.flush();
+			output.close();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	private void buildProcessBlockVariables() {
