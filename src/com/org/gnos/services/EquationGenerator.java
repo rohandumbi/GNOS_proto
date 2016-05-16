@@ -82,8 +82,8 @@ public class EquationGenerator {
 		Map<Integer, Integer> oreMiningCostMap = fixedOpexCost[0].getCostData();
 		Set keys = oreMiningCostMap.keySet();
 		Iterator<Integer> it = keys.iterator();
+		int count = 1;
 		while(it.hasNext()){
-			int count = 1;
 			int year = it.next();
 			int miningcost = oreMiningCostMap.get(year);
 			
@@ -107,8 +107,8 @@ public class EquationGenerator {
 		Map<Integer, Integer> stockPilingCostMap = fixedOpexCost[2].getCostData();
 		Set keys = stockPilingCostMap.keySet();
 		Iterator<Integer> it = keys.iterator();
-		while(it.hasNext()){
-			int count = 1;
+		int count = 1;
+		while(it.hasNext()){			
 			int year = it.next();
 			int cost = stockPilingCostMap.get(year)+oreMiningCostMap.get(year);
 			
@@ -127,8 +127,9 @@ public class EquationGenerator {
 		Map<Integer, Integer> wasteMiningCostMap = fixedOpexCost[1].getCostData();
 		Set keys = wasteMiningCostMap.keySet();
 		Iterator<Integer> it = keys.iterator();
+		int count = 1;	
 		while(it.hasNext()){
-			int count = 1;		
+	
 			int year = it.next();
 			int cost = wasteMiningCostMap.get(year);
 			
