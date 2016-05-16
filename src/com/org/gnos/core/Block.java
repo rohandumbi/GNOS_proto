@@ -46,4 +46,13 @@ public class Block {
 		this.fields.put(key, ratio);
 	}
 	
+	@Override
+	public boolean equals(Object obj) {
+		return (this.blockNo == ((Block)obj).blockNo);
+	}
+	
+	@Override
+	public int hashCode() {
+		return new Integer(this.blockNo).hashCode();
+	}
 }

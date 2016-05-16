@@ -59,7 +59,7 @@ public class EquationGenerator {
 	private void buildProcessBlockVariables() {
 		Tree processtree = projectConfiguration.getProcessTree();
 		List<Node> porcesses = processtree.getLeafNodes();
-		List<Block> processBlocks = new ArrayList<>();
+		Set<Block> processBlocks = new HashSet<Block>();
 		int processNumber = 1;
 		for(Node process: porcesses) {
 			String condition = buildCondition(process) ;
@@ -101,7 +101,7 @@ public class EquationGenerator {
 		}
 	}
 	
-	private void buildStockpileVariables(List<Block> blocks) {
+	private void buildStockpileVariables(Set<Block> blocks) {
 		FixedOpexCost[] fixedOpexCost = ProjectConfigutration.getInstance().getFixedCost();
 		Map<Integer, Integer> oreMiningCostMap = fixedOpexCost[0].getCostData();
 		Map<Integer, Integer> stockPilingCostMap = fixedOpexCost[2].getCostData();
