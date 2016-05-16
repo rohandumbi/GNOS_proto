@@ -41,7 +41,9 @@ public class Block {
 	}
 	
 	public Float getRatioField(String fieldName) {
-		return Float.parseFloat(this.fields.get(fieldName));
+		String val = this.fields.get(fieldName);
+		if(val == null ) return new Float(0);
+		else return Float.parseFloat(val);
 	}
 	
 	public Map<String, String> getFields() {

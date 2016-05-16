@@ -144,7 +144,7 @@ public class MiningStockpileCostGrid extends Composite {
 			fd_labelCategory.top = new FormAttachment(0);
 			fd_labelCategory.right = new FormAttachment(0, 168);
 			labelCategory.setLayoutData(fd_labelCategory);
-			if(this.existingFixedOpexCost != null){
+			if(this.existingFixedOpexCost != null && this.existingFixedOpexCost[i] != null){
 				this.addTimePeriodRowMembers(compositeRow, labelCategory, this.existingFixedOpexCost[i]);
 			}else{
 				this.addTimePeriodRowMembers(compositeRow, labelCategory);
@@ -174,12 +174,12 @@ public class MiningStockpileCostGrid extends Composite {
 	
 	private void addTimePeriodRowMembers(Composite parent, Control reference, FixedOpexCost fixedOpexCost){
 		Control previousMember = reference;
-		Map<Integer, Integer> fixedOpexCostData = fixedOpexCost.getCostData();
+		Map<Integer, Float> fixedOpexCostData = fixedOpexCost.getCostData();
 		for(int i=0; i<this.timePeriod.getIncrements(); i++){
 			Text yearlyValue = new Text(parent, SWT.BORDER);
 			FormData fd_yearlyValue = new FormData();
-			Integer intValue = (Integer)fixedOpexCostData.get(this.timePeriod.getStartYear() + i);
-			yearlyValue.setText(Integer.toString(intValue));
+			Float value = fixedOpexCostData.get(this.timePeriod.getStartYear() + i);
+			yearlyValue.setText(Float.toString(value));
 			/*
 			 * Hacky calculation at the moment
 			 */
@@ -208,9 +208,9 @@ public class MiningStockpileCostGrid extends Composite {
 				fixedOpexCost = new StockpileReclaimingCost();
 			}
 			
-			HashMap<Integer, Integer> mapCostData = new LinkedHashMap<Integer, Integer>();
+			HashMap<Integer, Float> mapCostData = new LinkedHashMap<Integer, Float>();
 			for(int j=0; j<this.timePeriod.getIncrements(); j++){
-				mapCostData.put((this.timePeriod.getStartYear() + j), Integer.valueOf(((Text)rowChildren[1+j]).getText())); // cost input data starts from 1st indexed row child.
+				mapCostData.put((this.timePeriod.getStartYear() + j), Float.valueOf(((Text)rowChildren[1+j]).getText())); // cost input data starts from 1st indexed row child.
 			}
 			
 			fixedOpexCost.setCostData(mapCostData);

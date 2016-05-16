@@ -79,13 +79,13 @@ public class EquationGenerator {
 	
 	private void buildProcessVariables(Node process, List<Block> blocks, int processNumber) {
 		FixedOpexCost[] fixedOpexCost = ProjectConfigutration.getInstance().getFixedCost();
-		Map<Integer, Integer> oreMiningCostMap = fixedOpexCost[0].getCostData();
+		Map<Integer, Float> oreMiningCostMap = fixedOpexCost[0].getCostData();
 		Set keys = oreMiningCostMap.keySet();
 		Iterator<Integer> it = keys.iterator();
 		int count = 1;
 		while(it.hasNext()){
 			int year = it.next();
-			int miningcost = oreMiningCostMap.get(year);
+			float miningcost = oreMiningCostMap.get(year);
 			
 			for(Block block: blocks) {
 				float processValue = getProcessValue(block, process.getData(), year);
@@ -103,14 +103,14 @@ public class EquationGenerator {
 	
 	private void buildStockpileVariables(Set<Block> blocks) {
 		FixedOpexCost[] fixedOpexCost = ProjectConfigutration.getInstance().getFixedCost();
-		Map<Integer, Integer> oreMiningCostMap = fixedOpexCost[0].getCostData();
-		Map<Integer, Integer> stockPilingCostMap = fixedOpexCost[2].getCostData();
+		Map<Integer, Float> oreMiningCostMap = fixedOpexCost[0].getCostData();
+		Map<Integer, Float> stockPilingCostMap = fixedOpexCost[2].getCostData();
 		Set keys = stockPilingCostMap.keySet();
 		Iterator<Integer> it = keys.iterator();
 		int count = 1;
 		while(it.hasNext()){			
 			int year = it.next();
-			int cost = stockPilingCostMap.get(year)+oreMiningCostMap.get(year);
+			float cost = stockPilingCostMap.get(year)+oreMiningCostMap.get(year);
 			
 			for(Block block: blocks) {			
 				String eq = " -"+cost+"p"+block.getPitNo()+"x"+block.getBlockNo()+"s"+getStockPileForPit(block.getPitNo())+"t"+count;
@@ -124,14 +124,14 @@ public class EquationGenerator {
 	private void buildWasteBlockVariables() throws IOException {
 		List<Block> wasteblocks = findWasteBlocks();
 		FixedOpexCost[] fixedOpexCost = ProjectConfigutration.getInstance().getFixedCost();
-		Map<Integer, Integer> wasteMiningCostMap = fixedOpexCost[1].getCostData();
+		Map<Integer, Float> wasteMiningCostMap = fixedOpexCost[1].getCostData();
 		Set keys = wasteMiningCostMap.keySet();
 		Iterator<Integer> it = keys.iterator();
 		int count = 1;	
 		while(it.hasNext()){
 	
 			int year = it.next();
-			int cost = wasteMiningCostMap.get(year);
+			float cost = wasteMiningCostMap.get(year);
 			
 			for(Block block: wasteblocks) {
 				String eq = " -"+cost+"p"+block.getPitNo()+"x"+block.getBlockNo()+"w"+getDumpForPit(block.getPitNo())+"t"+count;

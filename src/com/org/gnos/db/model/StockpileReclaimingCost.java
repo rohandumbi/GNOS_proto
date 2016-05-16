@@ -6,7 +6,7 @@ public class StockpileReclaimingCost extends FixedOpexCost{
 	public StockpileReclaimingCost(){
 		super();
 		this.id = -1;
-		this.costData = new LinkedHashMap<Integer, Integer>();
+		this.costData = new LinkedHashMap<Integer, Float>();
 	}
 
 }

@@ -339,7 +339,7 @@ public class ProjectConfigutration {
 			while (rs.next()) {
 				int costHead = rs.getInt(1);
 				int year = rs.getInt(2);
-				int value = rs.getInt(3);
+				float value = rs.getFloat(3);
 				FixedOpexCost fixedOpexCost = fixedCost[costHead];
 				if (fixedOpexCost == null) {
 					if (costHead == 0) {
@@ -752,7 +752,7 @@ public class ProjectConfigutration {
 					pstmt.setInt(2, 1);
 					pstmt.setInt(3, i);
 					pstmt.setInt(4, key);
-					pstmt.setInt(5, fixedOpexCost.getCostData().get(key));
+					pstmt.setFloat(5, fixedOpexCost.getCostData().get(key));
 					pstmt.executeUpdate();
 				}
 			}

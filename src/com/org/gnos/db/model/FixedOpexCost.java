@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 public class FixedOpexCost {
 	protected int id;
-	protected HashMap<Integer, Integer> costData;
+	protected HashMap<Integer, Float> costData;
 	
 	public int getId() {
 		return id;
@@ -13,11 +13,11 @@ public class FixedOpexCost {
 		this.id = id;
 	}
 	
-	public HashMap<Integer, Integer> getCostData() {
+	public HashMap<Integer, Float> getCostData() {
 		return costData;
 	}
 
-	public void setCostData(HashMap<Integer, Integer> costData) {
+	public void setCostData(HashMap<Integer, Float> costData) {
 		this.costData = costData;
 	}
 

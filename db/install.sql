@@ -107,8 +107,8 @@ DROP TABLE IF EXISTS fixedcost_year_mapping;
 CREATE TABLE fixedcost_year_mapping(
    project_id INT NOT NULL,
    scenario_id INT NOT NULL,
-   cost_head int NOT NULL,
+   cost_head float NOT NULL,
    year INT NOT NULL,
-   value INT NOT NULL,
+   value FLOAT NOT NULL,
    unique key(project_id, scenario_id, cost_head, year)
 );
