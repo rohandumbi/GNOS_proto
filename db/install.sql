@@ -87,7 +87,7 @@ CREATE TABLE opex_defn(
    project_id INT NOT NULL,
    scenario_id INT NOT NULL,
    model_id INT NOT NULL,
-   expression_id INT NOT NULL,
+   expression_id INT,
    in_use TINYINT NOT NULL default 1,
    is_revenue TINYINT NOT NULL default 1,
    PRIMARY KEY ( id )
@@ -98,7 +98,8 @@ DROP TABLE IF EXISTS model_year_mapping;
 CREATE TABLE model_year_mapping(
    opex_id INT NOT NULL,
    year INT NOT NULL,
-   value INT NOT NULL
+   value INT NOT NULL,
+   unique key( opex_id, year)
 );
 
 DROP TABLE IF EXISTS fixedcost_year_mapping; 
@@ -108,5 +109,6 @@ CREATE TABLE fixedcost_year_mapping(
    scenario_id INT NOT NULL,
    cost_head int NOT NULL,
    year INT NOT NULL,
-   value INT NOT NULL
+   value INT NOT NULL,
+   unique key(project_id, scenario_id, cost_head, year)
 );

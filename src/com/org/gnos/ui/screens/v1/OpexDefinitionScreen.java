@@ -196,6 +196,7 @@ public class OpexDefinitionScreen extends GnosScreen {
 			public void widgetSelected(SelectionEvent e) {
 				//TO DO implement row add
 				opexDefinitionGrid.saveOpexData();
+				ProjectConfigutration.getInstance().saveOpexData();
 			}
 		});
 		btnSaveOpexData.setFont(SWTResourceManager.getFont("Segoe UI", 16, SWT.BOLD));

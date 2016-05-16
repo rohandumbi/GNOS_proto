@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -57,42 +59,42 @@ public class OpexDefinitionGrid extends Composite {
 		this.timePeriod = timePeriod;
 		this.createContent(parent);
 	}
-	
+
 	private void createContent(Composite parent){
 		this.setLayout(new FormLayout());
 		this.createHeader();
 		this.createRows();
 	}
-	
+
 	private boolean isModelNameDuplicate(String modelName){
 		boolean isPresentInModelGrid = false;
 		for(String str: presentmodelNames) {
-		    if(str.trim().equalsIgnoreCase(modelName.trim()))
-		    	isPresentInModelGrid = true;
+			if(str.trim().equalsIgnoreCase(modelName.trim()))
+				isPresentInModelGrid = true;
 		}
 		return isPresentInModelGrid;
 	}
 
-	
+
 	private String[] getIdentifierComboItems(){
-		
+
 		List<Model> models = ProjectConfigutration.getInstance().getModels();
 		this.sourceFieldsComboItems = new String[models.size()];
 		for(int i=0; i<models.size(); i++){
 			this.sourceFieldsComboItems[i] = models.get(i).getName();
 		}
-				
+
 		return this.sourceFieldsComboItems;
 	}
-	
+
 	private String[] getExpressionComboItems(){
-		
+
 		List<Expression> models = ProjectConfigutration.getInstance().getExpressions();
 		this.sourceExpressionComboItems = new String[models.size()];
 		for(int i=0; i<models.size(); i++){
 			this.sourceExpressionComboItems[i] = models.get(i).getName();
 		}
-				
+
 		return this.sourceExpressionComboItems;
 	}
 
@@ -116,12 +118,12 @@ public class OpexDefinitionGrid extends Composite {
 		lblClassification.setLayoutData(fd_lblClassification);
 		lblClassification.setText("Classification");
 		lblClassification.setBackground(SWTResourceManager.getColor(230, 230, 230));
-		
+
 		firstSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
 		FormData fd_firstSeparator = new FormData();
 		fd_firstSeparator.left = new FormAttachment(lblClassification, 10);
 		firstSeparator.setLayoutData(fd_firstSeparator);
-		
+
 		Label lblUse = new Label(compositeGridHeader, SWT.NONE);
 		lblUse.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		FormData fd_lblUse = new FormData();
@@ -144,12 +146,12 @@ public class OpexDefinitionGrid extends Composite {
 		lblIdentifier.setLayoutData(fd_lblIdentifier);
 		lblIdentifier.setText("Identifier");
 		lblIdentifier.setBackground(SWTResourceManager.getColor(230, 230, 230));
-		
+
 		thirdSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
 		FormData fd_thirdSeparator = new FormData();
 		fd_thirdSeparator.left = new FormAttachment(lblIdentifier, 25);
 		thirdSeparator.setLayoutData(fd_thirdSeparator);
-		
+
 		Label lblExpression = new Label(compositeGridHeader, SWT.NONE);
 		lblExpression.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		FormData fd_lblExpression = new FormData();
@@ -164,7 +166,7 @@ public class OpexDefinitionGrid extends Composite {
 		this.addTimePeriodHeaderColumns(lblExpression);
 
 	}
-	
+
 	private void addTimePeriodHeaderColumns(Control reference){
 		Control previousColumn = reference;
 		for(int i=0; i<this.timePeriod.getIncrements(); i++){
@@ -172,7 +174,7 @@ public class OpexDefinitionGrid extends Composite {
 			FormData fd_separator = new FormData();
 			fd_separator.left = new FormAttachment(previousColumn, 25);
 			separator.setLayoutData(fd_separator);
-			
+
 			Label lblYear = new Label(compositeGridHeader, SWT.NONE);
 			lblYear.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 			FormData fd_lblYear = new FormData();
@@ -181,13 +183,13 @@ public class OpexDefinitionGrid extends Composite {
 			lblYear.setText(String.valueOf(this.timePeriod.getStartYear() + i));
 			lblYear.setBackground(SWTResourceManager.getColor(230, 230, 230));
 			lblYear.setLayoutData(fd_lblYear);
-			
+
 			previousColumn = lblYear;
 		}
 	}
 
 	private void createRows() {
-		
+
 		for(OpexData od: this.opexDataList) {
 			final Composite compositeRow = new Composite(this, SWT.BORDER);
 			compositeRow.setData(od);
@@ -197,7 +199,7 @@ public class OpexDefinitionGrid extends Composite {
 				backgroundColor =  SWTResourceManager.getColor(245, 245, 245);
 			}
 			compositeRow.setBackground(backgroundColor);
-			
+
 			FormData fd_compositeRow = new FormData();
 			fd_compositeRow.left = new FormAttachment(this.presentRow, 0, SWT.LEFT);
 			//fd_compositeRow.bottom = new FormAttachment(this.presentRow, 26, SWT.BOTTOM);
@@ -205,7 +207,7 @@ public class OpexDefinitionGrid extends Composite {
 			fd_compositeRow.top = new FormAttachment(this.presentRow);
 
 
-			Combo comboClassification = new Combo(compositeRow, SWT.NONE);
+			final Combo comboClassification = new Combo(compositeRow, SWT.NONE);
 			comboClassification.setItems(new String[]{"PCost", "Rev"});
 			if(od.isRevenue()) {
 				comboClassification.select(1);
@@ -217,14 +219,14 @@ public class OpexDefinitionGrid extends Composite {
 			fd_comboClassification.top = new FormAttachment(0);
 			fd_comboClassification.right = new FormAttachment(0, 89);
 			comboClassification.setLayoutData(fd_comboClassification);
-			
+
 			Button btnUse = new Button(compositeRow, SWT.CHECK);
 			btnUse.setSelection(od.isInUse());
 			FormData fd_btnUse = new FormData();
 			fd_btnUse.left = new FormAttachment(comboClassification, 10, SWT.RIGHT);
 			fd_btnUse.top = new FormAttachment(0, 2);
 			btnUse.setLayoutData(fd_btnUse);
-			
+
 			final Combo comboIdentifier = new Combo(compositeRow, SWT.NONE);
 			String[] items = this.getIdentifierComboItems();
 			comboIdentifier.setItems(items);
@@ -251,9 +253,7 @@ public class OpexDefinitionGrid extends Composite {
 					comboIdentifier.setListVisible(true);
 				}
 			});
-			
-			
-			
+
 			final Combo comboExpression = new Combo(compositeRow, SWT.NONE);
 			String[] expressionItems = this.getExpressionComboItems();
 			comboExpression.setItems(expressionItems);
@@ -283,6 +283,17 @@ public class OpexDefinitionGrid extends Composite {
 			fd_comboExpression.top = new FormAttachment(0);
 			comboExpression.setLayoutData(fd_comboExpression);
 			
+			
+			comboClassification.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent e) {
+					if (comboClassification.getSelectionIndex() == 0) {
+						comboExpression.setEnabled(false);
+					}else {
+						comboExpression.setEnabled(true);
+					}
+				}
+			});
+
 			Control previousMember = comboExpression;
 			Map<Integer, Integer> yearData = od.getCostData();
 			Set keys = yearData.keySet();
@@ -300,14 +311,14 @@ public class OpexDefinitionGrid extends Composite {
 				yearlyValue.setLayoutData(fd_yearlyValue);
 				previousMember = yearlyValue;
 			}
-			
+
 			this.presentRow = compositeRow;
 			this.allRows.add(compositeRow);
 			compositeRow.setLayoutData(fd_compositeRow);
 			this.layout();
 		}
 	}
-	
+
 	public void addRow(){
 		final Composite compositeRow = new Composite(this, SWT.BORDER);
 		compositeRow.setLayout(new FormLayout());
@@ -324,7 +335,7 @@ public class OpexDefinitionGrid extends Composite {
 		fd_compositeRow.top = new FormAttachment(this.presentRow);
 
 
-		Combo comboClassification = new Combo(compositeRow, SWT.NONE);
+		final Combo comboClassification = new Combo(compositeRow, SWT.NONE);
 		comboClassification.setItems(new String[]{"PCost", "Rev"});
 		comboClassification.setText("Select Type");
 		FormData fd_comboClassification = new FormData();
@@ -332,13 +343,13 @@ public class OpexDefinitionGrid extends Composite {
 		fd_comboClassification.top = new FormAttachment(0);
 		fd_comboClassification.right = new FormAttachment(0, 89);
 		comboClassification.setLayoutData(fd_comboClassification);
-		
+
 		Button btnUse = new Button(compositeRow, SWT.CHECK);
 		FormData fd_btnUse = new FormData();
 		fd_btnUse.left = new FormAttachment(comboClassification, 10, SWT.RIGHT);
 		fd_btnUse.top = new FormAttachment(0, 2);
 		btnUse.setLayoutData(fd_btnUse);
-		
+
 		final Combo comboIdentifier = new Combo(compositeRow, SWT.NONE);
 		String[] items = this.getIdentifierComboItems();
 		comboIdentifier.setItems(items);
@@ -359,8 +370,8 @@ public class OpexDefinitionGrid extends Composite {
 		fd_comboIdentifier.right = new FormAttachment(btnUse, 135);
 		fd_comboIdentifier.top = new FormAttachment(0);
 		comboIdentifier.setLayoutData(fd_comboIdentifier);
-		
-		
+
+
 		final Combo comboExpression = new Combo(compositeRow, SWT.NONE);
 		String[] expressionItems = this.getExpressionComboItems();
 		comboExpression.setItems(expressionItems);
@@ -382,14 +393,24 @@ public class OpexDefinitionGrid extends Composite {
 		fd_comboExpression.top = new FormAttachment(0);
 		comboExpression.setLayoutData(fd_comboExpression);
 		
+		comboClassification.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				if (comboClassification.getSelectionIndex() == 0) {
+					comboExpression.setEnabled(false);
+				}else {
+					comboExpression.setEnabled(true);
+				}
+			}
+		});
+
 		this.addTimePeriodRowMembers(compositeRow, comboExpression);
-		
+
 		this.presentRow = compositeRow;
 		this.allRows.add(compositeRow);
 		compositeRow.setLayoutData(fd_compositeRow);
 		this.layout();
 	}
-	
+
 	private void addTimePeriodRowMembers(Composite parent, Control reference){
 		Control previousMember = reference;
 		for(int i=0; i<this.timePeriod.getIncrements(); i++){
@@ -404,7 +425,7 @@ public class OpexDefinitionGrid extends Composite {
 			previousMember = yearlyValue;
 		}
 	}
-	
+
 	public boolean saveOpexData(){
 		//this.opexDataList = new ArrayList<OpexData>();
 		int i = 0;
@@ -422,7 +443,7 @@ public class OpexDefinitionGrid extends Composite {
 			boolean isRevenue = (comboClassification.getSelectionIndex() == 1);//0=cost; 1=revenue
 			String modelName = comboModel.getText();
 			String expressionName = comboExpression.getText();
-			
+
 			Model model = ProjectConfigutration.getInstance().getModelByName(modelName);
 			Expression expression = ProjectConfigutration.getInstance().getExpressionByName(expressionName);
 			OpexData opexData;
@@ -436,7 +457,7 @@ public class OpexDefinitionGrid extends Composite {
 				opexData = (OpexData)rowOpexData.getData();
 				opexData.setModel(model);
 			}
-			
+
 			opexData.setCostData(mapCostData);
 			opexData.setInUse(inUse);
 			opexData.setRevenue(isRevenue);

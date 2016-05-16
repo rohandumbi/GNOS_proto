@@ -381,7 +381,7 @@ public class ProjectConfigutration {
 		saveOpexData();
 		saveFixedCostData();
 
-		new EquationGenerator().generate();
+		//new EquationGenerator().generate();
 		
 	}
 
