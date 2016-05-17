@@ -291,7 +291,7 @@ public class ProjectConfigutration {
 			rs = stmt.getResultSet();
 			while (rs.next()) {
 				int id = rs.getInt(1);
-				float value = rs.getInt(2);
+				float value = rs.getFloat(2);
 				if(this.discountFactor == null){
 					this.discountFactor = new DiscountFactor();
 					this.discountFactor.setId(id);
