@@ -210,7 +210,13 @@ public class MiningStockpileCostGrid extends Composite {
 			
 			HashMap<Integer, Float> mapCostData = new LinkedHashMap<Integer, Float>();
 			for(int j=0; j<this.timePeriod.getIncrements(); j++){
-				mapCostData.put((this.timePeriod.getStartYear() + j), Float.valueOf(((Text)rowChildren[1+j]).getText())); // cost input data starts from 1st indexed row child.
+				String fixedCostValue = ((Text)rowChildren[1+j]).getText();
+				if(fixedCostValue.equals("") || fixedCostValue == null){
+					mapCostData.put((this.timePeriod.getStartYear() + j), 0f); // cost input data starts from 1st indexed row child.
+				}else{
+					mapCostData.put((this.timePeriod.getStartYear() + j), Float.valueOf(fixedCostValue)); // cost input data starts from 1st indexed row child.
+				}
+				
 			}
 			
 			fixedOpexCost.setCostData(mapCostData);

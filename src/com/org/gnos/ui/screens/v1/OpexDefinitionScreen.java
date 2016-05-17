@@ -228,7 +228,7 @@ public class OpexDefinitionScreen extends GnosScreen {
 			public void widgetSelected(SelectionEvent e) {
 				//TO DO implement row add
 				opexDefinitionGrid.saveOpexData();
-				ProjectConfigutration.getInstance().saveOpexData();
+				//ProjectConfigutration.getInstance().saveOpexData();
 			}
 		});
 		btnSaveOpexData.setFont(SWTResourceManager.getFont("Segoe UI", 16, SWT.BOLD));
@@ -272,7 +272,7 @@ public class OpexDefinitionScreen extends GnosScreen {
 				@SuppressWarnings("unused")
 				FixedOpexCost[] fixedOpexCost = miningStockpileCostGrid.getCostData();//indexing fixed; 0-OreMiningCost, 1-WasteMiningCost, 2-StockpilingCost, 3-StockpileReclaimingCost
 				ProjectConfigutration.getInstance().setFixedCost(fixedOpexCost);
-				ProjectConfigutration.getInstance().saveFixedCostData();
+				//ProjectConfigutration.getInstance().saveFixedCostData();
 			}
 		});
 		btnSaveFixedCostData.setFont(SWTResourceManager.getFont("Segoe UI", 16, SWT.BOLD));
