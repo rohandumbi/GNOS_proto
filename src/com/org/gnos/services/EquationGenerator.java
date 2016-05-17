@@ -36,8 +36,7 @@ public class EquationGenerator {
 	
 	private Set<Integer> processedBlocks;
 	private int bytesWritten = 0;
-	private float discount_rate = (float)0.08; //this has to be made an input variable later
-	
+	private float discount_rate = ProjectConfigutration.getInstance().getDiscountFactor().getValue(); //this has to be made an input variable later
 	public void generate() {
 		projectConfiguration = ProjectConfigutration.getInstance();
 		processedBlocks = new HashSet<Integer>();

@@ -20,6 +20,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.core.ProjectConfigutration;
+import com.org.gnos.db.model.DiscountFactor;
 import com.org.gnos.db.model.FixedOpexCost;
 import com.org.gnos.db.model.OpexData;
 import com.org.gnos.events.GnosEvent;
@@ -31,6 +32,7 @@ import com.org.gnos.ui.custom.controls.OpexDefinitionGrid;
 public class OpexDefinitionScreen extends GnosScreen {
 
 	private Text textStartYear;
+	private Text textDiscountFactor;
 	private Text textNumberOfIncrements;
 	private ScrolledComposite scGridContainer;
 	private ScrolledComposite scFixedCostGridContainer;
@@ -38,6 +40,7 @@ public class OpexDefinitionScreen extends GnosScreen {
 	private MiningStockpileCostGrid miningStockpileCostGrid;
 	private Label labelScreenName;
 	private List<OpexData> opexDataList;
+	private DiscountFactor discountFactor;
 	/**
 	 * Create the composite.
 	 * @param parent
@@ -90,11 +93,27 @@ public class OpexDefinitionScreen extends GnosScreen {
 		fd_textStartYear.right = new FormAttachment(lblStartYear, 58, SWT.RIGHT);
 		textStartYear.setLayoutData(fd_textStartYear);
 		
+		Label lblDiscountFactor = new Label(this, SWT.NONE);
+		lblDiscountFactor.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		FormData fd_lblDiscountFactor = new FormData();
+		fd_lblDiscountFactor.top = new FormAttachment(labelScreenDescription, 10);
+		fd_lblDiscountFactor.left = new FormAttachment(textStartYear, 10);
+		lblDiscountFactor.setLayoutData(fd_lblDiscountFactor);
+		lblDiscountFactor.setText("Discount Factor:");
+		
+		textDiscountFactor = new Text(this, SWT.BORDER);
+		textDiscountFactor.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		FormData fd_textDiscountFactor = new FormData();
+		fd_textDiscountFactor.top = new FormAttachment(textStartYear, -2, SWT.TOP);
+		fd_textDiscountFactor.left = new FormAttachment(lblDiscountFactor, 8);
+		fd_textDiscountFactor.right = new FormAttachment(lblDiscountFactor, 58, SWT.RIGHT);
+		textDiscountFactor.setLayoutData(fd_textDiscountFactor);
+		
 		Label lblNumberOfIncrements = new Label(this, SWT.NONE);
 		lblNumberOfIncrements.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		FormData fd_lblNumberOfIncrements = new FormData();
 		fd_lblNumberOfIncrements.top = new FormAttachment(lblStartYear, 0, SWT.TOP);
-		fd_lblNumberOfIncrements.left = new FormAttachment(textStartYear, 10);
+		fd_lblNumberOfIncrements.left = new FormAttachment(textDiscountFactor, 10);
 		lblNumberOfIncrements.setLayoutData(fd_lblNumberOfIncrements);
 		lblNumberOfIncrements.setText("Number of Increments:");
 		
@@ -112,6 +131,15 @@ public class OpexDefinitionScreen extends GnosScreen {
 			public void widgetSelected(SelectionEvent e) {
 				int startingYear = Integer.parseInt(textStartYear.getText());
 				int numberOfIncrements = Integer.parseInt(textNumberOfIncrements.getText());
+				String discountFactorValue = textDiscountFactor.getText();
+				DiscountFactor df = new DiscountFactor();
+				if((discountFactorValue.equals("")) || (discountFactorValue == null)){
+					df.setValue(1);
+				}else{
+					df.setValue(Float.parseFloat(discountFactorValue));
+				}
+				ProjectConfigutration.getInstance().setDiscountFactor(df);
+				//ProjectConfigutration.getInstance().saveDiscountFactor();
 				TimePeriod timePeriod = new TimePeriod(startingYear, numberOfIncrements);
 				initializeOpexGrid(timePeriod);
 				initializeMiningStockpileCostGrid(timePeriod);
@@ -128,6 +156,7 @@ public class OpexDefinitionScreen extends GnosScreen {
 		 * If there is an existing Opex data for the project
 		 */
 		this.opexDataList = ProjectConfigutration.getInstance().getOpexDataList();
+		this.discountFactor = ProjectConfigutration.getInstance().getDiscountFactor();
 		if(this.opexDataList.size() > 0){
 			OpexData opexData = this.opexDataList.get(0);
 			Map<Integer, Float> mapCostData = opexData.getCostData();
@@ -142,6 +171,9 @@ public class OpexDefinitionScreen extends GnosScreen {
 			TimePeriod savedTimePeriod = new TimePeriod(startYear, numberOfIncrements);
 			initializeOpexGrid(savedTimePeriod);
 			initializeMiningStockpileCostGrid(savedTimePeriod);
+		}
+		if(this.discountFactor != null) {
+			textDiscountFactor.setText(String.valueOf(this.discountFactor.getValue()));
 		}
 		
 	}
@@ -231,8 +263,8 @@ public class OpexDefinitionScreen extends GnosScreen {
 		Rectangle r = scFixedCostGridContainer.getClientArea();
 		scFixedCostGridContainer.setMinSize(scFixedCostGridContainer.computeSize(SWT.DEFAULT, r.height, true));
 		
-		Button btnSaveOpexData = new Button(this, SWT.NONE);
-		btnSaveOpexData.addSelectionListener(new SelectionAdapter() {
+		Button btnSaveFixedCostData = new Button(this, SWT.NONE);
+		btnSaveFixedCostData.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				//TO DO implement row add
@@ -243,12 +275,12 @@ public class OpexDefinitionScreen extends GnosScreen {
 				ProjectConfigutration.getInstance().saveFixedCostData();
 			}
 		});
-		btnSaveOpexData.setFont(SWTResourceManager.getFont("Segoe UI", 16, SWT.BOLD));
-		btnSaveOpexData.setImage(SWTResourceManager.getImage(OpexDefinitionScreen.class, "/com/org/gnos/resources/save.png"));
-		FormData fd_btnSaveOpexData = new FormData();
-		fd_btnSaveOpexData.top = new FormAttachment(scFixedCostGridContainer, 2, SWT.TOP);
-		fd_btnSaveOpexData.right = new FormAttachment(100, -5);
-		btnSaveOpexData.setLayoutData(fd_btnSaveOpexData);
+		btnSaveFixedCostData.setFont(SWTResourceManager.getFont("Segoe UI", 16, SWT.BOLD));
+		btnSaveFixedCostData.setImage(SWTResourceManager.getImage(OpexDefinitionScreen.class, "/com/org/gnos/resources/save.png"));
+		FormData fd_btnSaveFixedCostData = new FormData();
+		fd_btnSaveFixedCostData.top = new FormAttachment(scFixedCostGridContainer, 2, SWT.TOP);
+		fd_btnSaveFixedCostData.right = new FormAttachment(100, -5);
+		btnSaveFixedCostData.setLayoutData(fd_btnSaveFixedCostData);
 		this.layout();
 	}
 	

@@ -93,6 +93,17 @@ CREATE TABLE opex_defn(
    PRIMARY KEY ( id )
 );
 
+DROP TABLE IF EXISTS discount_factor; 
+
+CREATE TABLE discount_factor(
+   id INT NOT NULL AUTO_INCREMENT,
+   project_id INT NOT NULL,
+   scenario_id INT NOT NULL,
+   value FLOAT,
+   PRIMARY KEY ( id ),
+   unique key(project_id, scenario_id)
+);
+
 DROP TABLE IF EXISTS model_year_mapping; 
 
 CREATE TABLE model_year_mapping(

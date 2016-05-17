@@ -15,6 +15,7 @@ import java.util.Set;
 
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.dao.FieldDAO;
+import com.org.gnos.db.model.DiscountFactor;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Field;
 import com.org.gnos.db.model.FixedOpexCost;
@@ -36,6 +37,7 @@ public class ProjectConfigutration {
 	private Map<String, String> requiredFieldMapping = new LinkedHashMap<String, String>();
 	private List<Expression> expressions = new ArrayList<Expression>();
 	private List<Model> models = new ArrayList<Model>();
+	private DiscountFactor discountFactor;
 	private List<OpexData> opexDataList = new ArrayList<OpexData>();
 	private FixedOpexCost[] fixedCost;
 	private Tree processTree = null;
@@ -72,6 +74,7 @@ public class ProjectConfigutration {
 		loadExpressions();
 		loadModels();
 		loadProcessTree();
+		loadDiscountFactor();
 		loadOpexData();
 		loadFixedCost();
 	}
@@ -276,6 +279,40 @@ public class ProjectConfigutration {
 			}
 		}
 	}
+	
+	public void loadDiscountFactor() {
+		String sql = "select id, value from discount_factor where project_id = " + this.projectId;
+		Statement stmt = null;
+		ResultSet rs = null;
+		Connection conn = DBManager.getConnection();
+		try {
+			stmt = conn.createStatement();
+			stmt.execute(sql);
+			rs = stmt.getResultSet();
+			while (rs.next()) {
+				int id = rs.getInt(1);
+				float value = rs.getInt(2);
+				if(this.discountFactor == null){
+					this.discountFactor = new DiscountFactor();
+					this.discountFactor.setId(id);
+					this.discountFactor.setValue(value);
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (stmt != null)
+					stmt.close();
+				if (rs != null)
+					rs.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
 	public void loadOpexData() {
 		String sql = "select id, model_id, expression_id, in_use, is_revenue, year, value from opex_defn, model_year_mapping where id= opex_id and project_id = "
@@ -378,6 +415,7 @@ public class ProjectConfigutration {
 		saveExpressionData();
 		saveModelData();
 		saveProcessTree();
+		saveDiscountFactor();
 		saveOpexData();
 		saveFixedCostData();
 
@@ -664,6 +702,43 @@ public class ProjectConfigutration {
 			}
 		}
 	}
+	
+	public void saveDiscountFactor() {
+		Connection conn = DBManager.getConnection();
+		String insert_sql = "insert into discount_factor (project_id, scenario_id, value) values (?, ?, ?)";
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		boolean autoCommit = true;
+		
+		try {
+			autoCommit = conn.getAutoCommit();
+			conn.setAutoCommit(false);
+			pstmt = conn.prepareStatement(insert_sql, Statement.RETURN_GENERATED_KEYS);
+			pstmt.setInt(1, projectId);
+			pstmt.setInt(2, 1);
+			pstmt.setFloat(3, this.discountFactor.getValue());
+			pstmt.executeUpdate();
+			rs = pstmt.getGeneratedKeys();
+			if (rs.next()){
+				int id = rs.getInt(1);
+				this.discountFactor.setId(id);
+			}
+			conn.commit();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				conn.setAutoCommit(autoCommit);
+				if (pstmt != null)
+					pstmt.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
 	public void saveOpexData() {
 		Connection conn = DBManager.getConnection();
@@ -870,6 +945,15 @@ public class ProjectConfigutration {
 
 	public void setProcessTree(Tree processTree) {
 		this.processTree = processTree;
+	}
+	
+
+	public DiscountFactor getDiscountFactor() {
+		return discountFactor;
+	}
+
+	public void setDiscountFactor(DiscountFactor discountFactor) {
+		this.discountFactor = discountFactor;
 	}
 
 	public List<OpexData> getOpexDataList() {
