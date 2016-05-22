@@ -31,6 +31,7 @@ import com.org.gnos.ui.custom.controls.DumpCreationDialog;
 import com.org.gnos.ui.custom.controls.GnosScreen;
 import com.org.gnos.ui.custom.controls.GroupCreationDialog;
 import com.org.gnos.ui.custom.controls.StockpileCreationDialog;
+import com.org.gnos.ui.graph.PitGroupDefinitionGraph;
 
 public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 	private String[] sourcePitItems;
@@ -42,7 +43,7 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 	
 	private ArrayList<String> listAddedModels;
 	private Tree processTree;
-	private ProcessDiagramScreen compositeProcessDiagram;
+	private PitGroupDefinitionGraph compositeGroupDiagram;
 	private ArrayList<Pit> listOfPits;
 	private ArrayList<PitGroup> listOfPitGroups;
 	private ArrayList<Stockpile> listOfStockpiles;
@@ -169,7 +170,6 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 		this.pitList = new List(compositePitList, SWT.BORDER|SWT.MULTI|SWT.V_SCROLL);
 		this.pitList.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		this.pitList.setItems(this.getSourcePitItems());
-		//this.pitList.setItems(new String[]{"pit 1","pit 2","pit 3","pit 4","pit 5","pit 6","pit 7","pit 8","pit 9","pit 10","pit 11","pit 12","pit 13","pit 14","pit 15","pit 16","pit 17","pit 18",});
 		
 		/*
 		 * Group List
@@ -200,8 +200,6 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 		compositeDumpList.setLayoutData(fd_compositeDumpList);
 		this.dumpList = new List(compositeDumpList, SWT.BORDER|SWT.MULTI|SWT.V_SCROLL);
 		this.dumpList.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
-		//this.pitList.setItems(this.getSourceFieldsComboItems());
-		//this.dumpList.setItems(new String[]{"dump 1","dump 2","dump 3","dump 4","dump 5","dump 6","dump 7","dump 8","dump 9","dump 10"});
 		
 		
 		/*
@@ -224,16 +222,16 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 		/*
 		 * Graphical Diagram
 		 */
-		this.compositeProcessDiagram = new ProcessDiagramScreen(this, SWT.BORDER);
-		FormData fd_compositeProcessDiagram = new FormData();
-		fd_compositeProcessDiagram.top = new FormAttachment(lblProcessDiagram, 10);
-		fd_compositeProcessDiagram.left = new FormAttachment(labelFirstSeparator, 10);
-		fd_compositeProcessDiagram.bottom = new FormAttachment(100, -10);
-		fd_compositeProcessDiagram.right = new FormAttachment(labelSecondSeparator, -10);
-		this.compositeProcessDiagram.setLayoutData(fd_compositeProcessDiagram);
+		this.compositeGroupDiagram = new PitGroupDefinitionGraph(this, SWT.BORDER);
+		FormData fd_compositeGroupDiagram = new FormData();
+		fd_compositeGroupDiagram.top = new FormAttachment(lblProcessDiagram, 10);
+		fd_compositeGroupDiagram.left = new FormAttachment(labelFirstSeparator, 10);
+		fd_compositeGroupDiagram.bottom = new FormAttachment(100, -10);
+		fd_compositeGroupDiagram.right = new FormAttachment(labelSecondSeparator, -10);
+		this.compositeGroupDiagram.setLayoutData(fd_compositeGroupDiagram);
 		
 
-		this.compositeProcessDiagram.refresh(processTree);
+		//this.compositeProcessDiagram.refresh(processTree);
 
 		/*
 		 * Add pit to group button
@@ -255,18 +253,9 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 					}
 					listOfPitGroups.add(pitGroup);
 					groupList.add(groupName);
+					compositeGroupDiagram.addGroup(pitGroup);
 					
 				}
-				/*String selectedModelName = pitList.getSelection()[0];
-				System.out.println("Selected model: " + selectedModelName);
-				ProcessNodeDefinitionDialog processNodeDefintiDefinitionDialog = new ProcessNodeDefinitionDialog(getShell(), listAddedModels);
-				if (Window.OK == processNodeDefintiDefinitionDialog.open()) {
-					String parent = processNodeDefintiDefinitionDialog.getParentName();
-					System.out.println("Model: " + selectedModelName + " has Parent: " + parent);
-					processTree.addNode(selectedModelName, parent);
-					listAddedModels.add(selectedModelName);
-					compositeProcessDiagram.refresh(processTree);
-				}*/
 				/*
 				 * Test line to test tree DS
 				 */
@@ -312,6 +301,7 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 					Dump dump = new Dump(dumpName, getPitGroupByNameFromPitGroupList(associatedPitGroupName));
 					listOfDumps.add(dump);
 					dumpList.add(dumpName);
+					compositeGroupDiagram.addDumpToGroup(dump);
 				}
 			}
 		});
@@ -337,6 +327,7 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 					Stockpile stockPile = new Stockpile(stockpileName, getPitGroupByNameFromPitGroupList(associatedPitGroupName));
 					listOfStockpiles.add(stockPile);
 					stockpileList.add(stockpileName);
+					compositeGroupDiagram.addStockpileToGroup(stockPile);
 				}
 			}
 		});

@@ -27,7 +27,6 @@ public class MainConfigurationViewPort extends GnosScreen{
 	private OpexDefinitionScreen opexDefinitionScreen;
 	private GradeConstraintScreen gradeConstraintScreen;
 	private BenchConstraintScreen benchConstraintScreen;
-	private StockPileDefinitionScreen stockPileDefinitionScreen;
 	
 	private Shell dummyShell;
 	
@@ -70,8 +69,6 @@ public class MainConfigurationViewPort extends GnosScreen{
 		benchConstraintScreen = new BenchConstraintScreen(this.dummyShell, SWT.NONE);
 		benchConstraintScreen.registerEventListener(this);
 		
-		stockPileDefinitionScreen = new StockPileDefinitionScreen(this.dummyShell, SWT.NONE);
-		stockPileDefinitionScreen.registerEventListener(this);
 	}
 	
 	public void loadFieldDatatypeDefinitionScreen(){
@@ -147,14 +144,6 @@ public class MainConfigurationViewPort extends GnosScreen{
 		this.viewPort = benchConstraintScreen;
 		this.viewPort.setParent(this);
 		this.stackLayout.topControl = benchConstraintScreen;
-		this.layout();
-	}
-	
-	public void loadStockpileDefinitionScreen(){
-		this.viewPort.setParent(dummyShell);
-		this.viewPort = stockPileDefinitionScreen;
-		this.viewPort.setParent(this);
-		this.stackLayout.topControl = stockPileDefinitionScreen;
 		this.layout();
 	}
 	
