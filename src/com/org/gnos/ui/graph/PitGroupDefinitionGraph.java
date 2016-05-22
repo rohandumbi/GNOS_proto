@@ -19,10 +19,7 @@ import com.org.gnos.db.model.Stockpile;
 
 public class PitGroupDefinitionGraph extends Composite {
 
-	private Composite parent;
 	private Graph graph;
-	private GraphNode rootNode;
-	private GraphNode presentNode;
 	private HashMap<String, GraphNode> existingGroupNodeGraph;
 	/**
 	 * Create the composite.
@@ -31,7 +28,6 @@ public class PitGroupDefinitionGraph extends Composite {
 	 */
 	public PitGroupDefinitionGraph(Composite parent, int style) {
 		super(parent, style);
-		this.parent = parent;
 		this.setLayout(new FillLayout());
 		this.graph = new Graph(this, SWT.NONE);
 		this.existingGroupNodeGraph = new HashMap<String, GraphNode>();
