@@ -10,8 +10,7 @@ import org.eclipse.zest.core.widgets.GraphConnection;
 import org.eclipse.zest.core.widgets.GraphNode;
 import org.eclipse.zest.core.widgets.ZestStyles;
 import org.eclipse.zest.layouts.LayoutStyles;
-import org.eclipse.zest.layouts.algorithms.SpringLayoutAlgorithm;
-import org.eclipse.zest.layouts.algorithms.TreeLayoutAlgorithm;
+import org.eclipse.zest.layouts.algorithms.HorizontalTreeLayoutAlgorithm;
 
 import com.org.gnos.db.model.Dump;
 import com.org.gnos.db.model.Pit;
@@ -41,21 +40,21 @@ public class PitGroupDefinitionGraph extends Composite {
 			GraphNode pitNode = new GraphNode(this.graph, SWT.NONE, "Pit: " + pit.getPitName());
 			new GraphConnection(this.graph, ZestStyles.CONNECTIONS_DIRECTED, pitNode, groupNode);
 		}
-		this.graph.setLayoutAlgorithm(new SpringLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);
+		this.graph.setLayoutAlgorithm(new HorizontalTreeLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);
 	}
 	
 	public void addDumpToGroup(Dump dump){
 		GraphNode dumpNode = new GraphNode(this.graph, SWT.NONE, "Dump: " + dump.getName());
 		GraphNode associatedPitGroupNode = this.existingGroupNodeGraph.get(dump.getAssociatedPitGroup().getName());
 		new GraphConnection(this.graph, ZestStyles.CONNECTIONS_DOT, dumpNode, associatedPitGroupNode);
-		this.graph.setLayoutAlgorithm(new TreeLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);
+		this.graph.setLayoutAlgorithm(new HorizontalTreeLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);
 	}
 	
 	public void addStockpileToGroup(Stockpile stockpile){
 		GraphNode stockPileNode = new GraphNode(this.graph, SWT.NONE, "Stockpile: " + stockpile.getName());
 		GraphNode associatedPitGroupNode = this.existingGroupNodeGraph.get(stockpile.getAssociatedPitGroup().getName());
 		new GraphConnection(this.graph, ZestStyles.CONNECTIONS_DOT, stockPileNode, associatedPitGroupNode);
-		this.graph.setLayoutAlgorithm(new TreeLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);
+		this.graph.setLayoutAlgorithm(new HorizontalTreeLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);
 	}
 
 	
