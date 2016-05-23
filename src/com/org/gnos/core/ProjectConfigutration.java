@@ -926,6 +926,26 @@ public class ProjectConfigutration {
 	public List<Expression> getExpressions() {
 		return expressions;
 	}
+	
+	public List<Expression> getGradeExpressions() {
+		List<Expression> gradeExpressions = new ArrayList<Expression>();
+		for(Expression expression : expressions){
+			if(expression.isGrade() == true){
+				gradeExpressions.add(expression);
+			}
+		}
+		return gradeExpressions;
+	}
+	
+	public List<Expression> getNonGradeExpressions() {
+		List<Expression> nonGradeExpressions = new ArrayList<Expression>();
+		for(Expression expression : expressions){
+			if(expression.isGrade() == false){
+				nonGradeExpressions.add(expression);
+			}
+		}
+		return nonGradeExpressions;
+	}
 
 	public void setExpressions(List<Expression> expressions) {
 		this.expressions = expressions;
