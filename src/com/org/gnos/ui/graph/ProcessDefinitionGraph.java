@@ -16,7 +16,7 @@ import org.eclipse.zest.layouts.algorithms.TreeLayoutAlgorithm;
 import com.org.gnos.core.Node;
 import com.org.gnos.core.Tree;
 
-public class GraphContainer extends Composite {
+public class ProcessDefinitionGraph extends Composite {
 
 	private Composite parent;
 	private Graph graph;
@@ -27,7 +27,7 @@ public class GraphContainer extends Composite {
 	 * @param parent
 	 * @param style
 	 */
-	public GraphContainer(Composite parent, int style) {
+	public ProcessDefinitionGraph(Composite parent, int style) {
 		super(parent, style);
 		this.parent = parent;
 		
@@ -40,7 +40,6 @@ public class GraphContainer extends Composite {
 		}
 		this.graph = new Graph(this, SWT.NONE);
 		this.layout();
-		//if(this.processNodes == null || this.processNodes.size() == 0) return;
 		this.graph.setLayoutAlgorithm(new TreeLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);
 		// Selection listener on graphConnect or GraphNode is not supported
 		// see https://bugs.eclipse.org/bugs/show_bug.cgi?id=236528

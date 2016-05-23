@@ -5,15 +5,15 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 
 import com.org.gnos.core.Tree;
-import com.org.gnos.ui.graph.GraphContainer;
+import com.org.gnos.ui.graph.ProcessDefinitionGraph;
 
 public class ProcessDiagramScreen extends Composite{
-	private GraphContainer graphContainer;
+	private ProcessDefinitionGraph graphContainer;
 
 	public ProcessDiagramScreen(Composite parent, int style) {
 		super(parent, style);
 		setLayout(new FillLayout(SWT.HORIZONTAL));
-		this.graphContainer = new GraphContainer(this, SWT.BORDER);
+		this.graphContainer = new ProcessDefinitionGraph(this, SWT.BORDER);
 		this.graphContainer.setLayout(new FillLayout(SWT.HORIZONTAL));
 		// TODO Auto-generated constructor stub
 	}
