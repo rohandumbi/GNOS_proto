@@ -42,7 +42,6 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 	private List stockpileList;
 	
 	private ArrayList<String> listAddedModels;
-	private Tree processTree;
 	private PitGroupDefinitionGraph compositeGroupDiagram;
 	private ArrayList<Pit> listOfPits;
 	private ArrayList<PitGroup> listOfPitGroups;
@@ -59,22 +58,6 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 		this.listOfDumps = new ArrayList<Dump>();
 		
 		this.listAddedModels = new ArrayList<String>();
-		
-
-		this.processTree = ProjectConfigutration.getInstance().getProcessTree();
-		if(this.processTree == null) {
-			this.processTree = new Tree();
-			ProjectConfigutration.getInstance().setProcessTree(processTree);
-		} else {
-			Map<String, Node> nodes = this.processTree.getNodes();
-			Set<String> keys = nodes.keySet();
-			Iterator<String> it = keys.iterator();
-			
-			while (it.hasNext()) {
-				String key = it.next();
-				this.listAddedModels.add(key);
-			}
-		}
 		
 		Label labelScreenName = new Label(this, SWT.NONE);
 		labelScreenName.setForeground(SWTResourceManager.getColor(0, 191, 255));
@@ -256,10 +239,6 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 					compositeGroupDiagram.addGroup(pitGroup);
 					
 				}
-				/*
-				 * Test line to test tree DS
-				 */
-				//processTree.display("Block");
 			}
 		});
 		btnAddPitToGroup.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));

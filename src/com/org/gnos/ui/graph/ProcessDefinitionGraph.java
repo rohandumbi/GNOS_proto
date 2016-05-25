@@ -9,6 +9,7 @@ import org.eclipse.swt.events.MenuDetectListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -37,6 +38,7 @@ public class ProcessDefinitionGraph extends Composite {
 	public ProcessDefinitionGraph(Composite parent, int style) {
 		super(parent, style);
 		this.parent = parent;
+		this.setLayout(new FillLayout());
 
 	}
 

@@ -26,13 +26,14 @@ import com.org.gnos.db.model.Model;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.ui.custom.controls.GnosScreen;
 import com.org.gnos.ui.custom.controls.ProcessNodeDefinitionDialog;
+import com.org.gnos.ui.graph.ProcessDefinitionGraph;
 
 public class ProcessRouteDefinitionScreen extends GnosScreen {
 	private String[] sourceFieldsComboItems;
 	private List modelList;
 	private ArrayList<String> listAddedModels;
 	private Tree processTree;
-	private ProcessDiagramScreen compositeProcessDiagram;
+	private ProcessDefinitionGraph compositeProcessDiagram;
 
 	public ProcessRouteDefinitionScreen(Composite parent, int style) {
 		super(parent, style);
@@ -115,7 +116,7 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 		modelList.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
 		this.modelList.setItems(this.getSourceFieldsComboItems());
 		
-		this.compositeProcessDiagram = new ProcessDiagramScreen(this, SWT.BORDER);
+		this.compositeProcessDiagram = new ProcessDefinitionGraph(this, SWT.BORDER);
 		FormData fd_compositeProcessDiagram = new FormData();
 		fd_compositeProcessDiagram.top = new FormAttachment(lblProcessDiagram, 10);
 		fd_compositeProcessDiagram.left = new FormAttachment(labelSectionSeparator, 10);
@@ -124,7 +125,7 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 		this.compositeProcessDiagram.setLayoutData(fd_compositeProcessDiagram);
 		
 
-		this.compositeProcessDiagram.refresh(processTree);
+		this.compositeProcessDiagram.refreshTree(processTree);
 
 		Button btnAddModelToProcess = new Button(this, SWT.NONE);
 		btnAddModelToProcess.addSelectionListener(new SelectionAdapter() {
@@ -141,7 +142,7 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 					Node parentNode = processTree.getNodeByName(parent);
 					processTree.addNode(node, parentNode);
 					listAddedModels.add(selectedModelName);
-					compositeProcessDiagram.refresh(processTree);
+					compositeProcessDiagram.refreshTree(processTree);
 				}
 			}
 		});
