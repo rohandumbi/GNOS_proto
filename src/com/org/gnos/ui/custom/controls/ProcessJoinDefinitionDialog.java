@@ -22,6 +22,9 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import com.org.gnos.core.ProjectConfigutration;
+import com.org.gnos.db.model.Model;
+import com.org.gnos.db.model.ProcessJoin;
 import com.org.gnos.services.ProcessRoute;
 
 public class ProcessJoinDefinitionDialog extends Dialog {
@@ -35,6 +38,8 @@ public class ProcessJoinDefinitionDialog extends Dialog {
 	private Button btnAddProcess;
 	private ArrayList<Combo> listOfChildProcessCombos;
 	private Control presentRow;
+	private String processJoinName;
+	private ProcessJoin createdProcessJoin;
 	
 	
 	public ProcessJoinDefinitionDialog(Shell parentShell, List<String> availableProcesses) {
@@ -125,6 +130,13 @@ public class ProcessJoinDefinitionDialog extends Dialog {
 		System.out.println("OK Pressed");
 		//this.definedProcessRoute = this.processDefinitionFormScreen.getDefinedProcess();
 		//this.selectedParent = comboParent.getText();
+		this.processJoinName = textProcessJoinName.getText();
+		this.createdProcessJoin = new ProcessJoin(processJoinName);
+		for(Combo processCombo : listOfChildProcessCombos){
+			String modelName = processCombo.getText();
+			Model respectiveModel = ProjectConfigutration.getInstance().getModelByName(modelName);
+			createdProcessJoin.addProcess(respectiveModel);
+		}
 		super.okPressed();
 	}
 
@@ -138,8 +150,14 @@ public class ProcessJoinDefinitionDialog extends Dialog {
 		getShell().setLocation(x,y);
 	}
 	
-	public ProcessRoute getDefinedProcessRoute(){
-		return this.definedProcessRoute;
+	
+	public ProcessJoin getCreatedProcessJoin() {
+		return createdProcessJoin;
 	}
+	
+	public String getProcessJoinName() {
+		return this.processJoinName;
+	}
+	
 	
 }

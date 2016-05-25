@@ -142,7 +142,6 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 		compositeJoinList.setLayoutData(fd_compositeJoinList);
 		this.processJoinList = new List(compositeJoinList, SWT.BORDER|SWT.MULTI|SWT.V_SCROLL);
 		this.processJoinList.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
-		this.processJoinList.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		
 		
 		/*
@@ -198,7 +197,8 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 				// TODO create process join implementation
 				ProcessJoinDefinitionDialog processJoinDefinitionDialog = new ProcessJoinDefinitionDialog(getShell(), listAddedModels);
 				if (Window.OK == processJoinDefinitionDialog.open()) {
-					
+					String createdProcessJoinName = processJoinDefinitionDialog.getProcessJoinName();
+					processJoinList.add(createdProcessJoinName);
 				}
 			}
 		});
