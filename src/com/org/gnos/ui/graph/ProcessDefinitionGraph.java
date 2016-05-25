@@ -1,5 +1,6 @@
 package com.org.gnos.ui.graph;
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.draw2d.IFigure;
@@ -19,10 +20,13 @@ import org.eclipse.zest.core.widgets.GraphNode;
 import org.eclipse.zest.core.widgets.ZestStyles;
 import org.eclipse.zest.core.widgets.internal.GraphLabel;
 import org.eclipse.zest.layouts.LayoutStyles;
+import org.eclipse.zest.layouts.algorithms.HorizontalTreeLayoutAlgorithm;
 import org.eclipse.zest.layouts.algorithms.TreeLayoutAlgorithm;
 
 import com.org.gnos.core.Node;
 import com.org.gnos.core.Tree;
+import com.org.gnos.db.model.Model;
+import com.org.gnos.db.model.ProcessJoin;
 
 public class ProcessDefinitionGraph extends Composite {
 
@@ -30,6 +34,8 @@ public class ProcessDefinitionGraph extends Composite {
 	private Graph graph;
 	private GraphNode rootNode;
 	private GraphNode presentNode;
+	private HashMap<String, GraphNode> existingProcessGraphNodes;
+	private HashMap<String, GraphNode> existingProcessJoinGraphNodes;
 	/**
 	 * Create the composite.
 	 * @param parent
@@ -39,7 +45,8 @@ public class ProcessDefinitionGraph extends Composite {
 		super(parent, style);
 		this.parent = parent;
 		this.setLayout(new FillLayout());
-
+		this.existingProcessGraphNodes = new HashMap<String, GraphNode>();
+		this.existingProcessJoinGraphNodes = new HashMap<String, GraphNode>();
 	}
 
 
@@ -94,16 +101,10 @@ public class ProcessDefinitionGraph extends Composite {
 	public void displayProcess(Node node, GraphNode parent){
 		List<Node> children = node.getChildrens();
 		GraphNode graphNode = new GraphNode(this.graph, SWT.NONE, node.getIdentifier());
+		this.existingProcessGraphNodes.put(node.getIdentifier(), graphNode);
 		if(parent != null){
 			new GraphConnection(this.graph, ZestStyles.CONNECTIONS_DIRECTED, parent, graphNode);
 		}
-		/*graphNode.addMouseListener(new ClickBehavior(new Runnable(){
-			@Override
-			public void run() {
-				// TODO Auto-generated method stub
-				System.out.println("Got the click...");
-			}
-		}));*/
 
 		for (Node child : children) {
 			// Recursive call
@@ -111,6 +112,23 @@ public class ProcessDefinitionGraph extends Composite {
 		}
 	}
 
+	public void addProcess(Node node){
+		GraphNode processNode = new GraphNode(this.graph, SWT.NONE, node.getIdentifier());
+		GraphNode parentNode = this.existingProcessGraphNodes.get(node.getParent().getIdentifier());
+		this.existingProcessGraphNodes.put(node.getIdentifier(), processNode);
+		new GraphConnection(this.graph, ZestStyles.CONNECTIONS_DIRECTED, parentNode, processNode);
+		this.graph.setLayoutAlgorithm(new TreeLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);
+	}
+	
+	public void addProcessJoin(ProcessJoin processJoin) {
+		GraphNode processJoinNode = new GraphNode(this.graph, SWT.NONE, "Process Join: " + processJoin.getName());
+		this.existingProcessJoinGraphNodes.put(processJoin.getName(), processJoinNode);
+		for(Model model : processJoin.getListChildPits()){
+			GraphNode processNode = this.existingProcessGraphNodes.get(model.getName());
+			new GraphConnection(this.graph, ZestStyles.CONNECTIONS_DIRECTED, processJoinNode, processNode);
+		}
+		this.graph.setLayoutAlgorithm(new TreeLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);
+	}
 
 	@Override
 	protected void checkSubclass() {

@@ -23,6 +23,7 @@ import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.OpexData;
 import com.org.gnos.db.model.OreMiningCost;
 import com.org.gnos.db.model.Pit;
+import com.org.gnos.db.model.ProcessJoin;
 import com.org.gnos.db.model.StockpileReclaimingCost;
 import com.org.gnos.db.model.StockpilingCost;
 import com.org.gnos.db.model.WasteMiningCost;
@@ -41,6 +42,7 @@ public class ProjectConfigutration {
 	private List<OpexData> opexDataList = new ArrayList<OpexData>();
 	private FixedOpexCost[] fixedCost;
 	private Tree processTree = null;
+	private List<ProcessJoin> processJoins = new ArrayList<ProcessJoin>();
 
 	private boolean newProject = true;
 	private Map<String, String> savedRequiredFieldMapping;
@@ -991,5 +993,18 @@ public class ProjectConfigutration {
 	public void setOpexDataList(List<OpexData> opexDataList) {
 		this.opexDataList = opexDataList;
 	}
+
+	public List<ProcessJoin> getProcessJoins() {
+		return processJoins;
+	}
+
+	public void setProcessJoins(List<ProcessJoin> processJoins) {
+		this.processJoins = processJoins;
+	}
+	
+	public void addProcessJoin(ProcessJoin processJoin) {
+		this.processJoins.add(processJoin);
+	}
+	
 
 }

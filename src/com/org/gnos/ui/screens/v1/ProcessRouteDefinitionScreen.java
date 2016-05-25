@@ -23,6 +23,7 @@ import com.org.gnos.core.Node;
 import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.core.Tree;
 import com.org.gnos.db.model.Model;
+import com.org.gnos.db.model.ProcessJoin;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.ui.custom.controls.GnosScreen;
 import com.org.gnos.ui.custom.controls.ProcessJoinDefinitionDialog;
@@ -176,7 +177,7 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 					Node parentNode = processTree.getNodeByName(parent);
 					processTree.addNode(node, parentNode);
 					listAddedModels.add(selectedModelName);
-					compositeProcessDiagram.refreshTree(processTree);
+					compositeProcessDiagram.addProcess(node);
 				}
 			}
 		});
@@ -199,6 +200,9 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 				if (Window.OK == processJoinDefinitionDialog.open()) {
 					String createdProcessJoinName = processJoinDefinitionDialog.getProcessJoinName();
 					processJoinList.add(createdProcessJoinName);
+					ProcessJoin createdProcessJoin = processJoinDefinitionDialog.getCreatedProcessJoin();
+					ProjectConfigutration.getInstance().addProcessJoin(createdProcessJoin);
+					compositeProcessDiagram.addProcessJoin(createdProcessJoin);
 				}
 			}
 		});
