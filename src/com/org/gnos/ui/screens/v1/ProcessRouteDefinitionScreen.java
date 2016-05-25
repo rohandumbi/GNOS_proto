@@ -25,12 +25,14 @@ import com.org.gnos.core.Tree;
 import com.org.gnos.db.model.Model;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.ui.custom.controls.GnosScreen;
+import com.org.gnos.ui.custom.controls.ProcessJoinDefinitionDialog;
 import com.org.gnos.ui.custom.controls.ProcessNodeDefinitionDialog;
 import com.org.gnos.ui.graph.ProcessDefinitionGraph;
 
 public class ProcessRouteDefinitionScreen extends GnosScreen {
 	private String[] sourceFieldsComboItems;
 	private List modelList;
+	private List processJoinList;
 	private ArrayList<String> listAddedModels;
 	private Tree processTree;
 	private ProcessDefinitionGraph compositeProcessDiagram;
@@ -80,42 +82,72 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 		Label labelSectionSeparator = new Label(this, SWT.SEPARATOR | SWT.VERTICAL);
 		FormData fd_labelSectionSeparator = new FormData();
 		fd_labelSectionSeparator.top = new FormAttachment(labelScreenDescription, 10, SWT.BOTTOM);
-		fd_labelSectionSeparator.left = new FormAttachment(25);
+		fd_labelSectionSeparator.left = new FormAttachment(12);
 		fd_labelSectionSeparator.bottom = new FormAttachment(100);
 		labelSectionSeparator.setLayoutData(fd_labelSectionSeparator);
 
 		Label lblAllModels = new Label(this, SWT.NONE);
 		lblAllModels.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		lblAllModels.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
+		lblAllModels.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.BOLD));
 		FormData fd_lblAllModels = new FormData();
 		fd_lblAllModels.top = new FormAttachment(labelSectionSeparator, 0, SWT.TOP);
 		fd_lblAllModels.left = new FormAttachment(0, 10);
 		lblAllModels.setLayoutData(fd_lblAllModels);
-		lblAllModels.setText("All Models");
+		lblAllModels.setText("All Models :");
+		
+		Label lblAllProcessJoins = new Label(this, SWT.NONE);
+		lblAllProcessJoins.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		lblAllProcessJoins.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.BOLD));
+		FormData fd_lblAllProcessJoins = new FormData();
+		fd_lblAllProcessJoins.top = new FormAttachment(50);
+		fd_lblAllProcessJoins.left = new FormAttachment(0, 10);
+		lblAllProcessJoins.setLayoutData(fd_lblAllProcessJoins);
+		lblAllProcessJoins.setText("All Joins :");
 		
 		Label lblProcessDiagram = new Label(this, SWT.NONE);
 		lblProcessDiagram.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		lblProcessDiagram.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		FormData fd_lblProcessDiagram = new FormData();
-		//fd_lblProcessDiagram.bottom = new FormAttachment(lblAllModels, 0, SWT.BOTTOM);
 		fd_lblProcessDiagram.top = new FormAttachment(labelSectionSeparator, 0, SWT.TOP);
 		fd_lblProcessDiagram.left = new FormAttachment(labelSectionSeparator, 10);
 		lblProcessDiagram.setLayoutData(fd_lblProcessDiagram);
 		lblProcessDiagram.setText("Generated Process Diagram");
 		
+		
+		/*
+		 *Model List 
+		 */
 		final Composite compositeModelList = new Composite(this, SWT.BORDER);
 		compositeModelList.setLayout(new FillLayout(SWT.HORIZONTAL));
 		FormData fd_compositeModelList = new FormData();
 		fd_compositeModelList.top = new FormAttachment(lblAllModels, 10);
-		fd_compositeModelList.bottom = new FormAttachment(100, -10);
+		fd_compositeModelList.bottom = new FormAttachment(50, -10);
 		fd_compositeModelList.left = new FormAttachment(0, 10);
 		fd_compositeModelList.right = new FormAttachment(labelSectionSeparator, -10);
 		compositeModelList.setLayoutData(fd_compositeModelList);
-		
 		this.modelList = new List(compositeModelList, SWT.BORDER);
-		modelList.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
-		this.modelList.setItems(this.getSourceFieldsComboItems());
+		this.modelList.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
+		this.modelList.setItems(this.getModelNamesArray());
 		
+		/*
+		 * Process Join List
+		 */
+		final Composite compositeJoinList = new Composite(this, SWT.BORDER);
+		compositeJoinList.setLayout(new FillLayout(SWT.HORIZONTAL));
+		FormData fd_compositeJoinList = new FormData();
+		fd_compositeJoinList.top = new FormAttachment(lblAllProcessJoins, 10);
+		fd_compositeJoinList.bottom = new FormAttachment(100, -10);
+		fd_compositeJoinList.left = new FormAttachment(0, 10);
+		fd_compositeJoinList.right = new FormAttachment(labelSectionSeparator, -10);
+		compositeJoinList.setLayoutData(fd_compositeJoinList);
+		this.processJoinList = new List(compositeJoinList, SWT.BORDER|SWT.MULTI|SWT.V_SCROLL);
+		this.processJoinList.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
+		this.processJoinList.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
+		
+		
+		/*
+		 * Graphical Diagram
+		 */
 		this.compositeProcessDiagram = new ProcessDefinitionGraph(this, SWT.BORDER);
 		FormData fd_compositeProcessDiagram = new FormData();
 		fd_compositeProcessDiagram.top = new FormAttachment(lblProcessDiagram, 10);
@@ -124,9 +156,12 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 		fd_compositeProcessDiagram.right = new FormAttachment(100, -10);
 		this.compositeProcessDiagram.setLayoutData(fd_compositeProcessDiagram);
 		
-
+		// Load graphical diagram with existing process tree, if any
 		this.compositeProcessDiagram.refreshTree(processTree);
 
+		/*
+		 * Add Model to Process Button
+		 */
 		Button btnAddModelToProcess = new Button(this, SWT.NONE);
 		btnAddModelToProcess.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -148,13 +183,34 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 		});
 		btnAddModelToProcess.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		FormData fd_btnAddModelToProcess = new FormData();
-		fd_btnAddModelToProcess.top = new FormAttachment(lblAllModels, 0, SWT.TOP);
-		fd_btnAddModelToProcess.left = new FormAttachment(lblAllModels, 20);
+		fd_btnAddModelToProcess.bottom = new FormAttachment(lblAllModels, 5, SWT.BOTTOM);
+		fd_btnAddModelToProcess.left = new FormAttachment(lblAllModels, 2);
 		btnAddModelToProcess.setLayoutData(fd_btnAddModelToProcess);
 		btnAddModelToProcess.setText("Add to Process");
+		
+		/*
+		 * Button Create Process Join
+		 */
+		Button btnCreateProcessJoin = new Button(this, SWT.NONE);
+		btnCreateProcessJoin.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				// TODO create process join implementation
+				ProcessJoinDefinitionDialog processJoinDefinitionDialog = new ProcessJoinDefinitionDialog(getShell(), listAddedModels);
+				if (Window.OK == processJoinDefinitionDialog.open()) {
+					
+				}
+			}
+		});
+		btnCreateProcessJoin.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
+		FormData fd_btnCreateProcessJoin = new FormData();
+		fd_btnCreateProcessJoin.bottom = new FormAttachment(lblAllProcessJoins, 5, SWT.BOTTOM);
+		fd_btnCreateProcessJoin.left = new FormAttachment(lblAllProcessJoins, 2);
+		btnCreateProcessJoin.setLayoutData(fd_btnCreateProcessJoin);
+		btnCreateProcessJoin.setText("Add New");
 	}
 	
-	private String[] getSourceFieldsComboItems(){
+	private String[] getModelNamesArray(){
 		
 		java.util.List<Model> models = ProjectConfigutration.getInstance().getModels();
 		this.sourceFieldsComboItems = new String[models.size()];
@@ -166,7 +222,7 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 	}
 
 	public void refreshModelList(){
-		this.modelList.setItems(this.getSourceFieldsComboItems());
+		this.modelList.setItems(this.getModelNamesArray());
 	}
 
 	@Override

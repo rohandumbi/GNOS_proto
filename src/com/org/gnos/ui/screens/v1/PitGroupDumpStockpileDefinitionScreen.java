@@ -167,8 +167,6 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 		compositeGroupList.setLayoutData(fd_compositeGroupList);
 		this.groupList = new List(compositeGroupList, SWT.BORDER|SWT.MULTI|SWT.V_SCROLL);
 		this.groupList.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
-		//this.pitList.setItems(this.getSourceFieldsComboItems());
-		//this.pitList.setItems(new String[]{"dump 1","dump 2","dump 3","dump 4","dump 5","dump 6","dump 7","dump 8","dump 9","dump 10"});
 		
 		/*
 		 * Dump List
@@ -198,8 +196,6 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 		compositeStockpileList.setLayoutData(fd_compositeStockpileList);
 		this.stockpileList = new List(compositeStockpileList, SWT.BORDER|SWT.MULTI|SWT.V_SCROLL);
 		this.stockpileList.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
-		//this.pitList.setItems(this.getSourceFieldsComboItems());
-		//this.stockpileList.setItems(new String[]{"stockpile 1","stockpile 2","stockpile 3","stockpile 4","stockpile 5","stockpile 6","stockpile 7","stockpile 8","stockpile 9","stockpile 10"});;
 		
 		
 		/*
@@ -213,8 +209,6 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 		fd_compositeGroupDiagram.right = new FormAttachment(labelSecondSeparator, -10);
 		this.compositeGroupDiagram.setLayoutData(fd_compositeGroupDiagram);
 		
-
-		//this.compositeProcessDiagram.refresh(processTree);
 
 		/*
 		 * Add pit to group button
