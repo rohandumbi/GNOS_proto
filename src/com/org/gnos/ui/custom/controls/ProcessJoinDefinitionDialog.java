@@ -1,19 +1,25 @@
 package com.org.gnos.ui.custom.controls;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.services.ProcessRoute;
@@ -23,40 +29,84 @@ public class ProcessJoinDefinitionDialog extends Dialog {
 	//private ProcessDefinitionFormScreen processDefinitionFormScreen;
 	private ProcessRoute definedProcessRoute;
 	private List<String> availableProcesses;
-	private String selectedParent;
-	private Combo comboParent;
+	private Label lblProcessJoinName;
+	private Composite container;
+	private Text textProcessJoinName;
+	private Button btnAddProcess;
+	private ArrayList<Combo> listOfChildProcessCombos;
+	private Control presentRow;
+	
 	
 	public ProcessJoinDefinitionDialog(Shell parentShell, List<String> availableProcesses) {
 		super(parentShell);
 		this.availableProcesses = availableProcesses;
+		this.listOfChildProcessCombos = new ArrayList<Combo>();
 		// TODO Auto-generated constructor stub
 	}
 	@Override
 	protected Control createDialogArea(Composite parent) {
-		Composite container = (Composite) super.createDialogArea(parent);
-		container.setLayout(new FormLayout());
+		this.container = (Composite) super.createDialogArea(parent);
+		this.container.setLayout(new FormLayout());
 		
-		Label lblSelectParent = new Label(container, SWT.NONE);
-		lblSelectParent.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
-		FormData fd_lblSelectParent = new FormData();
-		fd_lblSelectParent.top = new FormAttachment(0, 10);
-		fd_lblSelectParent.left = new FormAttachment(0, 10);
-		lblSelectParent.setLayoutData(fd_lblSelectParent);
-		lblSelectParent.setText("Select Parent:");
+		this.lblProcessJoinName = new Label(this.container, SWT.NONE);
+		this.lblProcessJoinName.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
+		FormData fd_lblProcessJoinName = new FormData();
+		fd_lblProcessJoinName.top = new FormAttachment(0, 10);
+		fd_lblProcessJoinName.left = new FormAttachment(0, 10);
+		this.lblProcessJoinName.setLayoutData(fd_lblProcessJoinName);
+		this.lblProcessJoinName.setText("Join Name:");
 		
-		comboParent = new Combo(container, SWT.NONE);
-		comboParent.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
-		String[] comboParentItems = availableProcesses.toArray(new String[availableProcesses.size()]);
-		comboParent.setItems(comboParentItems);
-		FormData fd_comboParent = new FormData();
-		fd_comboParent.top = new FormAttachment(0, 10);
-		fd_comboParent.left = new FormAttachment(lblSelectParent, 6);
-		fd_comboParent.right = new FormAttachment(100, -10);
-		comboParent.setLayoutData(fd_comboParent);
+		this.textProcessJoinName = new Text(this.container, SWT.BORDER);
+		FormData fd_textProcessJoinName = new FormData();
+		fd_textProcessJoinName.top = new FormAttachment(0, 10);
+		fd_textProcessJoinName.left = new FormAttachment(this.lblProcessJoinName, 6);
+		fd_textProcessJoinName.right = new FormAttachment(100, -10);
+		this.textProcessJoinName.setLayoutData(fd_textProcessJoinName);
+		
+		this.btnAddProcess = new Button(container, SWT.NONE);
+		this.btnAddProcess.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				//TODO add implementation for button click
+				addProcessDefinitionRow();
+			}
+		});
+		FormData fd_btnAddProcess = new FormData();
+		fd_btnAddProcess.right = new FormAttachment(textProcessJoinName, 0, SWT.RIGHT);
+		fd_btnAddProcess.top = new FormAttachment(lblProcessJoinName, 20);
+		fd_btnAddProcess.left = new FormAttachment(0, 10);
+		this.btnAddProcess.setLayoutData(fd_btnAddProcess);
+		this.btnAddProcess.setText("Add Process");
+		
+		this.presentRow = this.btnAddProcess;
+		
 		container.getShell().setText("Process Details");
-		//this.processDefinitionFormScreen = new ProcessDefinitionFormScreen(container, SWT.NONE);
 		this.setDialogLocation();
-		return container;
+		return this.container;
+	}
+	
+	private void addProcessDefinitionRow() {
+		Label lblSelectProcess = new Label(container, SWT.NONE);
+		lblSelectProcess.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
+		FormData fd_lblSelectProcess = new FormData();
+		fd_lblSelectProcess.top = new FormAttachment(this.presentRow, 10);
+		fd_lblSelectProcess.left = new FormAttachment(0, 10);
+		lblSelectProcess.setLayoutData(fd_lblSelectProcess);
+		lblSelectProcess.setText("Select Process:");
+		
+		Combo comboProcess = new Combo(container, SWT.NONE);
+		comboProcess.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
+		String[] comboParentItems = availableProcesses.toArray(new String[availableProcesses.size()]);
+		comboProcess.setItems(comboParentItems);
+		FormData fd_comboProcess = new FormData();
+		fd_comboProcess.top = new FormAttachment(lblSelectProcess, 0, SWT.TOP);
+		fd_comboProcess.left = new FormAttachment(lblSelectProcess, 6);
+		fd_comboProcess.right = new FormAttachment(100, -10);
+		comboProcess.setLayoutData(fd_comboProcess);
+		
+		this.container.layout();
+		this.presentRow = lblSelectProcess;
+		this.listOfChildProcessCombos.add(comboProcess);
 	}
 
 	@Override
@@ -65,16 +115,16 @@ public class ProcessJoinDefinitionDialog extends Dialog {
 		createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
 	}
 
-	/*@Override
+	@Override
 	protected Point getInitialSize() {
-		return new Point(980, 650);
-	}*/
+		return new Point(490, 325);
+	}
 
 	@Override
 	protected void okPressed() {
 		System.out.println("OK Pressed");
 		//this.definedProcessRoute = this.processDefinitionFormScreen.getDefinedProcess();
-		this.selectedParent = comboParent.getText();
+		//this.selectedParent = comboParent.getText();
 		super.okPressed();
 	}
 
@@ -92,9 +142,4 @@ public class ProcessJoinDefinitionDialog extends Dialog {
 		return this.definedProcessRoute;
 	}
 	
-	public String getParentName(){
-		return this.selectedParent;
-	}
-
-
 }
