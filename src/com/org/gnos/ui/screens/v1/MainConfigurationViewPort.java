@@ -24,21 +24,19 @@ public class MainConfigurationViewPort extends GnosScreen{
 	private ModelDefinitionScreen modelDefinitionScreen;
 	private ProcessRouteDefinitionScreen processRouteDefinitionScreen;
 	private PitGroupDumpStockpileDefinitionScreen pitGroupDumpStockpileDefinitionScreen;
+	private ProcessConstraintDefinitionScreen processConstraintDefinitionScreen;
 	private OpexDefinitionScreen opexDefinitionScreen;
 	private GradeConstraintScreen gradeConstraintScreen;
 	private BenchConstraintScreen benchConstraintScreen;
 	
 	private Shell dummyShell;
 	
-	//private Layout mainLayout;
 	public MainConfigurationViewPort(Composite parent, int style){
 		super(parent, style);
 		this.stackLayout = new StackLayout();
 		this.setLayout(stackLayout);
 		this.dummyShell = new Shell();
-		//this.parent = parent;
-		//this.loadFieldDatatypeDefinitionScreen();
-		//this.setMinSize(this.viewPort.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		
 		fieldDatatypeDefinitionScreen = new FieldDatatypeDefinitionScreen(this.dummyShell, SWT.NONE);
 		fieldDatatypeDefinitionScreen.registerEventListener(this);
 		
@@ -54,14 +52,14 @@ public class MainConfigurationViewPort extends GnosScreen{
 		processRouteDefinitionScreen = new ProcessRouteDefinitionScreen(this.dummyShell, SWT.NONE);
 		processRouteDefinitionScreen.registerEventListener(this);
 		
-		/*pitGroupDefinitionScreen = new PitGroupDefinitionScreen(this.dummyShell, SWT.NONE);
-		pitGroupDefinitionScreen.registerEventListener(this);*/
-		
 		pitGroupDumpStockpileDefinitionScreen = new PitGroupDumpStockpileDefinitionScreen(this.dummyShell, SWT.NONE);
 		pitGroupDumpStockpileDefinitionScreen.registerEventListener(this);
 		
 		opexDefinitionScreen = new OpexDefinitionScreen(this.dummyShell, SWT.NONE);
 		opexDefinitionScreen.registerEventListener(this);
+		
+		processConstraintDefinitionScreen = new ProcessConstraintDefinitionScreen(this.dummyShell, SWT.NONE);
+		processConstraintDefinitionScreen.registerEventListener(this);
 		
 		gradeConstraintScreen = new GradeConstraintScreen(this.dummyShell, SWT.NONE);
 		gradeConstraintScreen.registerEventListener(this);
@@ -128,6 +126,14 @@ public class MainConfigurationViewPort extends GnosScreen{
 		this.viewPort = opexDefinitionScreen;
 		this.viewPort.setParent(this);
 		this.stackLayout.topControl = opexDefinitionScreen;
+		this.layout();
+	}
+	
+	public void loadProcessConstraintDefinitionScreen(){
+		this.viewPort.setParent(dummyShell);
+		this.viewPort = processConstraintDefinitionScreen;
+		this.viewPort.setParent(this);
+		this.stackLayout.topControl = processConstraintDefinitionScreen;
 		this.layout();
 	}
 	
