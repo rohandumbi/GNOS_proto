@@ -163,6 +163,7 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 		if(this.listOfProcessJoins.size() > 0){
 			for(ProcessJoin processJoin : this.listOfProcessJoins){
 				this.compositeProcessDiagram.addProcessJoin(processJoin);
+				this.processJoinList.add(processJoin.getName());
 			}
 		}
 
