@@ -1,8 +1,9 @@
 package com.org.gnos.test;
 
 import com.org.gnos.application.GNOSConfig;
+import com.org.gnos.db.dao.ExpressionDAO;
 import com.org.gnos.db.dao.ProjectDAO;
-import com.org.gnos.db.model.Project;
+import com.org.gnos.db.model.Expression;
 
 public class TestDB {
 
@@ -11,11 +12,12 @@ public class TestDB {
 	 */
 	public static void main(String[] args) {
 		GNOSConfig.load();
-		Project project = new Project();
-		project.setName("test1");
-		project.setDesc("test1");
-		project.setFileName("test1");
-		new ProjectDAO().create(project);
+		Expression expression = new Expression();
+		expression.setId(1);
+		expression.setName("test1");
+		expression.setExprvalue("a+b");
+		expression.setGrade(true);
+		new ExpressionDAO().update(expression);
 	}
 
 }

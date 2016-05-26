@@ -1,7 +1,5 @@
 package com.org.gnos.test;
 
-import java.io.IOException;
-
 import com.org.gnos.application.GNOSConfig;
 import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.db.dao.ProjectDAO;

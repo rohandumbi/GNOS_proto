@@ -20,6 +20,7 @@ public class ProjectDAO {
 	private static final String SQL_LIST_ORDER_BY_MODIFIED_DATE = "select id, name, description, fileName, created_date, modified_date from  project order by modified_date";
 	private static final String SQL_INSERT = "insert into project (name, description, fileName, created_date, modified_date) values (?, ?, ?, ?,?)";
 	private static final String SQL_DELETE = "delete from project where id = ?";
+	private static final String SQL_UPDATE = "update project set description = ?, fileName = ?, modified_date = ? where id = ?";
 	
 	public List<Project> getAll() {
 		
@@ -71,6 +72,32 @@ public class ProjectDAO {
                     //throw new DAOException("Creating user failed, no generated key obtained.");
                 }
             }
+		} catch(SQLException e){
+			e.printStackTrace();
+		}
+		return true;
+	}
+	
+	
+	public boolean update(Project project){
+		
+		if (project.getId() == -1) {
+            throw new IllegalArgumentException("Project is not created.");
+        }
+		
+		Object[] values = {
+				project.getDesc(),
+	            project.getFileName(),
+	            toSqlTimeStamp(project.getModifiedDate()),
+	            project.getId()
+	   };
+
+		try ( Connection connection = DBManager.getConnection();
+	            PreparedStatement statement = prepareStatement(connection, SQL_UPDATE, true, values);
+			){
+			
+			statement.executeUpdate();        
+          
 		} catch(SQLException e){
 			e.printStackTrace();
 		}

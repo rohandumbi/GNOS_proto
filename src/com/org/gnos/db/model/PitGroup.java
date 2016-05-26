@@ -5,7 +5,6 @@ import java.util.ArrayList;
 public class PitGroup {
 	private String name;
 	private ArrayList<Pit> listChildPits;
-
 	private ArrayList<PitGroup> listChildPitGroups;
 	
 	public PitGroup(String name){

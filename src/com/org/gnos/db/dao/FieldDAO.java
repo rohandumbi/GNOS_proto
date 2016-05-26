@@ -1,9 +1,9 @@
 package com.org.gnos.db.dao;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,29 +17,19 @@ public class FieldDAO {
 	public List<Field> get() {
 		List<Field> fields = new ArrayList<Field>();
 		String sql = "select id, name, data_type from fields where project_id = "+ ProjectConfigutration.getInstance().getProjectId();
-		Statement stmt = null;
-		ResultSet rs = null; 
-		Connection conn = DBManager.getConnection();
-		try {
-			stmt = conn.createStatement();
-			stmt.execute(sql);
-			rs = stmt.getResultSet();
+		try (
+				Connection connection = DBManager.getConnection();
+	            PreparedStatement statement = connection.prepareStatement(sql);
+	            ResultSet resultSet = statement.executeQuery();
+			){
 			Field field = null;
-			while(rs.next()){
-				field = new Field(rs.getInt(1), rs.getString(2), rs.getShort(3));
+			while(resultSet.next()){
+				field = new Field(resultSet.getInt(1), resultSet.getString(2), resultSet.getShort(3));
 				fields.add(field);
 			}
 			
 		} catch(SQLException e){
 			e.printStackTrace();
-		} finally {
-			try {
-				if(stmt != null) stmt.close();
-				if(rs != null) rs.close();
-				if(conn != null) DBManager.releaseConnection(conn);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
 		}
 		return fields;
 	}

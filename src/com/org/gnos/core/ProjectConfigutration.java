@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.org.gnos.db.DBManager;
+import com.org.gnos.db.dao.ExpressionDAO;
 import com.org.gnos.db.dao.FieldDAO;
 import com.org.gnos.db.model.DiscountFactor;
 import com.org.gnos.db.model.Expression;
@@ -115,40 +116,7 @@ public class ProjectConfigutration {
 	}
 
 	private void loadExpressions() {
-		String sql = "select id, name, grade, is_complex, expr_str, filter_str from expressions where project_id = "
-				+ this.projectId;
-		Statement stmt = null;
-		ResultSet rs = null;
-		Connection conn = DBManager.getConnection();
-
-		try {
-			stmt = conn.createStatement();
-			stmt.execute(sql);
-			rs = stmt.getResultSet();
-			Expression expression = null;
-			while (rs.next()) {
-				expression = new Expression(rs.getInt(1), rs.getString(2));
-				expression.setGrade(rs.getBoolean(3));
-				expression.setComplex(rs.getBoolean(4));
-				expression.setExpr_str(rs.getString(5));
-				expression.setCondition(rs.getString(6));
-				expressions.add(expression);
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (stmt != null)
-					stmt.close();
-				if (rs != null)
-					rs.close();
-				if (conn != null)
-					DBManager.releaseConnection(conn);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
+		expressions = new ExpressionDAO().getAll();
 	}
 
 	private void loadModels() {
@@ -536,61 +504,14 @@ public class ProjectConfigutration {
 	}
 
 	public void saveExpressionData() {
-
-		Connection conn = DBManager.getConnection();
-		String insert_sql = " insert into expressions (project_id, name, grade, is_complex, expr_str, filter_str) values (?, ?, ?, ?, ?, ?)";
-		String update_sql = " update expressions set grade= ?,  is_complex = ?, expr_str = ?,  filter_str = ? where id = ?";
-		PreparedStatement pstmt = null;
-		PreparedStatement pstmt1 = null;
-
-		ResultSet rs = null;
-		boolean autoCommit = true;
-
-		try {
-			autoCommit = conn.getAutoCommit();
-			conn.setAutoCommit(false);
-			pstmt = conn.prepareStatement(insert_sql,
-					Statement.RETURN_GENERATED_KEYS);
-			pstmt1 = conn.prepareStatement(update_sql);
-			for (Expression expression : expressions) {
-				if (expression.getId() == -1) {
-					pstmt.setInt(1, projectId);
-					pstmt.setString(2, expression.getName());
-					pstmt.setBoolean(3, expression.isGrade());
-					pstmt.setBoolean(4, expression.isComplex());
-					pstmt.setString(5, expression.getExpr_str());
-					pstmt.setString(6, expression.getCondition());
-					pstmt.executeUpdate();
-					rs = pstmt.getGeneratedKeys();
-					rs.next();
-					expression.setId(rs.getInt(1));
-				} else {
-					pstmt1.setBoolean(1, expression.isGrade());
-					pstmt1.setBoolean(2, expression.isComplex());
-					pstmt1.setString(3, expression.getExpr_str());
-					pstmt1.setString(4, expression.getCondition());
-					pstmt1.setInt(5, expression.getId());
-					pstmt1.executeUpdate();
-				}
-
+		ExpressionDAO expressiondao = new ExpressionDAO();
+		for (Expression expression : expressions) {
+			if (expression.getId() == -1) {
+				expressiondao.create(expression);
+			} else {
+				expressiondao.update(expression);
 			}
 
-			conn.commit();
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				conn.setAutoCommit(autoCommit);
-				if (pstmt != null)
-					pstmt.close();
-				if (rs != null)
-					rs.close();
-				if (conn != null)
-					DBManager.releaseConnection(conn);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
 		}
 
 	}

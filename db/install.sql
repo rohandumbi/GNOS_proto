@@ -7,7 +7,8 @@ CREATE TABLE project (
    fileName VARCHAR(200) NOT NULL,
    created_date	DATETIME,
    modified_date DATETIME,
-   PRIMARY KEY ( id )
+   PRIMARY KEY ( id ),
+   UNIQUE (name)
 );
 
 DROP TABLE IF EXISTS fields;
@@ -54,11 +55,12 @@ CREATE TABLE expressions (
    id INT NOT NULL  AUTO_INCREMENT,
    project_id INT NOT NULL,
    name VARCHAR(100) NOT NULL,
-   grade TINYINT(1),
+   is_grade TINYINT(1),
    is_complex TINYINT(1),
-   expr_str VARCHAR(200) NOT NULL,
-   filter_str VARCHAR(400),
-   PRIMARY KEY ( id, project_id )
+   expr_value VARCHAR(200) NOT NULL,
+   filter VARCHAR(400),
+   PRIMARY KEY ( id, project_id ),
+   UNIQUE (project_id, name)
 );
 
 DROP TABLE IF EXISTS models;
