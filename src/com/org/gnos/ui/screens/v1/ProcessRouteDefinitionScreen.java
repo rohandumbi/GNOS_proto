@@ -37,6 +37,7 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 	private ArrayList<String> listAddedModels;
 	private Tree processTree;
 	private ProcessDefinitionGraph compositeProcessDiagram;
+	private java.util.List<ProcessJoin> listOfProcessJoins;
 
 	public ProcessRouteDefinitionScreen(Composite parent, int style) {
 		super(parent, style);
@@ -45,6 +46,7 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 		this.listAddedModels = new ArrayList<String>();
 		this.listAddedModels.add("Block");
 		this.processTree = ProjectConfigutration.getInstance().getProcessTree();
+		this.listOfProcessJoins = ProjectConfigutration.getInstance().getProcessJoins();
 		if(this.processTree == null) {
 			this.processTree = new Tree();
 			ProjectConfigutration.getInstance().setProcessTree(processTree);
@@ -63,7 +65,6 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 		labelScreenName.setForeground(SWTResourceManager.getColor(0, 191, 255));
 		labelScreenName.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		FormData fd_labelScreenName = new FormData();
-		//fd_labelScreenName.bottom = new FormAttachment(100, -461);
 		fd_labelScreenName.top = new FormAttachment(0, 10);
 		fd_labelScreenName.left = new FormAttachment(0, 10);
 		labelScreenName.setLayoutData(fd_labelScreenName);
@@ -76,7 +77,6 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 		FormData fd_labelScreenDescription = new FormData();
 		fd_labelScreenDescription.top = new FormAttachment(labelScreenName, 10, SWT.BOTTOM);
 		fd_labelScreenDescription.left = new FormAttachment(0, 10);
-		//fd_labelScreenDescription.right = new FormAttachment(0, 866);
 		labelScreenDescription.setLayoutData(fd_labelScreenDescription);
 		labelScreenDescription.setText("Design process flow using your defined models.");
 	
@@ -158,6 +158,13 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 		
 		// Load graphical diagram with existing process tree, if any
 		this.compositeProcessDiagram.refreshTree(processTree);
+		
+		// Load graphical diagram with existing process joins, if any
+		if(this.listOfProcessJoins.size() > 0){
+			for(ProcessJoin processJoin : this.listOfProcessJoins){
+				this.compositeProcessDiagram.addProcessJoin(processJoin);
+			}
+		}
 
 		/*
 		 * Add Model to Process Button

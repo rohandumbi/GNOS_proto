@@ -76,6 +76,7 @@ public class ProjectConfigutration {
 		loadExpressions();
 		loadModels();
 		loadProcessTree();
+		loadProcessJoins();
 		loadDiscountFactor();
 		loadOpexData();
 		loadFixedCost();
@@ -282,6 +283,47 @@ public class ProjectConfigutration {
 		}
 	}
 	
+	public void loadProcessJoins() {
+		String sql = "select name, child_model_id from process_join_defn where project_id = "
+				+ this.projectId + " order by name ";
+		Statement stmt = null;
+		ResultSet rs = null;
+		Connection conn = DBManager.getConnection();
+		try {
+			stmt = conn.createStatement();
+			stmt.execute(sql);
+			rs = stmt.getResultSet();
+
+			while (rs.next()) {
+				
+				String processJoinName = rs.getString(1);
+				ProcessJoin processJoin = this.getProcessJoinByName(processJoinName);
+				if(processJoin == null){
+					processJoin = new ProcessJoin(processJoinName);
+					this.processJoins.add(processJoin);
+				}
+				int modelId = rs.getInt(2);
+				Model childModel = this.getModelById(modelId);
+				if(childModel != null){
+					processJoin.addProcess(childModel);
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (stmt != null)
+					stmt.close();
+				if (rs != null)
+					rs.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	public void loadDiscountFactor() {
 		String sql = "select id, value from discount_factor where project_id = " + this.projectId;
 		Statement stmt = null;
@@ -420,6 +462,7 @@ public class ProjectConfigutration {
 		saveDiscountFactor();
 		saveOpexData();
 		saveFixedCostData();
+		saveProcessJoins();
 
 		//new EquationGenerator().generate();
 		
@@ -705,6 +748,47 @@ public class ProjectConfigutration {
 		}
 	}
 	
+	public void saveProcessJoins() {
+		Connection conn = DBManager.getConnection();
+		String insert_sql = " insert into process_join_defn (project_id, name, child_model_id) values (?, ?, ?)";
+		PreparedStatement pstmt = null;
+		boolean autoCommit = true;
+		
+		if(this.processJoins.size() < 1){ // no process joins defined
+			return;
+		}
+		
+		try{
+			autoCommit = conn.getAutoCommit();
+			conn.setAutoCommit(false);
+			pstmt = conn.prepareStatement(insert_sql);
+		
+			for(ProcessJoin processJoin : this.processJoins){
+				String processJoinName = processJoin.getName();
+				for(Model childModel : processJoin.getlistChildProcesses()){
+					int childModelId = childModel.getId();
+					pstmt.setInt(1, this.projectId);
+					pstmt.setString(2, processJoinName);
+					pstmt.setInt(3, childModelId);
+					pstmt.executeUpdate();
+				}
+			}
+			conn.commit();
+		}catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				conn.setAutoCommit(autoCommit);
+				if (pstmt != null)
+					pstmt.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	public void saveDiscountFactor() {
 		Connection conn = DBManager.getConnection();
 		String insert_sql = "insert into discount_factor (project_id, scenario_id, value) values (?, ?, ?)";
@@ -885,6 +969,17 @@ public class ProjectConfigutration {
 		for (Model model : models) {
 			if (model.getName().equals(name)) {
 				return model;
+			}
+		}
+		return null;
+	}
+	
+	public ProcessJoin getProcessJoinByName(String name) {
+		if (name == null)
+			return null;
+		for (ProcessJoin processJoin : processJoins) {
+			if (processJoin.getName().equals(name)) {
+				return processJoin;
 			}
 		}
 		return null;

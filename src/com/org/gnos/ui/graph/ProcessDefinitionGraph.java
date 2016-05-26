@@ -123,7 +123,7 @@ public class ProcessDefinitionGraph extends Composite {
 	public void addProcessJoin(ProcessJoin processJoin) {
 		GraphNode processJoinNode = new GraphNode(this.graph, SWT.NONE, "Process Join: " + processJoin.getName());
 		this.existingProcessJoinGraphNodes.put(processJoin.getName(), processJoinNode);
-		for(Model model : processJoin.getListChildPits()){
+		for(Model model : processJoin.getlistChildProcesses()){
 			GraphNode processNode = this.existingProcessGraphNodes.get(model.getName());
 			new GraphConnection(this.graph, ZestStyles.CONNECTIONS_DIRECTED, processJoinNode, processNode);
 		}
