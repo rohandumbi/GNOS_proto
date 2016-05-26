@@ -138,11 +138,11 @@ public class EquationGenerator {
 		if(hasValue(model.getCondition())){
 			condition = model.getCondition();
 		}
-		if(hasValue(model.getExpression().getCondition())) {
+		if(hasValue(model.getExpression().getFilter())) {
 			if(hasValue(condition)) {
-				condition = condition + " AND "+ model.getExpression().getCondition();
+				condition = condition + " AND "+ model.getExpression().getFilter();
 			} else {
-				condition =  model.getExpression().getCondition();
+				condition =  model.getExpression().getFilter();
 			}
 		}
 		boolean continueLoop = true;
@@ -156,11 +156,11 @@ public class EquationGenerator {
 				if(hasValue(pModel.getCondition())){
 					condition = pModel.getCondition();
 				}
-				if(pModel.getExpression() != null && hasValue(pModel.getExpression().getCondition())) {
+				if(pModel.getExpression() != null && hasValue(pModel.getExpression().getFilter())) {
 					if(hasValue(condition)) {
-						condition = condition + " AND "+ pModel.getExpression().getCondition();
+						condition = condition + " AND "+ pModel.getExpression().getFilter();
 					} else {
-						condition =  pModel.getExpression().getCondition();
+						condition =  pModel.getExpression().getFilter();
 					}
 				}
 			}

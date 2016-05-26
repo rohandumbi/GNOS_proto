@@ -184,15 +184,15 @@ public class ExpressionBuilderGrid extends Composite {
 			buttonIsComplex.setLayoutData(fd_buttonIsComplex);
 
 			Text textExpression = new Text(compositeRow, SWT.BORDER);
-			textExpression.setText(expression.getExpr_str());
+			textExpression.setText(expression.getExprvalue());
 			FormData fd_textExpression = new FormData();
 			fd_textExpression.right = new FormAttachment(62, -2);
 			fd_textExpression.left = new FormAttachment(30, 2);
 			textExpression.setLayoutData(fd_textExpression);
 			
 			Text textCondition = new Text(compositeRow, SWT.BORDER);
-			if(expression.getCondition() != null)
-				textCondition.setText(expression.getCondition());
+			if(expression.getFilter() != null)
+				textCondition.setText(expression.getFilter());
 			FormData fd_textCondition = new FormData();
 			fd_textCondition.left = new FormAttachment(62, 2);
 			fd_textCondition.right = new FormAttachment(100, -2);
@@ -446,7 +446,7 @@ public class ExpressionBuilderGrid extends Composite {
 					String rightOperandValue = rightOperand.getText();
 					String operatorValue = operator.getText();
 
-					expression.setExpr_str(leftOperandValue + operatorValue + rightOperandValue);
+					expression.setExprvalue(leftOperandValue + operatorValue + rightOperandValue);
 
 				}else{
 					Combo sourceField = (Combo)compositeExpressionValue.getChildren()[0];
@@ -464,14 +464,14 @@ public class ExpressionBuilderGrid extends Composite {
 						MessageDialog.openError(this.parent.getShell(), "GNOS Error", "Please map a proper value for the expression: " + expressionName);
 						return null;
 					}
-					expression.setExpr_str(expressionValue);
+					expression.setExprvalue(expressionValue);
 				}
 			}
 
 			expression.setGrade(isGrade);
 			expression.setComplex(isComplex);
 			String condition = textCondition.getText();
-			expression.setCondition(condition);
+			expression.setFilter(condition);
 /*			if(condition == null || condition == ""){
 				condition = "[bin]==[bin]";
 				System.out.println("Condition: " + condition);//temporary hack to set everything when no condition
