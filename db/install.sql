@@ -85,7 +85,8 @@ DROP TABLE IF EXISTS process_join_defn;
 CREATE TABLE process_join_defn(
    project_id INT NOT NULL,
    name  VARCHAR(100) NOT NULL,
-   child_model_id INT
+   child_model_id INT,
+   unique key(project_id, name, child_model_id)
 );
 
 DROP TABLE IF EXISTS opex_defn; 
