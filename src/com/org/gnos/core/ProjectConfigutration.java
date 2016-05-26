@@ -24,6 +24,7 @@ import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.OpexData;
 import com.org.gnos.db.model.OreMiningCost;
 import com.org.gnos.db.model.Pit;
+import com.org.gnos.db.model.ProcessJoin;
 import com.org.gnos.db.model.StockpileReclaimingCost;
 import com.org.gnos.db.model.StockpilingCost;
 import com.org.gnos.db.model.WasteMiningCost;
@@ -42,6 +43,7 @@ public class ProjectConfigutration {
 	private List<OpexData> opexDataList = new ArrayList<OpexData>();
 	private FixedOpexCost[] fixedCost;
 	private Tree processTree = null;
+	private List<ProcessJoin> processJoins = new ArrayList<ProcessJoin>();
 
 	private boolean newProject = true;
 	private Map<String, String> savedRequiredFieldMapping;
@@ -75,6 +77,7 @@ public class ProjectConfigutration {
 		loadExpressions();
 		loadModels();
 		loadProcessTree();
+		loadProcessJoins();
 		loadDiscountFactor();
 		loadOpexData();
 		loadFixedCost();
@@ -248,6 +251,47 @@ public class ProjectConfigutration {
 		}
 	}
 	
+	public void loadProcessJoins() {
+		String sql = "select name, child_model_id from process_join_defn where project_id = "
+				+ this.projectId + " order by name ";
+		Statement stmt = null;
+		ResultSet rs = null;
+		Connection conn = DBManager.getConnection();
+		try {
+			stmt = conn.createStatement();
+			stmt.execute(sql);
+			rs = stmt.getResultSet();
+
+			while (rs.next()) {
+				
+				String processJoinName = rs.getString(1);
+				ProcessJoin processJoin = this.getProcessJoinByName(processJoinName);
+				if(processJoin == null){
+					processJoin = new ProcessJoin(processJoinName);
+					this.processJoins.add(processJoin);
+				}
+				int modelId = rs.getInt(2);
+				Model childModel = this.getModelById(modelId);
+				if(childModel != null){
+					processJoin.addProcess(childModel);
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (stmt != null)
+					stmt.close();
+				if (rs != null)
+					rs.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	public void loadDiscountFactor() {
 		String sql = "select id, value from discount_factor where project_id = " + this.projectId;
 		Statement stmt = null;
@@ -386,6 +430,7 @@ public class ProjectConfigutration {
 		saveDiscountFactor();
 		saveOpexData();
 		saveFixedCostData();
+		saveProcessJoins();
 
 		//new EquationGenerator().generate();
 		
@@ -624,6 +669,47 @@ public class ProjectConfigutration {
 		}
 	}
 	
+	public void saveProcessJoins() {
+		Connection conn = DBManager.getConnection();
+		String insert_sql = " insert into process_join_defn (project_id, name, child_model_id) values (?, ?, ?)";
+		PreparedStatement pstmt = null;
+		boolean autoCommit = true;
+		
+		if(this.processJoins.size() < 1){ // no process joins defined
+			return;
+		}
+		
+		try{
+			autoCommit = conn.getAutoCommit();
+			conn.setAutoCommit(false);
+			pstmt = conn.prepareStatement(insert_sql);
+		
+			for(ProcessJoin processJoin : this.processJoins){
+				String processJoinName = processJoin.getName();
+				for(Model childModel : processJoin.getlistChildProcesses()){
+					int childModelId = childModel.getId();
+					pstmt.setInt(1, this.projectId);
+					pstmt.setString(2, processJoinName);
+					pstmt.setInt(3, childModelId);
+					pstmt.executeUpdate();
+				}
+			}
+			conn.commit();
+		}catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				conn.setAutoCommit(autoCommit);
+				if (pstmt != null)
+					pstmt.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	public void saveDiscountFactor() {
 		Connection conn = DBManager.getConnection();
 		String insert_sql = "insert into discount_factor (project_id, scenario_id, value) values (?, ?, ?)";
@@ -808,6 +894,17 @@ public class ProjectConfigutration {
 		}
 		return null;
 	}
+	
+	public ProcessJoin getProcessJoinByName(String name) {
+		if (name == null)
+			return null;
+		for (ProcessJoin processJoin : processJoins) {
+			if (processJoin.getName().equals(name)) {
+				return processJoin;
+			}
+		}
+		return null;
+	}
 
 	public OpexData getOpexDataById(int id) {
 		if (this.opexDataList == null)
@@ -846,6 +943,26 @@ public class ProjectConfigutration {
 
 	public List<Expression> getExpressions() {
 		return expressions;
+	}
+	
+	public List<Expression> getGradeExpressions() {
+		List<Expression> gradeExpressions = new ArrayList<Expression>();
+		for(Expression expression : expressions){
+			if(expression.isGrade() == true){
+				gradeExpressions.add(expression);
+			}
+		}
+		return gradeExpressions;
+	}
+	
+	public List<Expression> getNonGradeExpressions() {
+		List<Expression> nonGradeExpressions = new ArrayList<Expression>();
+		for(Expression expression : expressions){
+			if(expression.isGrade() == false){
+				nonGradeExpressions.add(expression);
+			}
+		}
+		return nonGradeExpressions;
 	}
 
 	public void setExpressions(List<Expression> expressions) {
@@ -892,5 +1009,18 @@ public class ProjectConfigutration {
 	public void setOpexDataList(List<OpexData> opexDataList) {
 		this.opexDataList = opexDataList;
 	}
+
+	public List<ProcessJoin> getProcessJoins() {
+		return processJoins;
+	}
+
+	public void setProcessJoins(List<ProcessJoin> processJoins) {
+		this.processJoins = processJoins;
+	}
+	
+	public void addProcessJoin(ProcessJoin processJoin) {
+		this.processJoins.add(processJoin);
+	}
+	
 
 }

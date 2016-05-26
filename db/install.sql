@@ -82,6 +82,14 @@ CREATE TABLE process_route_defn(
    parent_model_id INT
 );
 
+DROP TABLE IF EXISTS process_join_defn; 
+
+CREATE TABLE process_join_defn(
+   project_id INT NOT NULL,
+   name  VARCHAR(100) NOT NULL,
+   child_model_id INT
+);
+
 DROP TABLE IF EXISTS opex_defn; 
 
 CREATE TABLE opex_defn(

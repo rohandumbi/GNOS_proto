@@ -24,6 +24,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import com.org.gnos.core.Node;
 import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Model;
@@ -77,8 +78,15 @@ public class OpexDefinitionGrid extends Composite {
 
 
 	private String[] getIdentifierComboItems(){
-
-		List<Model> models = ProjectConfigutration.getInstance().getModels();
+		//List<Model> models = ProjectConfigutration.getInstance().getModels();
+		/*
+		 * Allowing objective funtion calculation for leaf nodes only
+		 */
+		List<Model> models = new ArrayList<Model>();
+		List<Node> nodes = ProjectConfigutration.getInstance().getProcessTree().getLeafNodes();
+		for(Node node: nodes){
+			models.add(node.getData());
+		}
 		this.sourceFieldsComboItems = new String[models.size()];
 		for(int i=0; i<models.size(); i++){
 			this.sourceFieldsComboItems[i] = models.get(i).getName();
@@ -89,10 +97,10 @@ public class OpexDefinitionGrid extends Composite {
 
 	private String[] getExpressionComboItems(){
 
-		List<Expression> models = ProjectConfigutration.getInstance().getExpressions();
-		this.sourceExpressionComboItems = new String[models.size()];
-		for(int i=0; i<models.size(); i++){
-			this.sourceExpressionComboItems[i] = models.get(i).getName();
+		List<Expression> expressions = ProjectConfigutration.getInstance().getNonGradeExpressions();
+		this.sourceExpressionComboItems = new String[expressions.size()];
+		for(int i=0; i<expressions.size(); i++){
+			this.sourceExpressionComboItems[i] = expressions.get(i).getName();
 		}
 
 		return this.sourceExpressionComboItems;
