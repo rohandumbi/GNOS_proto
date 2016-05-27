@@ -25,8 +25,9 @@ import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.FixedOpexCost;
 import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.OpexData;
+import com.org.gnos.db.model.ProcessJoin;
 
-public class EquationGenerator {
+public class ProcessConstraintEquationGenerator {
 
 	static final int BYTES_PER_LINE = 128;
 	
@@ -44,11 +45,11 @@ public class EquationGenerator {
 		int bufferSize = 8 * 1024;
 		try {
 			discount_rate = ProjectConfigutration.getInstance().getDiscountFactor().getValue();
-			output = new BufferedOutputStream(new FileOutputStream("output.txt"), bufferSize);
+			output = new BufferedOutputStream(new FileOutputStream("processConstraint.txt"), bufferSize);
 			bytesWritten = 0;
 			//parseOpexData();
 			buildProcessBlockVariables();
-			buildWasteBlockVariables();
+			//buildWasteBlockVariables();
 			output.flush();
 			output.close();
 		} catch(Exception e) {
@@ -59,19 +60,33 @@ public class EquationGenerator {
 
 	private void buildProcessBlockVariables() {
 		Tree processtree = projectConfiguration.getProcessTree();
-		List<Node> porcesses = processtree.getLeafNodes();
+		//List<Node> porcesses = processtree.getLeafNodes();
+		
+		List<Node> processes = new ArrayList<Node>();
+		
+		
+		List<ProcessJoin> processJoins = projectConfiguration.getProcessJoins();
+		List<Model> allProcesses = new ArrayList<Model>();
+		
+		for(ProcessJoin processJoin: processJoins){
+			for(Model process: processJoin.getlistChildProcesses()){
+				allProcesses.add(process);
+				processes.add(processtree.getNodeByName(process.getName()));
+			}
+		}
+		
 		Set<Block> processBlocks = new HashSet<Block>();
 		int processNumber = 1;
-		for(Node process: porcesses) {
+		for(Node process: processes) {
 			System.out.println("Equation Generation: process name - "+process.getIdentifier());
 			String condition = buildCondition(process) ;
 			List<Block> blocks = findBlocks(condition);
 			processBlocks.addAll(blocks);
-			buildProcessVariables(process, blocks, processNumber);
+			//buildProcessVariables(process, blocks, processNumber);
 			processNumber++;
 			
 		}
-		buildStockpileVariables(processBlocks);
+		//buildStockpileVariables(processBlocks);
 	}
 	
 	private void buildProcessVariables(Node process, List<Block> blocks, int processNumber) {
