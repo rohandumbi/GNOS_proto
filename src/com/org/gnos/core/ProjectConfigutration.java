@@ -81,6 +81,7 @@ public class ProjectConfigutration {
 		loadDiscountFactor();
 		loadOpexData();
 		loadFixedCost();
+		loadProcessConstraintData();
 	}
 
 	private void loadFieldData() {
@@ -437,6 +438,53 @@ public class ProjectConfigutration {
 				}
 
 				fixedOpexCost.getCostData().put(year, value);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (stmt != null)
+					stmt.close();
+				if (rs != null)
+					rs.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public void loadProcessConstraintData() {
+		String sql = "select id, process_join_name, expression_id, in_use, is_max, year, value from process_constraint_defn, process_constraint_year_mapping where id= process_constraint_id and project_id = "
+				+ this.projectId + " order by id, year";
+		Statement stmt = null;
+		ResultSet rs = null;
+		Connection conn = DBManager.getConnection();
+		try {
+			stmt = conn.createStatement();
+			stmt.execute(sql);
+			rs = stmt.getResultSet();
+			ProcessConstraintData pcd;
+			while (rs.next()) {
+				int id = rs.getInt(1);
+				String processJoinName = rs.getString(2);
+				int expressionId = rs.getInt(3);
+				//Model model = this.getModelById(modelId);
+				ProcessJoin processJoin = this.getProcessJoinByName(processJoinName);
+
+				pcd = getProcessConstraintDataById(id);
+				if (pcd == null) {
+					pcd = new ProcessConstraintData();					
+					pcd.setId(id);
+					pcd.setInUse(rs.getBoolean(4));
+					pcd.setMax(rs.getBoolean(5));
+					pcd.setExpression(this.getExpressionById(expressionId));
+					pcd.setProcessJoin(processJoin);
+
+					this.processConstraintDataList.add(pcd);
+				}
+				pcd.addYear(rs.getInt(6), rs.getFloat(7));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -1061,6 +1109,17 @@ public class ProjectConfigutration {
 		}
 		return null;
 	}
+	
+	public ProcessConstraintData getProcessConstraintDataById(int id) {
+		if (this.processConstraintDataList == null)
+			return null;
+		for (ProcessConstraintData pcd : this.processConstraintDataList) {
+			if (pcd.getId() == id) {
+				return pcd;
+			}
+		}
+		return null;
+	}
 
 	public int getProjectId() {
 		return this.projectId;
@@ -1164,11 +1223,11 @@ public class ProjectConfigutration {
 	}
 
 
-	public List<ProcessConstraintData> getProcessConstraintData() {
+	public List<ProcessConstraintData> getProcessConstraintDataList() {
 		return processConstraintDataList;
 	}
 
-	public void setProcessConstraintData(List<ProcessConstraintData> processConstraintDataList) {
+	public void setProcessConstraintDataList(List<ProcessConstraintData> processConstraintDataList) {
 		this.processConstraintDataList = processConstraintDataList;
 	}
 

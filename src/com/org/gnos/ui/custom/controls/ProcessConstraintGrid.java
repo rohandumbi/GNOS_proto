@@ -53,12 +53,14 @@ public class ProcessConstraintGrid extends Composite {
 	private Label secondSeparator;
 	private Label thirdSeparator;
 	private Label lblClassification;
+	private List<ProcessConstraintData> processConstraintDataList;
 
 	public ProcessConstraintGrid(Composite parent, int style, TimePeriod timePeriod) {
 		super(parent, style);
 		this.parent = parent;
 		this.allRows = new ArrayList<Composite>();
 		this.opexDataList = ProjectConfigutration.getInstance().getOpexDataList();
+		this.processConstraintDataList = ProjectConfigutration.getInstance().getProcessConstraintDataList();
 		this.timePeriod = timePeriod;
 		this.createContent(parent);
 	}
@@ -66,7 +68,7 @@ public class ProcessConstraintGrid extends Composite {
 	private void createContent(Composite parent){
 		this.setLayout(new FormLayout());
 		this.createHeader();
-		//this.createRows();
+		this.createRows();
 	}
 
 	private boolean isModelNameDuplicate(String modelName){
@@ -78,24 +80,6 @@ public class ProcessConstraintGrid extends Composite {
 		return isPresentInModelGrid;
 	}
 
-
-	/*private String[] getIdentifierComboItems(){
-		//List<Model> models = ProjectConfigutration.getInstance().getModels();
-		
-		 * Allowing objective funtion calculation for leaf nodes only
-		 
-		List<Model> models = new ArrayList<Model>();
-		List<Node> nodes = ProjectConfigutration.getInstance().getProcessTree().getLeafNodes();
-		for(Node node: nodes){
-			models.add(node.getData());
-		}
-		this.sourceFieldsComboItems = new String[models.size()];
-		for(int i=0; i<models.size(); i++){
-			this.sourceFieldsComboItems[i] = models.get(i).getName();
-		}
-
-		return this.sourceFieldsComboItems;
-	}*/
 
 	private String[] getNonGradeExpressionComboItems(){
 
@@ -207,114 +191,94 @@ public class ProcessConstraintGrid extends Composite {
 		}
 	}
 
-	/*private void createRows() {
-
-		for(OpexData od: this.opexDataList) {
+	private void createRows() {
+		
+		for(ProcessConstraintData pcd : this.processConstraintDataList) {
 			final Composite compositeRow = new Composite(this, SWT.BORDER);
-			compositeRow.setData(od);
+			compositeRow.setData(pcd);
 			compositeRow.setLayout(new FormLayout());
 			Color backgroundColor = SWTResourceManager.getColor(SWT.COLOR_WHITE);
 			if((this.allRows != null) && (this.allRows.size()%2 != 0)){
 				backgroundColor =  SWTResourceManager.getColor(245, 245, 245);
 			}
 			compositeRow.setBackground(backgroundColor);
-
 			FormData fd_compositeRow = new FormData();
 			fd_compositeRow.left = new FormAttachment(this.presentRow, 0, SWT.LEFT);
-			//fd_compositeRow.bottom = new FormAttachment(this.presentRow, 26, SWT.BOTTOM);
 			fd_compositeRow.right = new FormAttachment(this.presentRow, 0, SWT.RIGHT);
 			fd_compositeRow.top = new FormAttachment(this.presentRow);
-
-
-			final Combo comboClassification = new Combo(compositeRow, SWT.NONE);
-			comboClassification.setItems(new String[]{"PCost", "Rev"});
-			if(od.isRevenue()) {
-				comboClassification.select(1);
-			} else {
-				comboClassification.select(0);
-			}
-			FormData fd_comboClassification = new FormData();
-			fd_comboClassification.left = new FormAttachment(0, 2);
-			fd_comboClassification.top = new FormAttachment(0);
-			fd_comboClassification.right = new FormAttachment(0, 89);
-			comboClassification.setLayoutData(fd_comboClassification);
-
-			Button btnUse = new Button(compositeRow, SWT.CHECK);
-			btnUse.setSelection(od.isInUse());
-			FormData fd_btnUse = new FormData();
-			fd_btnUse.left = new FormAttachment(comboClassification, 10, SWT.RIGHT);
-			fd_btnUse.top = new FormAttachment(0, 2);
-			btnUse.setLayoutData(fd_btnUse);
-
-			final Combo comboIdentifier = new Combo(compositeRow, SWT.NONE);
-			String[] items = this.getIdentifierComboItems();
-			comboIdentifier.setItems(items);
-			for(int i=0; i< items.length; i++){
-				if(items[i].equals(od.getModel().getName())) {
-					comboIdentifier.select(i);
-					break;
-				}
-			}
-			//comboIdentifier.setText("Select Model");
-			FormData fd_comboIdentifier = new FormData();
-			fd_comboIdentifier.left = new FormAttachment(btnUse, 21);
-			fd_comboIdentifier.right = new FormAttachment(btnUse, 135);
-			fd_comboIdentifier.top = new FormAttachment(0);
-			comboIdentifier.setLayoutData(fd_comboIdentifier);
-			comboIdentifier.addListener(SWT.MouseDown, new Listener(){
-				@Override
-				public void handleEvent(Event event) {
-					// TODO Auto-generated method stub
-					//System.out.println("detected combo click");
-					comboIdentifier.removeAll();
-					comboIdentifier.setItems(getIdentifierComboItems());
-					comboIdentifier.getParent().layout();
-					comboIdentifier.setListVisible(true);
-				}
-			});
-
+			
 			final Combo comboExpression = new Combo(compositeRow, SWT.NONE);
-			String[] expressionItems = this.getNonGradeExpressionComboItems();
-			comboExpression.setItems(expressionItems);
-			for(int i=0; i< expressionItems.length; i++){
-				if(od.getExpression() == null){
-					comboExpression.setEnabled(false);
-				}else if(expressionItems[i].equals(od.getExpression().getName())) {
-					comboExpression.select(i);
-					break;
-				}
-			}
-			//comboExpression.setText("Select Expression");
+			String[] itemsComboExpression = this.getNonGradeExpressionComboItems();
+			comboExpression.setItems(itemsComboExpression);
 			comboExpression.addListener(SWT.MouseDown, new Listener(){
 				@Override
 				public void handleEvent(Event event) {
 					// TODO Auto-generated method stub
-					//System.out.println("detected combo click");
 					comboExpression.removeAll();
 					comboExpression.setItems(getNonGradeExpressionComboItems());
 					comboExpression.getParent().layout();
 					comboExpression.setListVisible(true);
 				}
 			});
+			for(int i=0; i< itemsComboExpression.length; i++){
+				if(itemsComboExpression[i].equals(pcd.getExpression().getName())) {
+					comboExpression.select(i);
+					break;
+				}
+			}
 			FormData fd_comboExpression = new FormData();
-			fd_comboExpression.left = new FormAttachment(comboIdentifier, 4);
-			fd_comboExpression.right = new FormAttachment(comboIdentifier, 120, SWT.RIGHT);
+			fd_comboExpression.left = new FormAttachment(0, 2);
 			fd_comboExpression.top = new FormAttachment(0);
+			fd_comboExpression.right = new FormAttachment(0, 115);
 			comboExpression.setLayoutData(fd_comboExpression);
 			
+			Button btnUse = new Button(compositeRow, SWT.CHECK);
+			btnUse.setSelection(pcd.isInUse());
+			FormData fd_btnUse = new FormData();
+			fd_btnUse.left = new FormAttachment(comboExpression, 12, SWT.RIGHT);
+			fd_btnUse.top = new FormAttachment(0, 2);
+			btnUse.setLayoutData(fd_btnUse);
 			
-			comboClassification.addSelectionListener(new SelectionAdapter() {
-				public void widgetSelected(SelectionEvent e) {
-					if (comboClassification.getSelectionIndex() == 0) {
-						comboExpression.setEnabled(false);
-					}else {
-						comboExpression.setEnabled(true);
-					}
+			final Combo comboGroup = new Combo(compositeRow, SWT.NONE);
+			String[] itemsComboGroup = this.getProcessJoins();
+			comboGroup.setItems(itemsComboGroup);
+			comboGroup.addListener(SWT.MouseDown, new Listener(){
+				@Override
+				public void handleEvent(Event event) {
+					// TODO Auto-generated method stub
+					comboGroup.removeAll();
+					comboGroup.setItems(getProcessJoins());
+					comboGroup.getParent().layout();
+					comboGroup.setListVisible(true);
 				}
 			});
-
-			Control previousMember = comboExpression;
-			Map<Integer, Float> yearData = od.getCostData();
+			for(int i=0; i< itemsComboGroup.length; i++){
+				if(itemsComboGroup[i].equals(pcd.getProcessJoin().getName())) {
+					comboGroup.select(i);
+					break;
+				}
+			}
+			FormData fd_comboGroup = new FormData();
+			fd_comboGroup.left = new FormAttachment(btnUse, 18);
+			fd_comboGroup.right = new FormAttachment(btnUse, 135);
+			fd_comboGroup.top = new FormAttachment(0);
+			comboGroup.setLayoutData(fd_comboGroup);
+			
+			final Combo comboMaxMin = new Combo(compositeRow, SWT.NONE);
+			comboMaxMin.setItems(new String[]{"Max", "Min"});
+			if(pcd.isMax()){
+				comboMaxMin.select(0);
+			}else{
+				comboMaxMin.select(1);
+			}
+			FormData fd_comboMaxMin = new FormData();
+			fd_comboMaxMin.left = new FormAttachment(comboGroup, 8);
+			fd_comboMaxMin.right = new FormAttachment(comboGroup, 116, SWT.RIGHT);
+			fd_comboMaxMin.top = new FormAttachment(0);
+			comboMaxMin.setLayoutData(fd_comboMaxMin);
+			
+			Control previousMember = comboMaxMin;
+			Map<Integer, Float> yearData = pcd.getConstraintData();
 			Set keys = yearData.keySet();
 			Iterator<Integer> it = keys.iterator();
 			while(it.hasNext()){
@@ -323,7 +287,7 @@ public class ProcessConstraintGrid extends Composite {
 				yearlyValue.setText(String.valueOf(value));
 				FormData fd_yearlyValue = new FormData();
 				
-				 * Hacky calculation at the moment
+				 // Hacky calculation at the moment
 				 
 				fd_yearlyValue.left = new FormAttachment(previousMember, 3);
 				fd_yearlyValue.right = new FormAttachment(previousMember, 76, SWT.RIGHT);
@@ -336,7 +300,8 @@ public class ProcessConstraintGrid extends Composite {
 			compositeRow.setLayoutData(fd_compositeRow);
 			this.layout();
 		}
-	}*/
+		
+	}
 
 	public void addRow(){
 		final Composite compositeRow = new Composite(this, SWT.BORDER);
@@ -403,17 +368,6 @@ public class ProcessConstraintGrid extends Composite {
 		final Combo comboMaxMin = new Combo(compositeRow, SWT.NONE);
 		comboMaxMin.setItems(new String[]{"Max", "Min"});
 		comboMaxMin.setText("Select Max/Min");
-		comboMaxMin.addListener(SWT.MouseDown, new Listener(){
-			@Override
-			public void handleEvent(Event event) {
-				// TODO Auto-generated method stub
-				/*//System.out.println("detected combo click");
-				comboGroup.removeAll();
-				comboGroup.setItems(getProcessJoins());
-				comboGroup.getParent().layout();
-				comboGroup.setListVisible(true);*/
-			}
-		});
 		FormData fd_comboMaxMin = new FormData();
 		fd_comboMaxMin.left = new FormAttachment(comboGroup, 8);
 		fd_comboMaxMin.right = new FormAttachment(comboGroup, 116, SWT.RIGHT);
@@ -461,8 +415,18 @@ public class ProcessConstraintGrid extends Composite {
 			
 			ProcessJoin processJoin = ProjectConfigutration.getInstance().getProcessJoinByName(processJoinName);
 			Expression expression = ProjectConfigutration.getInstance().getExpressionByName(expressionName);
+			ProcessConstraintData processConstraintData = null;
 			
-			ProcessConstraintData processConstraintData = new ProcessConstraintData();
+			if(rowConstraintData.getData() == null){
+				//new row data, not update of previously saved rowOpexData.
+				processConstraintData  = new ProcessConstraintData();
+				this.processConstraintDataList.add(processConstraintData);
+			}else{
+				//update of previously saved rowOpexData.
+				processConstraintData = (ProcessConstraintData)rowConstraintData.getData();
+			}
+			
+			
 			processConstraintData.setConstraintData(mapConstraintData);
 			processConstraintData.setExpression(expression);
 			processConstraintData.setInUse(inUse);
@@ -472,42 +436,6 @@ public class ProcessConstraintGrid extends Composite {
 			ProjectConfigutration.getInstance().addProcesssConstraintData(processConstraintData);
 			
 		}
-		/*for(Composite rowOpexData : this.allRows){
-			Control[] rowChildren = rowOpexData.getChildren();
-			Combo comboClassification = (Combo)rowChildren[0];
-			Button isInUse = (Button)rowChildren[1];
-			Combo comboModel = (Combo)rowChildren[2];
-			Combo comboExpression = (Combo)rowChildren[3];
-			LinkedHashMap<Integer, Float> mapCostData = new LinkedHashMap<Integer, Float>();
-			for(int j=0; j<this.timePeriod.getIncrements(); j++){
-				mapCostData.put((this.timePeriod.getStartYear() + j), Float.valueOf(((Text)rowChildren[4+j]).getText())); // cost input data starts from 4th indexed row child.
-			}
-			boolean inUse = isInUse.getSelection();
-			boolean isRevenue = (comboClassification.getSelectionIndex() == 1);//0=cost; 1=revenue
-			String modelName = comboModel.getText();
-			String expressionName = comboExpression.getText();
-
-			Model model = ProjectConfigutration.getInstance().getModelByName(modelName);
-			Expression expression = ProjectConfigutration.getInstance().getExpressionByName(expressionName);
-			OpexData opexData;
-			if(rowOpexData.getData() == null){
-				//new row data, not update of previously saved rowOpexData.
-				System.out.println("\n Model: " + modelName + " inUse " + inUse + " isRevenue " + isRevenue);
-				opexData = new OpexData(model);
-				this.opexDataList.add(opexData);
-			}else{
-				//update of previously saved rowOpexData.
-				opexData = (OpexData)rowOpexData.getData();
-				opexData.setModel(model);
-			}
-
-			opexData.setCostData(mapCostData);
-			opexData.setInUse(inUse);
-			opexData.setRevenue(isRevenue);
-			opexData.setExpression(expression);
-			//this.opexDataList.get(i).setCostData(mapCostData);
-			i++;
-		}*/
 		return true;
 	}
 
