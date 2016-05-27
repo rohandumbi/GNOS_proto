@@ -28,6 +28,7 @@ import com.org.gnos.services.TimePeriod;
 import com.org.gnos.ui.custom.controls.GnosScreen;
 import com.org.gnos.ui.custom.controls.MiningStockpileCostGrid;
 import com.org.gnos.ui.custom.controls.OpexDefinitionGrid;
+import com.org.gnos.ui.custom.controls.ProcessConstraintGrid;
 
 public class ProcessConstraintDefinitionScreen extends GnosScreen {
 
@@ -35,7 +36,7 @@ public class ProcessConstraintDefinitionScreen extends GnosScreen {
 	private Text textDiscountFactor;
 	private Text textNumberOfIncrements;
 	private ScrolledComposite scGridContainer;
-	private OpexDefinitionGrid opexDefinitionGrid;
+	private ProcessConstraintGrid processConstraintGrid;
 	private Label labelScreenName;
 	private List<OpexData> opexDataList;
 	private DiscountFactor discountFactor;
@@ -144,15 +145,16 @@ public class ProcessConstraintDefinitionScreen extends GnosScreen {
 			textNumberOfIncrements.setText(String.valueOf(numberOfIncrements));
 			textStartYear.setText(String.valueOf(startYear));
 			TimePeriod savedTimePeriod = new TimePeriod(startYear, numberOfIncrements);
-			initializeOpexGrid(savedTimePeriod);
+			initializeprocessConstraintGrid(savedTimePeriod);
 		}
 		if(this.discountFactor != null) {
 			textDiscountFactor.setText(String.valueOf(this.discountFactor.getValue()));
 		}
+		//this.initializeOpexGrid(timePeriod);
 		
 	}
 	
-	private void initializeOpexGrid(TimePeriod timePeriod){
+	private void initializeprocessConstraintGrid(TimePeriod timePeriod){
 		if(scGridContainer != null){
 			scGridContainer.dispose();
 		}
@@ -164,8 +166,8 @@ public class ProcessConstraintDefinitionScreen extends GnosScreen {
 		//fd_scGridContainer.bottom = new FormAttachment(50);
 		fd_scGridContainer.right = new FormAttachment(100, -35);
 		
-		final OpexDefinitionGrid opexDefinitionGrid = new OpexDefinitionGrid(scGridContainer, SWT.None, timePeriod);
-		scGridContainer.setContent(opexDefinitionGrid);
+		processConstraintGrid = new ProcessConstraintGrid(scGridContainer, SWT.None, timePeriod);
+		scGridContainer.setContent(processConstraintGrid);
 		
 		scGridContainer.setExpandHorizontal(true);
 		scGridContainer.setExpandVertical(true);
@@ -180,8 +182,8 @@ public class ProcessConstraintDefinitionScreen extends GnosScreen {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				//TO DO implement row add
-				opexDefinitionGrid.addRow();
-				Rectangle r = opexDefinitionGrid.getClientArea();
+				processConstraintGrid.addRow();
+				Rectangle r = processConstraintGrid.getClientArea();
 				int gridWidth = r.width;
 				
 				int scrollableHeight = scGridContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).y;
@@ -201,7 +203,7 @@ public class ProcessConstraintDefinitionScreen extends GnosScreen {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				//TO DO implement row add
-				opexDefinitionGrid.saveOpexData();
+				processConstraintGrid.saveOpexData();
 				//ProjectConfigutration.getInstance().saveOpexData();
 			}
 		});
