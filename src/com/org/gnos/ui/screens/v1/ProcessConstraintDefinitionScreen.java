@@ -203,7 +203,7 @@ public class ProcessConstraintDefinitionScreen extends GnosScreen {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				//TO DO implement row add
-				processConstraintGrid.saveOpexData();
+				processConstraintGrid.saveProcessConstraintData();
 				//ProjectConfigutration.getInstance().saveOpexData();
 			}
 		});

@@ -23,11 +23,11 @@ import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.OpexData;
 import com.org.gnos.db.model.OreMiningCost;
 import com.org.gnos.db.model.Pit;
+import com.org.gnos.db.model.ProcessConstraintData;
 import com.org.gnos.db.model.ProcessJoin;
 import com.org.gnos.db.model.StockpileReclaimingCost;
 import com.org.gnos.db.model.StockpilingCost;
 import com.org.gnos.db.model.WasteMiningCost;
-import com.org.gnos.services.EquationGenerator;
 import com.org.gnos.services.PitBenchProcessor;
 
 public class ProjectConfigutration {
@@ -43,6 +43,7 @@ public class ProjectConfigutration {
 	private FixedOpexCost[] fixedCost;
 	private Tree processTree = null;
 	private List<ProcessJoin> processJoins = new ArrayList<ProcessJoin>();
+	private List<ProcessConstraintData> processConstraintDataList = new ArrayList<ProcessConstraintData>();
 
 	private boolean newProject = true;
 	private Map<String, String> savedRequiredFieldMapping;
@@ -57,7 +58,7 @@ public class ProjectConfigutration {
 
 		if (projectId == -1) {
 			System.err
-					.println("Can not load project unless projectId is present");
+			.println("Can not load project unless projectId is present");
 			return;
 		}
 		this.projectId = projectId;
@@ -208,7 +209,7 @@ public class ProjectConfigutration {
 				Statement stmt = conn.createStatement();
 				ResultSet rs = stmt.executeQuery(sql);
 
-		) {
+				) {
 
 			while (rs.next()) {
 				String pit_name = rs.getString(1);
@@ -282,7 +283,7 @@ public class ProjectConfigutration {
 			}
 		}
 	}
-	
+
 	public void loadProcessJoins() {
 		String sql = "select name, child_model_id from process_join_defn where project_id = "
 				+ this.projectId + " order by name ";
@@ -295,7 +296,7 @@ public class ProjectConfigutration {
 			rs = stmt.getResultSet();
 
 			while (rs.next()) {
-				
+
 				String processJoinName = rs.getString(1);
 				ProcessJoin processJoin = this.getProcessJoinByName(processJoinName);
 				if(processJoin == null){
@@ -323,7 +324,7 @@ public class ProjectConfigutration {
 			}
 		}
 	}
-	
+
 	public void loadDiscountFactor() {
 		String sql = "select id, value from discount_factor where project_id = " + this.projectId;
 		Statement stmt = null;
@@ -374,7 +375,7 @@ public class ProjectConfigutration {
 				int modelId = rs.getInt(2);
 				int expressionId = rs.getInt(3);
 				Model model = this.getModelById(modelId);
-				
+
 				od = getOpexDataById(id);
 				if (od == null) {
 					od = new OpexData(model);					
@@ -385,7 +386,7 @@ public class ProjectConfigutration {
 						Expression expression = this.getExpressionById(expressionId);
 						od.setExpression(expression);
 					}
-					
+
 					this.opexDataList.add(od);
 				}
 				od.addYear(rs.getInt(6), rs.getFloat(7));
@@ -459,13 +460,13 @@ public class ProjectConfigutration {
 		saveExpressionData();
 		saveModelData();
 		saveProcessTree();
+		saveProcessJoins();
 		saveDiscountFactor();
 		saveOpexData();
 		saveFixedCostData();
-		saveProcessJoins();
-
+		saveProcessConstraintData();
 		//new EquationGenerator().generate();
-		
+
 	}
 
 	public void saveFieldData() {
@@ -747,22 +748,22 @@ public class ProjectConfigutration {
 			}
 		}
 	}
-	
+
 	public void saveProcessJoins() {
 		Connection conn = DBManager.getConnection();
 		String insert_sql = " insert into process_join_defn (project_id, name, child_model_id) values (?, ?, ?)";
 		PreparedStatement pstmt = null;
 		boolean autoCommit = true;
-		
+
 		if(this.processJoins.size() < 1){ // no process joins defined
 			return;
 		}
-		
+
 		try{
 			autoCommit = conn.getAutoCommit();
 			conn.setAutoCommit(false);
 			pstmt = conn.prepareStatement(insert_sql);
-		
+
 			for(ProcessJoin processJoin : this.processJoins){
 				String processJoinName = processJoin.getName();
 				for(Model childModel : processJoin.getlistChildProcesses()){
@@ -788,14 +789,14 @@ public class ProjectConfigutration {
 			}
 		}
 	}
-	
+
 	public void saveDiscountFactor() {
 		Connection conn = DBManager.getConnection();
 		String insert_sql = "insert into discount_factor (project_id, scenario_id, value) values (?, ?, ?)";
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		boolean autoCommit = true;
-		
+
 		try {
 			autoCommit = conn.getAutoCommit();
 			conn.setAutoCommit(false);
@@ -810,7 +811,7 @@ public class ProjectConfigutration {
 				this.discountFactor.setId(id);
 			}
 			conn.commit();
-			
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -826,6 +827,71 @@ public class ProjectConfigutration {
 		}
 	}
 
+	public void saveProcessConstraintData() {
+		Connection conn = DBManager.getConnection();
+		String insert_sql = "insert into process_constraint_defn (project_id, scenario_id, process_join_name, expression_id, in_use, is_max) values (?, ?, ?, ?, ?, ?)";
+		String mapping_sql = "insert into process_constraint_year_mapping (process_constraint_id, year, value) values (?, ?, ?)";
+		PreparedStatement pstmt = null;
+		PreparedStatement pstmt1 = null;
+		ResultSet rs = null;
+		boolean autoCommit = true;
+
+		try {
+			autoCommit = conn.getAutoCommit();
+			conn.setAutoCommit(false);
+			pstmt = conn.prepareStatement(insert_sql,
+					Statement.RETURN_GENERATED_KEYS);
+			pstmt1 = conn.prepareStatement(mapping_sql);
+			
+			for(ProcessConstraintData pcd : this.processConstraintDataList) {
+				if (pcd.getId() > 0)
+					continue;
+				pstmt.setInt(1, projectId);
+				pstmt.setInt(2, 1);
+				pstmt.setString(3, pcd.getProcessJoin().getName());
+				if(pcd.getExpression() != null){
+					pstmt.setInt(4, pcd.getExpression().getId());
+				}else{
+					pstmt.setNull(4, java.sql.Types.INTEGER);
+				}
+				pstmt.setBoolean(5, pcd.isInUse());
+				pstmt.setBoolean(6, pcd.isMax());
+				pstmt.executeUpdate();
+				rs = pstmt.getGeneratedKeys();
+				
+				if (rs.next()){
+					int id = rs.getInt(1);
+					pcd.setId(id);
+
+					Set keys = pcd.getConstraintData().keySet();
+					Iterator<Integer> it = keys.iterator();
+					while (it.hasNext()) {
+						int key = it.next();
+						pstmt1.setInt(1, pcd.getId());
+						pstmt1.setInt(2, key);
+						pstmt1.setFloat(3, pcd.getConstraintData().get(key));
+						pstmt1.executeUpdate();
+					}
+				}
+			}
+
+			conn.commit();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				conn.setAutoCommit(autoCommit);
+				if (pstmt != null)
+					pstmt.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	public void saveOpexData() {
 		Connection conn = DBManager.getConnection();
 		String insert_sql = "insert into opex_defn (project_id, scenario_id, model_id, expression_id, in_use, is_revenue) values (?, ?, ?, ?, ?, ?)";
@@ -973,7 +1039,7 @@ public class ProjectConfigutration {
 		}
 		return null;
 	}
-	
+
 	public ProcessJoin getProcessJoinByName(String name) {
 		if (name == null)
 			return null;
@@ -1023,7 +1089,7 @@ public class ProjectConfigutration {
 	public List<Expression> getExpressions() {
 		return expressions;
 	}
-	
+
 	public List<Expression> getGradeExpressions() {
 		List<Expression> gradeExpressions = new ArrayList<Expression>();
 		for(Expression expression : expressions){
@@ -1033,7 +1099,7 @@ public class ProjectConfigutration {
 		}
 		return gradeExpressions;
 	}
-	
+
 	public List<Expression> getNonGradeExpressions() {
 		List<Expression> nonGradeExpressions = new ArrayList<Expression>();
 		for(Expression expression : expressions){
@@ -1063,7 +1129,7 @@ public class ProjectConfigutration {
 	public void setProcessTree(Tree processTree) {
 		this.processTree = processTree;
 	}
-	
+
 
 	public DiscountFactor getDiscountFactor() {
 		return discountFactor;
@@ -1096,10 +1162,23 @@ public class ProjectConfigutration {
 	public void setProcessJoins(List<ProcessJoin> processJoins) {
 		this.processJoins = processJoins;
 	}
-	
+
+
+	public List<ProcessConstraintData> getProcessConstraintData() {
+		return processConstraintDataList;
+	}
+
+	public void setProcessConstraintData(List<ProcessConstraintData> processConstraintDataList) {
+		this.processConstraintDataList = processConstraintDataList;
+	}
+
 	public void addProcessJoin(ProcessJoin processJoin) {
 		this.processJoins.add(processJoin);
 	}
 	
+	public void addProcesssConstraintData(ProcessConstraintData processConstraintData) {
+		this.processConstraintDataList.add(processConstraintData);
+	}
+
 
 }

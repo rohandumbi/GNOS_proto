@@ -102,6 +102,19 @@ CREATE TABLE opex_defn(
    PRIMARY KEY ( id )
 );
 
+DROP TABLE IF EXISTS process_constraint_defn; 
+
+CREATE TABLE process_constraint_defn(
+   id INT NOT NULL AUTO_INCREMENT,
+   project_id INT NOT NULL,
+   scenario_id INT NOT NULL,
+   process_join_name VARCHAR(100),
+   expression_id INT,
+   in_use TINYINT NOT NULL default 1,
+   is_max TINYINT NOT NULL default 1,
+   PRIMARY KEY ( id )
+);
+
 DROP TABLE IF EXISTS discount_factor; 
 
 CREATE TABLE discount_factor(
@@ -120,6 +133,15 @@ CREATE TABLE model_year_mapping(
    year INT NOT NULL,
    value FLOAT NOT NULL,
    unique key( opex_id, year)
+);
+
+DROP TABLE IF EXISTS process_constraint_year_mapping; 
+
+CREATE TABLE process_constraint_year_mapping(
+   process_constraint_id INT NOT NULL,
+   year INT NOT NULL,
+   value FLOAT NOT NULL,
+   unique key( process_constraint_id, year)
 );
 
 DROP TABLE IF EXISTS fixedcost_year_mapping; 

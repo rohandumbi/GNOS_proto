@@ -29,6 +29,7 @@ import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.OpexData;
+import com.org.gnos.db.model.ProcessConstraintData;
 import com.org.gnos.db.model.ProcessJoin;
 import com.org.gnos.services.TimePeriod;
 
@@ -442,10 +443,36 @@ public class ProcessConstraintGrid extends Composite {
 		}
 	}
 
-	public boolean saveOpexData(){
-		//this.opexDataList = new ArrayList<OpexData>();
-		int i = 0;
-		for(Composite rowOpexData : this.allRows){
+	public boolean saveProcessConstraintData(){
+		for(Composite rowConstraintData: this.allRows){
+			Control[] rowChildren = rowConstraintData.getChildren();
+			Combo comboExpression = (Combo)rowChildren[0];
+			Button isInUse = (Button)rowChildren[1];
+			Combo comboGroup = (Combo)rowChildren[2];
+			Combo comboMaxMin = (Combo)rowChildren[3];
+			LinkedHashMap<Integer, Float> mapConstraintData = new LinkedHashMap<Integer, Float>();
+			for(int j=0; j<this.timePeriod.getIncrements(); j++){
+				mapConstraintData.put((this.timePeriod.getStartYear() + j), Float.valueOf(((Text)rowChildren[4+j]).getText())); // cost input data starts from 4th indexed row child.
+			}
+			boolean inUse = isInUse.getSelection();
+			boolean isMax = (comboMaxMin.getSelectionIndex() == 0);//0=max; 1=min
+			String processJoinName = comboGroup.getText();
+			String expressionName = comboExpression.getText();
+			
+			ProcessJoin processJoin = ProjectConfigutration.getInstance().getProcessJoinByName(processJoinName);
+			Expression expression = ProjectConfigutration.getInstance().getExpressionByName(expressionName);
+			
+			ProcessConstraintData processConstraintData = new ProcessConstraintData();
+			processConstraintData.setConstraintData(mapConstraintData);
+			processConstraintData.setExpression(expression);
+			processConstraintData.setInUse(inUse);
+			processConstraintData.setMax(isMax);
+			processConstraintData.setProcessJoin(processJoin);
+			
+			ProjectConfigutration.getInstance().addProcesssConstraintData(processConstraintData);
+			
+		}
+		/*for(Composite rowOpexData : this.allRows){
 			Control[] rowChildren = rowOpexData.getChildren();
 			Combo comboClassification = (Combo)rowChildren[0];
 			Button isInUse = (Button)rowChildren[1];
@@ -480,8 +507,7 @@ public class ProcessConstraintGrid extends Composite {
 			opexData.setExpression(expression);
 			//this.opexDataList.get(i).setCostData(mapCostData);
 			i++;
-		}
-		//ProjectConfigutration.getInstance().setOpexDataList(this.opexDataList);
+		}*/
 		return true;
 	}
 
