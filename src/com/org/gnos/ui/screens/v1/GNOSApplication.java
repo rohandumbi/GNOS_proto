@@ -21,7 +21,8 @@ import com.org.gnos.db.model.Field;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.events.GnosEventWithAttributeMap;
 import com.org.gnos.events.interfaces.GnosEventListener;
-import com.org.gnos.services.EquationGenerator;
+import com.org.gnos.services.ObjectiveFunctionEquationGenerator;
+import com.org.gnos.services.ProcessConstraintEquationGenerator;
 import com.org.gnos.services.csv.GNOSCSVDataProcessor;
 import com.org.gnos.ui.custom.controls.GnosScreen;
 
@@ -177,7 +178,8 @@ public class GNOSApplication extends ApplicationWindow implements GnosEventListe
    
    private void tidyUpOnExit(){
 	   //ProjectConfigutration.getInstance().save();
-	   new EquationGenerator().generate();
+	   new ObjectiveFunctionEquationGenerator().generate();
+	   new ProcessConstraintEquationGenerator().generate();
    }
 	
 	

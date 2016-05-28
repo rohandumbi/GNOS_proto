@@ -87,7 +87,8 @@ DROP TABLE IF EXISTS process_join_defn;
 CREATE TABLE process_join_defn(
    project_id INT NOT NULL,
    name  VARCHAR(100) NOT NULL,
-   child_model_id INT
+   child_model_id INT,
+   unique key(project_id, name, child_model_id)
 );
 
 DROP TABLE IF EXISTS opex_defn; 
@@ -100,6 +101,19 @@ CREATE TABLE opex_defn(
    expression_id INT,
    in_use TINYINT NOT NULL default 1,
    is_revenue TINYINT NOT NULL default 1,
+   PRIMARY KEY ( id )
+);
+
+DROP TABLE IF EXISTS process_constraint_defn; 
+
+CREATE TABLE process_constraint_defn(
+   id INT NOT NULL AUTO_INCREMENT,
+   project_id INT NOT NULL,
+   scenario_id INT NOT NULL,
+   process_join_name VARCHAR(100),
+   expression_id INT,
+   in_use TINYINT NOT NULL default 1,
+   is_max TINYINT NOT NULL default 1,
    PRIMARY KEY ( id )
 );
 
@@ -121,6 +135,15 @@ CREATE TABLE model_year_mapping(
    year INT NOT NULL,
    value FLOAT NOT NULL,
    unique key( opex_id, year)
+);
+
+DROP TABLE IF EXISTS process_constraint_year_mapping; 
+
+CREATE TABLE process_constraint_year_mapping(
+   process_constraint_id INT NOT NULL,
+   year INT NOT NULL,
+   value FLOAT NOT NULL,
+   unique key( process_constraint_id, year)
 );
 
 DROP TABLE IF EXISTS fixedcost_year_mapping; 

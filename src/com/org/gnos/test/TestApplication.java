@@ -4,7 +4,7 @@ import com.org.gnos.application.GNOSConfig;
 import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.db.dao.ProjectDAO;
 import com.org.gnos.db.model.Project;
-import com.org.gnos.services.EquationGenerator;
+import com.org.gnos.services.ObjectiveFunctionEquationGenerator;
 import com.org.gnos.services.csv.GNOSCSVDataProcessor;
 
 public class TestApplication {
@@ -47,7 +47,7 @@ public class TestApplication {
 		//application.test();
 		ProjectConfigutration.getInstance().load(3);
 
-		new EquationGenerator().generate();
+		new ObjectiveFunctionEquationGenerator().generate();
 
 	}
 

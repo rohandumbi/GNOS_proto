@@ -41,9 +41,9 @@ public class WorkbenchScreen extends GnosScreen {
 	private GnosConfigurationStepLabel gnosStepProcessRouteDefinitionLabel;
 	private GnosConfigurationStepLabel gnosStepPitGroupDefinitionLabel;
 	private GnosConfigurationStepLabel gnosStepOpexDefinitionLabel;
+	private GnosConfigurationStepLabel gnosStepProcessConstraintsDefinitionLabel;
 	private GnosConfigurationStepLabel gnosStepGradeConstraintsDefinitionLabel;
 	private GnosConfigurationStepLabel gnosStepBenchConstraintsDefinitionLabel;
-	//private GnosConfigurationStepLabel gnosStepStockpileDefinitionLabel;
 	private ScrolledComposite scViewPortContainer;
 	private MainConfigurationViewPort mainConfigurationViewPort;
 
@@ -159,30 +159,40 @@ public class WorkbenchScreen extends GnosScreen {
 		gnosStepProcessRouteDefinitionLabel.setLayoutData(fd_gnosStepProcessRouteDefinitionLabel);
 		gnosStepProcessRouteDefinitionLabel.registerEventListener(this);
 		
-		gnosStepOpexDefinitionLabel = new GnosConfigurationStepLabel(this, SWT.NONE, "OPEX Definition");
-		FormData fd_gnosStepOpexDefinitionLabel = new FormData();
-		fd_gnosStepOpexDefinitionLabel.bottom = new FormAttachment(gnosStepProcessRouteDefinitionLabel, 40, SWT.BOTTOM);
-		fd_gnosStepOpexDefinitionLabel.right = new FormAttachment(label, -6);
-		fd_gnosStepOpexDefinitionLabel.top = new FormAttachment(gnosStepProcessRouteDefinitionLabel);
-		fd_gnosStepOpexDefinitionLabel.left = new FormAttachment(gnosStepProcessRouteDefinitionLabel, 0, SWT.LEFT);
-		gnosStepOpexDefinitionLabel.setLayoutData(fd_gnosStepOpexDefinitionLabel);
-		gnosStepOpexDefinitionLabel.registerEventListener(this);
-		
 		gnosStepPitGroupDefinitionLabel = new GnosConfigurationStepLabel(this, SWT.NONE, "PitGroup Dump and Stockpile");
 		FormData fd_gnosStepPitGroupDefinitionLabel = new FormData();
-		fd_gnosStepPitGroupDefinitionLabel.bottom = new FormAttachment(gnosStepOpexDefinitionLabel, 40, SWT.BOTTOM);
+		fd_gnosStepPitGroupDefinitionLabel.bottom = new FormAttachment(gnosStepProcessRouteDefinitionLabel, 40, SWT.BOTTOM);
 		fd_gnosStepPitGroupDefinitionLabel.right = new FormAttachment(label, -6);
-		fd_gnosStepPitGroupDefinitionLabel.top = new FormAttachment(gnosStepOpexDefinitionLabel);
-		fd_gnosStepPitGroupDefinitionLabel.left = new FormAttachment(gnosStepOpexDefinitionLabel, 0, SWT.LEFT);
+		fd_gnosStepPitGroupDefinitionLabel.top = new FormAttachment(gnosStepProcessRouteDefinitionLabel);
+		fd_gnosStepPitGroupDefinitionLabel.left = new FormAttachment(gnosStepProcessRouteDefinitionLabel, 0, SWT.LEFT);
 		gnosStepPitGroupDefinitionLabel.setLayoutData(fd_gnosStepPitGroupDefinitionLabel);
 		gnosStepPitGroupDefinitionLabel.registerEventListener(this);
 		
+		
+		gnosStepOpexDefinitionLabel = new GnosConfigurationStepLabel(this, SWT.NONE, "OPEX Definition");
+		FormData fd_gnosStepOpexDefinitionLabel = new FormData();
+		fd_gnosStepOpexDefinitionLabel.bottom = new FormAttachment(gnosStepPitGroupDefinitionLabel, 40, SWT.BOTTOM);
+		fd_gnosStepOpexDefinitionLabel.right = new FormAttachment(label, -6);
+		fd_gnosStepOpexDefinitionLabel.top = new FormAttachment(gnosStepPitGroupDefinitionLabel);
+		fd_gnosStepOpexDefinitionLabel.left = new FormAttachment(gnosStepPitGroupDefinitionLabel, 0, SWT.LEFT);
+		gnosStepOpexDefinitionLabel.setLayoutData(fd_gnosStepOpexDefinitionLabel);
+		gnosStepOpexDefinitionLabel.registerEventListener(this);
+		
+		gnosStepProcessConstraintsDefinitionLabel = new GnosConfigurationStepLabel(this, SWT.NONE, "Process Constraint Definition");
+		FormData fd_gnosStepProcessConstraintsDefinitionLabel = new FormData();
+		fd_gnosStepProcessConstraintsDefinitionLabel.bottom = new FormAttachment(gnosStepOpexDefinitionLabel, 40, SWT.BOTTOM);
+		fd_gnosStepProcessConstraintsDefinitionLabel.right = new FormAttachment(label, -6);
+		fd_gnosStepProcessConstraintsDefinitionLabel.top = new FormAttachment(gnosStepOpexDefinitionLabel);
+		fd_gnosStepProcessConstraintsDefinitionLabel.left = new FormAttachment(gnosStepOpexDefinitionLabel, 0, SWT.LEFT);
+		gnosStepProcessConstraintsDefinitionLabel.setLayoutData(fd_gnosStepProcessConstraintsDefinitionLabel);
+		gnosStepProcessConstraintsDefinitionLabel.registerEventListener(this);
+		
 		gnosStepGradeConstraintsDefinitionLabel = new GnosConfigurationStepLabel(this, SWT.NONE, "Grade Constraint Definition");
 		FormData fd_gnosStepGradeConstraintsDefinitionLabel = new FormData();
-		fd_gnosStepGradeConstraintsDefinitionLabel.bottom = new FormAttachment(gnosStepPitGroupDefinitionLabel, 40, SWT.BOTTOM);
+		fd_gnosStepGradeConstraintsDefinitionLabel.bottom = new FormAttachment(gnosStepProcessConstraintsDefinitionLabel, 40, SWT.BOTTOM);
 		fd_gnosStepGradeConstraintsDefinitionLabel.right = new FormAttachment(label, -6);
-		fd_gnosStepGradeConstraintsDefinitionLabel.top = new FormAttachment(gnosStepPitGroupDefinitionLabel);
-		fd_gnosStepGradeConstraintsDefinitionLabel.left = new FormAttachment(gnosStepPitGroupDefinitionLabel, 0, SWT.LEFT);
+		fd_gnosStepGradeConstraintsDefinitionLabel.top = new FormAttachment(gnosStepProcessConstraintsDefinitionLabel);
+		fd_gnosStepGradeConstraintsDefinitionLabel.left = new FormAttachment(gnosStepProcessConstraintsDefinitionLabel, 0, SWT.LEFT);
 		gnosStepGradeConstraintsDefinitionLabel.setLayoutData(fd_gnosStepGradeConstraintsDefinitionLabel);
 		gnosStepGradeConstraintsDefinitionLabel.registerEventListener(this);
 		
@@ -285,6 +295,7 @@ public class WorkbenchScreen extends GnosScreen {
 			gnosStepProcessRouteDefinitionLabel.setDeselectedState();
 			gnosStepPitGroupDefinitionLabel.setDeselectedState();
 			gnosStepOpexDefinitionLabel.setDeselectedState();
+			gnosStepProcessConstraintsDefinitionLabel.setDeselectedState();
 			gnosStepGradeConstraintsDefinitionLabel.setDeselectedState();
 			gnosStepBenchConstraintsDefinitionLabel.setDeselectedState();
 			//gnosStepStockpileDefinitionLabel.setDeselectedState();
@@ -299,6 +310,7 @@ public class WorkbenchScreen extends GnosScreen {
 			gnosStepProcessRouteDefinitionLabel.setDeselectedState();
 			gnosStepPitGroupDefinitionLabel.setDeselectedState();
 			gnosStepOpexDefinitionLabel.setDeselectedState();
+			gnosStepProcessConstraintsDefinitionLabel.setDeselectedState();
 			gnosStepGradeConstraintsDefinitionLabel.setDeselectedState();
 			gnosStepBenchConstraintsDefinitionLabel.setDeselectedState();
 			//gnosStepStockpileDefinitionLabel.setDeselectedState();
@@ -313,6 +325,7 @@ public class WorkbenchScreen extends GnosScreen {
 			gnosStepProcessRouteDefinitionLabel.setDeselectedState();
 			gnosStepPitGroupDefinitionLabel.setDeselectedState();
 			gnosStepOpexDefinitionLabel.setDeselectedState();
+			gnosStepProcessConstraintsDefinitionLabel.setDeselectedState();
 			gnosStepGradeConstraintsDefinitionLabel.setDeselectedState();
 			gnosStepBenchConstraintsDefinitionLabel.setDeselectedState();
 			//gnosStepStockpileDefinitionLabel.setDeselectedState();
@@ -327,6 +340,7 @@ public class WorkbenchScreen extends GnosScreen {
 			gnosStepProcessRouteDefinitionLabel.setDeselectedState();
 			gnosStepPitGroupDefinitionLabel.setDeselectedState();
 			gnosStepOpexDefinitionLabel.setDeselectedState();
+			gnosStepProcessConstraintsDefinitionLabel.setDeselectedState();
 			gnosStepGradeConstraintsDefinitionLabel.setDeselectedState();
 			gnosStepBenchConstraintsDefinitionLabel.setDeselectedState();
 			//gnosStepStockpileDefinitionLabel.setDeselectedState();
@@ -341,6 +355,7 @@ public class WorkbenchScreen extends GnosScreen {
 			gnosStepModelDefinitionLabel.setDeselectedState();
 			gnosStepPitGroupDefinitionLabel.setDeselectedState();
 			gnosStepOpexDefinitionLabel.setDeselectedState();
+			gnosStepProcessConstraintsDefinitionLabel.setDeselectedState();
 			gnosStepGradeConstraintsDefinitionLabel.setDeselectedState();
 			gnosStepBenchConstraintsDefinitionLabel.setDeselectedState();
 			//gnosStepStockpileDefinitionLabel.setDeselectedState();
@@ -355,6 +370,7 @@ public class WorkbenchScreen extends GnosScreen {
 			gnosStepModelDefinitionLabel.setDeselectedState();
 			gnosStepProcessRouteDefinitionLabel.setDeselectedState();
 			gnosStepOpexDefinitionLabel.setDeselectedState();
+			gnosStepProcessConstraintsDefinitionLabel.setDeselectedState();
 			gnosStepGradeConstraintsDefinitionLabel.setDeselectedState();
 			gnosStepBenchConstraintsDefinitionLabel.setDeselectedState();
 			//gnosStepStockpileDefinitionLabel.setDeselectedState();
@@ -369,11 +385,26 @@ public class WorkbenchScreen extends GnosScreen {
 			gnosStepDefineExpressionsLabel.setDeselectedState();
 			gnosStepModelDefinitionLabel.setDeselectedState();
 			gnosStepProcessRouteDefinitionLabel.setDeselectedState();
+			gnosStepProcessConstraintsDefinitionLabel.setDeselectedState();
 			gnosStepGradeConstraintsDefinitionLabel.setDeselectedState();
 			gnosStepBenchConstraintsDefinitionLabel.setDeselectedState();
 			//gnosStepStockpileDefinitionLabel.setDeselectedState();
 			
 			mainConfigurationViewPort.loadOpexDefinitionScreen();
+		}else if(e.eventName == "Process Constraint Definition"){
+			gnosStepProcessConstraintsDefinitionLabel.setSelectedState();
+
+			gnosStepPitGroupDefinitionLabel.setDeselectedState();
+			gnosStepDefineFieldTypeLabel.setDeselectedState();
+			gnosStepMapRequiredFieldsLabel.setDeselectedState();
+			gnosStepDefineExpressionsLabel.setDeselectedState();
+			gnosStepModelDefinitionLabel.setDeselectedState();
+			gnosStepProcessRouteDefinitionLabel.setDeselectedState();
+			gnosStepOpexDefinitionLabel.setDeselectedState();
+			gnosStepGradeConstraintsDefinitionLabel.setDeselectedState();
+			gnosStepBenchConstraintsDefinitionLabel.setDeselectedState();
+			
+			mainConfigurationViewPort.loadProcessConstraintDefinitionScreen();
 		}else if(e.eventName == "Grade Constraint Definition"){
 			gnosStepGradeConstraintsDefinitionLabel.setSelectedState();
 			
@@ -384,6 +415,7 @@ public class WorkbenchScreen extends GnosScreen {
 			gnosStepModelDefinitionLabel.setDeselectedState();
 			gnosStepProcessRouteDefinitionLabel.setDeselectedState();
 			gnosStepOpexDefinitionLabel.setDeselectedState();
+			gnosStepProcessConstraintsDefinitionLabel.setDeselectedState();
 			gnosStepBenchConstraintsDefinitionLabel.setDeselectedState();
 			//gnosStepStockpileDefinitionLabel.setDeselectedState();
 			
@@ -398,6 +430,7 @@ public class WorkbenchScreen extends GnosScreen {
 			gnosStepModelDefinitionLabel.setDeselectedState();
 			gnosStepProcessRouteDefinitionLabel.setDeselectedState();
 			gnosStepOpexDefinitionLabel.setDeselectedState();
+			gnosStepProcessConstraintsDefinitionLabel.setDeselectedState();
 			gnosStepGradeConstraintsDefinitionLabel.setDeselectedState();
 			//gnosStepStockpileDefinitionLabel.setDeselectedState();
 			
