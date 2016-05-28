@@ -80,6 +80,7 @@ public class ProjectConfigutration {
 		loadModels();
 		loadProcessTree();
 		loadProcessJoins();
+		loadProducts();
 		loadDiscountFactor();
 		loadOpexData();
 		loadFixedCost();
@@ -327,6 +328,49 @@ public class ProjectConfigutration {
 			}
 		}
 	}
+	
+	public void loadProducts() {
+		String sql = "select name, associated_model_id, child_expression_id from product_defn where project_id = "
+				+ this.projectId + " order by name ";
+		Statement stmt = null;
+		ResultSet rs = null;
+		Connection conn = DBManager.getConnection();
+		try {
+			stmt = conn.createStatement();
+			stmt.execute(sql);
+			rs = stmt.getResultSet();
+
+			while (rs.next()) {
+
+				String productName = rs.getString(1);
+				int associatedModelId = rs.getInt(2);
+				Product product = this.getProductByName(productName);
+				Model model = this.getModelById(associatedModelId);
+				if(product == null){
+					product = new Product(productName, model);
+					this.productList.add(product);
+				}
+				int expressionId = rs.getInt(3);
+				Expression expression = this.getExpressionById(expressionId);
+				if(expression != null){
+					product.addExpression(expression);
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (stmt != null)
+					stmt.close();
+				if (rs != null)
+					rs.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
 	public void loadDiscountFactor() {
 		String sql = "select id, value from discount_factor where project_id = " + this.projectId;
@@ -511,11 +555,11 @@ public class ProjectConfigutration {
 		saveModelData();
 		saveProcessTree();
 		saveProcessJoins();
+		saveProducts();
 		saveDiscountFactor();
 		saveOpexData();
 		saveFixedCostData();
 		saveProcessConstraintData();
-		//new EquationGenerator().generate();
 
 	}
 
@@ -839,6 +883,50 @@ public class ProjectConfigutration {
 			}
 		}
 	}
+	
+	public void saveProducts() {
+		Connection conn = DBManager.getConnection();
+		String insert_sql = " insert into product_defn (project_id, name, associated_model_id, child_expression_id) values (?, ?, ?, ?)";
+		PreparedStatement pstmt = null;
+		boolean autoCommit = true;
+
+		if(this.productList.size() < 1){ // no products defined
+			return;
+		}
+
+		try{
+			autoCommit = conn.getAutoCommit();
+			conn.setAutoCommit(false);
+			pstmt = conn.prepareStatement(insert_sql);
+
+			for(Product product : this.productList){
+				String productName = product.getName();
+				int modelId = product.getAssociatedProcess().getId();
+				
+				for(Expression expression : product.getListOfExpressions()){
+					int expId = expression.getId();
+					pstmt.setInt(1, this.projectId);
+					pstmt.setString(2, productName);
+					pstmt.setInt(3, modelId);
+					pstmt.setInt(4, expId);
+					pstmt.executeUpdate();
+				}
+			}
+			conn.commit();
+		}catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				conn.setAutoCommit(autoCommit);
+				if (pstmt != null)
+					pstmt.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
 	public void saveDiscountFactor() {
 		Connection conn = DBManager.getConnection();
@@ -1096,6 +1184,17 @@ public class ProjectConfigutration {
 		for (ProcessJoin processJoin : processJoins) {
 			if (processJoin.getName().equals(name)) {
 				return processJoin;
+			}
+		}
+		return null;
+	}
+	
+	public Product getProductByName(String name) {
+		if (name == null)
+			return null;
+		for (Product product : productList) {
+			if (product.getName().equals(name)) {
+				return product;
 			}
 		}
 		return null;

@@ -1,5 +1,6 @@
 package com.org.gnos.db.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Product {
@@ -10,6 +11,7 @@ public class Product {
 	public Product(String name, Model associatedProcess){
 		this.associatedProcess = associatedProcess;
 		this.name = name;
+		this.listOfExpressions = new ArrayList<Expression>();
 	}
 
 	public Model getAssociatedProcess() {
@@ -28,6 +30,8 @@ public class Product {
 		return name;
 	}
 
-	
+	public void addExpression(Expression expression){
+		this.listOfExpressions.add(expression);
+	}
 	
 }
