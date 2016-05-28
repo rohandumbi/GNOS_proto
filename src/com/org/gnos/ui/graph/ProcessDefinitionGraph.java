@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.draw2d.IFigure;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuDetectEvent;
 import org.eclipse.swt.events.MenuDetectListener;
@@ -12,6 +13,8 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.zest.core.widgets.Graph;
@@ -20,13 +23,17 @@ import org.eclipse.zest.core.widgets.GraphNode;
 import org.eclipse.zest.core.widgets.ZestStyles;
 import org.eclipse.zest.core.widgets.internal.GraphLabel;
 import org.eclipse.zest.layouts.LayoutStyles;
-import org.eclipse.zest.layouts.algorithms.HorizontalTreeLayoutAlgorithm;
 import org.eclipse.zest.layouts.algorithms.TreeLayoutAlgorithm;
 
 import com.org.gnos.core.Node;
+import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.core.Tree;
+import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.ProcessJoin;
+import com.org.gnos.db.model.Product;
+import com.org.gnos.ui.custom.controls.ProductDefinitionDialog;
+import com.org.gnos.utilities.SWTResourceManager;
 
 public class ProcessDefinitionGraph extends Composite {
 
@@ -36,6 +43,8 @@ public class ProcessDefinitionGraph extends Composite {
 	private GraphNode presentNode;
 	private HashMap<String, GraphNode> existingProcessGraphNodes;
 	private HashMap<String, GraphNode> existingProcessJoinGraphNodes;
+	private HashMap<String, GraphNode> existingProductGraphNodes;
+	private List<Product> listOfProducts;
 	/**
 	 * Create the composite.
 	 * @param parent
@@ -47,6 +56,20 @@ public class ProcessDefinitionGraph extends Composite {
 		this.setLayout(new FillLayout());
 		this.existingProcessGraphNodes = new HashMap<String, GraphNode>();
 		this.existingProcessJoinGraphNodes = new HashMap<String, GraphNode>();
+		this.existingProductGraphNodes = new HashMap<String, GraphNode>();
+		this.listOfProducts = ProjectConfigutration.getInstance().getProductList();
+	}
+
+	private boolean isLeafNode(String nodeName){
+		//List<Model> models = new ArrayList<Model>();
+		List<Node> leafNodes = ProjectConfigutration.getInstance().getProcessTree().getLeafNodes();
+		for(Node node: leafNodes){
+			//models.add(node.getData());
+			if(node.getData().getName().equals(nodeName)){
+				return true;
+			}
+		}
+		return false;
 	}
 
 
@@ -67,30 +90,70 @@ public class ProcessDefinitionGraph extends Composite {
 
 		});
 		this.graph.addMenuDetectListener(new MenuDetectListener()
-	    {
-	        @Override
-	        public void menuDetected(MenuDetectEvent e)
-	        {
-	            Point point = graph.toControl(e.x, e.y);
-	            IFigure fig = graph.getFigureAt(point.x, point.y);
+		{
+			@Override
+			public void menuDetected(MenuDetectEvent e)
+			{
+				Point point = graph.toControl(e.x, e.y);
+				IFigure fig = graph.getFigureAt(point.x, point.y);
 
-	            if (fig != null)
-	            {
-	                Menu menu = new Menu(getShell(), SWT.POP_UP);
-	                MenuItem exit = new MenuItem(menu, SWT.NONE);
-	                exit.setText("Add a product to " + ((GraphLabel) fig).getText());
-	                menu.setVisible(true);
-	            }
-	            else
-	            {
-	                Menu menu = new Menu(getShell(), SWT.POP_UP);
-	                MenuItem exit = new MenuItem(menu, SWT.NONE);
-	                exit.setText("Nothing here...");
-	                menu.setVisible(true);
-	            }
-	        }
-	    });
+				if (fig != null){
+					final String nodeName = ((GraphLabel) fig).getText();
+					if(isLeafNode(nodeName)){
+						Menu menu = new Menu(getShell(), SWT.POP_UP);
+						MenuItem itemAddProduct = new MenuItem(menu, SWT.NONE);
+						itemAddProduct.setText("Add a product to " + ((GraphLabel) fig).getText());
+						itemAddProduct.addListener(SWT.Selection, new Listener() {
+							public void handleEvent(Event e) {
+								handleAddProductToProcess(nodeName);
+							}
+						});
+						menu.setVisible(true);
+					}
+				}
+			}
+		});
 		this.displayProcess(processTree.getRoot());
+	}
+	
+	public void addProduct(Product product){
+		GraphNode productNode = new GraphNode(this.graph, SWT.NONE, product.getName());
+		productNode.setBackgroundColor(SWTResourceManager.getColor(SWT.COLOR_GREEN));
+		GraphNode parentNode = this.existingProcessGraphNodes.get(product.getAssociatedProcess().getName());
+		this.existingProductGraphNodes.put(product.getName(), productNode);
+		new GraphConnection(this.graph, ZestStyles.CONNECTIONS_DIRECTED, parentNode, productNode);
+		this.graph.setLayoutAlgorithm(new TreeLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);
+	}
+	
+	public void handleAddProductToProcess(String processName){
+		System.out.println("We must now add a product to the process: " + processName);
+		
+		String[] listOfExpressionNames = this.getNonGradeExpressionNames();
+
+		ProductDefinitionDialog productDefinitionDialog = new ProductDefinitionDialog(getShell(), listOfExpressionNames);
+		if (Window.OK == productDefinitionDialog.open()) {
+			String definedProductName = productDefinitionDialog.getProductName();
+			List<Expression> associatedExpressions = productDefinitionDialog.getAssociatedExpressions();
+			String createdProductName = processName + '_' + definedProductName;
+			Model associatedProcess = ProjectConfigutration.getInstance().getModelByName(processName);
+			
+			Product newProduct = new Product(createdProductName, associatedProcess);
+			newProduct.setListOfExpressions(associatedExpressions);
+			
+			this.addProduct(newProduct);
+			this.listOfProducts.add(newProduct);
+		}
+	}
+	
+	private String[] getNonGradeExpressionNames(){
+
+		List<Expression> expressions = ProjectConfigutration.getInstance().getNonGradeExpressions();
+        String[] expressioNamesArray = new String[expressions.size()];
+		for(int i=0; i<expressions.size(); i++){
+			expressioNamesArray[i] = expressions.get(i).getName();
+		}
+
+		return expressioNamesArray;
 	}
 
 	public void displayProcess(Node rootnode) {
@@ -119,7 +182,7 @@ public class ProcessDefinitionGraph extends Composite {
 		new GraphConnection(this.graph, ZestStyles.CONNECTIONS_DIRECTED, parentNode, processNode);
 		this.graph.setLayoutAlgorithm(new TreeLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);
 	}
-	
+
 	public void addProcessJoin(ProcessJoin processJoin) {
 		GraphNode processJoinNode = new GraphNode(this.graph, SWT.NONE, "Process Join: " + processJoin.getName());
 		this.existingProcessJoinGraphNodes.put(processJoin.getName(), processJoinNode);
