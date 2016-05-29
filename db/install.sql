@@ -51,6 +51,15 @@ CREATE TABLE pit(
    UNIQUE KEY ( pit_id, project_id )
 );
 
+DROP TABLE IF EXISTS process;
+
+CREATE TABLE process (
+   model_id INT NOT NULL,
+   process_no INT NOT NULL,
+   project_id INT NOT NULL,
+   UNIQUE ( project_id, model_id )
+);
+
 DROP TABLE IF EXISTS block;
 
 CREATE TABLE block(

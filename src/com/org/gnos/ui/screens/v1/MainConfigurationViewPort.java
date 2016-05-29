@@ -185,7 +185,7 @@ public class MainConfigurationViewPort extends GnosScreen{
 
 	@Override
 	public void onGnosEventFired(GnosEvent e) {
-		// TODO Auto-generated method stub
+		
 		if(e.eventName == "complete:datatype-defintion"){
 			datatypeDefinitionComplete();
 		}else if(e.eventName == "complete:map-required-fields"){

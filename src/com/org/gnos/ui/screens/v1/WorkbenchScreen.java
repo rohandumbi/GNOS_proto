@@ -267,7 +267,7 @@ public class WorkbenchScreen extends GnosScreen {
 
 	@Override
 	public void onGnosEventFired(GnosEvent e) {
-		// TODO Auto-generated method stub
+		System.out.println("Screen navigation done :"+e.eventName);
 		if(e.eventName == "complete:datatype-defintion"){
 			this.gnosStepDefineFieldTypeLabel.setDeselectedState();
 			this.gnosStepMapRequiredFieldsLabel.setSelectedState();
@@ -281,7 +281,6 @@ public class WorkbenchScreen extends GnosScreen {
 			this.gnosStepModelDefinitionLabel.setDeselectedState();
 			this.gnosStepProcessRouteDefinitionLabel.setSelectedState();
 		}else if(e.eventName == "complete:process-route-defintion"){
-			//processRouteDefinitionComplete();
 			this.gnosStepProcessRouteDefinitionLabel.setDeselectedState();
 			this.gnosStepPitGroupDefinitionLabel.setSelectedState();
 		}

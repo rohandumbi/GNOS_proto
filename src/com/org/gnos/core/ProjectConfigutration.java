@@ -21,15 +21,12 @@ import com.org.gnos.db.model.Field;
 import com.org.gnos.db.model.FixedOpexCost;
 import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.OpexData;
-import com.org.gnos.db.model.OreMiningCost;
 import com.org.gnos.db.model.Pit;
 import com.org.gnos.db.model.ProcessConstraintData;
 import com.org.gnos.db.model.ProcessJoin;
 import com.org.gnos.db.model.Product;
+import com.org.gnos.db.model.Process;
 import com.org.gnos.db.model.ProductJoin;
-import com.org.gnos.db.model.StockpileReclaimingCost;
-import com.org.gnos.db.model.StockpilingCost;
-import com.org.gnos.db.model.WasteMiningCost;
 import com.org.gnos.services.PitBenchProcessor;
 
 public class ProjectConfigutration {
@@ -43,6 +40,7 @@ public class ProjectConfigutration {
 	private List<OpexData> opexDataList = new ArrayList<OpexData>();
 	private FixedOpexCost[] fixedCost;
 	private Tree processTree = null;
+	private List<Process> processList = null;
 	private List<ProcessJoin> processJoins = new ArrayList<ProcessJoin>();
 	private List<ProcessConstraintData> processConstraintDataList = new ArrayList<ProcessConstraintData>();
 	private List<Product> productList = new ArrayList<Product>();
@@ -73,13 +71,14 @@ public class ProjectConfigutration {
 		expressions = new ArrayList<Expression>();
 		models = new ArrayList<Model>();
 		processTree = new Tree();
-		opexDataList = new ArrayList<OpexData>();
+		processList = new ArrayList<Process>();
 
 		loadFieldData();
 		loadFieldMappingData();
 		loadExpressions();
 		loadModels();
 		loadProcessTree();
+		loadProcesses();
 		loadProcessJoins();
 		loadProducts();
 		loadProductJoins();
@@ -122,7 +121,7 @@ public class ProjectConfigutration {
 
 	private void loadExpressions() {
 		expressions = new ExpressionDAO().getAll();
-			}
+	}
 
 	private void loadModels() {
 		String sql = "select id, name, expr_id, filter_str from models where project_id = "
@@ -197,14 +196,13 @@ public class ProjectConfigutration {
 	public void loadProcessTree() {
 		String sql = "select model_id, parent_model_id from process_route_defn where project_id = "
 				+ this.projectId + " order by model_id ";
-		Statement stmt = null;
-		ResultSet rs = null;
-		Connection conn = DBManager.getConnection();
+		
 		Map<String, Node> nodes = new HashMap<String, Node>();
-		try {
-			stmt = conn.createStatement();
-			stmt.execute(sql);
-			rs = stmt.getResultSet();
+		try (
+				Connection conn = DBManager.getConnection();
+				Statement stmt = conn.createStatement();
+				ResultSet rs =stmt.executeQuery(sql);
+			){
 
 			while (rs.next()) {
 				int modelId = rs.getInt(1);
@@ -238,24 +236,35 @@ public class ProjectConfigutration {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-		} finally {
-			// processTree.setNodes((HashMap)nodes);
-			try {
-				if (stmt != null)
-					stmt.close();
-				if (rs != null)
-					rs.close();
-				if (conn != null)
-					DBManager.releaseConnection(conn);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
 		}
 	}
 
+	public void loadProcesses() {
+		String sql = "select model_id, process_no from process where project_id = " + this.projectId + " order by process_no ";
+
+		Map<String, Node> nodes = new HashMap<String, Node>();
+		try (
+				Connection conn = DBManager.getConnection();
+				Statement stmt = conn.createStatement();
+				ResultSet rs =stmt.executeQuery(sql);
+			){
+
+			while (rs.next()) {
+				int modelId = rs.getInt(1);
+				int processNo = rs.getInt(2);
+				Model model = this.getModelById(modelId);
+				Process process = new Process();
+				process.setModel(model);
+				process.setProcessNo(processNo);
+				this.processList.add(process);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+	}
 	public void loadProcessJoins() {
-		String sql = "select name, child_model_id from process_join_defn where project_id = "
-				+ this.projectId + " order by name ";
+		String sql = "select name, child_model_id from process_join_defn where project_id = " + this.projectId + " order by name ";
 		Statement stmt = null;
 		ResultSet rs = null;
 		Connection conn = DBManager.getConnection();
@@ -648,8 +657,49 @@ public class ProjectConfigutration {
 				e.printStackTrace();
 			}
 		}
+		saveProcesses();
 	}
 
+	public void saveProcesses() {
+		List<Node> processes = processTree.getLeafNodes();
+		
+		if(processes.size() < 1){ 
+			return;
+		}
+		
+		Connection conn = DBManager.getConnection();
+		String insert_sql = " insert into process (project_id, model_id, process_no) values (?, ?, ?)";
+		PreparedStatement pstmt = null;
+		boolean autoCommit = true;
+
+		try{
+			autoCommit = conn.getAutoCommit();
+			conn.setAutoCommit(false);
+			pstmt = conn.prepareStatement(insert_sql);
+			int count = 1;
+			for(Node node : processes){
+				pstmt.setInt(1, this.projectId);
+				pstmt.setInt(2, node.getData().getId());
+				pstmt.setInt(3, count);
+				pstmt.executeUpdate();
+				count++;
+			}
+			conn.commit();
+		}catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				conn.setAutoCommit(autoCommit);
+				if (pstmt != null)
+					pstmt.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	public void saveProcessJoins() {
 		Connection conn = DBManager.getConnection();
 		String insert_sql = " insert into process_join_defn (project_id, name, child_model_id) values (?, ?, ?)";
@@ -775,179 +825,6 @@ public class ProjectConfigutration {
 			}
 			conn.commit();
 		}catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				conn.setAutoCommit(autoCommit);
-				if (pstmt != null)
-					pstmt.close();
-				if (conn != null)
-					DBManager.releaseConnection(conn);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	public void saveProcessConstraintData() {
-		Connection conn = DBManager.getConnection();
-		String insert_sql = "insert into process_constraint_defn (project_id, scenario_id, process_join_name, expression_id, in_use, is_max) values (?, ?, ?, ?, ?, ?)";
-		String mapping_sql = "insert into process_constraint_year_mapping (process_constraint_id, year, value) values (?, ?, ?)";
-		PreparedStatement pstmt = null;
-		PreparedStatement pstmt1 = null;
-		ResultSet rs = null;
-		boolean autoCommit = true;
-
-		try {
-			autoCommit = conn.getAutoCommit();
-			conn.setAutoCommit(false);
-			pstmt = conn.prepareStatement(insert_sql,
-					Statement.RETURN_GENERATED_KEYS);
-			pstmt1 = conn.prepareStatement(mapping_sql);
-			
-			for(ProcessConstraintData pcd : this.processConstraintDataList) {
-				if (pcd.getId() > 0)
-					continue;
-				pstmt.setInt(1, projectId);
-				pstmt.setInt(2, 1);
-				pstmt.setString(3, pcd.getProcessJoin().getName());
-				if(pcd.getExpression() != null){
-					pstmt.setInt(4, pcd.getExpression().getId());
-				}else{
-					pstmt.setNull(4, java.sql.Types.INTEGER);
-				}
-				pstmt.setBoolean(5, pcd.isInUse());
-				pstmt.setBoolean(6, pcd.isMax());
-				pstmt.executeUpdate();
-				rs = pstmt.getGeneratedKeys();
-				
-				if (rs.next()){
-					int id = rs.getInt(1);
-					pcd.setId(id);
-
-					Set keys = pcd.getConstraintData().keySet();
-					Iterator<Integer> it = keys.iterator();
-					while (it.hasNext()) {
-						int key = it.next();
-						pstmt1.setInt(1, pcd.getId());
-						pstmt1.setInt(2, key);
-						pstmt1.setFloat(3, pcd.getConstraintData().get(key));
-						pstmt1.executeUpdate();
-					}
-				}
-			}
-
-			conn.commit();
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				conn.setAutoCommit(autoCommit);
-				if (pstmt != null)
-					pstmt.close();
-				if (conn != null)
-					DBManager.releaseConnection(conn);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-	
-	public void saveOpexData() {
-		Connection conn = DBManager.getConnection();
-		String insert_sql = "insert into opex_defn (project_id, scenario_id, model_id, expression_id, in_use, is_revenue) values (?, ?, ?, ?, ?, ?)";
-		String mapping_sql = "insert into model_year_mapping (opex_id, year, value) values (?, ?, ?)";
-		PreparedStatement pstmt = null;
-		PreparedStatement pstmt1 = null;
-		ResultSet rs = null;
-		boolean autoCommit = true;
-
-		try {
-			autoCommit = conn.getAutoCommit();
-			conn.setAutoCommit(false);
-			pstmt = conn.prepareStatement(insert_sql,
-					Statement.RETURN_GENERATED_KEYS);
-			pstmt1 = conn.prepareStatement(mapping_sql);
-
-			for (OpexData od : this.opexDataList) {
-				if (od.getId() > 0)
-					continue;
-				pstmt.setInt(1, projectId);
-				pstmt.setInt(2, 1);
-				pstmt.setInt(3, od.getModel().getId());
-				if(od.getExpression() != null){
-					pstmt.setInt(4, od.getExpression().getId());
-				}else{
-					pstmt.setNull(4, java.sql.Types.INTEGER);
-				}
-				pstmt.setBoolean(5, od.isInUse());
-				pstmt.setBoolean(6, od.isRevenue());
-				pstmt.executeUpdate();
-				rs = pstmt.getGeneratedKeys();
-				if (rs.next())
-				{
-					int id = rs.getInt(1);
-					od.setId(id);
-
-					Set keys = od.getCostData().keySet();
-					Iterator<Integer> it = keys.iterator();
-					while (it.hasNext()) {
-						int key = it.next();
-						pstmt1.setInt(1, od.getId());
-						pstmt1.setInt(2, key);
-						pstmt1.setFloat(3, od.getCostData().get(key));
-						pstmt1.executeUpdate();
-					}
-				}
-			}
-			conn.commit();
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				conn.setAutoCommit(autoCommit);
-				if (pstmt != null)
-					pstmt.close();
-				if (conn != null)
-					DBManager.releaseConnection(conn);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	public void saveFixedCostData() {
-		Connection conn = DBManager.getConnection();
-		String insert_sql = "insert into fixedcost_year_mapping (project_id, scenario_id, cost_head, year, value) values (?, ?, ?, ?, ?)";
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		boolean autoCommit = true;
-
-		try {
-			autoCommit = conn.getAutoCommit();
-			conn.setAutoCommit(false);
-			pstmt = conn.prepareStatement(insert_sql,
-					Statement.RETURN_GENERATED_KEYS);
-
-			for (int i = 0; i < fixedCost.length; i++) {
-				FixedOpexCost fixedOpexCost = fixedCost[i];
-				Set keys = fixedOpexCost.getCostData().keySet();
-				Iterator<Integer> it = keys.iterator();
-				while (it.hasNext()) {
-					int key = it.next();
-					pstmt.setInt(1, projectId);
-					pstmt.setInt(2, 1);
-					pstmt.setInt(3, i);
-					pstmt.setInt(4, key);
-					pstmt.setFloat(5, fixedOpexCost.getCostData().get(key));
-					pstmt.executeUpdate();
-				}
-			}
-			conn.commit();
-
-		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			try {
