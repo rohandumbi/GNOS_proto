@@ -1201,6 +1201,17 @@ public class ProjectConfigutration {
 		}
 		return null;
 	}
+	
+	public ProductJoin getProductJoinByName(String name) {
+		if (name == null)
+			return null;
+		for (ProductJoin productJoin : productJoinList) {
+			if (productJoin.getName().equals(name)) {
+				return productJoin;
+			}
+		}
+		return null;
+	}
 
 	public OpexData getOpexDataById(int id) {
 		if (this.opexDataList == null)

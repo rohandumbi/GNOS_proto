@@ -1,6 +1,5 @@
 package com.org.gnos.ui.graph;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -35,6 +34,7 @@ import com.org.gnos.db.model.ProcessJoin;
 import com.org.gnos.db.model.Product;
 import com.org.gnos.db.model.ProductJoin;
 import com.org.gnos.ui.custom.controls.ProductDefinitionDialog;
+import com.org.gnos.ui.custom.controls.ProductJoinAdditionDialog;
 import com.org.gnos.ui.custom.controls.ProductJoinDefinitionDialog;
 import com.org.gnos.utilities.SWTResourceManager;
 
@@ -77,10 +77,20 @@ public class ProcessDefinitionGraph extends Composite {
 		return false;
 	}
 	
-	public boolean isProductNode(String prductName) {
+	public boolean isProductNode(String productName) {
 		List<Product> products = ProjectConfigutration.getInstance().getProductList();
 		for(Product product: products){
-			if(product.getName().equals(prductName)){
+			if(product.getName().equals(productName)){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean isProductJoinNode(String productJoinName) {
+		List<ProductJoin> productJoins = ProjectConfigutration.getInstance().getProductJoinList();
+		for(ProductJoin productJoin: productJoins){
+			if(productJoin.getName().equals(productJoinName)){
 				return true;
 			}
 		}
@@ -125,10 +135,20 @@ public class ProcessDefinitionGraph extends Composite {
 					}else if(isProductNode(nodeName)){
 						Menu menu = new Menu(getShell(), SWT.POP_UP);
 						MenuItem itemAddProductJoin = new MenuItem(menu, SWT.NONE);
-						itemAddProductJoin.setText("Join with other products");
+						itemAddProductJoin.setText("Join with other products to create a join");
 						itemAddProductJoin.addListener(SWT.Selection, new Listener() {
 							public void handleEvent(Event e) {
 								handleCreateProductJoin(nodeName);
+							}
+						});
+						menu.setVisible(true);
+					}else if(isProductJoinNode(nodeName)){
+						Menu menu = new Menu(getShell(), SWT.POP_UP);
+						MenuItem itemAddProductJoin = new MenuItem(menu, SWT.NONE);
+						itemAddProductJoin.setText("Join with other product joins to create a join");
+						itemAddProductJoin.addListener(SWT.Selection, new Listener() {
+							public void handleEvent(Event e) {
+								handleCombineProductJoins(nodeName);
 							}
 						});
 						menu.setVisible(true);
@@ -137,6 +157,22 @@ public class ProcessDefinitionGraph extends Composite {
 			}
 		});
 		this.displayProcess(processTree.getRoot());
+	}
+	
+	private void handleCombineProductJoins(String initialProductJoinName){
+		System.out.println("Create join with " + initialProductJoinName);
+		String[] listOfProductNames = this.getProductJoinNames();
+		ProductJoinAdditionDialog productJoinAdditionDialog = new ProductJoinAdditionDialog(getShell(), listOfProductNames, initialProductJoinName);
+		if (Window.OK == productJoinAdditionDialog.open()) {
+			String definedProductJoinName = productJoinAdditionDialog.getProductJoinName();
+			List<ProductJoin> childProductJoins = productJoinAdditionDialog.getChildProductJoins();
+			
+			ProductJoin newProductJoin = new ProductJoin(definedProductJoinName);
+			newProductJoin.setListChildProductJoins(childProductJoins);
+			
+			this.addProductJoinToProductJoins(newProductJoin);
+			this.listOfProductJoins.add(newProductJoin);
+		}
 	}
 	
 	private void handleCreateProductJoin(String initialProductName) {
@@ -205,6 +241,17 @@ public class ProcessDefinitionGraph extends Composite {
 
 		return productNamesArray;
 	}
+	
+	private String[] getProductJoinNames(){
+
+		List<ProductJoin> productJoins = ProjectConfigutration.getInstance().getProductJoinList();
+        String[] productJoinNamesArray = new String[productJoins.size()];
+		for(int i=0; i<productJoins.size(); i++){
+			productJoinNamesArray[i] = productJoins.get(i).getName();
+		}
+
+		return productJoinNamesArray;
+	}
 
 	public void displayProcess(Node rootnode) {
 		this.displayProcess(rootnode, null);
@@ -251,6 +298,17 @@ public class ProcessDefinitionGraph extends Composite {
 		for(Product product : productJoin.getlistChildProducts()){
 			GraphNode productNode = this.existingProductGraphNodes.get(product.getName());
 			new GraphConnection(this.graph, ZestStyles.CONNECTIONS_DIRECTED, productNode, productJoinNode);
+		}
+		this.graph.setLayoutAlgorithm(new TreeLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);
+	}
+	
+	public void addProductJoinToProductJoins(ProductJoin productJoin) {
+		GraphNode parentProductJoinNode = new GraphNode(this.graph, SWT.NONE, productJoin.getName());
+		parentProductJoinNode.setBackgroundColor(SWTResourceManager.getColor(SWT.COLOR_GREEN));
+		this.existingProductJoinGraphNodes.put(productJoin.getName(), parentProductJoinNode);
+		for(ProductJoin childProductJoin : productJoin.getListChildProductJoins()){
+			GraphNode childProductNode = this.existingProductJoinGraphNodes.get(childProductJoin.getName());
+			new GraphConnection(this.graph, ZestStyles.CONNECTIONS_DIRECTED, childProductNode, parentProductJoinNode);
 		}
 		this.graph.setLayoutAlgorithm(new TreeLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);
 	}

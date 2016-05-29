@@ -28,7 +28,6 @@ import com.org.gnos.db.model.Product;
 
 public class ProductJoinDefinitionDialog extends Dialog {
 
-	//private ProcessDefinitionFormScreen processDefinitionFormScreen;
 	private String[] availableProductNames;
 	private Label lblProductName;
 	private Composite container;
@@ -60,7 +59,7 @@ public class ProductJoinDefinitionDialog extends Dialog {
 		fd_lblProductName.top = new FormAttachment(0, 10);
 		fd_lblProductName.left = new FormAttachment(0, 10);
 		this.lblProductName.setLayoutData(fd_lblProductName);
-		this.lblProductName.setText("Product Name:");
+		this.lblProductName.setText("Product Join Name:");
 		
 		this.textProductJoinName = new Text(this.container, SWT.BORDER);
 		FormData fd_textProductJoinName = new FormData();
@@ -87,7 +86,7 @@ public class ProductJoinDefinitionDialog extends Dialog {
 		
 		this.addProductDefinitionRow(this.defaultProductName);
 				
-		container.getShell().setText("Process Details");
+		container.getShell().setText("Join Products");
 		this.setDialogLocation();
 		return this.container;
 	}
