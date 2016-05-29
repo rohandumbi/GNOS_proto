@@ -83,6 +83,7 @@ public class ProjectConfigutration {
 		loadProcessTree();
 		loadProcessJoins();
 		loadProducts();
+		loadProductJoins();
 		loadDiscountFactor();
 		loadOpexData();
 		loadFixedCost();
@@ -373,6 +374,74 @@ public class ProjectConfigutration {
 			}
 		}
 	}
+	
+	public void loadProductJoins() {
+		String sql1 = "select name, child_product_name, child_product_join_name from product_join_defn where project_id = "
+				+ this.projectId + " and child_product_name is not null order by name ";
+		Statement stmt1 = null;
+		ResultSet rs1 = null;
+		
+		
+		String sql2 = "select name, child_product_name, child_product_join_name from product_join_defn where project_id = "
+				+ this.projectId + " and child_product_join_name is not null order by name ";
+		Statement stmt2 = null;
+		ResultSet rs2 = null;
+		
+		Connection conn = DBManager.getConnection();
+		try {
+			stmt1 = conn.createStatement();
+			stmt1.execute(sql1);
+			rs1 = stmt1.getResultSet();
+			
+			while(rs1.next()){
+				String productJoinName = rs1.getString(1);
+				ProductJoin productJoin = this.getProductJoinByName(productJoinName);
+				if(productJoin == null){
+					productJoin = new ProductJoin(productJoinName);
+					this.productJoinList.add(productJoin);
+				}
+				String childProductName = rs1.getString(2);
+				Product product = this.getProductByName(childProductName);
+				productJoin.addProduct(product);		
+				
+			}
+			
+			stmt2 = conn.createStatement();
+			stmt2.execute(sql2);
+			rs2 = stmt2.getResultSet();
+			
+			while(rs2.next()){
+				String productJoinName = rs2.getString(1);
+				ProductJoin productJoin = this.getProductJoinByName(productJoinName);
+				if(productJoin == null){
+					productJoin = new ProductJoin(productJoinName);
+					this.productJoinList.add(productJoin);
+				}
+				String childProductJoinName = rs2.getString(3);
+				ProductJoin childProductJoin = this.getProductJoinByName(childProductJoinName);
+				productJoin.addProductJoin(childProductJoin);		
+				
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (stmt1 != null)
+					stmt1.close();
+				if (rs1 != null)
+					rs1.close();
+				if (stmt2 != null)
+					stmt2.close();
+				if (rs2 != null)
+					rs2.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
 	public void loadDiscountFactor() {
 		String sql = "select id, value from discount_factor where project_id = " + this.projectId;
@@ -558,6 +627,7 @@ public class ProjectConfigutration {
 		saveProcessTree();
 		saveProcessJoins();
 		saveProducts();
+		saveProductJoins();
 		saveDiscountFactor();
 		saveOpexData();
 		saveFixedCostData();
@@ -870,6 +940,60 @@ public class ProjectConfigutration {
 					pstmt.executeUpdate();
 				}
 			}
+			conn.commit();
+		}catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				conn.setAutoCommit(autoCommit);
+				if (pstmt != null)
+					pstmt.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public void saveProductJoins() {
+		Connection conn = DBManager.getConnection();
+		String insert_sql = " insert into product_join_defn (project_id, name, child_product_name, child_product_join_name) values (?, ?, ?, ?)";
+		PreparedStatement pstmt = null;
+		boolean autoCommit = true;
+
+		if(this.productJoinList.size() < 1){ // no process joins defined
+			return;
+		}
+
+		try{
+			autoCommit = conn.getAutoCommit();
+			conn.setAutoCommit(false);
+			pstmt = conn.prepareStatement(insert_sql);
+			
+			for(ProductJoin productJoin : this.productJoinList) {
+				String productJoinName = productJoin.getName();
+				List<Product> childProducts = productJoin.getlistChildProducts();
+				if(childProducts.size() > 0){//this product join is 0th level product joins and consists only of products ie join of products
+					for(Product childProduct : childProducts) {
+						pstmt.setInt(1, this.projectId);
+						pstmt.setString(2, productJoinName);
+						pstmt.setString(3, childProduct.getName());
+						pstmt.setNull(4, java.sql.Types.VARCHAR);
+						pstmt.executeUpdate();
+					}
+				}else{// this product join is join of product joins
+					List<ProductJoin> childProductJoins = productJoin.getListChildProductJoins();
+					for(ProductJoin chilsProductJoin : childProductJoins) {
+						pstmt.setInt(1, this.projectId);
+						pstmt.setString(2, productJoinName);
+						pstmt.setNull(3, java.sql.Types.VARCHAR);
+						pstmt.setString(4, chilsProductJoin.getName());
+						pstmt.executeUpdate();
+					}
+				}
+			}
+			
 			conn.commit();
 		}catch (SQLException e) {
 			e.printStackTrace();
@@ -1367,6 +1491,26 @@ public class ProjectConfigutration {
 
 	public List<ProductJoin> getProductJoinList() {
 		return productJoinList;
+	}
+	
+	public List<ProductJoin> getProductJoinOfProductsList() {
+		List<ProductJoin> productJoinOfProducts = new ArrayList<ProductJoin>();
+		for(ProductJoin pj: productJoinList){
+			if(pj.getlistChildProducts().size() > 0){
+				productJoinOfProducts.add(pj);
+			}
+		}
+		return productJoinOfProducts;
+	}
+	
+	public List<ProductJoin> getProductJoinOfProductsJoinsList() {
+		List<ProductJoin> productJoinOfProductJoins = new ArrayList<ProductJoin>();
+		for(ProductJoin pj: productJoinList){
+			if(pj.getListChildProductJoins().size() > 0){
+				productJoinOfProductJoins.add(pj);
+			}
+		}
+		return productJoinOfProductJoins;
 	}
 
 	public void setProductJoinList(List<ProductJoin> productJoinList) {
