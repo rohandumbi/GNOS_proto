@@ -21,6 +21,7 @@ import com.org.gnos.db.model.Field;
 import com.org.gnos.db.model.FixedOpexCost;
 import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.OpexData;
+import com.org.gnos.db.model.OreMiningCost;
 import com.org.gnos.db.model.Pit;
 import com.org.gnos.db.model.ProcessConstraintData;
 import com.org.gnos.db.model.ProcessJoin;
@@ -292,9 +293,10 @@ public class ProjectConfigutration {
 			}
 		}
 	}
-
-	public void loadDiscountFactor() {
-		String sql = "select id, value from discount_factor where project_id = " + this.projectId;
+	
+	public void loadProducts() {
+		String sql = "select name, associated_model_id, child_expression_id from product_defn where project_id = "
+				+ this.projectId + " order by name ";
 		Statement stmt = null;
 		ResultSet rs = null;
 		Connection conn = DBManager.getConnection();
@@ -302,13 +304,21 @@ public class ProjectConfigutration {
 			stmt = conn.createStatement();
 			stmt.execute(sql);
 			rs = stmt.getResultSet();
+
 			while (rs.next()) {
-				int id = rs.getInt(1);
-				float value = rs.getFloat(2);
-				if(this.discountFactor == null){
-					this.discountFactor = new DiscountFactor();
-					this.discountFactor.setId(id);
-					this.discountFactor.setValue(value);
+
+				String productName = rs.getString(1);
+				int associatedModelId = rs.getInt(2);
+				Product product = this.getProductByName(productName);
+				Model model = this.getModelById(associatedModelId);
+				if(product == null){
+					product = new Product(productName, model);
+					this.productList.add(product);
+				}
+				int expressionId = rs.getInt(3);
+				Expression expression = this.getExpressionById(expressionId);
+				if(expression != null){
+					product.addExpression(expression);
 				}
 			}
 		} catch (SQLException e) {
@@ -326,9 +336,74 @@ public class ProjectConfigutration {
 			}
 		}
 	}
-
-
-
+	
+	public void loadProductJoins() {
+		String sql1 = "select name, child_product_name, child_product_join_name from product_join_defn where project_id = "
+				+ this.projectId + " and child_product_name is not null order by name ";
+		Statement stmt1 = null;
+		ResultSet rs1 = null;
+		
+		
+		String sql2 = "select name, child_product_name, child_product_join_name from product_join_defn where project_id = "
+				+ this.projectId + " and child_product_join_name is not null order by name ";
+		Statement stmt2 = null;
+		ResultSet rs2 = null;
+		
+		Connection conn = DBManager.getConnection();
+		try {
+			stmt1 = conn.createStatement();
+			stmt1.execute(sql1);
+			rs1 = stmt1.getResultSet();
+			
+			while(rs1.next()){
+				String productJoinName = rs1.getString(1);
+				ProductJoin productJoin = this.getProductJoinByName(productJoinName);
+				if(productJoin == null){
+					productJoin = new ProductJoin(productJoinName);
+					this.productJoinList.add(productJoin);
+				}
+				String childProductName = rs1.getString(2);
+				Product product = this.getProductByName(childProductName);
+				productJoin.addProduct(product);		
+				
+			}
+			
+			stmt2 = conn.createStatement();
+			stmt2.execute(sql2);
+			rs2 = stmt2.getResultSet();
+			
+			while(rs2.next()){
+				String productJoinName = rs2.getString(1);
+				ProductJoin productJoin = this.getProductJoinByName(productJoinName);
+				if(productJoin == null){
+					productJoin = new ProductJoin(productJoinName);
+					this.productJoinList.add(productJoin);
+				}
+				String childProductJoinName = rs2.getString(3);
+				ProductJoin childProductJoin = this.getProductJoinByName(childProductJoinName);
+				productJoin.addProductJoin(childProductJoin);		
+				
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (stmt1 != null)
+					stmt1.close();
+				if (rs1 != null)
+					rs1.close();
+				if (stmt2 != null)
+					stmt2.close();
+				if (rs2 != null)
+					rs2.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
 	public void save() {
 		saveFieldData();
@@ -624,31 +699,82 @@ public class ProjectConfigutration {
 
 		if(this.productJoinList.size() < 1){ // no process joins defined
 			return;
-	}
+		}
 
-	public void saveDiscountFactor() {
-		Connection conn = DBManager.getConnection();
-		String insert_sql = "insert into discount_factor (project_id, scenario_id, value) values (?, ?, ?)";
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		boolean autoCommit = true;
-
-		try {
+		try{
 			autoCommit = conn.getAutoCommit();
 			conn.setAutoCommit(false);
-			pstmt = conn.prepareStatement(insert_sql, Statement.RETURN_GENERATED_KEYS);
-			pstmt.setInt(1, projectId);
-			pstmt.setInt(2, 1);
-			pstmt.setFloat(3, this.discountFactor.getValue());
-			pstmt.executeUpdate();
-			rs = pstmt.getGeneratedKeys();
-			if (rs.next()){
-				int id = rs.getInt(1);
-				this.discountFactor.setId(id);
+			pstmt = conn.prepareStatement(insert_sql);
+			
+			for(ProductJoin productJoin : this.productJoinList) {
+				String productJoinName = productJoin.getName();
+				List<Product> childProducts = productJoin.getlistChildProducts();
+				if(childProducts.size() > 0){//this product join is 0th level product joins and consists only of products ie join of products
+					for(Product childProduct : childProducts) {
+						pstmt.setInt(1, this.projectId);
+						pstmt.setString(2, productJoinName);
+						pstmt.setString(3, childProduct.getName());
+						pstmt.setNull(4, java.sql.Types.VARCHAR);
+						pstmt.executeUpdate();
+					}
+				}else{// this product join is join of product joins
+					List<ProductJoin> childProductJoins = productJoin.getListChildProductJoins();
+					for(ProductJoin chilsProductJoin : childProductJoins) {
+						pstmt.setInt(1, this.projectId);
+						pstmt.setString(2, productJoinName);
+						pstmt.setNull(3, java.sql.Types.VARCHAR);
+						pstmt.setString(4, chilsProductJoin.getName());
+						pstmt.executeUpdate();
+					}
+				}
+			}
+			
+			conn.commit();
+		}catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				conn.setAutoCommit(autoCommit);
+				if (pstmt != null)
+					pstmt.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public void saveProducts() {
+		Connection conn = DBManager.getConnection();
+		String insert_sql = " insert into product_defn (project_id, name, associated_model_id, child_expression_id) values (?, ?, ?, ?)";
+		PreparedStatement pstmt = null;
+		boolean autoCommit = true;
+
+		if(this.productList.size() < 1){ // no products defined
+			return;
+		}
+
+		try{
+			autoCommit = conn.getAutoCommit();
+			conn.setAutoCommit(false);
+			pstmt = conn.prepareStatement(insert_sql);
+
+			for(Product product : this.productList){
+				String productName = product.getName();
+				int modelId = product.getAssociatedProcess().getId();
+				
+				for(Expression expression : product.getListOfExpressions()){
+					int expId = expression.getId();
+					pstmt.setInt(1, this.projectId);
+					pstmt.setString(2, productName);
+					pstmt.setInt(3, modelId);
+					pstmt.setInt(4, expId);
+					pstmt.executeUpdate();
+				}
 			}
 			conn.commit();
-
-		} catch (SQLException e) {
+		}catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			try {
