@@ -41,7 +41,6 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 	private ProcessDefinitionGraph compositeProcessDiagram;
 	private java.util.List<ProcessJoin> listOfProcessJoins;
 	private java.util.List<Product> listOfProducts;
-	private java.util.List<ProductJoin> listOfProductJoins;
 	private java.util.List<ProductJoin> listOfProductJoinOfProducts;
 	private java.util.List<ProductJoin> listOfProductJoinOfProductJoins;
 
@@ -54,7 +53,6 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 		this.processTree = ProjectConfigutration.getInstance().getProcessTree();
 		this.listOfProcessJoins = ProjectConfigutration.getInstance().getProcessJoins();
 		this.listOfProducts = ProjectConfigutration.getInstance().getProductList();
-		this.listOfProductJoins = ProjectConfigutration.getInstance().getProductJoinList();
 		this.listOfProductJoinOfProducts = ProjectConfigutration.getInstance().getProductJoinOfProductsList();
 		this.listOfProductJoinOfProductJoins = ProjectConfigutration.getInstance().getProductJoinOfProductsJoinsList();
 		
