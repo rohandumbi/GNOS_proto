@@ -16,19 +16,14 @@ import java.util.Set;
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.dao.ExpressionDAO;
 import com.org.gnos.db.dao.FieldDAO;
-import com.org.gnos.db.model.DiscountFactor;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Field;
 import com.org.gnos.db.model.FixedOpexCost;
 import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.OpexData;
-import com.org.gnos.db.model.OreMiningCost;
 import com.org.gnos.db.model.Pit;
 import com.org.gnos.db.model.ProcessConstraintData;
 import com.org.gnos.db.model.ProcessJoin;
-import com.org.gnos.db.model.StockpileReclaimingCost;
-import com.org.gnos.db.model.StockpilingCost;
-import com.org.gnos.db.model.WasteMiningCost;
 import com.org.gnos.services.PitBenchProcessor;
 
 public class ProjectConfigutration {
@@ -39,7 +34,6 @@ public class ProjectConfigutration {
 	private Map<String, String> requiredFieldMapping = new LinkedHashMap<String, String>();
 	private List<Expression> expressions = new ArrayList<Expression>();
 	private List<Model> models = new ArrayList<Model>();
-	private DiscountFactor discountFactor;
 	private List<OpexData> opexDataList = new ArrayList<OpexData>();
 	private FixedOpexCost[] fixedCost;
 	private Tree processTree = null;
@@ -79,10 +73,6 @@ public class ProjectConfigutration {
 		loadModels();
 		loadProcessTree();
 		loadProcessJoins();
-		loadDiscountFactor();
-		loadOpexData();
-		loadFixedCost();
-		loadProcessConstraintData();
 	}
 
 	private void loadFieldData() {
@@ -294,181 +284,9 @@ public class ProjectConfigutration {
 		}
 	}
 
-	public void loadDiscountFactor() {
-		String sql = "select id, value from discount_factor where project_id = " + this.projectId;
-		Statement stmt = null;
-		ResultSet rs = null;
-		Connection conn = DBManager.getConnection();
-		try {
-			stmt = conn.createStatement();
-			stmt.execute(sql);
-			rs = stmt.getResultSet();
-			while (rs.next()) {
-				int id = rs.getInt(1);
-				float value = rs.getFloat(2);
-				if(this.discountFactor == null){
-					this.discountFactor = new DiscountFactor();
-					this.discountFactor.setId(id);
-					this.discountFactor.setValue(value);
-				}
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (stmt != null)
-					stmt.close();
-				if (rs != null)
-					rs.close();
-				if (conn != null)
-					DBManager.releaseConnection(conn);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-	}
 
-	public void loadOpexData() {
-		String sql = "select id, model_id, expression_id, in_use, is_revenue, year, value from opex_defn, model_year_mapping where id= opex_id and project_id = "
-				+ this.projectId + " order by id, year";
-		Statement stmt = null;
-		ResultSet rs = null;
-		Connection conn = DBManager.getConnection();
-		try {
-			stmt = conn.createStatement();
-			stmt.execute(sql);
-			rs = stmt.getResultSet();
-			OpexData od;
-			while (rs.next()) {
-				int id = rs.getInt(1);
-				int modelId = rs.getInt(2);
-				int expressionId = rs.getInt(3);
-				Model model = this.getModelById(modelId);
 
-				od = getOpexDataById(id);
-				if (od == null) {
-					od = new OpexData(model);					
-					od.setId(id);
-					od.setInUse(rs.getBoolean(4));
-					od.setRevenue(rs.getBoolean(5));
-					if(od.isRevenue()){
-						Expression expression = this.getExpressionById(expressionId);
-						od.setExpression(expression);
-					}
 
-					this.opexDataList.add(od);
-				}
-				od.addYear(rs.getInt(6), rs.getFloat(7));
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (stmt != null)
-					stmt.close();
-				if (rs != null)
-					rs.close();
-				if (conn != null)
-					DBManager.releaseConnection(conn);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	public void loadFixedCost() {
-		String sql = "select cost_head, year, value, value from fixedcost_year_mapping where project_id = "
-				+ this.projectId + " order by cost_head";
-		fixedCost = new FixedOpexCost[4];
-		Statement stmt = null;
-		ResultSet rs = null;
-		Connection conn = DBManager.getConnection();
-		try {
-			stmt = conn.createStatement();
-			stmt.execute(sql);
-			rs = stmt.getResultSet();
-			while (rs.next()) {
-				int costHead = rs.getInt(1);
-				int year = rs.getInt(2);
-				float value = rs.getFloat(3);
-				FixedOpexCost fixedOpexCost = fixedCost[costHead];
-				if (fixedOpexCost == null) {
-					if (costHead == 0) {
-						fixedOpexCost = new OreMiningCost();
-					} else if (costHead == 1) {
-						fixedOpexCost = new WasteMiningCost();
-					} else if (costHead == 2) {
-						fixedOpexCost = new StockpilingCost();
-					} else if (costHead == 3) {
-						fixedOpexCost = new StockpileReclaimingCost();
-					}
-					fixedCost[costHead] = fixedOpexCost;
-				}
-
-				fixedOpexCost.getCostData().put(year, value);
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (stmt != null)
-					stmt.close();
-				if (rs != null)
-					rs.close();
-				if (conn != null)
-					DBManager.releaseConnection(conn);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-	
-	public void loadProcessConstraintData() {
-		String sql = "select id, process_join_name, expression_id, in_use, is_max, year, value from process_constraint_defn, process_constraint_year_mapping where id= process_constraint_id and project_id = "
-				+ this.projectId + " order by id, year";
-		Statement stmt = null;
-		ResultSet rs = null;
-		Connection conn = DBManager.getConnection();
-		try {
-			stmt = conn.createStatement();
-			stmt.execute(sql);
-			rs = stmt.getResultSet();
-			ProcessConstraintData pcd;
-			while (rs.next()) {
-				int id = rs.getInt(1);
-				String processJoinName = rs.getString(2);
-				int expressionId = rs.getInt(3);
-				//Model model = this.getModelById(modelId);
-				ProcessJoin processJoin = this.getProcessJoinByName(processJoinName);
-
-				pcd = getProcessConstraintDataById(id);
-				if (pcd == null) {
-					pcd = new ProcessConstraintData();					
-					pcd.setId(id);
-					pcd.setInUse(rs.getBoolean(4));
-					pcd.setMax(rs.getBoolean(5));
-					pcd.setExpression(this.getExpressionById(expressionId));
-					pcd.setProcessJoin(processJoin);
-
-					this.processConstraintDataList.add(pcd);
-				}
-				pcd.addYear(rs.getInt(6), rs.getFloat(7));
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (stmt != null)
-					stmt.close();
-				if (rs != null)
-					rs.close();
-				if (conn != null)
-					DBManager.releaseConnection(conn);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-	}
 
 	public void save() {
 		saveFieldData();
@@ -477,11 +295,6 @@ public class ProjectConfigutration {
 		saveModelData();
 		saveProcessTree();
 		saveProcessJoins();
-		saveDiscountFactor();
-		saveOpexData();
-		saveFixedCostData();
-		saveProcessConstraintData();
-		//new EquationGenerator().generate();
 
 	}
 
@@ -759,216 +572,6 @@ public class ProjectConfigutration {
 		}
 	}
 
-	public void saveDiscountFactor() {
-		Connection conn = DBManager.getConnection();
-		String insert_sql = "insert into discount_factor (project_id, scenario_id, value) values (?, ?, ?)";
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		boolean autoCommit = true;
-
-		try {
-			autoCommit = conn.getAutoCommit();
-			conn.setAutoCommit(false);
-			pstmt = conn.prepareStatement(insert_sql, Statement.RETURN_GENERATED_KEYS);
-			pstmt.setInt(1, projectId);
-			pstmt.setInt(2, 1);
-			pstmt.setFloat(3, this.discountFactor.getValue());
-			pstmt.executeUpdate();
-			rs = pstmt.getGeneratedKeys();
-			if (rs.next()){
-				int id = rs.getInt(1);
-				this.discountFactor.setId(id);
-			}
-			conn.commit();
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				conn.setAutoCommit(autoCommit);
-				if (pstmt != null)
-					pstmt.close();
-				if (conn != null)
-					DBManager.releaseConnection(conn);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	public void saveProcessConstraintData() {
-		Connection conn = DBManager.getConnection();
-		String insert_sql = "insert into process_constraint_defn (project_id, scenario_id, process_join_name, expression_id, in_use, is_max) values (?, ?, ?, ?, ?, ?)";
-		String mapping_sql = "insert into process_constraint_year_mapping (process_constraint_id, year, value) values (?, ?, ?)";
-		PreparedStatement pstmt = null;
-		PreparedStatement pstmt1 = null;
-		ResultSet rs = null;
-		boolean autoCommit = true;
-
-		try {
-			autoCommit = conn.getAutoCommit();
-			conn.setAutoCommit(false);
-			pstmt = conn.prepareStatement(insert_sql,
-					Statement.RETURN_GENERATED_KEYS);
-			pstmt1 = conn.prepareStatement(mapping_sql);
-			
-			for(ProcessConstraintData pcd : this.processConstraintDataList) {
-				if (pcd.getId() > 0)
-					continue;
-				pstmt.setInt(1, projectId);
-				pstmt.setInt(2, 1);
-				pstmt.setString(3, pcd.getProcessJoin().getName());
-				if(pcd.getExpression() != null){
-					pstmt.setInt(4, pcd.getExpression().getId());
-				}else{
-					pstmt.setNull(4, java.sql.Types.INTEGER);
-				}
-				pstmt.setBoolean(5, pcd.isInUse());
-				pstmt.setBoolean(6, pcd.isMax());
-				pstmt.executeUpdate();
-				rs = pstmt.getGeneratedKeys();
-				
-				if (rs.next()){
-					int id = rs.getInt(1);
-					pcd.setId(id);
-
-					Set keys = pcd.getConstraintData().keySet();
-					Iterator<Integer> it = keys.iterator();
-					while (it.hasNext()) {
-						int key = it.next();
-						pstmt1.setInt(1, pcd.getId());
-						pstmt1.setInt(2, key);
-						pstmt1.setFloat(3, pcd.getConstraintData().get(key));
-						pstmt1.executeUpdate();
-					}
-				}
-			}
-
-			conn.commit();
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				conn.setAutoCommit(autoCommit);
-				if (pstmt != null)
-					pstmt.close();
-				if (conn != null)
-					DBManager.releaseConnection(conn);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-	
-	public void saveOpexData() {
-		Connection conn = DBManager.getConnection();
-		String insert_sql = "insert into opex_defn (project_id, scenario_id, model_id, expression_id, in_use, is_revenue) values (?, ?, ?, ?, ?, ?)";
-		String mapping_sql = "insert into model_year_mapping (opex_id, year, value) values (?, ?, ?)";
-		PreparedStatement pstmt = null;
-		PreparedStatement pstmt1 = null;
-		ResultSet rs = null;
-		boolean autoCommit = true;
-
-		try {
-			autoCommit = conn.getAutoCommit();
-			conn.setAutoCommit(false);
-			pstmt = conn.prepareStatement(insert_sql,
-					Statement.RETURN_GENERATED_KEYS);
-			pstmt1 = conn.prepareStatement(mapping_sql);
-
-			for (OpexData od : this.opexDataList) {
-				if (od.getId() > 0)
-					continue;
-				pstmt.setInt(1, projectId);
-				pstmt.setInt(2, 1);
-				pstmt.setInt(3, od.getModel().getId());
-				if(od.getExpression() != null){
-					pstmt.setInt(4, od.getExpression().getId());
-				}else{
-					pstmt.setNull(4, java.sql.Types.INTEGER);
-				}
-				pstmt.setBoolean(5, od.isInUse());
-				pstmt.setBoolean(6, od.isRevenue());
-				pstmt.executeUpdate();
-				rs = pstmt.getGeneratedKeys();
-				if (rs.next())
-				{
-					int id = rs.getInt(1);
-					od.setId(id);
-
-					Set keys = od.getCostData().keySet();
-					Iterator<Integer> it = keys.iterator();
-					while (it.hasNext()) {
-						int key = it.next();
-						pstmt1.setInt(1, od.getId());
-						pstmt1.setInt(2, key);
-						pstmt1.setFloat(3, od.getCostData().get(key));
-						pstmt1.executeUpdate();
-					}
-				}
-			}
-			conn.commit();
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				conn.setAutoCommit(autoCommit);
-				if (pstmt != null)
-					pstmt.close();
-				if (conn != null)
-					DBManager.releaseConnection(conn);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	public void saveFixedCostData() {
-		Connection conn = DBManager.getConnection();
-		String insert_sql = "insert into fixedcost_year_mapping (project_id, scenario_id, cost_head, year, value) values (?, ?, ?, ?, ?)";
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		boolean autoCommit = true;
-
-		try {
-			autoCommit = conn.getAutoCommit();
-			conn.setAutoCommit(false);
-			pstmt = conn.prepareStatement(insert_sql,
-					Statement.RETURN_GENERATED_KEYS);
-
-			for (int i = 0; i < fixedCost.length; i++) {
-				FixedOpexCost fixedOpexCost = fixedCost[i];
-				Set keys = fixedOpexCost.getCostData().keySet();
-				Iterator<Integer> it = keys.iterator();
-				while (it.hasNext()) {
-					int key = it.next();
-					pstmt.setInt(1, projectId);
-					pstmt.setInt(2, 1);
-					pstmt.setInt(3, i);
-					pstmt.setInt(4, key);
-					pstmt.setFloat(5, fixedOpexCost.getCostData().get(key));
-					pstmt.executeUpdate();
-				}
-			}
-			conn.commit();
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				conn.setAutoCommit(autoCommit);
-				if (pstmt != null)
-					pstmt.close();
-				if (conn != null)
-					DBManager.releaseConnection(conn);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
 	public Expression getExpressionById(int expressionId) {
 		for (Expression expression : expressions) {
 			if (expression.getId() == expressionId) {
@@ -1108,15 +711,6 @@ public class ProjectConfigutration {
 
 	public void setProcessTree(Tree processTree) {
 		this.processTree = processTree;
-	}
-
-
-	public DiscountFactor getDiscountFactor() {
-		return discountFactor;
-	}
-
-	public void setDiscountFactor(DiscountFactor discountFactor) {
-		this.discountFactor = discountFactor;
 	}
 
 	public List<OpexData> getOpexDataList() {

@@ -11,6 +11,18 @@ CREATE TABLE project (
    UNIQUE (name)
 );
 
+DROP TABLE IF EXISTS scenario; 
+
+CREATE TABLE scenario (
+   id INT NOT NULL AUTO_INCREMENT,
+   project_id INT NOT NULL,
+   name VARCHAR(100),
+   start_year INT,
+   time_period INT,
+   discount FLOAT,
+   PRIMARY KEY ( id )
+);
+
 DROP TABLE IF EXISTS fields;
 
 CREATE TABLE fields(
@@ -95,7 +107,6 @@ DROP TABLE IF EXISTS opex_defn;
 
 CREATE TABLE opex_defn(
    id INT NOT NULL AUTO_INCREMENT,
-   project_id INT NOT NULL,
    scenario_id INT NOT NULL,
    model_id INT NOT NULL,
    expression_id INT,
@@ -108,24 +119,12 @@ DROP TABLE IF EXISTS process_constraint_defn;
 
 CREATE TABLE process_constraint_defn(
    id INT NOT NULL AUTO_INCREMENT,
-   project_id INT NOT NULL,
    scenario_id INT NOT NULL,
    process_join_name VARCHAR(100),
    expression_id INT,
    in_use TINYINT NOT NULL default 1,
    is_max TINYINT NOT NULL default 1,
    PRIMARY KEY ( id )
-);
-
-DROP TABLE IF EXISTS discount_factor; 
-
-CREATE TABLE discount_factor(
-   id INT NOT NULL AUTO_INCREMENT,
-   project_id INT NOT NULL,
-   scenario_id INT NOT NULL,
-   value FLOAT,
-   PRIMARY KEY ( id ),
-   unique key(project_id, scenario_id)
 );
 
 DROP TABLE IF EXISTS model_year_mapping; 
@@ -149,10 +148,9 @@ CREATE TABLE process_constraint_year_mapping(
 DROP TABLE IF EXISTS fixedcost_year_mapping; 
 
 CREATE TABLE fixedcost_year_mapping(
-   project_id INT NOT NULL,
    scenario_id INT NOT NULL,
    cost_head float NOT NULL,
    year INT NOT NULL,
    value FLOAT NOT NULL,
-   unique key(project_id, scenario_id, cost_head, year)
+   unique key(scenario_id, cost_head, year)
 );

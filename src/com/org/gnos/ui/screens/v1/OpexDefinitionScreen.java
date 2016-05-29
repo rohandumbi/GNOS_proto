@@ -20,7 +20,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.core.ProjectConfigutration;
-import com.org.gnos.db.model.DiscountFactor;
 import com.org.gnos.db.model.FixedOpexCost;
 import com.org.gnos.db.model.OpexData;
 import com.org.gnos.events.GnosEvent;
@@ -40,7 +39,6 @@ public class OpexDefinitionScreen extends GnosScreen {
 	private MiningStockpileCostGrid miningStockpileCostGrid;
 	private Label labelScreenName;
 	private List<OpexData> opexDataList;
-	private DiscountFactor discountFactor;
 	/**
 	 * Create the composite.
 	 * @param parent
@@ -132,13 +130,13 @@ public class OpexDefinitionScreen extends GnosScreen {
 				int startingYear = Integer.parseInt(textStartYear.getText());
 				int numberOfIncrements = Integer.parseInt(textNumberOfIncrements.getText());
 				String discountFactorValue = textDiscountFactor.getText();
-				DiscountFactor df = new DiscountFactor();
+/*				DiscountFactor df = new DiscountFactor();
 				if((discountFactorValue.equals("")) || (discountFactorValue == null)){
 					df.setValue(1);
 				}else{
 					df.setValue(Float.parseFloat(discountFactorValue));
 				}
-				ProjectConfigutration.getInstance().setDiscountFactor(df);
+				ProjectConfigutration.getInstance().setDiscountFactor(df);*/
 				//ProjectConfigutration.getInstance().saveDiscountFactor();
 				TimePeriod timePeriod = new TimePeriod(startingYear, numberOfIncrements);
 				initializeOpexGrid(timePeriod);
@@ -156,7 +154,7 @@ public class OpexDefinitionScreen extends GnosScreen {
 		 * If there is an existing Opex data for the project
 		 */
 		this.opexDataList = ProjectConfigutration.getInstance().getOpexDataList();
-		this.discountFactor = ProjectConfigutration.getInstance().getDiscountFactor();
+
 		if(this.opexDataList.size() > 0){
 			OpexData opexData = this.opexDataList.get(0);
 			Map<Integer, Float> mapCostData = opexData.getCostData();
@@ -172,9 +170,9 @@ public class OpexDefinitionScreen extends GnosScreen {
 			initializeOpexGrid(savedTimePeriod);
 			initializeMiningStockpileCostGrid(savedTimePeriod);
 		}
-		if(this.discountFactor != null) {
+		/*if(this.discountFactor != null) {
 			textDiscountFactor.setText(String.valueOf(this.discountFactor.getValue()));
-		}
+		}*/
 		
 	}
 	

@@ -19,6 +19,7 @@ import java.util.Set;
 import com.org.gnos.core.Block;
 import com.org.gnos.core.Node;
 import com.org.gnos.core.ProjectConfigutration;
+import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.core.Tree;
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.model.Expression;
@@ -32,6 +33,7 @@ public class ObjectiveFunctionEquationGenerator {
 	
 	private BufferedOutputStream output;
 	private ProjectConfigutration projectConfiguration;
+	private ScenarioConfigutration scenarioConfigutration;
 	private Map<Integer, List<CostRevenueData>> modelOpexDataMapping;
 	
 	private Set<Integer> processedBlocks;
@@ -39,11 +41,12 @@ public class ObjectiveFunctionEquationGenerator {
 	private float discount_rate = 0; //this has to be made an input variable later
 	public void generate() {
 		projectConfiguration = ProjectConfigutration.getInstance();
+		scenarioConfigutration = ScenarioConfigutration.getInstance();
 		processedBlocks = new HashSet<Integer>();
 
 		int bufferSize = 8 * 1024;
 		try {
-			discount_rate = ProjectConfigutration.getInstance().getDiscountFactor().getValue();
+			discount_rate = scenarioConfigutration.getDiscount();
 			output = new BufferedOutputStream(new FileOutputStream("output.txt"), bufferSize);
 			bytesWritten = 0;
 			//parseOpexData();

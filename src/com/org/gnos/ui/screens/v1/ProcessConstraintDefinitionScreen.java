@@ -20,14 +20,10 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.core.ProjectConfigutration;
-import com.org.gnos.db.model.DiscountFactor;
-import com.org.gnos.db.model.FixedOpexCost;
 import com.org.gnos.db.model.OpexData;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.services.TimePeriod;
 import com.org.gnos.ui.custom.controls.GnosScreen;
-import com.org.gnos.ui.custom.controls.MiningStockpileCostGrid;
-import com.org.gnos.ui.custom.controls.OpexDefinitionGrid;
 import com.org.gnos.ui.custom.controls.ProcessConstraintGrid;
 
 public class ProcessConstraintDefinitionScreen extends GnosScreen {
@@ -39,7 +35,6 @@ public class ProcessConstraintDefinitionScreen extends GnosScreen {
 	private ProcessConstraintGrid processConstraintGrid;
 	private Label labelScreenName;
 	private List<OpexData> opexDataList;
-	private DiscountFactor discountFactor;
 	/**
 	 * Create the composite.
 	 * @param parent
@@ -132,7 +127,6 @@ public class ProcessConstraintDefinitionScreen extends GnosScreen {
 		 * If there is an existing Opex data for the project
 		 */
 		this.opexDataList = ProjectConfigutration.getInstance().getOpexDataList();
-		this.discountFactor = ProjectConfigutration.getInstance().getDiscountFactor();
 		if(this.opexDataList.size() > 0){
 			OpexData opexData = this.opexDataList.get(0);
 			Map<Integer, Float> mapCostData = opexData.getCostData();
@@ -146,9 +140,6 @@ public class ProcessConstraintDefinitionScreen extends GnosScreen {
 			textStartYear.setText(String.valueOf(startYear));
 			TimePeriod savedTimePeriod = new TimePeriod(startYear, numberOfIncrements);
 			initializeprocessConstraintGrid(savedTimePeriod);
-		}
-		if(this.discountFactor != null) {
-			textDiscountFactor.setText(String.valueOf(this.discountFactor.getValue()));
 		}
 		//this.initializeOpexGrid(timePeriod);
 		
