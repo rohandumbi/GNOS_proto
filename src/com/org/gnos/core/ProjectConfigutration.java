@@ -26,6 +26,7 @@ import com.org.gnos.db.model.Pit;
 import com.org.gnos.db.model.ProcessConstraintData;
 import com.org.gnos.db.model.ProcessJoin;
 import com.org.gnos.db.model.Product;
+import com.org.gnos.db.model.ProductJoin;
 import com.org.gnos.db.model.StockpileReclaimingCost;
 import com.org.gnos.db.model.StockpilingCost;
 import com.org.gnos.db.model.WasteMiningCost;
@@ -46,6 +47,7 @@ public class ProjectConfigutration {
 	private List<ProcessJoin> processJoins = new ArrayList<ProcessJoin>();
 	private List<ProcessConstraintData> processConstraintDataList = new ArrayList<ProcessConstraintData>();
 	private List<Product> productList = new ArrayList<Product>();
+	private List<ProductJoin> productJoinList = new ArrayList<ProductJoin>();
 
 	private boolean newProject = true;
 	private Map<String, String> savedRequiredFieldMapping;
@@ -1351,5 +1353,15 @@ public class ProjectConfigutration {
 	public void addProduct(Product product){
 		this.productList.add(product);
 	}
+
+	public List<ProductJoin> getProductJoinList() {
+		return productJoinList;
+	}
+
+	public void setProductJoinList(List<ProductJoin> productJoinList) {
+		this.productJoinList = productJoinList;
+	}
+	
+	
 
 }
