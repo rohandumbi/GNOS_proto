@@ -154,3 +154,22 @@ CREATE TABLE fixedcost_year_mapping(
    value FLOAT NOT NULL,
    unique key(scenario_id, cost_head, year)
 );
+
+DROP TABLE IF EXISTS product_defn; 
+
+CREATE TABLE product_defn(
+  project_id INT NOT NULL,
+  name  VARCHAR(100) NOT NULL,
+  associated_model_id INT,
+  child_expression_id INT
+);
+
+DROP TABLE IF EXISTS product_join_defn; 
+
+CREATE TABLE product_join_defn(
+   project_id INT NOT NULL,
+   name  VARCHAR(100) NOT NULL,
+   child_product_name VARCHAR(100),
+   child_product_join_name VARCHAR(100),
+   unique key(project_id, name, child_product_name, child_product_join_name)
+);

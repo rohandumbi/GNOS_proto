@@ -24,6 +24,8 @@ import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.core.Tree;
 import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.ProcessJoin;
+import com.org.gnos.db.model.Product;
+import com.org.gnos.db.model.ProductJoin;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.ui.custom.controls.GnosScreen;
 import com.org.gnos.ui.custom.controls.ProcessJoinDefinitionDialog;
@@ -38,6 +40,9 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 	private Tree processTree;
 	private ProcessDefinitionGraph compositeProcessDiagram;
 	private java.util.List<ProcessJoin> listOfProcessJoins;
+	private java.util.List<Product> listOfProducts;
+	private java.util.List<ProductJoin> listOfProductJoinOfProducts;
+	private java.util.List<ProductJoin> listOfProductJoinOfProductJoins;
 
 	public ProcessRouteDefinitionScreen(Composite parent, int style) {
 		super(parent, style);
@@ -47,6 +52,10 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 		this.listAddedModels.add("Block");
 		this.processTree = ProjectConfigutration.getInstance().getProcessTree();
 		this.listOfProcessJoins = ProjectConfigutration.getInstance().getProcessJoins();
+		this.listOfProducts = ProjectConfigutration.getInstance().getProductList();
+		this.listOfProductJoinOfProducts = ProjectConfigutration.getInstance().getProductJoinOfProductsList();
+		this.listOfProductJoinOfProductJoins = ProjectConfigutration.getInstance().getProductJoinOfProductsJoinsList();
+		
 		if(this.processTree == null) {
 			this.processTree = new Tree();
 			ProjectConfigutration.getInstance().setProcessTree(processTree);
@@ -164,6 +173,27 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 			for(ProcessJoin processJoin : this.listOfProcessJoins){
 				this.compositeProcessDiagram.addProcessJoin(processJoin);
 				this.processJoinList.add(processJoin.getName());
+			}
+		}
+		
+		// Load graphical diagram with existing products, if any
+		if(this.listOfProducts.size() > 0){
+			for(Product product : this.listOfProducts){
+				this.compositeProcessDiagram.addProduct(product);;
+			}
+		}
+		
+		// Load graphical diagram with existing product joins, if any
+		// First load product join of products
+		if(this.listOfProductJoinOfProducts.size() > 0){
+			for(ProductJoin productJoin: this.listOfProductJoinOfProducts){
+				this.compositeProcessDiagram.addProductJoin(productJoin);
+			}
+		}
+		// Then load product join of product joins
+		if(this.listOfProductJoinOfProductJoins.size() > 0){
+			for(ProductJoin productJoin: this.listOfProductJoinOfProductJoins){
+				this.compositeProcessDiagram.addProductJoinToProductJoins(productJoin);
 			}
 		}
 

@@ -24,6 +24,11 @@ import com.org.gnos.db.model.OpexData;
 import com.org.gnos.db.model.Pit;
 import com.org.gnos.db.model.ProcessConstraintData;
 import com.org.gnos.db.model.ProcessJoin;
+import com.org.gnos.db.model.Product;
+import com.org.gnos.db.model.ProductJoin;
+import com.org.gnos.db.model.StockpileReclaimingCost;
+import com.org.gnos.db.model.StockpilingCost;
+import com.org.gnos.db.model.WasteMiningCost;
 import com.org.gnos.services.PitBenchProcessor;
 
 public class ProjectConfigutration {
@@ -39,6 +44,8 @@ public class ProjectConfigutration {
 	private Tree processTree = null;
 	private List<ProcessJoin> processJoins = new ArrayList<ProcessJoin>();
 	private List<ProcessConstraintData> processConstraintDataList = new ArrayList<ProcessConstraintData>();
+	private List<Product> productList = new ArrayList<Product>();
+	private List<ProductJoin> productJoinList = new ArrayList<ProductJoin>();
 
 	private boolean newProject = true;
 	private Map<String, String> savedRequiredFieldMapping;
@@ -73,6 +80,8 @@ public class ProjectConfigutration {
 		loadModels();
 		loadProcessTree();
 		loadProcessJoins();
+		loadProducts();
+		loadProductJoins();
 	}
 
 	private void loadFieldData() {
@@ -112,7 +121,7 @@ public class ProjectConfigutration {
 
 	private void loadExpressions() {
 		expressions = new ExpressionDAO().getAll();
-	}
+			}
 
 	private void loadModels() {
 		String sql = "select id, name, expr_id, filter_str from models where project_id = "
@@ -284,6 +293,39 @@ public class ProjectConfigutration {
 		}
 	}
 
+	public void loadDiscountFactor() {
+		String sql = "select id, value from discount_factor where project_id = " + this.projectId;
+		Statement stmt = null;
+		ResultSet rs = null;
+		Connection conn = DBManager.getConnection();
+		try {
+			stmt = conn.createStatement();
+			stmt.execute(sql);
+			rs = stmt.getResultSet();
+			while (rs.next()) {
+				int id = rs.getInt(1);
+				float value = rs.getFloat(2);
+				if(this.discountFactor == null){
+					this.discountFactor = new DiscountFactor();
+					this.discountFactor.setId(id);
+					this.discountFactor.setValue(value);
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (stmt != null)
+					stmt.close();
+				if (rs != null)
+					rs.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
 
 
@@ -295,6 +337,8 @@ public class ProjectConfigutration {
 		saveModelData();
 		saveProcessTree();
 		saveProcessJoins();
+		saveProducts();
+		saveProductJoins();
 
 	}
 
@@ -412,10 +456,10 @@ public class ProjectConfigutration {
 
 	public void saveExpressionData() {
 		ExpressionDAO expressiondao = new ExpressionDAO();
-		for (Expression expression : expressions) {
-			if (expression.getId() == -1) {
+			for (Expression expression : expressions) {
+				if (expression.getId() == -1) {
 				expressiondao.create(expression);
-			} else {
+				} else {
 				expressiondao.update(expression);
 			}
 
@@ -571,6 +615,226 @@ public class ProjectConfigutration {
 			}
 		}
 	}
+	
+	public void saveProductJoins() {
+		Connection conn = DBManager.getConnection();
+		String insert_sql = " insert into product_join_defn (project_id, name, child_product_name, child_product_join_name) values (?, ?, ?, ?)";
+		PreparedStatement pstmt = null;
+		boolean autoCommit = true;
+
+		if(this.productJoinList.size() < 1){ // no process joins defined
+			return;
+	}
+
+	public void saveDiscountFactor() {
+		Connection conn = DBManager.getConnection();
+		String insert_sql = "insert into discount_factor (project_id, scenario_id, value) values (?, ?, ?)";
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		boolean autoCommit = true;
+
+		try {
+			autoCommit = conn.getAutoCommit();
+			conn.setAutoCommit(false);
+			pstmt = conn.prepareStatement(insert_sql, Statement.RETURN_GENERATED_KEYS);
+			pstmt.setInt(1, projectId);
+			pstmt.setInt(2, 1);
+			pstmt.setFloat(3, this.discountFactor.getValue());
+			pstmt.executeUpdate();
+			rs = pstmt.getGeneratedKeys();
+			if (rs.next()){
+				int id = rs.getInt(1);
+				this.discountFactor.setId(id);
+			}
+			conn.commit();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				conn.setAutoCommit(autoCommit);
+				if (pstmt != null)
+					pstmt.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public void saveProcessConstraintData() {
+		Connection conn = DBManager.getConnection();
+		String insert_sql = "insert into process_constraint_defn (project_id, scenario_id, process_join_name, expression_id, in_use, is_max) values (?, ?, ?, ?, ?, ?)";
+		String mapping_sql = "insert into process_constraint_year_mapping (process_constraint_id, year, value) values (?, ?, ?)";
+		PreparedStatement pstmt = null;
+		PreparedStatement pstmt1 = null;
+		ResultSet rs = null;
+		boolean autoCommit = true;
+
+		try {
+			autoCommit = conn.getAutoCommit();
+			conn.setAutoCommit(false);
+			pstmt = conn.prepareStatement(insert_sql,
+					Statement.RETURN_GENERATED_KEYS);
+			pstmt1 = conn.prepareStatement(mapping_sql);
+			
+			for(ProcessConstraintData pcd : this.processConstraintDataList) {
+				if (pcd.getId() > 0)
+					continue;
+				pstmt.setInt(1, projectId);
+				pstmt.setInt(2, 1);
+				pstmt.setString(3, pcd.getProcessJoin().getName());
+				if(pcd.getExpression() != null){
+					pstmt.setInt(4, pcd.getExpression().getId());
+				}else{
+					pstmt.setNull(4, java.sql.Types.INTEGER);
+				}
+				pstmt.setBoolean(5, pcd.isInUse());
+				pstmt.setBoolean(6, pcd.isMax());
+				pstmt.executeUpdate();
+				rs = pstmt.getGeneratedKeys();
+				
+				if (rs.next()){
+					int id = rs.getInt(1);
+					pcd.setId(id);
+
+					Set keys = pcd.getConstraintData().keySet();
+					Iterator<Integer> it = keys.iterator();
+					while (it.hasNext()) {
+						int key = it.next();
+						pstmt1.setInt(1, pcd.getId());
+						pstmt1.setInt(2, key);
+						pstmt1.setFloat(3, pcd.getConstraintData().get(key));
+						pstmt1.executeUpdate();
+					}
+				}
+			}
+
+			conn.commit();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				conn.setAutoCommit(autoCommit);
+				if (pstmt != null)
+					pstmt.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public void saveOpexData() {
+		Connection conn = DBManager.getConnection();
+		String insert_sql = "insert into opex_defn (project_id, scenario_id, model_id, expression_id, in_use, is_revenue) values (?, ?, ?, ?, ?, ?)";
+		String mapping_sql = "insert into model_year_mapping (opex_id, year, value) values (?, ?, ?)";
+		PreparedStatement pstmt = null;
+		PreparedStatement pstmt1 = null;
+		ResultSet rs = null;
+		boolean autoCommit = true;
+
+		try {
+			autoCommit = conn.getAutoCommit();
+			conn.setAutoCommit(false);
+			pstmt = conn.prepareStatement(insert_sql,
+					Statement.RETURN_GENERATED_KEYS);
+			pstmt1 = conn.prepareStatement(mapping_sql);
+
+			for (OpexData od : this.opexDataList) {
+				if (od.getId() > 0)
+					continue;
+				pstmt.setInt(1, projectId);
+				pstmt.setInt(2, 1);
+				pstmt.setInt(3, od.getModel().getId());
+				if(od.getExpression() != null){
+					pstmt.setInt(4, od.getExpression().getId());
+				}else{
+					pstmt.setNull(4, java.sql.Types.INTEGER);
+				}
+				pstmt.setBoolean(5, od.isInUse());
+				pstmt.setBoolean(6, od.isRevenue());
+				pstmt.executeUpdate();
+				rs = pstmt.getGeneratedKeys();
+				if (rs.next())
+				{
+					int id = rs.getInt(1);
+					od.setId(id);
+
+					Set keys = od.getCostData().keySet();
+					Iterator<Integer> it = keys.iterator();
+					while (it.hasNext()) {
+						int key = it.next();
+						pstmt1.setInt(1, od.getId());
+						pstmt1.setInt(2, key);
+						pstmt1.setFloat(3, od.getCostData().get(key));
+						pstmt1.executeUpdate();
+					}
+				}
+			}
+			conn.commit();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				conn.setAutoCommit(autoCommit);
+				if (pstmt != null)
+					pstmt.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public void saveFixedCostData() {
+		Connection conn = DBManager.getConnection();
+		String insert_sql = "insert into fixedcost_year_mapping (project_id, scenario_id, cost_head, year, value) values (?, ?, ?, ?, ?)";
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		boolean autoCommit = true;
+
+		try {
+			autoCommit = conn.getAutoCommit();
+			conn.setAutoCommit(false);
+			pstmt = conn.prepareStatement(insert_sql,
+					Statement.RETURN_GENERATED_KEYS);
+
+			for (int i = 0; i < fixedCost.length; i++) {
+				FixedOpexCost fixedOpexCost = fixedCost[i];
+				Set keys = fixedOpexCost.getCostData().keySet();
+				Iterator<Integer> it = keys.iterator();
+				while (it.hasNext()) {
+					int key = it.next();
+					pstmt.setInt(1, projectId);
+					pstmt.setInt(2, 1);
+					pstmt.setInt(3, i);
+					pstmt.setInt(4, key);
+					pstmt.setFloat(5, fixedOpexCost.getCostData().get(key));
+					pstmt.executeUpdate();
+				}
+			}
+			conn.commit();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				conn.setAutoCommit(autoCommit);
+				if (pstmt != null)
+					pstmt.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
 	public Expression getExpressionById(int expressionId) {
 		for (Expression expression : expressions) {
@@ -618,6 +882,28 @@ public class ProjectConfigutration {
 		for (ProcessJoin processJoin : processJoins) {
 			if (processJoin.getName().equals(name)) {
 				return processJoin;
+			}
+		}
+		return null;
+	}
+
+	public Product getProductByName(String name) {
+		if (name == null)
+			return null;
+		for (Product product : productList) {
+			if (product.getName().equals(name)) {
+				return product;
+			}
+		}
+		return null;
+	}
+	
+	public ProductJoin getProductJoinByName(String name) {
+		if (name == null)
+			return null;
+		for (ProductJoin productJoin : productJoinList) {
+			if (productJoin.getName().equals(name)) {
+				return productJoin;
 			}
 		}
 		return null;
@@ -753,6 +1039,47 @@ public class ProjectConfigutration {
 	public void addProcesssConstraintData(ProcessConstraintData processConstraintData) {
 		this.processConstraintDataList.add(processConstraintData);
 	}
+
+	public List<Product> getProductList() {
+		return productList;
+	}
+
+	public void setProductList(List<Product> productList) {
+		this.productList = productList;
+	}
+
+	public void addProduct(Product product){
+		this.productList.add(product);
+	}
+
+	public List<ProductJoin> getProductJoinList() {
+		return productJoinList;
+	}
+	
+	public List<ProductJoin> getProductJoinOfProductsList() {
+		List<ProductJoin> productJoinOfProducts = new ArrayList<ProductJoin>();
+		for(ProductJoin pj: productJoinList){
+			if(pj.getlistChildProducts().size() > 0){
+				productJoinOfProducts.add(pj);
+			}
+		}
+		return productJoinOfProducts;
+	}
+	
+	public List<ProductJoin> getProductJoinOfProductsJoinsList() {
+		List<ProductJoin> productJoinOfProductJoins = new ArrayList<ProductJoin>();
+		for(ProductJoin pj: productJoinList){
+			if(pj.getListChildProductJoins().size() > 0){
+				productJoinOfProductJoins.add(pj);
+			}
+		}
+		return productJoinOfProductJoins;
+	}
+
+	public void setProductJoinList(List<ProductJoin> productJoinList) {
+		this.productJoinList = productJoinList;
+	}
+
 
 
 }
