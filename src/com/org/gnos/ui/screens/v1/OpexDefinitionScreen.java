@@ -1,6 +1,7 @@
 package com.org.gnos.ui.screens.v1;
 
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -14,15 +15,20 @@ import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.core.ScenarioConfigutration;
+import com.org.gnos.db.dao.ScenarioDAO;
 import com.org.gnos.db.model.FixedOpexCost;
 import com.org.gnos.db.model.OpexData;
+import com.org.gnos.db.model.Scenario;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.services.TimePeriod;
 import com.org.gnos.ui.custom.controls.GnosScreen;
@@ -34,12 +40,15 @@ public class OpexDefinitionScreen extends GnosScreen {
 	private Text textStartYear;
 	private Text textDiscountFactor;
 	private Text textNumberOfIncrements;
+	private Text textScenarioName;
 	private ScrolledComposite scGridContainer;
 	private ScrolledComposite scFixedCostGridContainer;
 	private OpexDefinitionGrid opexDefinitionGrid;
 	private MiningStockpileCostGrid miningStockpileCostGrid;
 	private Label labelScreenName;
 	private List<OpexData> opexDataList;
+	private List<Scenario> scenarioList;
+	private ScenarioDAO scenarioDAO;
 	/**
 	 * Create the composite.
 	 * @param parent
@@ -50,10 +59,26 @@ public class OpexDefinitionScreen extends GnosScreen {
 		setForeground(SWTResourceManager.getColor(30, 144, 255));
 		setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		this.scenarioDAO = new ScenarioDAO();
+		this.scenarioList = new ArrayList<Scenario>();
+
+		/*
+		 * If there is an existing Opex data for the project
+		 */
+		this.opexDataList = ScenarioConfigutration.getInstance().getOpexDataList();
 		this.createContent();
 
 	}
 	
+	private String[] getExistingScenarioList() {
+		this.scenarioList = this.scenarioDAO.getAll();
+		String[] exisitngScenarioNames = new String[this.scenarioList.size()];
+		for(int i=0; i<this.scenarioList.size(); i++){
+			exisitngScenarioNames[i] = this.scenarioList.get(i).getName();
+		}
+		return exisitngScenarioNames;
+	}
+
 	private void createContent(){
 		setLayout(new FormLayout());
 		labelScreenName = new Label(this, SWT.NONE);
@@ -75,13 +100,69 @@ public class OpexDefinitionScreen extends GnosScreen {
 		fd_labelScreenDescription.left = new FormAttachment(0, 10);
 		//fd_labelScreenDescription.right = new FormAttachment(0, 866);
 		labelScreenDescription.setLayoutData(fd_labelScreenDescription);
-		labelScreenDescription.setText("Define your operational expenditures.");
+		labelScreenDescription.setText("Select an existing scenario or define a new one.");
+
+		Label lblSelectExistingScenario = new Label(this, SWT.NONE);
+		lblSelectExistingScenario.setForeground(SWTResourceManager.getColor(0, 191, 255));
+		lblSelectExistingScenario.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		FormData fd_lblSelectExistingScenario = new FormData();
+		fd_lblSelectExistingScenario.top = new FormAttachment(labelScreenDescription, 10);
+		fd_lblSelectExistingScenario.left = new FormAttachment(labelScreenDescription, 0, SWT.LEFT);
+		lblSelectExistingScenario.setLayoutData(fd_lblSelectExistingScenario);
+		lblSelectExistingScenario.setText("EXISTING SCENARIOS:");
+
+		final Combo comboExistingScenarios = new Combo(this, SWT.NONE);
+		FormData fd_comboExistingScenarios = new FormData();
+		fd_comboExistingScenarios.left = new FormAttachment(lblSelectExistingScenario, 8, SWT.RIGHT);
+		fd_comboExistingScenarios.top = new FormAttachment(lblSelectExistingScenario, -2, SWT.TOP);
+		fd_comboExistingScenarios.right = new FormAttachment(lblSelectExistingScenario, 88, SWT.RIGHT);
+		comboExistingScenarios.setLayoutData(fd_comboExistingScenarios);
+		comboExistingScenarios.setItems(getExistingScenarioList());
+		comboExistingScenarios.addListener(SWT.MouseDown, new Listener(){
+			@Override
+			public void handleEvent(Event event) {
+				// TODO Auto-generated method stub
+				comboExistingScenarios.removeAll();
+				comboExistingScenarios.setItems(getExistingScenarioList());
+				comboExistingScenarios.getParent().layout();
+				comboExistingScenarios.setListVisible(true);
+			}
+		});
+		comboExistingScenarios.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				handleScenarioSelection(comboExistingScenarios.getSelectionIndex());
+			}
+		});
+
+		Label lblCreateNew = new Label(this, SWT.NONE);
+		lblCreateNew.setForeground(SWTResourceManager.getColor(0, 191, 255));
+		lblCreateNew.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		FormData fd_lblCreateNew = new FormData();
+		fd_lblCreateNew.top = new FormAttachment(comboExistingScenarios, 10);
+		fd_lblCreateNew.left = new FormAttachment(lblSelectExistingScenario, 0, SWT.LEFT);
+		lblCreateNew.setLayoutData(fd_lblCreateNew);
+		lblCreateNew.setText("CREATE NEW");
+		
+		Label lblScenarioName = new Label(this, SWT.NONE);
+		lblScenarioName.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		FormData fd_lblScenarioName = new FormData();
+		fd_lblScenarioName.top = new FormAttachment(comboExistingScenarios, 10);
+		fd_lblScenarioName.left = new FormAttachment(lblCreateNew, 8, SWT.RIGHT);
+		lblScenarioName.setLayoutData(fd_lblScenarioName);
+		lblScenarioName.setText("Name:");
+
+		textScenarioName = new Text(this, SWT.BORDER);
+		FormData fd_textScenarioName = new FormData();
+		fd_textScenarioName.top = new FormAttachment(lblScenarioName, -2, SWT.TOP);
+		fd_textScenarioName.left = new FormAttachment(lblScenarioName, 8);
+		fd_textScenarioName.right = new FormAttachment(lblScenarioName, 88, SWT.RIGHT);
+		textScenarioName.setLayoutData(fd_textScenarioName);
 		
 		Label lblStartYear = new Label(this, SWT.NONE);
 		lblStartYear.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		FormData fd_lblStartYear = new FormData();
-		fd_lblStartYear.top = new FormAttachment(labelScreenDescription, 10);
-		fd_lblStartYear.left = new FormAttachment(labelScreenDescription, 0, SWT.LEFT);
+		fd_lblStartYear.top = new FormAttachment(comboExistingScenarios, 10);
+		fd_lblStartYear.left = new FormAttachment(textScenarioName, 8, SWT.RIGHT);
 		lblStartYear.setLayoutData(fd_lblStartYear);
 		lblStartYear.setText("Start Year:");
 		
@@ -95,7 +176,7 @@ public class OpexDefinitionScreen extends GnosScreen {
 		Label lblDiscountFactor = new Label(this, SWT.NONE);
 		lblDiscountFactor.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		FormData fd_lblDiscountFactor = new FormData();
-		fd_lblDiscountFactor.top = new FormAttachment(labelScreenDescription, 10);
+		fd_lblDiscountFactor.top = new FormAttachment(lblStartYear, 0, SWT.TOP);
 		fd_lblDiscountFactor.left = new FormAttachment(textStartYear, 10);
 		lblDiscountFactor.setLayoutData(fd_lblDiscountFactor);
 		lblDiscountFactor.setText("Discount Factor:");
@@ -128,20 +209,29 @@ public class OpexDefinitionScreen extends GnosScreen {
 		btnAddTimePeriod.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				String scenarioName = textScenarioName.getText();
 				int startingYear = Integer.parseInt(textStartYear.getText());
 				int numberOfIncrements = Integer.parseInt(textNumberOfIncrements.getText());
 				String discountFactorValue = textDiscountFactor.getText();
-/*				DiscountFactor df = new DiscountFactor();
+				float discountFactor;
 				if((discountFactorValue.equals("")) || (discountFactorValue == null)){
-					df.setValue(1);
+					discountFactor = 1;
 				}else{
-					df.setValue(Float.parseFloat(discountFactorValue));
+					discountFactor = Float.parseFloat(discountFactorValue);
 				}
-				ProjectConfigutration.getInstance().setDiscountFactor(df);*/
-				//ProjectConfigutration.getInstance().saveDiscountFactor();
-				TimePeriod timePeriod = new TimePeriod(startingYear, numberOfIncrements);
-				initializeOpexGrid(timePeriod);
-				initializeMiningStockpileCostGrid(timePeriod);
+				
+				Scenario scenario = new Scenario();
+				scenario.setName(scenarioName);
+				scenario.setDiscount(discountFactor);
+				scenario.setStartYear(startingYear);
+				scenario.setTimePeriod(numberOfIncrements);
+				
+				boolean isScenarioCreationSuccessful = scenarioDAO.create(scenario);
+				if(isScenarioCreationSuccessful){
+					ScenarioConfigutration.getInstance().load(scenario.getId());
+					initializeOpexGrid(scenario);
+					initializeMiningStockpileCostGrid(scenario);
+				}
 			}
 		});
 		FormData fd_btnAddTimePeriod = new FormData();
@@ -149,35 +239,26 @@ public class OpexDefinitionScreen extends GnosScreen {
 		fd_btnAddTimePeriod.left = new FormAttachment(textNumberOfIncrements, 6);
 		btnAddTimePeriod.setLayoutData(fd_btnAddTimePeriod);
 		fd_btnAddTimePeriod.bottom = new FormAttachment(textNumberOfIncrements, 0, SWT.BOTTOM);
-		btnAddTimePeriod.setText("Next");
+		btnAddTimePeriod.setText("Create");
 		
-		/*
-		 * If there is an existing Opex data for the project
-		 */
-		this.opexDataList = ScenarioConfigutration.getInstance().getOpexDataList();
 
-		if(this.opexDataList.size() > 0){
-			OpexData opexData = this.opexDataList.get(0);
-			Map<Integer, Float> mapCostData = opexData.getCostData();
-			int numberOfIncrements = mapCostData.size();
-			int startYear = 0;
-			for(Integer key : mapCostData.keySet()){
-				startYear = key;
-				break;
-			}
-			textNumberOfIncrements.setText(String.valueOf(numberOfIncrements));
-			textStartYear.setText(String.valueOf(startYear));
-			TimePeriod savedTimePeriod = new TimePeriod(startYear, numberOfIncrements);
-			initializeOpexGrid(savedTimePeriod);
-			initializeMiningStockpileCostGrid(savedTimePeriod);
-		}
 		/*if(this.discountFactor != null) {
 			textDiscountFactor.setText(String.valueOf(this.discountFactor.getValue()));
 		}*/
 		
 	}
+
+	private void handleScenarioSelection(int index){
+		System.out.println("Selected scenario index is: " + index);
+		Scenario scenario = this.scenarioList.get(index);
+		ScenarioConfigutration.getInstance().load(scenario.getId());
+		initializeOpexGrid(scenario);
+		initializeMiningStockpileCostGrid(scenario);
+		GnosEvent event = new GnosEvent(this, "selected:new-scenario");
+		triggerGnosEvent(event);
+	}
 	
-	private void initializeOpexGrid(TimePeriod timePeriod){
+	private void initializeOpexGrid(Scenario scenario){
 		if(scGridContainer != null){
 			scGridContainer.dispose();
 		}
@@ -189,7 +270,7 @@ public class OpexDefinitionScreen extends GnosScreen {
 		//fd_scGridContainer.bottom = new FormAttachment(50);
 		fd_scGridContainer.right = new FormAttachment(100, -35);
 		
-		final OpexDefinitionGrid opexDefinitionGrid = new OpexDefinitionGrid(scGridContainer, SWT.None, timePeriod);
+		final OpexDefinitionGrid opexDefinitionGrid = new OpexDefinitionGrid(scGridContainer, SWT.None, scenario);
 		scGridContainer.setContent(opexDefinitionGrid);
 		
 		scGridContainer.setExpandHorizontal(true);
@@ -240,7 +321,7 @@ public class OpexDefinitionScreen extends GnosScreen {
 		this.layout();
 	}
 	
-	private void initializeMiningStockpileCostGrid(TimePeriod timePeriod){
+	private void initializeMiningStockpileCostGrid(Scenario scenario){
 		if(scFixedCostGridContainer != null){
 			scFixedCostGridContainer.dispose();
 		}
@@ -252,7 +333,7 @@ public class OpexDefinitionScreen extends GnosScreen {
 		//fd_scFixedCostGridContainer.bottom = new FormAttachment(70);
 		fd_scFixedCostGridContainer.right = new FormAttachment(100, -35);
 		
-		miningStockpileCostGrid = new MiningStockpileCostGrid(scFixedCostGridContainer, SWT.None, timePeriod);
+		miningStockpileCostGrid = new MiningStockpileCostGrid(scFixedCostGridContainer, SWT.None, scenario);
 		scFixedCostGridContainer.setContent(miningStockpileCostGrid);
 		
 		scFixedCostGridContainer.setExpandHorizontal(true);
@@ -292,5 +373,13 @@ public class OpexDefinitionScreen extends GnosScreen {
 	public void onGnosEventFired(GnosEvent e) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	private void triggerGnosEvent(GnosEvent event){
+		int j = listeners.size();
+		int i = 0;
+		for(i=0; i<j; i++){
+			listeners.get(i).onGnosEventFired(event);
+		}
 	}
 }

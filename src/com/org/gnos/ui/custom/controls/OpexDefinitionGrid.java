@@ -30,7 +30,7 @@ import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.OpexData;
-import com.org.gnos.services.TimePeriod;
+import com.org.gnos.db.model.Scenario;
 
 public class OpexDefinitionGrid extends Composite {
 
@@ -47,18 +47,18 @@ public class OpexDefinitionGrid extends Composite {
 	private List<OpexData> opexDataList;
 	private Composite parent;
 	private List<String> presentmodelNames;
-	private TimePeriod timePeriod;
+	private Scenario scenario;
 	private Label firstSeparator;
 	private Label secondSeparator;
 	private Label thirdSeparator;
 	private Label lblClassification;
 
-	public OpexDefinitionGrid(Composite parent, int style, TimePeriod timePeriod) {
+	public OpexDefinitionGrid(Composite parent, int style, Scenario scenario) {
 		super(parent, style);
 		this.parent = parent;
 		this.allRows = new ArrayList<Composite>();
 		this.opexDataList = ScenarioConfigutration.getInstance().getOpexDataList();
-		this.timePeriod = timePeriod;
+		this.scenario = scenario;
 		this.createContent(parent);
 	}
 
@@ -178,7 +178,7 @@ public class OpexDefinitionGrid extends Composite {
 
 	private void addTimePeriodHeaderColumns(Control reference){
 		Control previousColumn = reference;
-		for(int i=0; i<this.timePeriod.getIncrements(); i++){
+		for(int i=0; i<this.scenario.getTimePeriod(); i++){
 			Label separator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
 			FormData fd_separator = new FormData();
 			fd_separator.left = new FormAttachment(previousColumn, 25);
@@ -189,7 +189,7 @@ public class OpexDefinitionGrid extends Composite {
 			FormData fd_lblYear = new FormData();
 			fd_lblYear.left = new FormAttachment(separator, 25);
 			fd_lblYear.top = new FormAttachment(0, 2);
-			lblYear.setText(String.valueOf(this.timePeriod.getStartYear() + i));
+			lblYear.setText(String.valueOf(this.scenario.getStartYear() + i));
 			lblYear.setBackground(SWTResourceManager.getColor(230, 230, 230));
 			lblYear.setLayoutData(fd_lblYear);
 
@@ -422,7 +422,7 @@ public class OpexDefinitionGrid extends Composite {
 
 	private void addTimePeriodRowMembers(Composite parent, Control reference){
 		Control previousMember = reference;
-		for(int i=0; i<this.timePeriod.getIncrements(); i++){
+		for(int i=0; i<this.scenario.getTimePeriod(); i++){
 			Text yearlyValue = new Text(parent, SWT.BORDER);
 			FormData fd_yearlyValue = new FormData();
 			/*
@@ -445,8 +445,8 @@ public class OpexDefinitionGrid extends Composite {
 			Combo comboModel = (Combo)rowChildren[2];
 			Combo comboExpression = (Combo)rowChildren[3];
 			LinkedHashMap<Integer, Float> mapCostData = new LinkedHashMap<Integer, Float>();
-			for(int j=0; j<this.timePeriod.getIncrements(); j++){
-				mapCostData.put((this.timePeriod.getStartYear() + j), Float.valueOf(((Text)rowChildren[4+j]).getText())); // cost input data starts from 4th indexed row child.
+			for(int j=0; j<this.scenario.getTimePeriod(); j++){
+				mapCostData.put((this.scenario.getStartYear() + j), Float.valueOf(((Text)rowChildren[4+j]).getText())); // cost input data starts from 4th indexed row child.
 			}
 			boolean inUse = isInUse.getSelection();
 			boolean isRevenue = (comboClassification.getSelectionIndex() == 1);//0=cost; 1=revenue
@@ -460,6 +460,7 @@ public class OpexDefinitionGrid extends Composite {
 				//new row data, not update of previously saved rowOpexData.
 				System.out.println("\n Model: " + modelName + " inUse " + inUse + " isRevenue " + isRevenue);
 				opexData = new OpexData(model);
+				opexData.setScenarioId(this.scenario.getId());
 				this.opexDataList.add(opexData);
 			}else{
 				//update of previously saved rowOpexData.

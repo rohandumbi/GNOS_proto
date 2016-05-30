@@ -20,6 +20,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
 import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.db.model.FixedOpexCost;
 import com.org.gnos.db.model.OreMiningCost;
+import com.org.gnos.db.model.Scenario;
 import com.org.gnos.db.model.StockpileReclaimingCost;
 import com.org.gnos.db.model.StockpilingCost;
 import com.org.gnos.db.model.WasteMiningCost;
@@ -35,17 +36,17 @@ public class MiningStockpileCostGrid extends Composite {
 	private Composite compositeGridHeader;
 	private List<Composite> allRows;
 	private Composite presentRow;
-	private TimePeriod timePeriod;
+	private Scenario scenario;
 	private Label firstSeparator;
 	private Label lblClassification;
 	private String[] costCategories = new String[]{"Ore mining cost", "Waste mining cost", "Stockpile cost", "Stockpile reclaiming cost"};
 	private FixedOpexCost[] existingFixedOpexCost;
 
-	public MiningStockpileCostGrid(Composite parent, int style, TimePeriod timePeriod) {
+	public MiningStockpileCostGrid(Composite parent, int style, Scenario scenario) {
 		super(parent, style);
 		this.existingFixedOpexCost = ScenarioConfigutration.getInstance().getFixedCost();
 		this.allRows = new ArrayList<Composite>();
-		this.timePeriod = timePeriod;
+		this.scenario = scenario;
 		this.createContent(parent);
 	}
 	
@@ -88,7 +89,7 @@ public class MiningStockpileCostGrid extends Composite {
 	
 	private void addTimePeriodHeaderColumns(Control reference){
 		Control previousColumn = reference;
-		for(int i=0; i<this.timePeriod.getIncrements(); i++){
+		for(int i=0; i<this.scenario.getTimePeriod(); i++){
 			Label lblYear;
 			if(i != 0){
 				Label separator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
@@ -101,7 +102,7 @@ public class MiningStockpileCostGrid extends Composite {
 				FormData fd_lblYear = new FormData();
 				fd_lblYear.left = new FormAttachment(separator, 25);
 				fd_lblYear.top = new FormAttachment(0, 2);
-				lblYear.setText(String.valueOf(this.timePeriod.getStartYear() + i));
+				lblYear.setText(String.valueOf(this.scenario.getStartYear() + i));
 				lblYear.setBackground(SWTResourceManager.getColor(230, 230, 230));
 				lblYear.setLayoutData(fd_lblYear);
 			}else{
@@ -111,7 +112,7 @@ public class MiningStockpileCostGrid extends Composite {
 				FormData fd_lblYear = new FormData();
 				fd_lblYear.left = new FormAttachment(reference, 25);
 				fd_lblYear.top = new FormAttachment(0, 2);
-				lblYear.setText(String.valueOf(this.timePeriod.getStartYear() + i));
+				lblYear.setText(String.valueOf(this.scenario.getStartYear() + i));
 				lblYear.setBackground(SWTResourceManager.getColor(230, 230, 230));
 				lblYear.setLayoutData(fd_lblYear);
 			}
@@ -159,7 +160,7 @@ public class MiningStockpileCostGrid extends Composite {
 	
 	private void addTimePeriodRowMembers(Composite parent, Control reference){
 		Control previousMember = reference;
-		for(int i=0; i<this.timePeriod.getIncrements(); i++){
+		for(int i=0; i<this.scenario.getTimePeriod(); i++){
 			Text yearlyValue = new Text(parent, SWT.BORDER);
 			FormData fd_yearlyValue = new FormData();
 			/*
@@ -175,10 +176,10 @@ public class MiningStockpileCostGrid extends Composite {
 	private void addTimePeriodRowMembers(Composite parent, Control reference, FixedOpexCost fixedOpexCost){
 		Control previousMember = reference;
 		Map<Integer, Float> fixedOpexCostData = fixedOpexCost.getCostData();
-		for(int i=0; i<this.timePeriod.getIncrements(); i++){
+		for(int i=0; i<this.scenario.getTimePeriod(); i++){
 			Text yearlyValue = new Text(parent, SWT.BORDER);
 			FormData fd_yearlyValue = new FormData();
-			Float value = fixedOpexCostData.get(this.timePeriod.getStartYear() + i);
+			Float value = fixedOpexCostData.get(this.scenario.getStartYear() + i);
 			yearlyValue.setText(Float.toString(value));
 			/*
 			 * Hacky calculation at the moment
@@ -207,14 +208,14 @@ public class MiningStockpileCostGrid extends Composite {
 			}else if(i==3){
 				fixedOpexCost = new StockpileReclaimingCost();
 			}
-			
+			fixedOpexCost.setScenarioId(scenario.getId());
 			HashMap<Integer, Float> mapCostData = new LinkedHashMap<Integer, Float>();
-			for(int j=0; j<this.timePeriod.getIncrements(); j++){
+			for(int j=0; j<this.scenario.getTimePeriod(); j++){
 				String fixedCostValue = ((Text)rowChildren[1+j]).getText();
 				if(fixedCostValue.equals("") || fixedCostValue == null){
-					mapCostData.put((this.timePeriod.getStartYear() + j), 0f); // cost input data starts from 1st indexed row child.
+					mapCostData.put((this.scenario.getStartYear() + j), 0f); // cost input data starts from 1st indexed row child.
 				}else{
-					mapCostData.put((this.timePeriod.getStartYear() + j), Float.valueOf(fixedCostValue)); // cost input data starts from 1st indexed row child.
+					mapCostData.put((this.scenario.getStartYear() + j), Float.valueOf(fixedCostValue)); // cost input data starts from 1st indexed row child.
 				}
 				
 			}

@@ -166,8 +166,8 @@ public class GNOSApplication extends ApplicationWindow implements GnosEventListe
     */
 	
    protected void handleShellCloseEvent() {
-	   tidyUpOnExit();
-       super.handleShellCloseEvent();
+           tidyUpOnExit();
+           super.handleShellCloseEvent();
    }
    
    private void tidyUpOnExit(){

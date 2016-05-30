@@ -18,6 +18,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.core.ProjectConfigutration;
+import com.org.gnos.core.ScenarioConfigutration;
+import com.org.gnos.custom.models.ProjectModel;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.services.ObjectiveFunctionEquationGenerator;
 import com.org.gnos.services.ProcessConstraintEquationGenerator;
@@ -291,7 +293,7 @@ public class WorkbenchScreen extends GnosScreen {
 		gnosStepProcessConstraintsDefinitionLabel.setDeselectedState();
 		gnosStepGradeConstraintsDefinitionLabel.setDeselectedState();
 		gnosStepBenchConstraintsDefinitionLabel.setDeselectedState();
-		
+
 		label.setSelectedState();
 	}
 	@Override
@@ -318,7 +320,7 @@ public class WorkbenchScreen extends GnosScreen {
 			selectStepLabel(gnosStepDefineFieldTypeLabel);		
 			mainConfigurationViewPort.loadFieldDatatypeDefinitionScreen();
 			
-		}else if(e.eventName == "Map Required Fields"){			
+		}else if(e.eventName == "Map Required Fields"){
 			selectStepLabel(gnosStepMapRequiredFieldsLabel);			
 			mainConfigurationViewPort.loadMapRequiredFieldsScreen();
 			
