@@ -37,12 +37,9 @@ public class ProjectConfigutration {
 	private Map<String, String> requiredFieldMapping = new LinkedHashMap<String, String>();
 	private List<Expression> expressions = new ArrayList<Expression>();
 	private List<Model> models = new ArrayList<Model>();
-	private List<OpexData> opexDataList = new ArrayList<OpexData>();
-	private FixedOpexCost[] fixedCost;
 	private Tree processTree = null;
 	private List<Process> processList = null;
 	private List<ProcessJoin> processJoins = new ArrayList<ProcessJoin>();
-	private List<ProcessConstraintData> processConstraintDataList = new ArrayList<ProcessConstraintData>();
 	private List<Product> productList = new ArrayList<Product>();
 	private List<ProductJoin> productJoinList = new ArrayList<ProductJoin>();
 
@@ -77,11 +74,8 @@ public class ProjectConfigutration {
 		loadFieldMappingData();
 		loadExpressions();
 		loadModels();
-		loadProcessTree();
-		loadProcesses();
-		loadProcessJoins();
-		loadProducts();
-		loadProductJoins();
+		loadProcessDetails();
+		
 	}
 
 	private void loadFieldData() {
@@ -165,6 +159,14 @@ public class ProjectConfigutration {
 		}
 	}
 
+	private void loadProcessDetails() {
+		loadProcessTree();
+		loadProcesses();
+		loadProcessJoins();
+		loadProducts();
+		loadProductJoins();
+	}
+	
 	public ArrayList<Pit> getPitList() {
 		ArrayList<Pit> pitList = new ArrayList<Pit>();
 		String dataTableName = "gnos_data_" + this.projectId;
@@ -347,70 +349,33 @@ public class ProjectConfigutration {
 	}
 	
 	public void loadProductJoins() {
-		String sql1 = "select name, child_product_name, child_product_join_name from product_join_defn where project_id = "
-				+ this.projectId + " and child_product_name is not null order by name ";
-		Statement stmt1 = null;
-		ResultSet rs1 = null;
-		
-		
-		String sql2 = "select name, child_product_name, child_product_join_name from product_join_defn where project_id = "
-				+ this.projectId + " and child_product_join_name is not null order by name ";
-		Statement stmt2 = null;
-		ResultSet rs2 = null;
-		
-		Connection conn = DBManager.getConnection();
-		try {
-			stmt1 = conn.createStatement();
-			stmt1.execute(sql1);
-			rs1 = stmt1.getResultSet();
+		String sql = "select name, child_product_name, child_product_join_name from product_join_defn where project_id = "+ this.projectId  +
+				" and ( child_product_name is not null  or child_product_join_name is not null ) order by name";
+
+		try (
+				Connection conn = DBManager.getConnection();
+				Statement stmt = conn.createStatement();
+				ResultSet rs = stmt.executeQuery(sql);
+				
+			){
 			
-			while(rs1.next()){
-				String productJoinName = rs1.getString(1);
+			while(rs.next()){
+				String productJoinName = rs.getString(1);
 				ProductJoin productJoin = this.getProductJoinByName(productJoinName);
 				if(productJoin == null){
 					productJoin = new ProductJoin(productJoinName);
 					this.productJoinList.add(productJoin);
 				}
-				String childProductName = rs1.getString(2);
+				String childProductName = rs.getString(2);
 				Product product = this.getProductByName(childProductName);
-				productJoin.addProduct(product);		
-				
-			}
-			
-			stmt2 = conn.createStatement();
-			stmt2.execute(sql2);
-			rs2 = stmt2.getResultSet();
-			
-			while(rs2.next()){
-				String productJoinName = rs2.getString(1);
-				ProductJoin productJoin = this.getProductJoinByName(productJoinName);
-				if(productJoin == null){
-					productJoin = new ProductJoin(productJoinName);
-					this.productJoinList.add(productJoin);
-				}
-				String childProductJoinName = rs2.getString(3);
+				productJoin.addProduct(product);
+				String childProductJoinName = rs.getString(3);
 				ProductJoin childProductJoin = this.getProductJoinByName(childProductJoinName);
-				productJoin.addProductJoin(childProductJoin);		
-				
+				productJoin.addProductJoin(childProductJoin);	
 			}
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
-		} finally {
-			try {
-				if (stmt1 != null)
-					stmt1.close();
-				if (rs1 != null)
-					rs1.close();
-				if (stmt2 != null)
-					stmt2.close();
-				if (rs2 != null)
-					rs2.close();
-				if (conn != null)
-					DBManager.releaseConnection(conn);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
 		}
 	}
 
@@ -912,28 +877,6 @@ public class ProjectConfigutration {
 		return null;
 	}
 
-	public OpexData getOpexDataById(int id) {
-		if (this.opexDataList == null)
-			return null;
-		for (OpexData od : this.opexDataList) {
-			if (od.getId() == id) {
-				return od;
-			}
-		}
-		return null;
-	}
-	
-	public ProcessConstraintData getProcessConstraintDataById(int id) {
-		if (this.processConstraintDataList == null)
-			return null;
-		for (ProcessConstraintData pcd : this.processConstraintDataList) {
-			if (pcd.getId() == id) {
-				return pcd;
-			}
-		}
-		return null;
-	}
-
 	public int getProjectId() {
 		return this.projectId;
 	}
@@ -1002,22 +945,6 @@ public class ProjectConfigutration {
 		this.processTree = processTree;
 	}
 
-	public List<OpexData> getOpexDataList() {
-		return opexDataList;
-	}
-
-	public FixedOpexCost[] getFixedCost() {
-		return fixedCost;
-	}
-
-	public void setFixedCost(FixedOpexCost[] fixedCost) {
-		this.fixedCost = fixedCost;
-	}
-
-	public void setOpexDataList(List<OpexData> opexDataList) {
-		this.opexDataList = opexDataList;
-	}
-
 	public List<ProcessJoin> getProcessJoins() {
 		return processJoins;
 	}
@@ -1025,24 +952,11 @@ public class ProjectConfigutration {
 	public void setProcessJoins(List<ProcessJoin> processJoins) {
 		this.processJoins = processJoins;
 	}
-
-
-	public List<ProcessConstraintData> getProcessConstraintDataList() {
-		return processConstraintDataList;
-	}
-
-	public void setProcessConstraintDataList(List<ProcessConstraintData> processConstraintDataList) {
-		this.processConstraintDataList = processConstraintDataList;
-	}
-
+	
 	public void addProcessJoin(ProcessJoin processJoin) {
 		this.processJoins.add(processJoin);
 	}
 	
-	public void addProcesssConstraintData(ProcessConstraintData processConstraintData) {
-		this.processConstraintDataList.add(processConstraintData);
-	}
-
 	public List<Product> getProductList() {
 		return productList;
 	}

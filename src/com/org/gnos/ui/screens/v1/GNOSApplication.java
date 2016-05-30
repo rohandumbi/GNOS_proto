@@ -15,7 +15,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-import com.org.gnos.application.GNOSConfig;
+import com.org.gnos.core.Application;
 import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.db.model.Field;
 import com.org.gnos.events.GnosEvent;
@@ -40,6 +40,7 @@ public class GNOSApplication extends ApplicationWindow implements GnosEventListe
 	 */
 	public GNOSApplication() {
 		super(null);
+		Application.start();
 		createActions();
 		addToolBar(SWT.FLAT | SWT.WRAP);
 		addMenuBar();
@@ -165,21 +166,12 @@ public class GNOSApplication extends ApplicationWindow implements GnosEventListe
     */
 	
    protected void handleShellCloseEvent() {
-       /*boolean cancelled = saveAppIfDirty();
-       if (cancelled) {
-           setReturnCode(OK);
-       } else {
-           tidyUpOnExit();
-           super.handleShellCloseEvent();
-       }*/
 	   tidyUpOnExit();
        super.handleShellCloseEvent();
    }
    
    private void tidyUpOnExit(){
-	   //ProjectConfigutration.getInstance().save();
-	   new ObjectiveFunctionEquationGenerator().generate();
-	   new ProcessConstraintEquationGenerator().generate();
+	   // DO NOT DO ANYTHING HERE NOW
    }
 	
 	
@@ -197,8 +189,12 @@ public class GNOSApplication extends ApplicationWindow implements GnosEventListe
 			int projectId = Integer.parseInt(event.attributes.get("projectId"));
 			ProjectConfigutration.getInstance().load(projectId);
 			openProjectConfiguration();
-		}else if(e.eventName == "open:homeScreen"){
+		} else if(e.eventName == "open:homeScreen"){
 			loadProjectScreen();
+		} else if(e.eventName == "save:clicked"){
+			Application.save();
+		} else if(e.eventName == "run:clicked"){
+			Application.generate();
 		}
 
 	}
@@ -209,7 +205,6 @@ public class GNOSApplication extends ApplicationWindow implements GnosEventListe
 	 */
 	public static void main(String args[]) {
 		try {
-			GNOSConfig.load();
 			GNOSApplication window = new GNOSApplication();
 			window.setBlockOnOpen(true);
 			window.open();

@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import com.org.gnos.application.GNOSConfig;
+import com.org.gnos.core.GNOSConfig;
 
 public class DBManager {
 
@@ -21,8 +21,17 @@ public class DBManager {
 		}	
 	}
 	
-	private static void initializePool(){
-		pool = new DBConnectionPool();
-		pool.init();
+	public static void initializePool(){
+		if(pool == null) {
+			pool = new DBConnectionPool();
+			pool.init();
+		}
+	}
+	
+	public static void terminatePool(){
+		if(pool != null){
+			pool.destroy();
+		}
+		
 	}
 }

@@ -20,6 +20,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.core.ProjectConfigutration;
+import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.db.model.FixedOpexCost;
 import com.org.gnos.db.model.OpexData;
 import com.org.gnos.events.GnosEvent;
@@ -153,7 +154,7 @@ public class OpexDefinitionScreen extends GnosScreen {
 		/*
 		 * If there is an existing Opex data for the project
 		 */
-		this.opexDataList = ProjectConfigutration.getInstance().getOpexDataList();
+		this.opexDataList = ScenarioConfigutration.getInstance().getOpexDataList();
 
 		if(this.opexDataList.size() > 0){
 			OpexData opexData = this.opexDataList.get(0);
@@ -269,7 +270,7 @@ public class OpexDefinitionScreen extends GnosScreen {
 				//opexDefinitionGrid.saveOpexData();
 				@SuppressWarnings("unused")
 				FixedOpexCost[] fixedOpexCost = miningStockpileCostGrid.getCostData();//indexing fixed; 0-OreMiningCost, 1-WasteMiningCost, 2-StockpilingCost, 3-StockpileReclaimingCost
-				ProjectConfigutration.getInstance().setFixedCost(fixedOpexCost);
+				ScenarioConfigutration.getInstance().setFixedCost(fixedOpexCost);
 				//ProjectConfigutration.getInstance().saveFixedCostData();
 			}
 		});

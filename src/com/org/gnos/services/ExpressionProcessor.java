@@ -80,7 +80,7 @@ public class ExpressionProcessor {
 					sql = "update gnos_data_"+projectId+" a, gnos_computed_data_"+projectId+" b set b."+columnName +" = ("+ expr.getExprvalue() +") / "+tonnes_wt_alias;
 				}
 				sql = sql+ " where a.id = b.row_id ";
-				if(expr.getFilter() != null) {
+				if(expr.getFilter() != null && expr.getFilter().trim().length() > 0) {
 					sql = sql+ " AND "+expr.getFilter();
 				}
 				System.out.println("sql :"+sql);
@@ -88,7 +88,6 @@ public class ExpressionProcessor {
 			}
 			
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
 			

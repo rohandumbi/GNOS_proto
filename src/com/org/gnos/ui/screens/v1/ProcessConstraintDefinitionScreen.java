@@ -19,7 +19,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import com.org.gnos.core.ProjectConfigutration;
+import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.db.model.OpexData;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.services.TimePeriod;
@@ -126,7 +126,7 @@ public class ProcessConstraintDefinitionScreen extends GnosScreen {
 		/*
 		 * If there is an existing Opex data for the project
 		 */
-		this.opexDataList = ProjectConfigutration.getInstance().getOpexDataList();
+		this.opexDataList = ScenarioConfigutration.getInstance().getOpexDataList();
 		if(this.opexDataList.size() > 0){
 			OpexData opexData = this.opexDataList.get(0);
 			Map<Integer, Float> mapCostData = opexData.getCostData();

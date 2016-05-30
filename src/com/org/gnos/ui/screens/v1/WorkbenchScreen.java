@@ -5,27 +5,24 @@ import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.core.ProjectConfigutration;
-import com.org.gnos.custom.models.ProjectModel;
 import com.org.gnos.events.GnosEvent;
-import com.org.gnos.events.GnosEventWithAttributeMap;
 import com.org.gnos.services.ObjectiveFunctionEquationGenerator;
+import com.org.gnos.services.ProcessConstraintEquationGenerator;
 import com.org.gnos.ui.custom.controls.GnosConfigurationStepLabel;
 import com.org.gnos.ui.custom.controls.GnosScreen;
-import com.org.gnos.utilities.ClickBehavior;
-
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 
 
 public class WorkbenchScreen extends GnosScreen {
@@ -82,7 +79,8 @@ public class WorkbenchScreen extends GnosScreen {
 		btnSave.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				ProjectConfigutration.getInstance().save();
+				GnosEvent event = new GnosEvent(me, "save:clicked");
+				fireChildEvent(event);
 			}
 		});
 		btnSave.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
@@ -96,7 +94,8 @@ public class WorkbenchScreen extends GnosScreen {
 		btnRun.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				new ObjectiveFunctionEquationGenerator().generate();
+				GnosEvent event = new GnosEvent(me, "run:clicked");
+				fireChildEvent(event);
 			}
 		});
 		btnRun.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
@@ -281,6 +280,20 @@ public class WorkbenchScreen extends GnosScreen {
 	}
 
 
+	private void selectStepLabel(GnosConfigurationStepLabel label) {
+		gnosStepDefineFieldTypeLabel.setDeselectedState();
+		gnosStepMapRequiredFieldsLabel.setDeselectedState();
+		gnosStepDefineExpressionsLabel.setDeselectedState();
+		gnosStepModelDefinitionLabel.setDeselectedState();
+		gnosStepProcessRouteDefinitionLabel.setDeselectedState();
+		gnosStepPitGroupDefinitionLabel.setDeselectedState();
+		gnosStepOpexDefinitionLabel.setDeselectedState();
+		gnosStepProcessConstraintsDefinitionLabel.setDeselectedState();
+		gnosStepGradeConstraintsDefinitionLabel.setDeselectedState();
+		gnosStepBenchConstraintsDefinitionLabel.setDeselectedState();
+		
+		label.setSelectedState();
+	}
 	@Override
 	public void onGnosEventFired(GnosEvent e) {
 		System.out.println("Screen navigation done :"+e.eventName);
@@ -302,155 +315,41 @@ public class WorkbenchScreen extends GnosScreen {
 		}
 		
 		if(e.eventName == "Define Field Type"){
-			gnosStepDefineFieldTypeLabel.setSelectedState();
-			
-			gnosStepMapRequiredFieldsLabel.setDeselectedState();
-			gnosStepDefineExpressionsLabel.setDeselectedState();
-			gnosStepModelDefinitionLabel.setDeselectedState();
-			gnosStepProcessRouteDefinitionLabel.setDeselectedState();
-			gnosStepPitGroupDefinitionLabel.setDeselectedState();
-			gnosStepOpexDefinitionLabel.setDeselectedState();
-			gnosStepProcessConstraintsDefinitionLabel.setDeselectedState();
-			gnosStepGradeConstraintsDefinitionLabel.setDeselectedState();
-			gnosStepBenchConstraintsDefinitionLabel.setDeselectedState();
-			//gnosStepStockpileDefinitionLabel.setDeselectedState();
-			
+			selectStepLabel(gnosStepDefineFieldTypeLabel);		
 			mainConfigurationViewPort.loadFieldDatatypeDefinitionScreen();
-		}else if(e.eventName == "Map Required Fields"){
-			gnosStepMapRequiredFieldsLabel.setSelectedState();
 			
-			gnosStepDefineFieldTypeLabel.setDeselectedState();
-			gnosStepDefineExpressionsLabel.setDeselectedState();
-			gnosStepModelDefinitionLabel.setDeselectedState();
-			gnosStepProcessRouteDefinitionLabel.setDeselectedState();
-			gnosStepPitGroupDefinitionLabel.setDeselectedState();
-			gnosStepOpexDefinitionLabel.setDeselectedState();
-			gnosStepProcessConstraintsDefinitionLabel.setDeselectedState();
-			gnosStepGradeConstraintsDefinitionLabel.setDeselectedState();
-			gnosStepBenchConstraintsDefinitionLabel.setDeselectedState();
-			//gnosStepStockpileDefinitionLabel.setDeselectedState();
-			
+		}else if(e.eventName == "Map Required Fields"){			
+			selectStepLabel(gnosStepMapRequiredFieldsLabel);			
 			mainConfigurationViewPort.loadMapRequiredFieldsScreen();
+			
 		}else if(e.eventName == "Expression Definition"){
-			gnosStepDefineExpressionsLabel.setSelectedState();
-			
-			gnosStepDefineFieldTypeLabel.setDeselectedState();
-			gnosStepMapRequiredFieldsLabel.setDeselectedState();
-			gnosStepModelDefinitionLabel.setDeselectedState();
-			gnosStepProcessRouteDefinitionLabel.setDeselectedState();
-			gnosStepPitGroupDefinitionLabel.setDeselectedState();
-			gnosStepOpexDefinitionLabel.setDeselectedState();
-			gnosStepProcessConstraintsDefinitionLabel.setDeselectedState();
-			gnosStepGradeConstraintsDefinitionLabel.setDeselectedState();
-			gnosStepBenchConstraintsDefinitionLabel.setDeselectedState();
-			//gnosStepStockpileDefinitionLabel.setDeselectedState();
-			
+			selectStepLabel(gnosStepDefineExpressionsLabel);			
 			mainConfigurationViewPort.loadExpressionDefinitionScreen();
+			
 		}else if(e.eventName == "Model Definition"){
-			gnosStepModelDefinitionLabel.setSelectedState();
-			
-			gnosStepDefineFieldTypeLabel.setDeselectedState();
-			gnosStepMapRequiredFieldsLabel.setDeselectedState();
-			gnosStepDefineExpressionsLabel.setDeselectedState();
-			gnosStepProcessRouteDefinitionLabel.setDeselectedState();
-			gnosStepPitGroupDefinitionLabel.setDeselectedState();
-			gnosStepOpexDefinitionLabel.setDeselectedState();
-			gnosStepProcessConstraintsDefinitionLabel.setDeselectedState();
-			gnosStepGradeConstraintsDefinitionLabel.setDeselectedState();
-			gnosStepBenchConstraintsDefinitionLabel.setDeselectedState();
-			//gnosStepStockpileDefinitionLabel.setDeselectedState();
-			
+			selectStepLabel(gnosStepModelDefinitionLabel);			
 			mainConfigurationViewPort.loadModelDefinitionScreen();
+			
 		}else if(e.eventName == "Process Route Definition"){
-			gnosStepProcessRouteDefinitionLabel.setSelectedState();
-			
-			gnosStepDefineFieldTypeLabel.setDeselectedState();
-			gnosStepMapRequiredFieldsLabel.setDeselectedState();
-			gnosStepDefineExpressionsLabel.setDeselectedState();
-			gnosStepModelDefinitionLabel.setDeselectedState();
-			gnosStepPitGroupDefinitionLabel.setDeselectedState();
-			gnosStepOpexDefinitionLabel.setDeselectedState();
-			gnosStepProcessConstraintsDefinitionLabel.setDeselectedState();
-			gnosStepGradeConstraintsDefinitionLabel.setDeselectedState();
-			gnosStepBenchConstraintsDefinitionLabel.setDeselectedState();
-			//gnosStepStockpileDefinitionLabel.setDeselectedState();
-			
+			selectStepLabel(gnosStepProcessRouteDefinitionLabel);			
 			mainConfigurationViewPort.loadProcessRouteDefinitionScreen();
 		}else if(e.eventName == "PitGroup Dump and Stockpile"){
-			gnosStepPitGroupDefinitionLabel.setSelectedState();
-			
-			gnosStepDefineFieldTypeLabel.setDeselectedState();
-			gnosStepMapRequiredFieldsLabel.setDeselectedState();
-			gnosStepDefineExpressionsLabel.setDeselectedState();
-			gnosStepModelDefinitionLabel.setDeselectedState();
-			gnosStepProcessRouteDefinitionLabel.setDeselectedState();
-			gnosStepOpexDefinitionLabel.setDeselectedState();
-			gnosStepProcessConstraintsDefinitionLabel.setDeselectedState();
-			gnosStepGradeConstraintsDefinitionLabel.setDeselectedState();
-			gnosStepBenchConstraintsDefinitionLabel.setDeselectedState();
-			//gnosStepStockpileDefinitionLabel.setDeselectedState();
-			
+			selectStepLabel(gnosStepPitGroupDefinitionLabel);
 			mainConfigurationViewPort.loadPitGroupDefinitionScreen();
 		}else if(e.eventName == "OPEX Definition"){
-			gnosStepOpexDefinitionLabel.setSelectedState();
-
-			gnosStepPitGroupDefinitionLabel.setDeselectedState();
-			gnosStepDefineFieldTypeLabel.setDeselectedState();
-			gnosStepMapRequiredFieldsLabel.setDeselectedState();
-			gnosStepDefineExpressionsLabel.setDeselectedState();
-			gnosStepModelDefinitionLabel.setDeselectedState();
-			gnosStepProcessRouteDefinitionLabel.setDeselectedState();
-			gnosStepProcessConstraintsDefinitionLabel.setDeselectedState();
-			gnosStepGradeConstraintsDefinitionLabel.setDeselectedState();
-			gnosStepBenchConstraintsDefinitionLabel.setDeselectedState();
-			//gnosStepStockpileDefinitionLabel.setDeselectedState();
-			
+			selectStepLabel(gnosStepOpexDefinitionLabel);
 			mainConfigurationViewPort.loadOpexDefinitionScreen();
 		}else if(e.eventName == "Process Constraint Definition"){
-			gnosStepProcessConstraintsDefinitionLabel.setSelectedState();
-
-			gnosStepPitGroupDefinitionLabel.setDeselectedState();
-			gnosStepDefineFieldTypeLabel.setDeselectedState();
-			gnosStepMapRequiredFieldsLabel.setDeselectedState();
-			gnosStepDefineExpressionsLabel.setDeselectedState();
-			gnosStepModelDefinitionLabel.setDeselectedState();
-			gnosStepProcessRouteDefinitionLabel.setDeselectedState();
-			gnosStepOpexDefinitionLabel.setDeselectedState();
-			gnosStepGradeConstraintsDefinitionLabel.setDeselectedState();
-			gnosStepBenchConstraintsDefinitionLabel.setDeselectedState();
-			
+			selectStepLabel(gnosStepProcessConstraintsDefinitionLabel);
 			mainConfigurationViewPort.loadProcessConstraintDefinitionScreen();
 		}else if(e.eventName == "Grade Constraint Definition"){
-			gnosStepGradeConstraintsDefinitionLabel.setSelectedState();
-			
-			gnosStepPitGroupDefinitionLabel.setDeselectedState();
-			gnosStepDefineFieldTypeLabel.setDeselectedState();
-			gnosStepMapRequiredFieldsLabel.setDeselectedState();
-			gnosStepDefineExpressionsLabel.setDeselectedState();
-			gnosStepModelDefinitionLabel.setDeselectedState();
-			gnosStepProcessRouteDefinitionLabel.setDeselectedState();
-			gnosStepOpexDefinitionLabel.setDeselectedState();
-			gnosStepProcessConstraintsDefinitionLabel.setDeselectedState();
-			gnosStepBenchConstraintsDefinitionLabel.setDeselectedState();
-			//gnosStepStockpileDefinitionLabel.setDeselectedState();
-			
+			selectStepLabel(gnosStepGradeConstraintsDefinitionLabel);
 			mainConfigurationViewPort.loadGradeConstraintDefinitionScreen();
 		}else if(e.eventName == "Bench Constraint Definition"){
-			gnosStepBenchConstraintsDefinitionLabel.setSelectedState();
-			
-			gnosStepPitGroupDefinitionLabel.setDeselectedState();
-			gnosStepDefineFieldTypeLabel.setDeselectedState();
-			gnosStepMapRequiredFieldsLabel.setDeselectedState();
-			gnosStepDefineExpressionsLabel.setDeselectedState();
-			gnosStepModelDefinitionLabel.setDeselectedState();
-			gnosStepProcessRouteDefinitionLabel.setDeselectedState();
-			gnosStepOpexDefinitionLabel.setDeselectedState();
-			gnosStepProcessConstraintsDefinitionLabel.setDeselectedState();
-			gnosStepGradeConstraintsDefinitionLabel.setDeselectedState();
-			//gnosStepStockpileDefinitionLabel.setDeselectedState();
-			
+			selectStepLabel(gnosStepBenchConstraintsDefinitionLabel);
 			mainConfigurationViewPort.loadBenchConstraintDefinitionScreen();
 		}
+		
 		
 		this.scViewPortContainer.setMinSize(this.mainConfigurationViewPort.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 	}

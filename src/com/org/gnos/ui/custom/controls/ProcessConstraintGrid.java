@@ -8,8 +8,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -24,10 +22,9 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import com.org.gnos.core.Node;
 import com.org.gnos.core.ProjectConfigutration;
+import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.db.model.Expression;
-import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.OpexData;
 import com.org.gnos.db.model.ProcessConstraintData;
 import com.org.gnos.db.model.ProcessJoin;
@@ -59,8 +56,8 @@ public class ProcessConstraintGrid extends Composite {
 		super(parent, style);
 		this.parent = parent;
 		this.allRows = new ArrayList<Composite>();
-		this.opexDataList = ProjectConfigutration.getInstance().getOpexDataList();
-		this.processConstraintDataList = ProjectConfigutration.getInstance().getProcessConstraintDataList();
+		this.opexDataList = ScenarioConfigutration.getInstance().getOpexDataList();
+		this.processConstraintDataList = ScenarioConfigutration.getInstance().getProcessConstraintDataList();
 		this.timePeriod = timePeriod;
 		this.createContent(parent);
 	}
@@ -433,7 +430,7 @@ public class ProcessConstraintGrid extends Composite {
 			processConstraintData.setMax(isMax);
 			processConstraintData.setProcessJoin(processJoin);
 			
-			ProjectConfigutration.getInstance().addProcesssConstraintData(processConstraintData);
+			ScenarioConfigutration.getInstance().addProcesssConstraintData(processConstraintData);
 			
 		}
 		return true;

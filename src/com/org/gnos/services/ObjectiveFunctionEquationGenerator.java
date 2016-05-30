@@ -78,7 +78,7 @@ public class ObjectiveFunctionEquationGenerator {
 	}
 	
 	private void buildProcessVariables(Node process, List<Block> blocks, int processNumber) {
-		FixedOpexCost[] fixedOpexCost = ProjectConfigutration.getInstance().getFixedCost();
+		FixedOpexCost[] fixedOpexCost = scenarioConfigutration.getFixedCost();
 		Map<Integer, Float> oreMiningCostMap = fixedOpexCost[0].getCostData();
 		Set<Integer> keys = oreMiningCostMap.keySet();
 		int count = 1;
@@ -101,7 +101,7 @@ public class ObjectiveFunctionEquationGenerator {
 	}
 	
 	private void buildStockpileVariables(Set<Block> blocks) {
-		FixedOpexCost[] fixedOpexCost = ProjectConfigutration.getInstance().getFixedCost();
+		FixedOpexCost[] fixedOpexCost = scenarioConfigutration.getFixedCost();
 		Map<Integer, Float> oreMiningCostMap = fixedOpexCost[0].getCostData();
 		Map<Integer, Float> stockPilingCostMap = fixedOpexCost[2].getCostData();
 		Set<Integer> keys = stockPilingCostMap.keySet();
@@ -119,7 +119,7 @@ public class ObjectiveFunctionEquationGenerator {
 	
 	private void buildWasteBlockVariables() throws IOException {
 		List<Block> wasteblocks = findWasteBlocks();
-		FixedOpexCost[] fixedOpexCost = ProjectConfigutration.getInstance().getFixedCost();
+		FixedOpexCost[] fixedOpexCost = scenarioConfigutration.getFixedCost();
 		Map<Integer, Float> wasteMiningCostMap = fixedOpexCost[1].getCostData();
 		Set<Integer> keys = wasteMiningCostMap.keySet();
 
@@ -246,7 +246,7 @@ public class ObjectiveFunctionEquationGenerator {
 		if(model == null) return value;
 		float revenue = 0;
 		float pcost = 0;
-		List<OpexData> opexDataList = projectConfiguration.getOpexDataList();
+		List<OpexData> opexDataList = scenarioConfigutration.getOpexDataList();
 		for(OpexData opexData: opexDataList) {
 			if(opexData.getModel().getId() == model.getId()){
 				if(opexData.isRevenue()){
@@ -274,7 +274,7 @@ public class ObjectiveFunctionEquationGenerator {
 	}
 	
 	private void parseOpexData () {
-		List<OpexData> opexDataList = projectConfiguration.getOpexDataList();
+		List<OpexData> opexDataList = scenarioConfigutration.getOpexDataList();
 		modelOpexDataMapping = new LinkedHashMap<Integer, List<CostRevenueData>>();
 		
 		for(OpexData opexData: opexDataList) {

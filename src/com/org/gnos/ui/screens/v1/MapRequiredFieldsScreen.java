@@ -13,7 +13,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import com.org.gnos.application.GNOSConfig;
+import com.org.gnos.core.GNOSConfig;
 import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.db.model.Field;
 import com.org.gnos.events.GnosEvent;

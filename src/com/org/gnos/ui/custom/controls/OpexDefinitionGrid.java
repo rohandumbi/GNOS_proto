@@ -26,6 +26,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.core.Node;
 import com.org.gnos.core.ProjectConfigutration;
+import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.OpexData;
@@ -56,7 +57,7 @@ public class OpexDefinitionGrid extends Composite {
 		super(parent, style);
 		this.parent = parent;
 		this.allRows = new ArrayList<Composite>();
-		this.opexDataList = ProjectConfigutration.getInstance().getOpexDataList();
+		this.opexDataList = ScenarioConfigutration.getInstance().getOpexDataList();
 		this.timePeriod = timePeriod;
 		this.createContent(parent);
 	}
