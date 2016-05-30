@@ -177,6 +177,17 @@ public class MainConfigurationViewPort extends GnosScreen{
 		loadOpexDefinitionScreen();
 	}
 	
+	private void reloadScenarioScreens(){
+		/*
+		 * Since opex screen is reloaded at the selection of a scenario 
+		 * we don't need to reload it again although it is a scenario screen
+		 */
+		//reload process constraint
+		processConstraintDefinitionScreen = new ProcessConstraintDefinitionScreen(this.dummyShell, SWT.NONE);
+		processConstraintDefinitionScreen.registerEventListener(this);
+		this.layout();
+	}
+	
 	@Override
 	protected void checkSubclass() {
 		// Disable the check that prevents subclassing of SWT components
@@ -197,6 +208,17 @@ public class MainConfigurationViewPort extends GnosScreen{
 		}else if(e.eventName == "complete:process-route-defintion"){
 			processRouteDefinitionComplete();
 		}
+		
+		/*
+		 * Following event is to reload the scenario specific screens as they need to be reloaded
+		 * after a scenario has been selected
+		 */
+		
+		if(e.eventName == "selected:new-scenario"){
+			System.out.println("New scenario selected");
+			reloadScenarioScreens();
+		}
+		
 		this.triggerGnosEvent(e);
 		
 	}

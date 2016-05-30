@@ -134,22 +134,6 @@ public class OpexDefinitionScreen extends GnosScreen {
 			}
 		});
 
-		/*if(this.opexDataList.size() > 0){
-			OpexData opexData = this.opexDataList.get(0);
-			Map<Integer, Float> mapCostData = opexData.getCostData();
-			int numberOfIncrements = mapCostData.size();
-			int startYear = 0;
-			for(Integer key : mapCostData.keySet()){
-				startYear = key;
-				break;
-			}
-			textNumberOfIncrements.setText(String.valueOf(numberOfIncrements));
-			textStartYear.setText(String.valueOf(startYear));
-			TimePeriod savedTimePeriod = new TimePeriod(startYear, numberOfIncrements);
-			initializeOpexGrid(savedTimePeriod);
-			initializeMiningStockpileCostGrid(savedTimePeriod);
-		}*/
-
 		Label lblCreateNew = new Label(this, SWT.NONE);
 		lblCreateNew.setForeground(SWTResourceManager.getColor(0, 191, 255));
 		lblCreateNew.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
@@ -244,6 +228,7 @@ public class OpexDefinitionScreen extends GnosScreen {
 				
 				boolean isScenarioCreationSuccessful = scenarioDAO.create(scenario);
 				if(isScenarioCreationSuccessful){
+					ScenarioConfigutration.getInstance().load(scenario.getId());
 					initializeOpexGrid(scenario);
 					initializeMiningStockpileCostGrid(scenario);
 				}
@@ -269,6 +254,8 @@ public class OpexDefinitionScreen extends GnosScreen {
 		ScenarioConfigutration.getInstance().load(scenario.getId());
 		initializeOpexGrid(scenario);
 		initializeMiningStockpileCostGrid(scenario);
+		GnosEvent event = new GnosEvent(this, "selected:new-scenario");
+		triggerGnosEvent(event);
 	}
 
 	private void initializeOpexGrid(Scenario scenario){
@@ -386,5 +373,13 @@ public class OpexDefinitionScreen extends GnosScreen {
 	public void onGnosEventFired(GnosEvent e) {
 		// TODO Auto-generated method stub
 
+	}
+	
+	private void triggerGnosEvent(GnosEvent event){
+		int j = listeners.size();
+		int i = 0;
+		for(i=0; i<j; i++){
+			listeners.get(i).onGnosEventFired(event);
+		}
 	}
 }

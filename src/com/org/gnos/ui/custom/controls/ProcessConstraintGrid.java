@@ -26,6 +26,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.core.Node;
 import com.org.gnos.core.ProjectConfigutration;
+import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.OpexData;
@@ -45,23 +46,23 @@ public class ProcessConstraintGrid extends Composite {
 	private String[] sourceFieldsComboItems;
 	private String[] sourceExpressionComboItems;
 	private Composite presentRow;
-	private List<OpexData> opexDataList;
 	private Composite parent;
 	private List<String> presentmodelNames;
-	private TimePeriod timePeriod;
 	private Label firstSeparator;
 	private Label secondSeparator;
 	private Label thirdSeparator;
 	private Label lblClassification;
 	private List<ProcessConstraintData> processConstraintDataList;
+	private int startYear;
+	private int timePeriod;
 
-	public ProcessConstraintGrid(Composite parent, int style, TimePeriod timePeriod) {
+	public ProcessConstraintGrid(Composite parent, int style) {
 		super(parent, style);
 		this.parent = parent;
 		this.allRows = new ArrayList<Composite>();
-		this.opexDataList = ProjectConfigutration.getInstance().getOpexDataList();
-		this.processConstraintDataList = ProjectConfigutration.getInstance().getProcessConstraintDataList();
-		this.timePeriod = timePeriod;
+		this.timePeriod = ScenarioConfigutration.getInstance().getTimePeriod();
+		this.startYear = ScenarioConfigutration.getInstance().getStartYear();
+		this.processConstraintDataList = ScenarioConfigutration.getInstance().getProcessConstraintDataList();
 		this.createContent(parent);
 	}
 
@@ -172,7 +173,7 @@ public class ProcessConstraintGrid extends Composite {
 
 	private void addTimePeriodHeaderColumns(Control reference){
 		Control previousColumn = reference;
-		for(int i=0; i<this.timePeriod.getIncrements(); i++){
+		for(int i=0; i<this.timePeriod; i++){
 			Label separator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
 			FormData fd_separator = new FormData();
 			fd_separator.left = new FormAttachment(previousColumn, 25);
@@ -183,7 +184,7 @@ public class ProcessConstraintGrid extends Composite {
 			FormData fd_lblYear = new FormData();
 			fd_lblYear.left = new FormAttachment(separator, 25);
 			fd_lblYear.top = new FormAttachment(0, 2);
-			lblYear.setText(String.valueOf(this.timePeriod.getStartYear() + i));
+			lblYear.setText(String.valueOf(this.startYear + i));
 			lblYear.setBackground(SWTResourceManager.getColor(230, 230, 230));
 			lblYear.setLayoutData(fd_lblYear);
 
@@ -384,7 +385,7 @@ public class ProcessConstraintGrid extends Composite {
 
 	private void addTimePeriodRowMembers(Composite parent, Control reference){
 		Control previousMember = reference;
-		for(int i=0; i<this.timePeriod.getIncrements(); i++){
+		for(int i=0; i<this.timePeriod; i++){
 			Text yearlyValue = new Text(parent, SWT.BORDER);
 			FormData fd_yearlyValue = new FormData();
 			/*
@@ -405,8 +406,8 @@ public class ProcessConstraintGrid extends Composite {
 			Combo comboGroup = (Combo)rowChildren[2];
 			Combo comboMaxMin = (Combo)rowChildren[3];
 			LinkedHashMap<Integer, Float> mapConstraintData = new LinkedHashMap<Integer, Float>();
-			for(int j=0; j<this.timePeriod.getIncrements(); j++){
-				mapConstraintData.put((this.timePeriod.getStartYear() + j), Float.valueOf(((Text)rowChildren[4+j]).getText())); // cost input data starts from 4th indexed row child.
+			for(int j=0; j<this.timePeriod; j++){
+				mapConstraintData.put((this.startYear + j), Float.valueOf(((Text)rowChildren[4+j]).getText())); // cost input data starts from 4th indexed row child.
 			}
 			boolean inUse = isInUse.getSelection();
 			boolean isMax = (comboMaxMin.getSelectionIndex() == 0);//0=max; 1=min
@@ -433,7 +434,7 @@ public class ProcessConstraintGrid extends Composite {
 			processConstraintData.setMax(isMax);
 			processConstraintData.setProcessJoin(processJoin);
 			
-			ProjectConfigutration.getInstance().addProcesssConstraintData(processConstraintData);
+			//ProjectConfigutration.getInstance().addProcesssConstraintData(processConstraintData);
 			
 		}
 		return true;

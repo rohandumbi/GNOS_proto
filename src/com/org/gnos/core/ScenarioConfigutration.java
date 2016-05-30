@@ -173,7 +173,7 @@ public class ScenarioConfigutration {
 				String processJoinName = rs.getString(2);
 				int expressionId = rs.getInt(3);
 				//Model model = this.getModelById(modelId);
-				ProcessJoin processJoin = this.getProcessJoinByName(processJoinName);
+				ProcessJoin processJoin = this.projectConfiguration.getProcessJoinByName(processJoinName);
 
 				pcd = getProcessConstraintDataById(id);
 				if (pcd == null) {
@@ -486,6 +486,14 @@ public class ScenarioConfigutration {
 			return -1;
 		} else {
 			return this.scenarioData.getDiscount();
+		}
+	}
+	
+	public String getName() {
+		if(scenarioData == null){
+			return null;
+		} else {
+			return this.scenarioData.getName();
 		}
 	}
 }
