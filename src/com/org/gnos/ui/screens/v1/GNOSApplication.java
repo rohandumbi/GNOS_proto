@@ -172,7 +172,7 @@ public class GNOSApplication extends ApplicationWindow implements GnosEventListe
            tidyUpOnExit();
            super.handleShellCloseEvent();
        }*/
-	   tidyUpOnExit();
+	   //tidyUpOnExit();
        super.handleShellCloseEvent();
    }
    

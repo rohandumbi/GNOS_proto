@@ -15,6 +15,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.core.ProjectConfigutration;
+import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.custom.models.ProjectModel;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.events.GnosEventWithAttributeMap;
@@ -83,6 +84,7 @@ public class WorkbenchScreen extends GnosScreen {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				ProjectConfigutration.getInstance().save();
+				ScenarioConfigutration.getInstance().save();
 			}
 		});
 		btnSave.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));

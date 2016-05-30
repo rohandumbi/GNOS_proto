@@ -63,8 +63,8 @@ public class ScenarioConfigutration {
 	}
 	
 	public void loadOpexData() {
-		String sql = "select id, model_id, expression_id, in_use, is_revenue, year, value from opex_defn, model_year_mapping where id= opex_id and scneario_id = "
-				+ this.projectConfiguration.getProjectId() + " order by id, year";
+		String sql = "select id, model_id, expression_id, in_use, is_revenue, year, value from opex_defn, model_year_mapping where id= opex_id and scenario_id = "
+				+ this.scenarioId + " order by id, year";
 		Statement stmt = null;
 		ResultSet rs = null;
 		Connection conn = DBManager.getConnection();
@@ -111,8 +111,8 @@ public class ScenarioConfigutration {
 	}
 
 	public void loadFixedCost() {
-		String sql = "select cost_head, year, value, value from fixedcost_year_mapping where project_id = "
-				+ this.projectConfiguration.getProjectId() + " order by cost_head";
+		String sql = "select cost_head, year, value, value from fixedcost_year_mapping where scenario_id = "
+				+ this.scenarioId + " order by cost_head";
 		fixedCost = new FixedOpexCost[4];
 		Statement stmt = null;
 		ResultSet rs = null;
@@ -158,8 +158,8 @@ public class ScenarioConfigutration {
 	}
 	
 	public void loadProcessConstraintData() {
-		String sql = "select id, process_join_name, expression_id, in_use, is_max, year, value from process_constraint_defn, process_constraint_year_mapping where id= process_constraint_id and project_id = "
-				+ this.projectConfiguration.getProjectId() + " order by id, year";
+		String sql = "select id, process_join_name, expression_id, in_use, is_max, year, value from process_constraint_defn, process_constraint_year_mapping where id= process_constraint_id and scenario_id = "
+				+ this.scenarioId + " order by id, year";
 		Statement stmt = null;
 		ResultSet rs = null;
 		Connection conn = DBManager.getConnection();
@@ -205,6 +205,7 @@ public class ScenarioConfigutration {
 	}
 
 	public void save() {
+		this.projectConfiguration = ProjectConfigutration.getInstance();
 		saveOpexData();
 		saveFixedCostData();
 		saveProcessConstraintData();
@@ -213,7 +214,7 @@ public class ScenarioConfigutration {
 
 	public void saveProcessConstraintData() {
 		Connection conn = DBManager.getConnection();
-		String insert_sql = "insert into process_constraint_defn (project_id, scenario_id, process_join_name, expression_id, in_use, is_max) values (?, ?, ?, ?, ?, ?)";
+		String insert_sql = "insert into process_constraint_defn (scenario_id, process_join_name, expression_id, in_use, is_max) values (?, ?, ?, ?, ?)";
 		String mapping_sql = "insert into process_constraint_year_mapping (process_constraint_id, year, value) values (?, ?, ?)";
 		PreparedStatement pstmt = null;
 		PreparedStatement pstmt1 = null;
@@ -230,16 +231,16 @@ public class ScenarioConfigutration {
 			for(ProcessConstraintData pcd : this.processConstraintDataList) {
 				if (pcd.getId() > 0)
 					continue;
-				pstmt.setInt(1, this.projectConfiguration.getProjectId());
-				pstmt.setInt(2, 1);
-				pstmt.setString(3, pcd.getProcessJoin().getName());
+				//pstmt.setInt(1, this.projectConfiguration.getProjectId());
+				pstmt.setInt(1, 1);
+				pstmt.setString(2, pcd.getProcessJoin().getName());
 				if(pcd.getExpression() != null){
-					pstmt.setInt(4, pcd.getExpression().getId());
+					pstmt.setInt(3, pcd.getExpression().getId());
 				}else{
-					pstmt.setNull(4, java.sql.Types.INTEGER);
+					pstmt.setNull(3, java.sql.Types.INTEGER);
 				}
-				pstmt.setBoolean(5, pcd.isInUse());
-				pstmt.setBoolean(6, pcd.isMax());
+				pstmt.setBoolean(4, pcd.isInUse());
+				pstmt.setBoolean(5, pcd.isMax());
 				pstmt.executeUpdate();
 				rs = pstmt.getGeneratedKeys();
 				
@@ -278,7 +279,7 @@ public class ScenarioConfigutration {
 	
 	public void saveOpexData() {
 		Connection conn = DBManager.getConnection();
-		String insert_sql = "insert into opex_defn (project_id, scenario_id, model_id, expression_id, in_use, is_revenue) values (?, ?, ?, ?, ?, ?)";
+		String insert_sql = "insert into opex_defn (scenario_id, model_id, expression_id, in_use, is_revenue) values ( ?, ?, ?, ?, ?)";
 		String mapping_sql = "insert into model_year_mapping (opex_id, year, value) values (?, ?, ?)";
 		PreparedStatement pstmt = null;
 		PreparedStatement pstmt1 = null;
@@ -295,16 +296,16 @@ public class ScenarioConfigutration {
 			for (OpexData od : this.opexDataList) {
 				if (od.getId() > 0)
 					continue;
-				pstmt.setInt(1, this.projectConfiguration.getProjectId());
-				pstmt.setInt(2, 1);
-				pstmt.setInt(3, od.getModel().getId());
+				//pstmt.setInt(1, this.projectConfiguration.getProjectId());
+				pstmt.setInt(1, od.getScenarioId());
+				pstmt.setInt(2, od.getModel().getId());
 				if(od.getExpression() != null){
-					pstmt.setInt(4, od.getExpression().getId());
+					pstmt.setInt(3, od.getExpression().getId());
 				}else{
-					pstmt.setNull(4, java.sql.Types.INTEGER);
+					pstmt.setNull(3, java.sql.Types.INTEGER);
 				}
-				pstmt.setBoolean(5, od.isInUse());
-				pstmt.setBoolean(6, od.isRevenue());
+				pstmt.setBoolean(4, od.isInUse());
+				pstmt.setBoolean(5, od.isRevenue());
 				pstmt.executeUpdate();
 				rs = pstmt.getGeneratedKeys();
 				if (rs.next())
@@ -341,8 +342,11 @@ public class ScenarioConfigutration {
 	}
 
 	public void saveFixedCostData() {
+		if(fixedCost == null){
+			return;
+		}
 		Connection conn = DBManager.getConnection();
-		String insert_sql = "insert into fixedcost_year_mapping (project_id, scenario_id, cost_head, year, value) values (?, ?, ?, ?, ?)";
+		String insert_sql = "insert into fixedcost_year_mapping (scenario_id, cost_head, year, value) values (?, ?, ?, ?)";
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		boolean autoCommit = true;
@@ -359,11 +363,11 @@ public class ScenarioConfigutration {
 				Iterator<Integer> it = keys.iterator();
 				while (it.hasNext()) {
 					int key = it.next();
-					pstmt.setInt(1, this.projectConfiguration.getProjectId());
-					pstmt.setInt(2, 1);
-					pstmt.setInt(3, i);
-					pstmt.setInt(4, key);
-					pstmt.setFloat(5, fixedOpexCost.getCostData().get(key));
+					//pstmt.setInt(1, this.projectConfiguration.getProjectId());
+					pstmt.setInt(1, fixedOpexCost.getScenarioId());
+					pstmt.setInt(2, i);
+					pstmt.setInt(3, key);
+					pstmt.setFloat(4, fixedOpexCost.getCostData().get(key));
 					pstmt.executeUpdate();
 				}
 			}
