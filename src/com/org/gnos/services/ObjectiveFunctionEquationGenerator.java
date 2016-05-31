@@ -86,6 +86,7 @@ public class ObjectiveFunctionEquationGenerator {
 			float miningcost = oreMiningCostMap.get(year);
 			
 			for(Block block: blocks) {
+				block.addProcess(processNumber);
 				float processValue = getProcessValue(block, process.getModel(), year);
 				float value = processValue - miningcost;
 				value = (float) (value * (1 / Math.pow ((1 + discount_rate), count)));

@@ -218,7 +218,7 @@ public class ProcessConstraintGrid extends Composite {
 				}
 			});
 			for(int i=0; i< itemsComboExpression.length; i++){
-				if(itemsComboExpression[i].equals(pcd.getExpression().getName())) {
+				if(itemsComboExpression[i].equals(pcd.getCoefficient_name())) {
 					comboExpression.select(i);
 					break;
 				}
@@ -250,7 +250,7 @@ public class ProcessConstraintGrid extends Composite {
 				}
 			});
 			for(int i=0; i< itemsComboGroup.length; i++){
-				if(itemsComboGroup[i].equals(pcd.getProcessJoin().getName())) {
+				if(itemsComboGroup[i].equals(pcd.getSelector_name())) {
 					comboGroup.select(i);
 					break;
 				}
@@ -410,8 +410,6 @@ public class ProcessConstraintGrid extends Composite {
 			String processJoinName = comboGroup.getText();
 			String expressionName = comboExpression.getText();
 			
-			ProcessJoin processJoin = ProjectConfigutration.getInstance().getProcessJoinByName(processJoinName);
-			Expression expression = ProjectConfigutration.getInstance().getExpressionByName(expressionName);
 			ProcessConstraintData processConstraintData = null;
 			
 			if(rowConstraintData.getData() == null){
@@ -425,10 +423,12 @@ public class ProcessConstraintGrid extends Composite {
 			
 			
 			processConstraintData.setConstraintData(mapConstraintData);
-			processConstraintData.setExpression(expression);
+			processConstraintData.setCoefficientType(ProcessConstraintData.COEFFICIENT_EXPRESSION);
+			processConstraintData.setCoefficient_name(expressionName);
+			processConstraintData.setSelectionType(ProcessConstraintData.SELECTION_PROCESS);
+			processConstraintData.setSelector_name(processJoinName);
 			processConstraintData.setInUse(inUse);
 			processConstraintData.setMax(isMax);
-			processConstraintData.setProcessJoin(processJoin);
 			
 			ScenarioConfigutration.getInstance().addProcesssConstraintData(processConstraintData);
 			

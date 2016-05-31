@@ -5,11 +5,22 @@ import java.util.Map;
 
 public class ProcessConstraintData {
 
+	public static final int COEFFICIENT_EXPRESSION =1;
+	public static final int COEFFICIENT_PRODUCT =2;
+	public static final int COEFFICIENT_PRODUCT_JOIN =3;
+	
+	public static final int SELECTION_PROCESS = 1;
+	public static final int SELECTION_PIT = 2;
+	public static final int SELECTION_PIT_GROUP = 3;
+	
 	private int id;
-	private ProcessJoin processJoin;
-	private Expression expression;
+	private String coefficient_name;
+	
+	private String selector_name;
 	private boolean inUse;
 	private boolean isMax;
+	private int coefficientType;
+	private int selectionType;
 	private LinkedHashMap<Integer, Float> constraintData;
 	
 	public ProcessConstraintData() {
@@ -26,22 +37,6 @@ public class ProcessConstraintData {
 		this.id = id;
 	}
 
-	public ProcessJoin getProcessJoin() {
-		return processJoin;
-	}
-
-	public void setProcessJoin(ProcessJoin processJoin) {
-		this.processJoin = processJoin;
-	}
-
-	public Expression getExpression() {
-		return expression;
-	}
-
-	public void setExpression(Expression expression) {
-		this.expression = expression;
-	}
-
 	public boolean isInUse() {
 		return inUse;
 	}
@@ -56,6 +51,38 @@ public class ProcessConstraintData {
 
 	public void setMax(boolean isMax) {
 		this.isMax = isMax;
+	}
+	
+	public String getCoefficient_name() {
+		return coefficient_name;
+	}
+
+	public void setCoefficient_name(String coefficient_name) {
+		this.coefficient_name = coefficient_name;
+	}
+
+	public String getSelector_name() {
+		return selector_name;
+	}
+
+	public void setSelector_name(String selector_name) {
+		this.selector_name = selector_name;
+	}
+
+	public int getCoefficientType() {
+		return coefficientType;
+	}
+
+	public void setCoefficientType(int coefficientType) {
+		this.coefficientType = coefficientType;
+	}
+
+	public int getSelectionType() {
+		return selectionType;
+	}
+
+	public void setSelectionType(int selectionType) {
+		this.selectionType = selectionType;
 	}
 
 	public LinkedHashMap<Integer, Float> getConstraintData() {

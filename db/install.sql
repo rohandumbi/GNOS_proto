@@ -129,8 +129,10 @@ DROP TABLE IF EXISTS process_constraint_defn;
 CREATE TABLE process_constraint_defn(
    id INT NOT NULL AUTO_INCREMENT,
    scenario_id INT NOT NULL,
-   process_join_name VARCHAR(100),
-   expression_id INT,
+   selector_name VARCHAR(50),
+   selector_type TINYINT,
+   coefficient_name VARCHAR(50),
+   coefficient_type TINYINT,
    in_use TINYINT NOT NULL default 1,
    is_max TINYINT NOT NULL default 1,
    PRIMARY KEY ( id )

@@ -160,7 +160,7 @@ public class ScenarioConfigutration {
 	
 	public void loadProcessConstraintData() {
 		this.processConstraintDataList = new ArrayList<ProcessConstraintData>();
-		String sql = "select id, process_join_name, expression_id, in_use, is_max, year, value from process_constraint_defn, process_constraint_year_mapping where id= process_constraint_id and scenario_id = "
+		String sql = "select id, selector_name, selector_type, coefficient_name, coefficient_type, in_use, is_max, year, value from process_constraint_defn, process_constraint_year_mapping where id = process_constraint_id and scenario_id = "
 				+ this.scenarioId + " order by id, year";
 		Statement stmt = null;
 		ResultSet rs = null;
@@ -181,14 +181,16 @@ public class ScenarioConfigutration {
 				if (pcd == null) {
 					pcd = new ProcessConstraintData();					
 					pcd.setId(id);
-					pcd.setInUse(rs.getBoolean(4));
-					pcd.setMax(rs.getBoolean(5));
-					pcd.setExpression(this.projectConfiguration.getExpressionById(expressionId));
-					pcd.setProcessJoin(processJoin);
+					pcd.setSelector_name(rs.getString(2));
+					pcd.setSelectionType(rs.getInt(3));
+					pcd.setCoefficient_name(rs.getString(4));
+					pcd.setCoefficientType(rs.getInt(5));
+					pcd.setInUse(rs.getBoolean(6));
+					pcd.setMax(rs.getBoolean(7));
 
 					this.processConstraintDataList.add(pcd);
 				}
-				pcd.addYear(rs.getInt(6), rs.getFloat(7));
+				pcd.addYear(rs.getInt("year"), rs.getFloat("value"));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -216,7 +218,7 @@ public class ScenarioConfigutration {
 
 	public void saveProcessConstraintData() {
 		Connection conn = DBManager.getConnection();
-		String insert_sql = "insert into process_constraint_defn (scenario_id, process_join_name, expression_id, in_use, is_max) values (?, ?, ?, ?, ?)";
+		String insert_sql = "insert into process_constraint_defn (scenario_id, selector_name, selector_type, coefficient_name, coefficient_type,  in_use, is_max) values (?, ?, ?, ?, ?, ?, ?)";
 		String mapping_sql = "insert into process_constraint_year_mapping (process_constraint_id, year, value) values (?, ?, ?)";
 		PreparedStatement pstmt = null;
 		PreparedStatement pstmt1 = null;
@@ -235,12 +237,8 @@ public class ScenarioConfigutration {
 					continue;
 				//pstmt.setInt(1, this.projectConfiguration.getProjectId());
 				pstmt.setInt(1, this.scenarioId);
-				pstmt.setString(2, pcd.getProcessJoin().getName());
-				if(pcd.getExpression() != null){
-					pstmt.setInt(3, pcd.getExpression().getId());
-				}else{
-					pstmt.setNull(3, java.sql.Types.INTEGER);
-				}
+				pstmt.setString(2, pcd.getSelector_name());
+				pstmt.setInt(3, pcd.getSelectionType());
 				pstmt.setBoolean(4, pcd.isInUse());
 				pstmt.setBoolean(5, pcd.isMax());
 				pstmt.executeUpdate();

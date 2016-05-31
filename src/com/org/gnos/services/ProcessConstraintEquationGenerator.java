@@ -45,6 +45,13 @@ public class ProcessConstraintEquationGenerator {
 		}
 
 	}
+	
+	public void buildProcessConstraintVariables() {
+		for(ProcessConstraintData processConstraintData: processConstraintDataList) {
+			
+		}
+		
+	}
 
 	public void buildProcessJoinVariables() {
 		List<ProcessJoin> processJoins = projectConfiguration.getProcessJoins();
@@ -54,7 +61,7 @@ public class ProcessConstraintEquationGenerator {
 			List<ProcessConstraintData> processConstraintList = getProcessConstraintData(processjoin);
 			if(processConstraintList.size() < 1) continue;
 			for(ProcessConstraintData data: processConstraintList){
-				String expressionName = data.getExpression().getName().replaceAll("\\s+","_");
+				String expressionName = data.getCoefficient_name().replaceAll("\\s+","_");
 				
 				for(int i=1; i<= timePeriod; i++){
 					String eq = "";
@@ -101,7 +108,7 @@ public class ProcessConstraintEquationGenerator {
 	private List<ProcessConstraintData> getProcessConstraintData(ProcessJoin processjoin) {
 		List<ProcessConstraintData> data = new ArrayList<ProcessConstraintData>();
 		for(ProcessConstraintData processConstraintData: processConstraintDataList){
-			if(processConstraintData.isInUse() && processConstraintData.getProcessJoin().getName().equals(processjoin.getName())){
+			if(processConstraintData.isInUse() && processConstraintData.getSelector_name().equals(processjoin.getName())){
 				data.add(processConstraintData);
 			}
 		}

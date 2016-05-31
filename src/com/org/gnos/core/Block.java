@@ -1,6 +1,8 @@
 package com.org.gnos.core;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Block {
@@ -9,6 +11,7 @@ public class Block {
 	private int blockNo;
 	private int pitNo;
 	private int benchNo;
+	private List<Integer> processNumbers;
 	
 	private Map<String, String> fields;
 
@@ -58,6 +61,20 @@ public class Block {
 		this.fields.put(key, ratio);
 	}
 	
+	
+	public void addProcess(int processNo) {
+		this.processNumbers.add(processNo);
+	}
+	
+	public List<String> getProcessVariables() {
+		List<String> variables = new ArrayList();
+		for(int processNumber: processNumbers){
+			String variable = "p"+this.getPitNo()+"x"+this.getBlockNo()+"p"+processNumber;
+			variables.add(variable);
+		}
+		
+		return variables;
+	}
 	@Override
 	public boolean equals(Object obj) {
 		return (this.blockNo == ((Block)obj).blockNo);
