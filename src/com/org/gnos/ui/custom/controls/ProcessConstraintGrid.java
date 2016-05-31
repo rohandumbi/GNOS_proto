@@ -26,8 +26,13 @@ import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.OpexData;
+import com.org.gnos.db.model.Pit;
+import com.org.gnos.db.model.PitGroup;
+import com.org.gnos.db.model.Process;
 import com.org.gnos.db.model.ProcessConstraintData;
 import com.org.gnos.db.model.ProcessJoin;
+import com.org.gnos.db.model.Product;
+import com.org.gnos.db.model.ProductJoin;
 import com.org.gnos.services.TimePeriod;
 
 public class ProcessConstraintGrid extends Composite {
@@ -39,8 +44,6 @@ public class ProcessConstraintGrid extends Composite {
 	 */
 	private Composite compositeGridHeader;
 	private List<Composite> allRows;
-	private String[] sourceFieldsComboItems;
-	private String[] sourceExpressionComboItems;
 	private Composite presentRow;
 	private Composite parent;
 	private List<String> presentmodelNames;
@@ -51,6 +54,15 @@ public class ProcessConstraintGrid extends Composite {
 	private List<ProcessConstraintData> processConstraintDataList;
 	private int startYear;
 	private int timePeriod;
+
+	private int expressionEndIndex = 0;
+	private int productEndIndex = 0;
+	private int productJoinEndIndex = 0;
+	
+	private int processEndIndex = 0;
+	private int processJoinEndIndex = 0;
+	private int pitEndIndex = 0;
+	private int pitGroupEndIndex = 0;
 
 	public ProcessConstraintGrid(Composite parent, int style) {
 		super(parent, style);
@@ -78,24 +90,53 @@ public class ProcessConstraintGrid extends Composite {
 	}
 
 
-	private String[] getNonGradeExpressionComboItems(){
-
-		List<Expression> expressions = ProjectConfigutration.getInstance().getNonGradeExpressions();
-		this.sourceExpressionComboItems = new String[expressions.size()];
-		for(int i=0; i<expressions.size(); i++){
-			this.sourceExpressionComboItems[i] = expressions.get(i).getName();
+	private String[] getCoefficientComboItems(){
+		ProjectConfigutration projectConfigutration = ProjectConfigutration.getInstance();
+		List<Expression> expressions = projectConfigutration.getNonGradeExpressions();
+		List<Product> products = projectConfigutration.getProductList();
+		List<ProductJoin> productJoins = projectConfigutration.getProductJoinList();
+		this.expressionEndIndex = expressions.size() -1;
+		this.productEndIndex = this.expressionEndIndex + products.size();
+		this.productJoinEndIndex = this.productEndIndex + productJoins.size();
+		String[] comboItems = new String[this.productJoinEndIndex+1];
+		for(int i=0; i< expressions.size() ; i++){
+			comboItems[i] = expressions.get(i).getName();
 		}
-
-		return this.sourceExpressionComboItems;
+		for(int i=0; i < products.size(); i++){
+			comboItems[this.expressionEndIndex +i+1] = products.get(i).getName();
+		}
+		for(int i=0; i < productJoins.size(); i++){
+			comboItems[this.productEndIndex+ i +1] = productJoins.get(i).getName();
+		}
+		return comboItems;
 	}
 	
-	private String[] getProcessJoins(){
-		List<ProcessJoin> processJoins = ProjectConfigutration.getInstance().getProcessJoins();
-		this.sourceExpressionComboItems = new String[processJoins.size()];
-		for(int i=0; i<processJoins.size(); i++){
-			this.sourceExpressionComboItems[i] = processJoins.get(i).getName();
+	private String[] getSelectors(){
+		
+		ProjectConfigutration projectConfigutration = ProjectConfigutration.getInstance();
+			
+		List<ProcessJoin> processJoins = projectConfigutration.getProcessJoins();
+		List<Process> processes = projectConfigutration.getProcessList();
+		List<Pit> pits = projectConfigutration.getPitList();
+		List<PitGroup> pitGroups = projectConfigutration.getPitGroupList();
+		this.processJoinEndIndex = processJoins.size() -1;
+		this.processEndIndex = this.processJoinEndIndex + processes.size();
+		this.pitEndIndex = this.processEndIndex + pits.size();
+		this.pitGroupEndIndex = this.pitEndIndex + pitGroups.size();
+		String[] comboItems = new String[this.pitGroupEndIndex+1];
+		for(int i=0; i < processJoins.size(); i++){
+			comboItems[i] = processJoins.get(i).getName();
 		}
-		return this.sourceExpressionComboItems;
+		for(int i=0; i < processes.size(); i++){
+			comboItems[this.processJoinEndIndex + i +1] = processes.get(i).getModel().getName();
+		}
+		for(int i=0; i < pits.size(); i++){
+			comboItems[this.processEndIndex + i +1] = pits.get(i).getPitName();
+		}
+		for(int i=0; i < pitGroups.size(); i++){
+			comboItems[this.pitEndIndex +i +1] = pitGroups.get(i).getName();
+		}
+		return comboItems;
 	}
 
 
@@ -205,21 +246,30 @@ public class ProcessConstraintGrid extends Composite {
 			fd_compositeRow.top = new FormAttachment(this.presentRow);
 			
 			final Combo comboExpression = new Combo(compositeRow, SWT.NONE);
-			String[] itemsComboExpression = this.getNonGradeExpressionComboItems();
+			String[] itemsComboExpression = this.getCoefficientComboItems();
 			comboExpression.setItems(itemsComboExpression);
 			comboExpression.addListener(SWT.MouseDown, new Listener(){
 				@Override
 				public void handleEvent(Event event) {
 					// TODO Auto-generated method stub
 					comboExpression.removeAll();
-					comboExpression.setItems(getNonGradeExpressionComboItems());
+					comboExpression.setItems(getCoefficientComboItems());
 					comboExpression.getParent().layout();
 					comboExpression.setListVisible(true);
 				}
 			});
-			for(int i=0; i< itemsComboExpression.length; i++){
-				if(itemsComboExpression[i].equals(pcd.getCoefficient_name())) {
-					comboExpression.select(i);
+			int start = 0;
+			int end = this.expressionEndIndex;
+			if(pcd.getCoefficientType() == ProcessConstraintData.COEFFICIENT_PRODUCT) {
+				start = this.expressionEndIndex +1 ;
+				end = this.productEndIndex;
+			} else if (pcd.getCoefficientType() == ProcessConstraintData.COEFFICIENT_PRODUCT_JOIN) {
+				start = this.productEndIndex +1 ;
+				end = this.processJoinEndIndex;
+			}
+			for(; start <= end; start++){
+				if(itemsComboExpression[start].equals(pcd.getCoefficient_name())) {
+					comboExpression.select(start);
 					break;
 				}
 			}
@@ -237,24 +287,37 @@ public class ProcessConstraintGrid extends Composite {
 			btnUse.setLayoutData(fd_btnUse);
 			
 			final Combo comboGroup = new Combo(compositeRow, SWT.NONE);
-			String[] itemsComboGroup = this.getProcessJoins();
+			String[] itemsComboGroup = this.getSelectors();
 			comboGroup.setItems(itemsComboGroup);
 			comboGroup.addListener(SWT.MouseDown, new Listener(){
 				@Override
 				public void handleEvent(Event event) {
 					// TODO Auto-generated method stub
 					comboGroup.removeAll();
-					comboGroup.setItems(getProcessJoins());
+					comboGroup.setItems(getSelectors());
 					comboGroup.getParent().layout();
 					comboGroup.setListVisible(true);
 				}
 			});
-			for(int i=0; i< itemsComboGroup.length; i++){
-				if(itemsComboGroup[i].equals(pcd.getSelector_name())) {
-					comboGroup.select(i);
+			start = 0;
+			end = this.processJoinEndIndex;
+			if(pcd.getSelectionType() == ProcessConstraintData.SELECTION_PROCESS) {
+				start = this.processJoinEndIndex +1 ;
+				end = this.processEndIndex;
+			} else if (pcd.getSelectionType() == ProcessConstraintData.SELECTION_PIT) {
+				start = this.processEndIndex +1 ;
+				end = this.pitEndIndex;
+			} else if (pcd.getSelectionType() == ProcessConstraintData.SELECTION_PIT_GROUP) {
+				start = this.pitEndIndex +1 ;
+				end = this.pitGroupEndIndex;
+			}
+			for(; start <= end; start++){
+				if(itemsComboGroup[start].equals(pcd.getSelector_name())) {
+					comboGroup.select(start);
 					break;
 				}
 			}
+			
 			FormData fd_comboGroup = new FormData();
 			fd_comboGroup.left = new FormAttachment(btnUse, 18);
 			fd_comboGroup.right = new FormAttachment(btnUse, 135);
@@ -317,14 +380,14 @@ public class ProcessConstraintGrid extends Composite {
 
 
 		final Combo comboExpression = new Combo(compositeRow, SWT.NONE);
-		comboExpression.setItems(this.getNonGradeExpressionComboItems());
+		comboExpression.setItems(this.getCoefficientComboItems());
 		comboExpression.setText("Select Expression");
 		comboExpression.addListener(SWT.MouseDown, new Listener(){
 			@Override
 			public void handleEvent(Event event) {
 				// TODO Auto-generated method stub
 				comboExpression.removeAll();
-				comboExpression.setItems(getNonGradeExpressionComboItems());
+				comboExpression.setItems(getCoefficientComboItems());
 				comboExpression.getParent().layout();
 				comboExpression.setListVisible(true);
 			}
@@ -342,7 +405,7 @@ public class ProcessConstraintGrid extends Composite {
 		btnUse.setLayoutData(fd_btnUse);
 
 		final Combo comboGroup = new Combo(compositeRow, SWT.NONE);
-		String[] items = this.getProcessJoins();
+		String[] items = this.getSelectors();
 		comboGroup.setItems(items);
 		comboGroup.setText("Select Group");
 		comboGroup.addListener(SWT.MouseDown, new Listener(){
@@ -350,7 +413,7 @@ public class ProcessConstraintGrid extends Composite {
 			public void handleEvent(Event event) {
 				// TODO Auto-generated method stub
 				comboGroup.removeAll();
-				comboGroup.setItems(getProcessJoins());
+				comboGroup.setItems(getSelectors());
 				comboGroup.getParent().layout();
 				comboGroup.setListVisible(true);
 			}
@@ -407,8 +470,10 @@ public class ProcessConstraintGrid extends Composite {
 			}
 			boolean inUse = isInUse.getSelection();
 			boolean isMax = (comboMaxMin.getSelectionIndex() == 0);//0=max; 1=min
-			String processJoinName = comboGroup.getText();
-			String expressionName = comboExpression.getText();
+			String selectorName = comboGroup.getText();
+			String coefficientName = comboExpression.getText();
+			int coefficientSelectionIndex = comboExpression.getSelectionIndex();
+			int selectorSelectionIndex = comboGroup.getSelectionIndex();
 			
 			ProcessConstraintData processConstraintData = null;
 			
@@ -423,10 +488,25 @@ public class ProcessConstraintGrid extends Composite {
 			
 			
 			processConstraintData.setConstraintData(mapConstraintData);
-			processConstraintData.setCoefficientType(ProcessConstraintData.COEFFICIENT_EXPRESSION);
-			processConstraintData.setCoefficient_name(expressionName);
-			processConstraintData.setSelectionType(ProcessConstraintData.SELECTION_PROCESS);
-			processConstraintData.setSelector_name(processJoinName);
+			if(coefficientSelectionIndex <= this.expressionEndIndex) {
+				processConstraintData.setCoefficientType(ProcessConstraintData.COEFFICIENT_EXPRESSION);
+			} else if(coefficientSelectionIndex <= this.productEndIndex) {
+				processConstraintData.setCoefficientType(ProcessConstraintData.COEFFICIENT_PRODUCT);
+			} else {
+				processConstraintData.setCoefficientType(ProcessConstraintData.COEFFICIENT_PRODUCT_JOIN);
+			}		
+			processConstraintData.setCoefficient_name(coefficientName);
+			if(selectorSelectionIndex <= processJoinEndIndex ) {
+				processConstraintData.setSelectionType(ProcessConstraintData.SELECTION_PROCESS_JOIN);
+			} else if(selectorSelectionIndex <= processEndIndex ) {
+				processConstraintData.setSelectionType(ProcessConstraintData.SELECTION_PROCESS);
+			} else if(selectorSelectionIndex <= pitEndIndex ) {
+				processConstraintData.setSelectionType(ProcessConstraintData.SELECTION_PIT);
+			} else {
+				processConstraintData.setSelectionType(ProcessConstraintData.SELECTION_PIT_GROUP);
+			}
+
+			processConstraintData.setSelector_name(selectorName);
 			processConstraintData.setInUse(inUse);
 			processConstraintData.setMax(isMax);
 			
