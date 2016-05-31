@@ -725,7 +725,7 @@ public class ProjectConfigutration {
 	}
 
 	public void saveProcesses() {
-		List<Node> processes = processTree.getLeafNodes();
+		List<Process> processes = this.getProcessList();
 		
 		if(processes.size() < 1){ 
 			return;
@@ -741,9 +741,9 @@ public class ProjectConfigutration {
 			conn.setAutoCommit(false);
 			pstmt = conn.prepareStatement(insert_sql);
 			int count = 1;
-			for(Node node : processes){
+			for(Process process : processes){
 				pstmt.setInt(1, this.projectId);
-				pstmt.setInt(2, node.getData().getId());
+				pstmt.setInt(2, process.getModel().getId());
 				pstmt.setInt(3, count);
 				pstmt.executeUpdate();
 				count++;
@@ -1133,6 +1133,18 @@ public class ProjectConfigutration {
 	}
 
 	public List<Process> getProcessList() {
+		if(processList == null) {
+			this.processList = new ArrayList<Process>();
+			List<Node> nodes = processTree.getLeafNodes();
+			int count =1;
+			for(Node node: nodes) {
+				Process process = new Process();
+				process.setModel(node.getData());
+				process.setProcessNo(count);
+				this.processList.add(process);
+				count ++;
+			}
+		}
 		return processList;
 	}
 
