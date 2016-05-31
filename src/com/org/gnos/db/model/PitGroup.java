@@ -14,10 +14,12 @@ public class PitGroup {
 	}
 	
 	public void addPit(Pit newPit){
+		if(newPit == null) return;
 		this.listChildPits.add(newPit);
 	}
 	
 	public void addPitGroup(PitGroup newPitGroup){
+		if(newPitGroup == null) return;
 		this.listChildPitGroups.add(newPitGroup);
 	}
 	

@@ -20,7 +20,8 @@ CREATE TABLE scenario (
    start_year INT,
    time_period INT,
    discount FLOAT,
-   PRIMARY KEY ( id )
+   PRIMARY KEY ( id ),
+   unique (project_id, name)
 );
 
 DROP TABLE IF EXISTS fields;
@@ -183,4 +184,38 @@ CREATE TABLE product_join_defn(
    child_product_name VARCHAR(100),
    child_product_join_name VARCHAR(100),
    unique key(project_id, name, child_product_name, child_product_join_name)
+);
+
+DROP TABLE IF EXISTS pitgroup_pit_mapping; 
+
+CREATE TABLE pitgroup_pit_mapping(
+   id INT NOT NULL AUTO_INCREMENT,
+   project_id INT NOT NULL,
+   name  VARCHAR(100) NOT NULL,
+   child_pit_name VARCHAR(100),
+   child_pitgroup_name VARCHAR(100),
+   primary key (id),
+   unique (project_id, name, child_pit_name, child_pitgroup_name)
+);
+
+DROP TABLE IF EXISTS dump_pit_mapping; 
+
+CREATE TABLE dump_pit_mapping(
+   id INT NOT NULL AUTO_INCREMENT,
+   project_id INT NOT NULL,
+   name  VARCHAR(100) NOT NULL,
+   pitgroup_name VARCHAR(100) NOT NULL,
+   primary key (id),
+   unique (project_id, name, pitgroup_name)
+);
+
+DROP TABLE IF EXISTS stockpile_pit_mapping; 
+
+CREATE TABLE stockpile_pit_mapping(
+   id INT NOT NULL AUTO_INCREMENT,
+   project_id INT NOT NULL,
+   name  VARCHAR(100) NOT NULL,
+   pitgroup_name VARCHAR(100) NOT NULL,
+   primary key (id),
+   unique key(project_id, name, pitgroup_name)
 );

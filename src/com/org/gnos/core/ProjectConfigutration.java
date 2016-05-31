@@ -16,17 +16,17 @@ import java.util.Set;
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.dao.ExpressionDAO;
 import com.org.gnos.db.dao.FieldDAO;
+import com.org.gnos.db.model.Dump;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Field;
-import com.org.gnos.db.model.FixedOpexCost;
 import com.org.gnos.db.model.Model;
-import com.org.gnos.db.model.OpexData;
 import com.org.gnos.db.model.Pit;
-import com.org.gnos.db.model.ProcessConstraintData;
+import com.org.gnos.db.model.PitGroup;
+import com.org.gnos.db.model.Process;
 import com.org.gnos.db.model.ProcessJoin;
 import com.org.gnos.db.model.Product;
-import com.org.gnos.db.model.Process;
 import com.org.gnos.db.model.ProductJoin;
+import com.org.gnos.db.model.Stockpile;
 import com.org.gnos.services.PitBenchProcessor;
 
 public class ProjectConfigutration {
@@ -42,6 +42,10 @@ public class ProjectConfigutration {
 	private List<ProcessJoin> processJoins = new ArrayList<ProcessJoin>();
 	private List<Product> productList = new ArrayList<Product>();
 	private List<ProductJoin> productJoinList = new ArrayList<ProductJoin>();
+	private List<PitGroup> pitGroupList = new ArrayList<PitGroup>();
+	private List<Dump> dumpList = new ArrayList<Dump>();
+	private List<Stockpile> stockPileList = new ArrayList<Stockpile>();
+	private List<Pit> pitList;
 
 	private boolean newProject = true;
 	private Map<String, String> savedRequiredFieldMapping;
@@ -69,13 +73,18 @@ public class ProjectConfigutration {
 		models = new ArrayList<Model>();
 		processTree = new Tree();
 		processList = new ArrayList<Process>();
-
+		pitGroupList = new ArrayList<PitGroup>();
+		dumpList = new ArrayList<Dump>();
+		stockPileList = new ArrayList<Stockpile>();
+		
 		loadFieldData();
 		loadFieldMappingData();
 		loadExpressions();
 		loadModels();
 		loadProcessDetails();
-		
+		loadPitGroups();
+		loadDumps();
+		loadStockpiles();
 	}
 
 	private void loadFieldData() {
@@ -167,8 +176,9 @@ public class ProjectConfigutration {
 		loadProductJoins();
 	}
 	
-	public ArrayList<Pit> getPitList() {
-		ArrayList<Pit> pitList = new ArrayList<Pit>();
+	public List<Pit> getPitList() {
+		if(pitList != null && this.pitList.size() > 0) return this.pitList;
+		this.pitList = new ArrayList<Pit>();
 		String dataTableName = "gnos_data_" + this.projectId;
 		String computedDataTableName = "gnos_computed_data_" + this.projectId;
 		String sql = "select  distinct a.pit_name, b.pit_no from "
@@ -192,7 +202,7 @@ public class ProjectConfigutration {
 			e.printStackTrace();
 		}
 
-		return pitList;
+		return this.pitList;
 	}
 
 	public void loadProcessTree() {
@@ -385,6 +395,87 @@ public class ProjectConfigutration {
 		}
 	}
 
+	public void loadPitGroups() {
+		String sql = "select id, name, child_pit_name, child_pitgroup_name from pitgroup_pit_mapping where project_id = "+ this.projectId +" order by id asc ";
+
+		try (
+				Connection conn = DBManager.getConnection();
+				Statement stmt = conn.createStatement();
+				ResultSet rs = stmt.executeQuery(sql);
+				
+			){
+			
+			while(rs.next()){
+				String name = rs.getString(2);
+				PitGroup pitGroup = this.getPitGroupfromName(name);
+				if(pitGroup == null){
+					pitGroup = new PitGroup(name);
+				}			
+				String child_pit_name = rs.getString(3);
+				String child_pitgroup_name = rs.getString(4);
+				if(child_pit_name != null){
+					pitGroup.addPit(this.getPitfromPitName(child_pit_name));
+				}
+				if(child_pitgroup_name != null){
+					pitGroup.addPitGroup(this.getPitGroupfromName(child_pitgroup_name));
+				}
+				pitGroupList.add(pitGroup);
+		
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void loadDumps() {
+		String sql = "select id, name, pitgroup_name from dump_pit_mapping where project_id = "+ this.projectId +" order by id asc ";
+
+		try (
+				Connection conn = DBManager.getConnection();
+				Statement stmt = conn.createStatement();
+				ResultSet rs = stmt.executeQuery(sql);
+				
+			){
+			int count = 1;
+			while(rs.next()){
+				String name = rs.getString(2);
+				PitGroup pitGroup = this.getPitGroupfromName(name);
+				Dump dump = new Dump(name, pitGroup);
+				dump.setDumpNumber(count);
+				count ++;
+				this.dumpList.add(dump);
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void loadStockpiles() {
+		String sql = "select id, name, pitgroup_name from stockpile_pit_mapping where project_id = "+ this.projectId +" order by id asc ";
+
+		try (
+				Connection conn = DBManager.getConnection();
+				Statement stmt = conn.createStatement();
+				ResultSet rs = stmt.executeQuery(sql);
+				
+			){	
+			int count = 1;
+			while(rs.next()){
+				String name = rs.getString(2);
+				PitGroup pitGroup = this.getPitGroupfromName(name);
+				Stockpile dump = new Stockpile(name, pitGroup);
+				dump.setStockpileNumber(count);
+				count ++;
+				this.stockPileList.add(dump);
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public void save() {
 		saveFieldData();
 		saveRequiredFieldMappingData();
@@ -394,7 +485,9 @@ public class ProjectConfigutration {
 		saveProcessJoins();
 		saveProducts();
 		saveProductJoins();
-
+		savePitGroups();
+		saveDumps();
+		saveStockpiles();
 	}
 
 	public void saveFieldData() {
@@ -810,6 +903,75 @@ public class ProjectConfigutration {
 		}
 	}
 
+	public void savePitGroups() {
+		String insert_sql = "insert into pitgroup_pit_mapping ( project_id , name, child_pit_name, child_pitgroup_name) values ( ? , ?, ?, ?) ";
+
+		try (
+				Connection conn = DBManager.getConnection();
+				PreparedStatement pstmt = conn.prepareStatement(insert_sql);
+				
+			){
+			for(PitGroup pitGroup: pitGroupList) {
+				for(Pit pit: pitGroup.getListChildPits()){
+					pstmt.setInt(1, projectId);
+					pstmt.setString(2, pitGroup.getName());
+					pstmt.setString(3, pit.getPitName());
+					pstmt.setNull(4, java.sql.Types.VARCHAR);
+					pstmt.executeUpdate();
+				}
+				for(PitGroup childGroup: pitGroup.getListChildPitGroups()){
+					pstmt.setInt(1, projectId);
+					pstmt.setString(2, pitGroup.getName());
+					pstmt.setNull(3, java.sql.Types.VARCHAR);
+					pstmt.setString(4, pitGroup.getName());
+					pstmt.executeUpdate();
+				}
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	public void saveDumps() {
+		String insert_sql = "insert into dump_pit_mapping ( project_id , name, pitgroup_name) values ( ? , ?, ?)";
+
+		try (
+				Connection conn = DBManager.getConnection();
+				PreparedStatement pstmt = conn.prepareStatement(insert_sql);
+				
+			){
+			for(Dump dump : dumpList) {
+				pstmt.setInt(1, projectId);
+				pstmt.setString(2, dump.getName());
+				pstmt.setString(3, dump.getAssociatedPitGroup().getName());
+				pstmt.executeUpdate();
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void saveStockpiles() {
+		String insert_sql = "insert into stockpile_pit_mapping ( project_id , name, pitgroup_name) values ( ? , ?, ?)";
+
+		try (
+				Connection conn = DBManager.getConnection();
+				PreparedStatement pstmt = conn.prepareStatement(insert_sql);
+				
+			){
+			for(Stockpile stockpile : stockPileList) {
+				pstmt.setInt(1, projectId);
+				pstmt.setString(2, stockpile.getName());
+				pstmt.setString(3, stockpile.getAssociatedPitGroup().getName());
+				pstmt.executeUpdate();
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public Expression getExpressionById(int expressionId) {
 		for (Expression expression : expressions) {
 			if (expression.getId() == expressionId) {
@@ -931,6 +1093,25 @@ public class ProjectConfigutration {
 		return nonGradeExpressions;
 	}
 
+	public Pit getPitfromPitName(String name) {
+		List<Pit> pitList = this.getPitList();
+		for(Pit p : pitList){
+			if(p.getPitName().equals(name)){
+				return p;
+			}
+		}
+		return null;
+	}
+	
+	public PitGroup getPitGroupfromName(String name) {
+
+		for(PitGroup pg : this.pitGroupList){
+			if(pg.getName().equals(name)){
+				return pg;
+			}
+		}
+		return null;
+	}
 	public void setExpressions(List<Expression> expressions) {
 		this.expressions = expressions;
 	}
@@ -1007,6 +1188,16 @@ public class ProjectConfigutration {
 		this.productJoinList = productJoinList;
 	}
 
+	public List<PitGroup> getPitGroupList() {
+		return pitGroupList;
+	}
 
+	public List<Dump> getDumpList() {
+		return dumpList;
+	}
+
+	public List<Stockpile> getStockPileList() {
+		return stockPileList;
+	}
 
 }

@@ -1,9 +1,6 @@
 package com.org.gnos.ui.screens.v1;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
@@ -19,9 +16,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import com.org.gnos.core.Node;
 import com.org.gnos.core.ProjectConfigutration;
-import com.org.gnos.core.Tree;
 import com.org.gnos.db.model.Dump;
 import com.org.gnos.db.model.Pit;
 import com.org.gnos.db.model.PitGroup;
@@ -43,19 +38,21 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 	
 	private ArrayList<String> listAddedModels;
 	private PitGroupDefinitionGraph compositeGroupDiagram;
-	private ArrayList<Pit> listOfPits;
-	private ArrayList<PitGroup> listOfPitGroups;
-	private ArrayList<Stockpile> listOfStockpiles;
-	private ArrayList<Dump> listOfDumps;
+	private java.util.List<Pit> listOfPits;
+	private java.util.List<PitGroup> listOfPitGroups;
+	private java.util.List<Stockpile> listOfStockpiles;
+	private java.util.List<Dump> listOfDumps;
 
 	public PitGroupDumpStockpileDefinitionScreen(Composite parent, int style) {
 		super(parent, style);
 		setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		setLayout(new FormLayout());
-		this.listOfPits = ProjectConfigutration.getInstance().getPitList();
-		this.listOfPitGroups = new ArrayList<PitGroup>();
-		this.listOfStockpiles = new ArrayList<Stockpile>();
-		this.listOfDumps = new ArrayList<Dump>();
+		
+		ProjectConfigutration projectConfigutration = ProjectConfigutration.getInstance();
+		this.listOfPits = projectConfigutration.getPitList();
+		this.listOfPitGroups = projectConfigutration.getPitGroupList();
+		this.listOfStockpiles = projectConfigutration.getStockPileList();
+		this.listOfDumps = projectConfigutration.getDumpList();
 		
 		this.listAddedModels = new ArrayList<String>();
 		

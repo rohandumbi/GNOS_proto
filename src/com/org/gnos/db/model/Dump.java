@@ -3,6 +3,7 @@ package com.org.gnos.db.model;
 public class Dump {
 	private String name;
 	private PitGroup associatedPitGroup;
+	private int dumpNumber;
 	
 	public Dump(String name, PitGroup pitGroup){
 		this.name = name;
@@ -16,5 +17,14 @@ public class Dump {
 	public PitGroup getAssociatedPitGroup() {
 		return associatedPitGroup;
 	}
+
+	public int getDumpNumber() {
+		return dumpNumber;
+	}
+
+	public void setDumpNumber(int dumpNumber) {
+		this.dumpNumber = dumpNumber;
+	}
+	
 	
 }
