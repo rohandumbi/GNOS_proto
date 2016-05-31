@@ -6,7 +6,6 @@ import java.util.Map;
 public class ProcessConstraintData {
 
 	private int id;
-	//private Model model;
 	private ProcessJoin processJoin;
 	private Expression expression;
 	private boolean inUse;

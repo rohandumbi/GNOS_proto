@@ -11,6 +11,7 @@ import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.Process;
+import com.org.gnos.db.model.ProcessConstraintData;
 import com.org.gnos.db.model.ProcessJoin;
 
 public class ProcessConstraintEquationGenerator {
@@ -21,6 +22,7 @@ public class ProcessConstraintEquationGenerator {
 	private ProjectConfigutration projectConfiguration;
 	private ScenarioConfigutration scenarioConfigutration;
 	private List<Process> porcesses;
+	private List<ProcessConstraintData> processConstraintDataList;
 	
 	private int bytesWritten = 0;
 
@@ -29,7 +31,8 @@ public class ProcessConstraintEquationGenerator {
 		projectConfiguration = ProjectConfigutration.getInstance();
 		scenarioConfigutration = ScenarioConfigutration.getInstance();
 		porcesses = projectConfiguration.getProcessList();
-
+		processConstraintDataList = scenarioConfigutration.getProcessConstraintDataList();
+		
 		int bufferSize = 8 * 1024;
 		try {
 			output = new BufferedOutputStream(new FileOutputStream("processConstraint.txt"), bufferSize);
@@ -46,29 +49,41 @@ public class ProcessConstraintEquationGenerator {
 	public void buildProcessJoinVariables() {
 		List<ProcessJoin> processJoins = projectConfiguration.getProcessJoins();
 		int timePeriod = scenarioConfigutration.getTimePeriod();
+		int startYear = scenarioConfigutration.getStartYear();
 		for(ProcessJoin processjoin:processJoins) {
-			boolean firstVariable = true;
-			List<Model> childModels = processjoin.getlistChildProcesses();
-			for(Model model: childModels) {
-				Process process = getProcessFromModel(model);
-				if(process == null) continue;
-				List<Block> blocks = process.getBlocks();
-				for(Block block: blocks){
-					String expressionName = model.getExpression().getName().replaceAll("\\s+","_");
-					float processRatio = block.getRatioField(expressionName);
-					for(int i=1; i<= timePeriod; i++){
-
-						String eq = processRatio+"p"+block.getPitNo()+"x"+block.getBlockNo()+"p"+process.getProcessNo()+"t"+i;
-						if(firstVariable) {
-							firstVariable = false;
-						} else {
-							eq = " + "+eq;
+			List<ProcessConstraintData> processConstraintList = getProcessConstraintData(processjoin);
+			if(processConstraintList.size() < 1) continue;
+			for(ProcessConstraintData data: processConstraintList){
+				String expressionName = data.getExpression().getName().replaceAll("\\s+","_");
+				
+				for(int i=1; i<= timePeriod; i++){
+					String eq = "";
+					boolean firstVariable = true;
+					List<Model> childModels = processjoin.getlistChildProcesses();
+					for(Model model: childModels) {
+						Process process = getProcessFromModel(model);
+						if(process == null) continue;
+						List<Block> blocks = process.getBlocks();
+						for(Block block: blocks){
+							//String expressionName = model.getExpression().getName().replaceAll("\\s+","_");
+							float processRatio = block.getRatioField(expressionName);
+							String tmpEq= processRatio+"p"+block.getPitNo()+"x"+block.getBlockNo()+"p"+process.getProcessNo()+"t"+i;
+							if(firstVariable) {
+								firstVariable = false;
+							} else {
+								tmpEq = " + "+tmpEq;
+							}
+							eq = eq + tmpEq;
 						}
-						write(eq);
 					}
+					if(data.isMax()){
+						eq = eq + "<=" +data.getConstraintData().get(startYear+i -1);
+					} else {
+						eq = eq + ">=" +data.getConstraintData().get(startYear+i -1);
+					}
+					write(eq);
 				}
-			}
-			write(" <= 1000");
+			}			
 		}
 	}
 	
@@ -82,17 +97,30 @@ public class ProcessConstraintEquationGenerator {
 		
 		return null;
 	}
+	
+	private List<ProcessConstraintData> getProcessConstraintData(ProcessJoin processjoin) {
+		List<ProcessConstraintData> data = new ArrayList<ProcessConstraintData>();
+		for(ProcessConstraintData processConstraintData: processConstraintDataList){
+			if(processConstraintData.isInUse() && processConstraintData.getProcessJoin().getName().equals(processjoin.getName())){
+				data.add(processConstraintData);
+			}
+		}
+		
+		return data;
+	}
 	private void write(String s) {
 
 		try {
+			s = s +"\r\n";
 			byte[] bytes = s.getBytes();
-			if(bytes.length + bytesWritten > BYTES_PER_LINE){
+			/*if(bytes.length + bytesWritten > BYTES_PER_LINE){
 				output.write("\r\n".getBytes());
 				output.flush();
 				bytesWritten = 0;
-			}
+			}*/
 			output.write(bytes);
-			bytesWritten = bytesWritten + bytes.length;
+			output.flush();
+			//bytesWritten = bytesWritten + bytes.length;
 			
 		} catch (IOException e) {
 			e.printStackTrace();
