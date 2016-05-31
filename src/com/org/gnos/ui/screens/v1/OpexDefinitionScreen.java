@@ -3,7 +3,6 @@ package com.org.gnos.ui.screens.v1;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -23,14 +22,11 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.db.dao.ScenarioDAO;
 import com.org.gnos.db.model.FixedOpexCost;
-import com.org.gnos.db.model.OpexData;
 import com.org.gnos.db.model.Scenario;
 import com.org.gnos.events.GnosEvent;
-import com.org.gnos.services.TimePeriod;
 import com.org.gnos.ui.custom.controls.GnosScreen;
 import com.org.gnos.ui.custom.controls.MiningStockpileCostGrid;
 import com.org.gnos.ui.custom.controls.OpexDefinitionGrid;
@@ -41,14 +37,17 @@ public class OpexDefinitionScreen extends GnosScreen {
 	private Text textDiscountFactor;
 	private Text textNumberOfIncrements;
 	private Text textScenarioName;
-	private ScrolledComposite scGridContainer;
+	private ScrolledComposite scOpexGridContainer;
 	private ScrolledComposite scFixedCostGridContainer;
-	private OpexDefinitionGrid opexDefinitionGrid;
-	private MiningStockpileCostGrid miningStockpileCostGrid;
+	private OpexDefinitionGrid opexGrid;
+	private MiningStockpileCostGrid fixedCostGrid;
+	private Button btnAddOpexRow;
+	private Button btnSaveOpex;
+	private Button saveFixedCost;
 	private Label labelScreenName;
-	private List<OpexData> opexDataList;
 	private List<Scenario> scenarioList;
 	private ScenarioDAO scenarioDAO;
+	private Text textScenarioInUse;
 	/**
 	 * Create the composite.
 	 * @param parent
@@ -65,7 +64,6 @@ public class OpexDefinitionScreen extends GnosScreen {
 		/*
 		 * If there is an existing Opex data for the project
 		 */
-		this.opexDataList = ScenarioConfigutration.getInstance().getOpexDataList();
 		this.createContent();
 
 	}
@@ -229,8 +227,11 @@ public class OpexDefinitionScreen extends GnosScreen {
 				boolean isScenarioCreationSuccessful = scenarioDAO.create(scenario);
 				if(isScenarioCreationSuccessful){
 					ScenarioConfigutration.getInstance().load(scenario.getId());
-					initializeOpexGrid(scenario);
-					initializeMiningStockpileCostGrid(scenario);
+					textScenarioInUse.setText(scenario.getName());
+					refreshOpexGrid(scenario);
+					refreshFixedCostGrid(scenario);
+					GnosEvent event = new GnosEvent(this, "selected:new-scenario");
+					triggerGnosEvent(event);//this event needs to be thrown as new scenario is being loaded
 				}
 			}
 		});
@@ -241,127 +242,142 @@ public class OpexDefinitionScreen extends GnosScreen {
 		fd_btnAddTimePeriod.bottom = new FormAttachment(textNumberOfIncrements, 0, SWT.BOTTOM);
 		btnAddTimePeriod.setText("Create");
 		
-
-		/*if(this.discountFactor != null) {
-			textDiscountFactor.setText(String.valueOf(this.discountFactor.getValue()));
-		}*/
+		Label lblScenarioInUse = new Label(this, SWT.NONE);
+		lblScenarioInUse.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		FormData fd_lblScenarioInUse = new FormData();
+		fd_lblScenarioInUse.top = new FormAttachment(lblStartYear, 0, SWT.TOP);
+		fd_lblScenarioInUse.left = new FormAttachment(btnAddTimePeriod, 10);
+		lblScenarioInUse.setLayoutData(fd_lblScenarioInUse);
+		lblScenarioInUse.setText("Scenario In Use:");
 		
+		textScenarioInUse = new Text(this, SWT.BORDER);
+		textScenarioInUse.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		FormData fd_textScenarioInUse = new FormData();
+		fd_textScenarioInUse.top = new FormAttachment(lblScenarioInUse, -2, SWT.TOP);
+		fd_textScenarioInUse.left = new FormAttachment(lblScenarioInUse, 8);
+		fd_textScenarioInUse.right = new FormAttachment(lblScenarioInUse, 88, SWT.RIGHT);
+		textScenarioInUse.setLayoutData(fd_textScenarioInUse);
+		textScenarioInUse.setEditable(false);
+		
+		this.initializeOpexGridContainer();
+		this.initializeFixedCostGridContainer();
+		
+		
+	}
+	
+	private void initializeFixedCostGridContainer(){
+		this.scFixedCostGridContainer = new ScrolledComposite(this, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		FormData fd_scFixedCostGridContainer = new FormData(500,500);// temp hack else size of scrolled composite keeps on increasing
+		fd_scFixedCostGridContainer.top = new FormAttachment(this.scOpexGridContainer, 10, SWT.BOTTOM);
+		fd_scFixedCostGridContainer.left = new FormAttachment(labelScreenName, 0, SWT.LEFT);
+		fd_scFixedCostGridContainer.bottom = new FormAttachment(this.scOpexGridContainer, 300, SWT.BOTTOM);
+		//fd_scFixedCostGridContainer.bottom = new FormAttachment(70);
+		fd_scFixedCostGridContainer.right = new FormAttachment(100, -35);
+		
+		this.scFixedCostGridContainer.setExpandHorizontal(true);
+		this.scFixedCostGridContainer.setExpandVertical(true);
+		this.scFixedCostGridContainer.setLayoutData(fd_scFixedCostGridContainer);
+		
+		Rectangle r = this.scFixedCostGridContainer.getClientArea();
+		this.scFixedCostGridContainer.setMinSize(this.scFixedCostGridContainer.computeSize(SWT.DEFAULT, r.height, true));
+		
+		this.saveFixedCost = new Button(this, SWT.NONE);
+		this.saveFixedCost.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				FixedOpexCost[] fixedOpexCost = fixedCostGrid.getCostData();//indexing fixed; 0-OreMiningCost, 1-WasteMiningCost, 2-StockpilingCost, 3-StockpileReclaimingCost
+				ScenarioConfigutration.getInstance().setFixedCost(fixedOpexCost);
+			}
+		});
+		this.saveFixedCost.setFont(SWTResourceManager.getFont("Segoe UI", 16, SWT.BOLD));
+		this.saveFixedCost.setImage(SWTResourceManager.getImage(OpexDefinitionScreen.class, "/com/org/gnos/resources/save.png"));
+		FormData fd_btnSaveFixedCostData = new FormData();
+		fd_btnSaveFixedCostData.top = new FormAttachment(this.scFixedCostGridContainer, 2, SWT.TOP);
+		fd_btnSaveFixedCostData.right = new FormAttachment(100, -5);
+		this.saveFixedCost.setLayoutData(fd_btnSaveFixedCostData);
+	}
+	
+	private void refreshFixedCostGrid(Scenario scenario){
+		if(this.fixedCostGrid != null){
+			this.fixedCostGrid.dispose();
+		}
+		this.fixedCostGrid = new MiningStockpileCostGrid(this.scFixedCostGridContainer, SWT.None, scenario);
+		this.scFixedCostGridContainer.setContent(this.fixedCostGrid);
+	}
+	
+	private void initializeOpexGridContainer(){
+		this.scOpexGridContainer = new ScrolledComposite(this, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		FormData fd_scGridContainer = new FormData(500,500);// temp hack else size of scrolled composite keeps on increasing
+		fd_scGridContainer.top = new FormAttachment(textStartYear, 10, SWT.BOTTOM);
+		fd_scGridContainer.left = new FormAttachment(labelScreenName, 0, SWT.LEFT);
+		fd_scGridContainer.bottom = new FormAttachment(100, -250);
+		//fd_scGridContainer.bottom = new FormAttachment(50);
+		fd_scGridContainer.right = new FormAttachment(100, -35);
+		this.scOpexGridContainer.setExpandHorizontal(true);
+		this.scOpexGridContainer.setExpandVertical(true);
+		this.scOpexGridContainer.setLayoutData(fd_scGridContainer);
+		
+		Rectangle r = this.scOpexGridContainer.getClientArea();
+		this.scOpexGridContainer.setMinSize(this.scOpexGridContainer.computeSize(SWT.DEFAULT, r.height, true));
+		
+		this.btnAddOpexRow = new Button(this, SWT.NONE);
+		this.btnAddOpexRow.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				//TO DO implement row add
+				if(opexGrid != null){
+					opexGrid.addRow();
+					Rectangle r = opexGrid.getClientArea();
+					int gridWidth = r.width;
+					
+					int scrollableHeight = scOpexGridContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).y;
+					Point point = new Point(gridWidth, scrollableHeight);
+					scOpexGridContainer.setMinSize(point);
+				}
+			}
+		});
+		this.btnAddOpexRow.setFont(SWTResourceManager.getFont("Segoe UI", 16, SWT.BOLD));
+		FormData fd_btnAddRow = new FormData();
+		fd_btnAddRow.top = new FormAttachment(textStartYear, 10, SWT.BOTTOM);
+		fd_btnAddRow.right = new FormAttachment(100, -5);
+		this.btnAddOpexRow.setLayoutData(fd_btnAddRow);
+		this.btnAddOpexRow.setText("+");
+		
+		this.btnSaveOpex = new Button(this, SWT.NONE);
+		this.btnSaveOpex.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if(opexGrid != null){
+					opexGrid.saveOpexData();
+				}
+			}
+		});
+		this.btnSaveOpex.setFont(SWTResourceManager.getFont("Segoe UI", 16, SWT.BOLD));
+		this.btnSaveOpex.setImage(SWTResourceManager.getImage(OpexDefinitionScreen.class, "/com/org/gnos/resources/save.png"));
+		FormData fd_btnSaveOpexData = new FormData();
+		fd_btnSaveOpexData.top = new FormAttachment(this.btnAddOpexRow, 5, SWT.BOTTOM);
+		fd_btnSaveOpexData.right = new FormAttachment(100, -5);
+		this.btnSaveOpex.setLayoutData(fd_btnSaveOpexData);
+		
+	}
+	
+	private void refreshOpexGrid(Scenario scenario){
+		if(this.opexGrid != null){
+			this.opexGrid.dispose();
+		}
+		this.opexGrid = new OpexDefinitionGrid(this.scOpexGridContainer, SWT.None, scenario);
+		this.scOpexGridContainer.setContent(this.opexGrid);
 	}
 
 	private void handleScenarioSelection(int index){
 		System.out.println("Selected scenario index is: " + index);
 		Scenario scenario = this.scenarioList.get(index);
 		ScenarioConfigutration.getInstance().load(scenario.getId());
-		initializeOpexGrid(scenario);
-		initializeMiningStockpileCostGrid(scenario);
+		this.textScenarioInUse.setText(scenario.getName());
+		this.refreshOpexGrid(scenario);
+		this.refreshFixedCostGrid(scenario);
 		GnosEvent event = new GnosEvent(this, "selected:new-scenario");
 		triggerGnosEvent(event);
-	}
-	
-	private void initializeOpexGrid(Scenario scenario){
-		if(scGridContainer != null){
-			scGridContainer.dispose();
-		}
-		scGridContainer = new ScrolledComposite(this, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		FormData fd_scGridContainer = new FormData(500,500);// temp hack else size of scrolled composite keeps on increasing
-		fd_scGridContainer.top = new FormAttachment(textStartYear, 10, SWT.BOTTOM);
-		fd_scGridContainer.left = new FormAttachment(labelScreenName, 0, SWT.LEFT);
-		fd_scGridContainer.bottom = new FormAttachment(100, -300);
-		//fd_scGridContainer.bottom = new FormAttachment(50);
-		fd_scGridContainer.right = new FormAttachment(100, -35);
-		
-		final OpexDefinitionGrid opexDefinitionGrid = new OpexDefinitionGrid(scGridContainer, SWT.None, scenario);
-		scGridContainer.setContent(opexDefinitionGrid);
-		
-		scGridContainer.setExpandHorizontal(true);
-		scGridContainer.setExpandVertical(true);
-		scGridContainer.setLayoutData(fd_scGridContainer);
-		
-		Rectangle r = scGridContainer.getClientArea();
-		scGridContainer.setMinSize(scGridContainer.computeSize(SWT.DEFAULT, r.height, true));
-		
-		
-		Button btnAddRow = new Button(this, SWT.NONE);
-		btnAddRow.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				//TO DO implement row add
-				opexDefinitionGrid.addRow();
-				Rectangle r = opexDefinitionGrid.getClientArea();
-				int gridWidth = r.width;
-				
-				int scrollableHeight = scGridContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).y;
-				Point point = new Point(gridWidth, scrollableHeight);
-				scGridContainer.setMinSize(point);
-			}
-		});
-		btnAddRow.setFont(SWTResourceManager.getFont("Segoe UI", 16, SWT.BOLD));
-		FormData fd_btnAddRow = new FormData();
-		fd_btnAddRow.top = new FormAttachment(textStartYear, 10, SWT.BOTTOM);
-		fd_btnAddRow.right = new FormAttachment(100, -5);
-		btnAddRow.setLayoutData(fd_btnAddRow);
-		btnAddRow.setText("+");
-		
-		Button btnSaveOpexData = new Button(this, SWT.NONE);
-		btnSaveOpexData.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				//TO DO implement row add
-				opexDefinitionGrid.saveOpexData();
-				//ProjectConfigutration.getInstance().saveOpexData();
-			}
-		});
-		btnSaveOpexData.setFont(SWTResourceManager.getFont("Segoe UI", 16, SWT.BOLD));
-		btnSaveOpexData.setImage(SWTResourceManager.getImage(OpexDefinitionScreen.class, "/com/org/gnos/resources/save.png"));
-		FormData fd_btnSaveOpexData = new FormData();
-		fd_btnSaveOpexData.top = new FormAttachment(btnAddRow, 5, SWT.BOTTOM);
-		fd_btnSaveOpexData.right = new FormAttachment(100, -5);
-		btnSaveOpexData.setLayoutData(fd_btnSaveOpexData);
-		
-		this.layout();
-	}
-	
-	private void initializeMiningStockpileCostGrid(Scenario scenario){
-		if(scFixedCostGridContainer != null){
-			scFixedCostGridContainer.dispose();
-		}
-		scFixedCostGridContainer = new ScrolledComposite(this, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		FormData fd_scFixedCostGridContainer = new FormData(500,500);// temp hack else size of scrolled composite keeps on increasing
-		fd_scFixedCostGridContainer.top = new FormAttachment(scGridContainer, 10, SWT.BOTTOM);
-		fd_scFixedCostGridContainer.left = new FormAttachment(labelScreenName, 0, SWT.LEFT);
-		fd_scFixedCostGridContainer.bottom = new FormAttachment(scGridContainer, 300, SWT.BOTTOM);
-		//fd_scFixedCostGridContainer.bottom = new FormAttachment(70);
-		fd_scFixedCostGridContainer.right = new FormAttachment(100, -35);
-		
-		miningStockpileCostGrid = new MiningStockpileCostGrid(scFixedCostGridContainer, SWT.None, scenario);
-		scFixedCostGridContainer.setContent(miningStockpileCostGrid);
-		
-		scFixedCostGridContainer.setExpandHorizontal(true);
-		scFixedCostGridContainer.setExpandVertical(true);
-		scFixedCostGridContainer.setLayoutData(fd_scFixedCostGridContainer);
-		
-		Rectangle r = scFixedCostGridContainer.getClientArea();
-		scFixedCostGridContainer.setMinSize(scFixedCostGridContainer.computeSize(SWT.DEFAULT, r.height, true));
-		
-		Button btnSaveFixedCostData = new Button(this, SWT.NONE);
-		btnSaveFixedCostData.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				//TO DO implement row add
-				//opexDefinitionGrid.saveOpexData();
-				@SuppressWarnings("unused")
-				FixedOpexCost[] fixedOpexCost = miningStockpileCostGrid.getCostData();//indexing fixed; 0-OreMiningCost, 1-WasteMiningCost, 2-StockpilingCost, 3-StockpileReclaimingCost
-				ScenarioConfigutration.getInstance().setFixedCost(fixedOpexCost);
-				//ProjectConfigutration.getInstance().saveFixedCostData();
-			}
-		});
-		btnSaveFixedCostData.setFont(SWTResourceManager.getFont("Segoe UI", 16, SWT.BOLD));
-		btnSaveFixedCostData.setImage(SWTResourceManager.getImage(OpexDefinitionScreen.class, "/com/org/gnos/resources/save.png"));
-		FormData fd_btnSaveFixedCostData = new FormData();
-		fd_btnSaveFixedCostData.top = new FormAttachment(scFixedCostGridContainer, 2, SWT.TOP);
-		fd_btnSaveFixedCostData.right = new FormAttachment(100, -5);
-		btnSaveFixedCostData.setLayoutData(fd_btnSaveFixedCostData);
-		this.layout();
 	}
 	
 	@Override

@@ -63,6 +63,7 @@ public class ScenarioConfigutration {
 	}
 	
 	public void loadOpexData() {
+		this.opexDataList = new ArrayList<OpexData>();
 		String sql = "select id, model_id, expression_id, in_use, is_revenue, year, value from opex_defn, model_year_mapping where id= opex_id and scenario_id = "
 				+ this.scenarioId + " order by id, year";
 		Statement stmt = null;
@@ -158,6 +159,7 @@ public class ScenarioConfigutration {
 	}
 	
 	public void loadProcessConstraintData() {
+		this.processConstraintDataList = new ArrayList<ProcessConstraintData>();
 		String sql = "select id, process_join_name, expression_id, in_use, is_max, year, value from process_constraint_defn, process_constraint_year_mapping where id= process_constraint_id and scenario_id = "
 				+ this.scenarioId + " order by id, year";
 		Statement stmt = null;
@@ -232,7 +234,7 @@ public class ScenarioConfigutration {
 				if (pcd.getId() > 0)
 					continue;
 				//pstmt.setInt(1, this.projectConfiguration.getProjectId());
-				pstmt.setInt(1, 1);
+				pstmt.setInt(1, this.scenarioId);
 				pstmt.setString(2, pcd.getProcessJoin().getName());
 				if(pcd.getExpression() != null){
 					pstmt.setInt(3, pcd.getExpression().getId());

@@ -183,9 +183,10 @@ public class MainConfigurationViewPort extends GnosScreen{
 		 * we don't need to reload it again although it is a scenario screen
 		 */
 		//reload process constraint
-		processConstraintDefinitionScreen = new ProcessConstraintDefinitionScreen(this.dummyShell, SWT.NONE);
-		processConstraintDefinitionScreen.registerEventListener(this);
-		this.layout();
+		//processConstraintDefinitionScreen = new ProcessConstraintDefinitionScreen(this.dummyShell, SWT.NONE);
+		//processConstraintDefinitionScreen.registerEventListener(this);
+		processConstraintDefinitionScreen.refreshGrid();
+		//this.layout();
 	}
 	
 	@Override

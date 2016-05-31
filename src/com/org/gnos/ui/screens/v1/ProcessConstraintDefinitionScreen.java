@@ -37,6 +37,7 @@ public class ProcessConstraintDefinitionScreen extends GnosScreen {
 	private int timePeriod;
 	private int startYear;
 	private String scenarioName;
+	private Button btnAddConstraintRow;
 	/**
 	 * Create the composite.
 	 * @param parent
@@ -82,30 +83,27 @@ public class ProcessConstraintDefinitionScreen extends GnosScreen {
 		fd_lblScenarioName.top = new FormAttachment(labelScreenDescription, 10);
 		fd_lblScenarioName.left = new FormAttachment(labelScreenDescription, 0, SWT.LEFT);
 		lblScenarioName.setLayoutData(fd_lblScenarioName);
-		lblScenarioName.setText("Scenario Name:");
+		lblScenarioName.setText("Scenario In Use:");
 		
 		textScenarioName = new Text(this, SWT.BORDER);
 		textScenarioName.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		FormData fd_textStartYear = new FormData();
 		fd_textStartYear.top = new FormAttachment(lblScenarioName, -2, SWT.TOP);
 		fd_textStartYear.left = new FormAttachment(lblScenarioName, 8);
-		fd_textStartYear.right = new FormAttachment(lblScenarioName, 58, SWT.RIGHT);
+		fd_textStartYear.right = new FormAttachment(lblScenarioName, 88, SWT.RIGHT);
 		textScenarioName.setLayoutData(fd_textStartYear);
 		textScenarioName.setEditable(false);
-		
-		
-		if(this.timePeriod > 0){ //this scenario has saved process constraint data
-			initializeprocessConstraintGrid();
+		if(this.scenarioName != null){
 			textScenarioName.setText(this.scenarioName);
 		}
 		
+		this.initializeGridContainer();
+		this.refreshGrid();
+		
 	}
 	
-	private void initializeprocessConstraintGrid(){
-		if(scGridContainer != null){
-			scGridContainer.dispose();
-		}
-		scGridContainer = new ScrolledComposite(this, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+	private void initializeGridContainer(){
+		this.scGridContainer = new ScrolledComposite(this, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 		FormData fd_scGridContainer = new FormData(500,500);// temp hack else size of scrolled composite keeps on increasing
 		fd_scGridContainer.top = new FormAttachment(textScenarioName, 10, SWT.BOTTOM);
 		fd_scGridContainer.left = new FormAttachment(labelScreenName, 0, SWT.LEFT);
@@ -113,19 +111,19 @@ public class ProcessConstraintDefinitionScreen extends GnosScreen {
 		//fd_scGridContainer.bottom = new FormAttachment(50);
 		fd_scGridContainer.right = new FormAttachment(100, -35);
 		
-		processConstraintGrid = new ProcessConstraintGrid(scGridContainer, SWT.None);
-		scGridContainer.setContent(processConstraintGrid);
+		//processConstraintGrid = new ProcessConstraintGrid(scGridContainer, SWT.None);
+		//scGridContainer.setContent(processConstraintGrid);
 		
-		scGridContainer.setExpandHorizontal(true);
-		scGridContainer.setExpandVertical(true);
-		scGridContainer.setLayoutData(fd_scGridContainer);
+		this.scGridContainer.setExpandHorizontal(true);
+		this.scGridContainer.setExpandVertical(true);
+		this.scGridContainer.setLayoutData(fd_scGridContainer);
 		
-		Rectangle r = scGridContainer.getClientArea();
-		scGridContainer.setMinSize(scGridContainer.computeSize(SWT.DEFAULT, r.height, true));
+		Rectangle r = this.scGridContainer.getClientArea();
+		this.scGridContainer.setMinSize(this.scGridContainer.computeSize(SWT.DEFAULT, r.height, true));
 		
 		
-		Button btnAddRow = new Button(this, SWT.NONE);
-		btnAddRow.addSelectionListener(new SelectionAdapter() {
+		this.btnAddConstraintRow = new Button(this, SWT.NONE);
+		this.btnAddConstraintRow.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				//TO DO implement row add
@@ -138,29 +136,43 @@ public class ProcessConstraintDefinitionScreen extends GnosScreen {
 				scGridContainer.setMinSize(point);
 			}
 		});
-		btnAddRow.setFont(SWTResourceManager.getFont("Segoe UI", 16, SWT.BOLD));
+		this.btnAddConstraintRow.setFont(SWTResourceManager.getFont("Segoe UI", 16, SWT.BOLD));
 		FormData fd_btnAddRow = new FormData();
 		fd_btnAddRow.top = new FormAttachment(textScenarioName, 10, SWT.BOTTOM);
 		fd_btnAddRow.right = new FormAttachment(100, -5);
-		btnAddRow.setLayoutData(fd_btnAddRow);
-		btnAddRow.setText("+");
+		this.btnAddConstraintRow.setLayoutData(fd_btnAddRow);
+		this.btnAddConstraintRow.setText("+");
 		
 		Button btnSaveOpexData = new Button(this, SWT.NONE);
 		btnSaveOpexData.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				//TO DO implement row add
-				processConstraintGrid.saveProcessConstraintData();
+				if(processConstraintGrid != null){
+					processConstraintGrid.saveProcessConstraintData();
+				}
+				
 			}
 		});
 		btnSaveOpexData.setFont(SWTResourceManager.getFont("Segoe UI", 16, SWT.BOLD));
 		btnSaveOpexData.setImage(SWTResourceManager.getImage(ProcessConstraintDefinitionScreen.class, "/com/org/gnos/resources/save.png"));
 		FormData fd_btnSaveOpexData = new FormData();
-		fd_btnSaveOpexData.top = new FormAttachment(btnAddRow, 5, SWT.BOTTOM);
+		fd_btnSaveOpexData.top = new FormAttachment(this.btnAddConstraintRow, 5, SWT.BOTTOM);
 		fd_btnSaveOpexData.right = new FormAttachment(100, -5);
 		btnSaveOpexData.setLayoutData(fd_btnSaveOpexData);
+	}
+	
+	public void refreshGrid(){
+		this.scenarioName = ScenarioConfigutration.getInstance().getName();
+		if(this.scenarioName != null){
+			this.textScenarioName.setText(this.scenarioName);
+		}
 		
-		this.layout();
+		if(this.processConstraintGrid != null){
+			this.processConstraintGrid.dispose();
+		}
+		this.processConstraintGrid = new ProcessConstraintGrid(scGridContainer, SWT.None);
+		this.scGridContainer.setContent(this.processConstraintGrid);
 	}
 	
 	@Override
