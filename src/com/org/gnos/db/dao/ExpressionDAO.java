@@ -15,7 +15,7 @@ import com.org.gnos.db.model.Expression;
 
 public class ExpressionDAO {
 
-	private static final String SQL_LIST_ORDER_BY_ID = "select id, name, is_grade, is_complex, expr_value, filter from  expressions order by id";
+	private static final String SQL_LIST_ORDER_BY_ID = "select id, name, is_grade, is_complex, expr_value, filter from  expressions where project_id = ? order by id";
 	private static final String SQL_INSERT = "insert into expressions (project_id, name, is_grade, is_complex, expr_value, filter) values (?, ?, ?, ?, ?,?)";
 	private static final String SQL_DELETE = "delete from expressions where id = ?";
 	private static final String SQL_UPDATE = "update expressions set is_grade = ?, is_complex = ?, expr_value = ?, filter = ? where id = ?";
@@ -23,10 +23,15 @@ public class ExpressionDAO {
 	public List<Expression> getAll() {
 		
 		List<Expression> expressions = new ArrayList<Expression>();
+		int projectId = ProjectConfigutration.getInstance().getProjectId();
+		Object[] values = {
+				projectId, 
+	   };
 		
 		try (
 	            Connection connection = DBManager.getConnection();
-	            PreparedStatement statement = connection.prepareStatement(SQL_LIST_ORDER_BY_ID);
+	            //PreparedStatement statement = connection.prepareStatement(SQL_LIST_ORDER_BY_ID);
+				PreparedStatement statement = prepareStatement(connection, SQL_LIST_ORDER_BY_ID, false, values);
 	            ResultSet resultSet = statement.executeQuery();
 	        ){
 			while(resultSet.next()){

@@ -106,7 +106,7 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 		fd_lblAllGroups.top = new FormAttachment(50);
 		fd_lblAllGroups.left = new FormAttachment(0, 10);
 		lblAllGroups.setLayoutData(fd_lblAllGroups);
-		lblAllGroups.setText("All Groups:");
+		lblAllGroups.setText("All Pit Groups:");
 		
 		Label lblProcessDiagram = new Label(this, SWT.NONE);
 		lblProcessDiagram.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
@@ -307,6 +307,24 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 		fd_btnAddStockpileToGroup.left = new FormAttachment(lblAllStockpiles, 2);
 		btnAddStockpileToGroup.setLayoutData(fd_btnAddStockpileToGroup);
 		btnAddStockpileToGroup.setText("Add");
+		
+		//Add existing pit groups to diagram and list
+		for(PitGroup pitGroup: this.listOfPitGroups){
+			this.compositeGroupDiagram.addGroup(pitGroup);
+			this.groupList.add(pitGroup.getName());
+		}
+		
+		//Add existing dumps to diagram and list
+		for(Dump dump : this.listOfDumps){
+			this.compositeGroupDiagram.addDumpToGroup(dump);
+			this.dumpList.add(dump.getName());
+		}
+		
+		//Add existing stockpiles to diagram and list
+		for(Stockpile stockPile :  this.listOfStockpiles){
+			this.compositeGroupDiagram.addStockpileToGroup(stockPile);
+			this.stockpileList.add(stockPile.getName());
+		}
 	}
 	
 	private String[] getSourcePitItems(){

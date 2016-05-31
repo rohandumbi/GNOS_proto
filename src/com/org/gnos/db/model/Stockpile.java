@@ -15,7 +15,7 @@ public class Stockpile {
 	}
 
 	public PitGroup getAssociatedPitGroup() {
-		return associatedPitGroup;
+		return this.associatedPitGroup;
 	}
 
 	public int getStockpileNumber() {
