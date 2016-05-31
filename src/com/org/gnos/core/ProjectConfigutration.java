@@ -410,6 +410,7 @@ public class ProjectConfigutration {
 				PitGroup pitGroup = this.getPitGroupfromName(name);
 				if(pitGroup == null){
 					pitGroup = new PitGroup(name);
+					pitGroupList.add(pitGroup);
 				}			
 				String child_pit_name = rs.getString(3);
 				String child_pitgroup_name = rs.getString(4);
@@ -419,7 +420,7 @@ public class ProjectConfigutration {
 				if(child_pitgroup_name != null){
 					pitGroup.addPitGroup(this.getPitGroupfromName(child_pitgroup_name));
 				}
-				pitGroupList.add(pitGroup);
+				//pitGroupList.add(pitGroup);
 		
 			}
 			
@@ -440,7 +441,8 @@ public class ProjectConfigutration {
 			int count = 1;
 			while(rs.next()){
 				String name = rs.getString(2);
-				PitGroup pitGroup = this.getPitGroupfromName(name);
+				String pitGroupName = rs.getString(3);
+				PitGroup pitGroup = this.getPitGroupfromName(pitGroupName);
 				Dump dump = new Dump(name, pitGroup);
 				dump.setDumpNumber(count);
 				count ++;
@@ -464,11 +466,13 @@ public class ProjectConfigutration {
 			int count = 1;
 			while(rs.next()){
 				String name = rs.getString(2);
-				PitGroup pitGroup = this.getPitGroupfromName(name);
-				Stockpile dump = new Stockpile(name, pitGroup);
-				dump.setStockpileNumber(count);
-				count ++;
-				this.stockPileList.add(dump);
+				String pitGroupName = rs.getString(3);
+				PitGroup pitGroup = this.getPitGroupfromName(pitGroupName);
+				Stockpile stockPile = new Stockpile(name, pitGroup);
+				stockPile.setStockpileNumber(count);
+				
+				count++;
+				this.stockPileList.add(stockPile);
 			}
 			
 		} catch (SQLException e) {
@@ -923,7 +927,7 @@ public class ProjectConfigutration {
 					pstmt.setInt(1, projectId);
 					pstmt.setString(2, pitGroup.getName());
 					pstmt.setNull(3, java.sql.Types.VARCHAR);
-					pstmt.setString(4, pitGroup.getName());
+					pstmt.setString(4, childGroup.getName());
 					pstmt.executeUpdate();
 				}
 			}

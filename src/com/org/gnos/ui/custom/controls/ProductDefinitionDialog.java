@@ -71,7 +71,7 @@ public class ProductDefinitionDialog extends Dialog {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				//TODO add implementation for button click
-				addProcessDefinitionRow();
+				addExpressionRow();
 			}
 		});
 		FormData fd_btnAddExpressions = new FormData();
@@ -83,19 +83,19 @@ public class ProductDefinitionDialog extends Dialog {
 		
 		this.presentRow = this.btnAddExpression;
 		
-		container.getShell().setText("Process Details");
+		container.getShell().setText("Product Definition");
 		this.setDialogLocation();
 		return this.container;
 	}
 	
-	private void addProcessDefinitionRow() {
+	private void addExpressionRow() {
 		Label lblSelectProcess = new Label(container, SWT.NONE);
 		lblSelectProcess.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
 		FormData fd_lblSelectProcess = new FormData();
 		fd_lblSelectProcess.top = new FormAttachment(this.presentRow, 10);
 		fd_lblSelectProcess.left = new FormAttachment(0, 10);
 		lblSelectProcess.setLayoutData(fd_lblSelectProcess);
-		lblSelectProcess.setText("Select Process:");
+		lblSelectProcess.setText("Select Expression:");
 		
 		Combo comboProcess = new Combo(container, SWT.NONE);
 		comboProcess.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
