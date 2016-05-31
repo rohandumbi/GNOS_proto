@@ -2,9 +2,11 @@ package com.org.gnos.test;
 
 import com.org.gnos.core.GNOSConfig;
 import com.org.gnos.core.ProjectConfigutration;
+import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.db.dao.ProjectDAO;
 import com.org.gnos.db.model.Project;
 import com.org.gnos.services.ObjectiveFunctionEquationGenerator;
+import com.org.gnos.services.ProcessConstraintEquationGenerator;
 import com.org.gnos.services.csv.GNOSCSVDataProcessor;
 
 public class TestApplication {
@@ -44,10 +46,10 @@ public class TestApplication {
 		TestApplication application = new TestApplication();
 		
 		GNOSConfig.load();
-		//application.test();
-		ProjectConfigutration.getInstance().load(3);
-
+		ProjectConfigutration.getInstance().load(1);
+		ScenarioConfigutration.getInstance().load(1);
 		new ObjectiveFunctionEquationGenerator().generate();
+		new ProcessConstraintEquationGenerator().generate();
 
 	}
 

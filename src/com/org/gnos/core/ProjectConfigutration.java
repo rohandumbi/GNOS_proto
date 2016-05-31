@@ -945,6 +945,10 @@ public class ProjectConfigutration {
 		this.processTree = processTree;
 	}
 
+	public List<Process> getProcessList() {
+		return processList;
+	}
+
 	public List<ProcessJoin> getProcessJoins() {
 		return processJoins;
 	}

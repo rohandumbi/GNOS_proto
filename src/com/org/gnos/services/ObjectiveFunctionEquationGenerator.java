@@ -26,6 +26,7 @@ import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.FixedOpexCost;
 import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.OpexData;
+import com.org.gnos.db.model.Process;
 
 public class ObjectiveFunctionEquationGenerator {
 
@@ -37,6 +38,7 @@ public class ObjectiveFunctionEquationGenerator {
 	private Map<Integer, List<CostRevenueData>> modelOpexDataMapping;
 	
 	private Set<Integer> processedBlocks;
+	private Tree processTree;
 	private int bytesWritten = 0;
 	private float discount_rate = 0; //this has to be made an input variable later
 	public void generate() {
@@ -46,10 +48,10 @@ public class ObjectiveFunctionEquationGenerator {
 
 		int bufferSize = 8 * 1024;
 		try {
-			discount_rate = scenarioConfigutration.getDiscount();
+			discount_rate = scenarioConfigutration.getDiscount()/100;
+			System.out.println("Discount :"+discount_rate);
 			output = new BufferedOutputStream(new FileOutputStream("output.txt"), bufferSize);
 			bytesWritten = 0;
-			//parseOpexData();
 			buildProcessBlockVariables();
 			buildWasteBlockVariables();
 			output.flush();
@@ -61,23 +63,21 @@ public class ObjectiveFunctionEquationGenerator {
 	}
 
 	private void buildProcessBlockVariables() {
-		Tree processtree = projectConfiguration.getProcessTree();
-		List<Node> porcesses = processtree.getLeafNodes();
+		List<Process> porcesses = projectConfiguration.getProcessList();
+		processTree = projectConfiguration.getProcessTree();
 		Set<Block> processBlocks = new HashSet<Block>();
-		int processNumber = 1;
-		for(Node process: porcesses) {
-			System.out.println("Equation Generation: process name - "+process.getIdentifier());
+		for(Process process: porcesses) {
+			System.out.println("Equation Generation: process name - "+process.getModel().getName());
 			String condition = buildCondition(process) ;
 			List<Block> blocks = findBlocks(condition);
+			process.setBlocks(blocks);
 			processBlocks.addAll(blocks);
-			buildProcessVariables(process, blocks, processNumber);
-			processNumber++;
-			
+			buildProcessVariables(process, blocks, process.getProcessNo());		
 		}
 		buildStockpileVariables(processBlocks);
 	}
 	
-	private void buildProcessVariables(Node process, List<Block> blocks, int processNumber) {
+	private void buildProcessVariables(Process process, List<Block> blocks, int processNumber) {
 		FixedOpexCost[] fixedOpexCost = scenarioConfigutration.getFixedCost();
 		Map<Integer, Float> oreMiningCostMap = fixedOpexCost[0].getCostData();
 		Set<Integer> keys = oreMiningCostMap.keySet();
@@ -86,7 +86,7 @@ public class ObjectiveFunctionEquationGenerator {
 			float miningcost = oreMiningCostMap.get(year);
 			
 			for(Block block: blocks) {
-				float processValue = getProcessValue(block, process.getData(), year);
+				float processValue = getProcessValue(block, process.getModel(), year);
 				float value = processValue - miningcost;
 				value = (float) (value * (1 / Math.pow ((1 + discount_rate), count)));
 				String eq = " "+value+"p"+block.getPitNo()+"x"+block.getBlockNo()+"p"+processNumber+"t"+count;
@@ -134,10 +134,10 @@ public class ObjectiveFunctionEquationGenerator {
 		}
 	}
 	
-	private String buildCondition(Node node) {
+	private String buildCondition(Process process) {
 		String condition = "";
 
-		Model model = node.getData();
+		Model model = process.getModel();
 		if(hasValue(model.getCondition())){
 			condition = model.getCondition();
 		}
@@ -149,7 +149,7 @@ public class ObjectiveFunctionEquationGenerator {
 			}
 		}
 		boolean continueLoop = true;
-		Node currNode = node;
+		Node currNode = processTree.getNodeByName(model.getName());
 		do{
 			Node parent = currNode.getParent();
 			if(parent == null) {
@@ -271,56 +271,6 @@ public class ObjectiveFunctionEquationGenerator {
 	}
 	private int getDumpForPit(int pitNo){
 		return pitNo;
-	}
-	
-	private void parseOpexData () {
-		List<OpexData> opexDataList = scenarioConfigutration.getOpexDataList();
-		modelOpexDataMapping = new LinkedHashMap<Integer, List<CostRevenueData>>();
-		
-		for(OpexData opexData: opexDataList) {
-			if(!opexData.isInUse()) continue;
-			int modelId = opexData.getModel().getId();
-			List<CostRevenueData> yearCostData = modelOpexDataMapping.get(modelId);
-			if(yearCostData == null) {
-				yearCostData = new ArrayList<CostRevenueData>();
-				modelOpexDataMapping.put(modelId, yearCostData);
-					
-				Map<Integer, Float> costData = opexData.getCostData();
-				Set<Integer> keys = costData.keySet();
-				Iterator<Integer> it = keys.iterator();
-				while(it.hasNext()){
-					CostRevenueData crd = new CostRevenueData();
-					crd.year = it.next();
-				
-					if(opexData.isRevenue()) {
-						crd.revenue = costData.get(crd.year);
-						crd.expressionName = opexData.getExpression().getName().replaceAll("\\s+","_");
-					} else {
-						crd.cost = costData.get(crd.year);
-					}
-					yearCostData.add(crd);
-				}
-			} else {
-				Map<Integer, Float> costData = opexData.getCostData();
-				Set<Integer> keys = costData.keySet();
-				Iterator<Integer> it = keys.iterator();
-				while(it.hasNext()){
-					int year = it.next();
-					for(CostRevenueData crd: yearCostData){
-						if(crd.year == year) {
-							if(opexData.isRevenue()) {
-								crd.revenue = costData.get(crd.year);
-								crd.expressionName = opexData.getExpression().getName().replaceAll("\\s+","_");
-							} else {
-								crd.cost = costData.get(crd.year);
-							}
-							break;
-						}
-					}				
-				}
-			}
-		}
-		
 	}
 	
 	private void write(String s) {

@@ -1,9 +1,15 @@
 package com.org.gnos.db.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.org.gnos.core.Block;
+
 public class Process {
 
 	private int processNo;
 	private Model model;
+	private List<Block> blocks = new ArrayList<Block>();
 	
 	public int getProcessNo() {
 		return processNo;
@@ -16,6 +22,15 @@ public class Process {
 	}
 	public void setModel(Model model) {
 		this.model = model;
+	}	
+	public List<Block> getBlocks() {
+		return blocks;
+	}
+	public void setBlocks(List<Block> blocks) {
+		this.blocks = blocks;
+	}
+	public void addBlock(Block block) {
+		this.blocks.add(block);
 	}
 }
 
