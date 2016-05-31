@@ -195,7 +195,8 @@ CREATE TABLE pitgroup_pit_mapping(
    child_pit_name VARCHAR(100),
    child_pitgroup_name VARCHAR(100),
    primary key (id),
-   unique (project_id, name, child_pit_name, child_pitgroup_name)
+   unique (project_id, name, child_pit_name),
+   unique (project_id, name, child_pitgroup_name)
 );
 
 DROP TABLE IF EXISTS dump_pit_mapping; 
