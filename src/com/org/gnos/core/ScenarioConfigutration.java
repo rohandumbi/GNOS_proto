@@ -239,8 +239,10 @@ public class ScenarioConfigutration {
 				pstmt.setInt(1, this.scenarioId);
 				pstmt.setString(2, pcd.getSelector_name());
 				pstmt.setInt(3, pcd.getSelectionType());
-				pstmt.setBoolean(4, pcd.isInUse());
-				pstmt.setBoolean(5, pcd.isMax());
+				pstmt.setString(4, pcd.getCoefficient_name());
+				pstmt.setInt(5, pcd.getCoefficientType());
+				pstmt.setBoolean(6, pcd.isInUse());
+				pstmt.setBoolean(7, pcd.isMax());
 				pstmt.executeUpdate();
 				rs = pstmt.getGeneratedKeys();
 				

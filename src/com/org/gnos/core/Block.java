@@ -17,6 +17,7 @@ public class Block {
 
 	public Block() {
 		fields = new HashMap<String, String>();
+		processNumbers = new ArrayList();
 	}
 	
 	public int getId() {

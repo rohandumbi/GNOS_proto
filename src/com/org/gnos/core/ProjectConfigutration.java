@@ -350,7 +350,7 @@ public class ProjectConfigutration {
 	
 	public void loadProductJoins() {
 		String sql = "select name, child_product_name, child_product_join_name from product_join_defn where project_id = "+ this.projectId  +
-				" and ( child_product_name is not null  or child_product_join_name is not null ) order by name";
+				" and ( child_product_name is not null  or child_product_join_name is not null ) order by child_product_name desc";
 
 		try (
 				Connection conn = DBManager.getConnection();
@@ -367,11 +367,17 @@ public class ProjectConfigutration {
 					this.productJoinList.add(productJoin);
 				}
 				String childProductName = rs.getString(2);
-				Product product = this.getProductByName(childProductName);
-				productJoin.addProduct(product);
+				if(childProductName != null) {
+					Product product = this.getProductByName(childProductName);
+					productJoin.addProduct(product);
+				}
+				
 				String childProductJoinName = rs.getString(3);
-				ProductJoin childProductJoin = this.getProductJoinByName(childProductJoinName);
-				productJoin.addProductJoin(childProductJoin);	
+				if(childProductJoinName != null) {
+					ProductJoin childProductJoin = this.getProductJoinByName(childProductJoinName);
+					productJoin.addProductJoin(childProductJoin);
+				}
+	
 			}
 			
 		} catch (SQLException e) {
