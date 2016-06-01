@@ -496,7 +496,10 @@ public class ProcessConstraintGrid extends Composite {
 				processConstraintData.setCoefficientType(ProcessConstraintData.COEFFICIENT_PRODUCT_JOIN);
 			}		
 			processConstraintData.setCoefficient_name(coefficientName);
-			if(selectorSelectionIndex <= processJoinEndIndex ) {
+			if(selectorSelectionIndex <= 0) {
+				processConstraintData.setSelectionType(ProcessConstraintData.SELECTION_NONE);
+			}
+			else if(selectorSelectionIndex <= processJoinEndIndex ) {
 				processConstraintData.setSelectionType(ProcessConstraintData.SELECTION_PROCESS_JOIN);
 			} else if(selectorSelectionIndex <= processEndIndex ) {
 				processConstraintData.setSelectionType(ProcessConstraintData.SELECTION_PROCESS);

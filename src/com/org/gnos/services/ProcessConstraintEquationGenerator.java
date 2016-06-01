@@ -4,15 +4,22 @@ import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.org.gnos.core.Block;
 import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.core.ScenarioConfigutration;
+import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Model;
+import com.org.gnos.db.model.Pit;
+import com.org.gnos.db.model.PitGroup;
 import com.org.gnos.db.model.Process;
 import com.org.gnos.db.model.ProcessConstraintData;
 import com.org.gnos.db.model.ProcessJoin;
+import com.org.gnos.db.model.Product;
+import com.org.gnos.db.model.ProductJoin;
 
 public class ProcessConstraintEquationGenerator {
 
@@ -37,7 +44,7 @@ public class ProcessConstraintEquationGenerator {
 		try {
 			output = new BufferedOutputStream(new FileOutputStream("processConstraint.txt"), bufferSize);
 			bytesWritten = 0;
-			buildProcessJoinVariables();
+			buildProcessConstraintVariables();
 			output.flush();
 			output.close();
 		} catch(Exception e) {
@@ -47,74 +54,149 @@ public class ProcessConstraintEquationGenerator {
 	}
 	
 	public void buildProcessConstraintVariables() {
+		List<Process> processList = projectConfiguration.getProcessList();
 		for(ProcessConstraintData processConstraintData: processConstraintDataList) {
+			if(!processConstraintData.isInUse()) continue;
+			int selectorType = processConstraintData.getSelectionType();
+			int coefficientType = processConstraintData.getCoefficientType();
+			List<String> coefficients = new ArrayList<String>();
+			Set<Block> blocks = new HashSet<Block>();
+			if(coefficientType == ProcessConstraintData.COEFFICIENT_EXPRESSION){
+				coefficients.add(processConstraintData.getCoefficient_name());
+			} else if(coefficientType == ProcessConstraintData.COEFFICIENT_PRODUCT) {
+				Product p = projectConfiguration.getProductByName(processConstraintData.getCoefficient_name());
+				if(p != null){
+					for(Expression e : p.getListOfExpressions()){
+						coefficients.add(e.getName());
+					}					
+				}
+			} else if(coefficientType == ProcessConstraintData.COEFFICIENT_PRODUCT_JOIN) {
+				ProductJoin pj = projectConfiguration.getProductJoinByName(processConstraintData.getCoefficient_name());
+				coefficients.addAll(getExpressionsFromProductJoin(pj));
+			}
 			
+			
+			if(selectorType == ProcessConstraintData.SELECTION_PROCESS_JOIN) {
+				ProcessJoin processJoin = projectConfiguration.getProcessJoinByName(processConstraintData.getSelector_name());
+				if(processJoin != null) {
+					for(Model model: processJoin.getlistChildProcesses()){
+						for( Process p: processList){
+							if(p.getModel().getName().equals(model.getName())){
+								blocks.addAll(p.getBlocks());
+								break;
+							}
+						}
+					}
+				}
+			}else if(selectorType == ProcessConstraintData.SELECTION_PROCESS) {
+				for( Process p: processList){
+					if(p.getModel().getName().equals(processConstraintData.getSelector_name())){
+						blocks.addAll(p.getBlocks());
+						break;
+					}
+				}
+			} else if(selectorType == ProcessConstraintData.SELECTION_PIT) {
+				String pitName = processConstraintData.getSelector_name();
+				Pit pit = projectConfiguration.getPitfromPitName(pitName);
+				if(pit != null)
+				for( Process p: processList){
+					for(Block b: p.getBlocks()){
+						if(b.getPitNo() == pit.getPitNumber()){
+							blocks.add(b);
+						}
+					}
+				}
+				
+			} else if(selectorType == ProcessConstraintData.SELECTION_PIT_GROUP) {
+				PitGroup pg = projectConfiguration.getPitGroupfromName(processConstraintData.getSelector_name());
+				Set pitNumbers = getPitsFromPitGroup(pg);
+				for( Process p: processList){
+					for(Block b: p.getBlocks()){
+						if(pitNumbers.contains(b.getPitNo())){
+							blocks.add(b);
+						}
+					}
+				}
+			} else {
+				for( Process p: processList){
+					blocks.addAll(p.getBlocks());
+				}
+			}
+			buildConstraintEquations(processConstraintData, coefficients, blocks);
 		}
 		
 	}
 
-	public void buildProcessJoinVariables() {
+	private Set<String> getExpressionsFromProductJoin(ProductJoin pj) {
+		Set<String> expressions = new HashSet<String>();
+		if(pj == null) return expressions;
+		if(pj.getlistChildProducts().size() >0){
+			for(Product p: pj.getlistChildProducts()) {
+				for(Expression expr: p.getListOfExpressions()){
+					expressions.add(expr.getName());
+				}
+				
+			}
+		}
+		if(pj.getListChildProductJoins().size() >0){
+			for(ProductJoin pji: pj.getListChildProductJoins()) {
+				expressions.addAll(getExpressionsFromProductJoin(pji));
+			}
+		}
+		return expressions;
+	}
+	
+	private Set<Integer> getPitsFromPitGroup(PitGroup pg) {
+		Set<Integer> pitNumbers = new HashSet<Integer>();
+		if(pg == null) return pitNumbers;
+		for(Pit p: pg.getListChildPits()){
+			pitNumbers.add(p.getPitNumber());
+		}
+		for(PitGroup pgi: pg.getListChildPitGroups()){
+			pitNumbers.addAll(getPitsFromPitGroup(pgi));
+		}
+		
+		return pitNumbers;
+	}
+	
+	public void buildConstraintEquations(ProcessConstraintData data, List<String> coefficients, Set<Block> blocks) {
 		List<ProcessJoin> processJoins = projectConfiguration.getProcessJoins();
 		int timePeriod = scenarioConfigutration.getTimePeriod();
 		int startYear = scenarioConfigutration.getStartYear();
-		for(ProcessJoin processjoin:processJoins) {
-			List<ProcessConstraintData> processConstraintList = getProcessConstraintData(processjoin);
-			if(processConstraintList.size() < 1) continue;
-			for(ProcessConstraintData data: processConstraintList){
-				String expressionName = data.getCoefficient_name().replaceAll("\\s+","_");
-				
-				for(int i=1; i<= timePeriod; i++){
-					String eq = "";
-					boolean firstVariable = true;
-					List<Model> childModels = processjoin.getlistChildProcesses();
-					for(Model model: childModels) {
-						Process process = getProcessFromModel(model);
-						if(process == null) continue;
-						List<Block> blocks = process.getBlocks();
-						for(Block block: blocks){
-							//String expressionName = model.getExpression().getName().replaceAll("\\s+","_");
-							float processRatio = block.getRatioField(expressionName);
-							String tmpEq= processRatio+"p"+block.getPitNo()+"x"+block.getBlockNo()+"p"+process.getProcessNo()+"t"+i;
-							if(firstVariable) {
-								firstVariable = false;
-							} else {
-								tmpEq = " + "+tmpEq;
-							}
-							eq = eq + tmpEq;
+		
+		for(int i=1; i<= timePeriod; i++){
+			String eq = "";
+			boolean firstVariable = true;
+			for(Block block: blocks){
+				for(String coefficient: coefficients){
+					String expressionName = coefficient.replaceAll("\\s+","_");
+					float processRatio = block.getRatioField(expressionName);
+					if(processRatio == 0) continue;
+					for(String variable:block.getProcessVariables()) {
+						String tmpEq= processRatio+variable+"t"+i;
+						if(firstVariable) {
+							firstVariable = false;
+						} else {
+							tmpEq = " + "+tmpEq;
 						}
-					}
-					if(data.isMax()){
-						eq = eq + "<=" +data.getConstraintData().get(startYear+i -1);
-					} else {
-						eq = eq + ">=" +data.getConstraintData().get(startYear+i -1);
-					}
-					write(eq);
+						eq = eq + tmpEq;
+					}					
 				}
-			}			
+			}
+			if(eq.length() > 0) {
+				if(data.isMax()){
+					eq = eq + "<=" +data.getConstraintData().get(startYear+i -1);
+				} else {
+					eq = eq + ">=" +data.getConstraintData().get(startYear+i -1);
+				}
+				write(eq);
+			}
 		}
-	}
-	
-	private Process getProcessFromModel(Model model) {
+					
 
-		for(Process process: this.porcesses) {
-			if(process.getModel().getId() == model.getId()){
-				return process;
-			}
-		}
-		
-		return null;
 	}
 	
-	private List<ProcessConstraintData> getProcessConstraintData(ProcessJoin processjoin) {
-		List<ProcessConstraintData> data = new ArrayList<ProcessConstraintData>();
-		for(ProcessConstraintData processConstraintData: processConstraintDataList){
-			if(processConstraintData.isInUse() && processConstraintData.getSelector_name().equals(processjoin.getName())){
-				data.add(processConstraintData);
-			}
-		}
-		
-		return data;
-	}
+
 	private void write(String s) {
 
 		try {
