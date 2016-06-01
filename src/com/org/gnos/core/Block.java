@@ -2,8 +2,10 @@ package com.org.gnos.core;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class Block {
 
@@ -11,13 +13,13 @@ public class Block {
 	private int blockNo;
 	private int pitNo;
 	private int benchNo;
-	private List<Integer> processNumbers;
+	private Set<Integer> processNumbers;
 	
 	private Map<String, String> fields;
 
 	public Block() {
 		fields = new HashMap<String, String>();
-		processNumbers = new ArrayList();
+		processNumbers = new HashSet<Integer>();
 	}
 	
 	public int getId() {
