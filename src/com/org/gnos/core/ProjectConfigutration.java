@@ -729,6 +729,7 @@ public class ProjectConfigutration {
 	}
 
 	public void saveProcesses() {
+		this.loadProcessList();
 		List<Process> processes = this.getProcessList();
 		
 		if(processes.size() < 1){ 
@@ -736,13 +737,18 @@ public class ProjectConfigutration {
 		}
 		
 		Connection conn = DBManager.getConnection();
+		String delete_sql = " delete from process where project_id = "+ this.projectId;
 		String insert_sql = " insert into process (project_id, model_id, process_no) values (?, ?, ?)";
 		PreparedStatement pstmt = null;
+		Statement stmt = null;
 		boolean autoCommit = true;
 
 		try{
 			autoCommit = conn.getAutoCommit();
-			conn.setAutoCommit(false);
+			
+			stmt = conn.createStatement();
+			stmt.executeUpdate(delete_sql);
+			conn.setAutoCommit(false);	
 			pstmt = conn.prepareStatement(insert_sql);
 			int count = 1;
 			for(Process process : processes){
@@ -1136,18 +1142,21 @@ public class ProjectConfigutration {
 		this.processTree = processTree;
 	}
 
+	private void loadProcessList() {
+		this.processList = new ArrayList<Process>();
+		List<Node> nodes = processTree.getLeafNodes();
+		int count =1;
+		for(Node node: nodes) {
+			Process process = new Process();
+			process.setModel(node.getData());
+			process.setProcessNo(count);
+			this.processList.add(process);
+			count ++;
+		}
+	}
 	public List<Process> getProcessList() {
 		if(processList == null) {
-			this.processList = new ArrayList<Process>();
-			List<Node> nodes = processTree.getLeafNodes();
-			int count =1;
-			for(Node node: nodes) {
-				Process process = new Process();
-				process.setModel(node.getData());
-				process.setProcessNo(count);
-				this.processList.add(process);
-				count ++;
-			}
+			loadProcessList();
 		}
 		return processList;
 	}
