@@ -265,7 +265,7 @@ public class ProcessConstraintGrid extends Composite {
 				end = this.productEndIndex;
 			} else if (pcd.getCoefficientType() == ProcessConstraintData.COEFFICIENT_PRODUCT_JOIN) {
 				start = this.productEndIndex +1 ;
-				end = this.processJoinEndIndex;
+				end = this.productJoinEndIndex;
 			}
 			for(; start <= end; start++){
 				if(itemsComboExpression[start].equals(pcd.getCoefficient_name())) {
@@ -481,6 +481,7 @@ public class ProcessConstraintGrid extends Composite {
 				//new row data, not update of previously saved rowOpexData.
 				processConstraintData  = new ProcessConstraintData();
 				this.processConstraintDataList.add(processConstraintData);
+				rowConstraintData.setData(processConstraintData);
 			}else{
 				//update of previously saved rowOpexData.
 				processConstraintData = (ProcessConstraintData)rowConstraintData.getData();
@@ -513,7 +514,6 @@ public class ProcessConstraintGrid extends Composite {
 			processConstraintData.setInUse(inUse);
 			processConstraintData.setMax(isMax);
 			
-			ScenarioConfigutration.getInstance().addProcesssConstraintData(processConstraintData);
 			
 		}
 		return true;
