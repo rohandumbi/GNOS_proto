@@ -729,7 +729,6 @@ public class ProjectConfigutration {
 	}
 
 	public void saveProcesses() {
-		this.loadProcessList();
 		List<Process> processes = this.getProcessList();
 		
 		if(processes.size() < 1){ 
@@ -1142,7 +1141,7 @@ public class ProjectConfigutration {
 		this.processTree = processTree;
 	}
 
-	private void loadProcessList() {
+	public List<Process> getProcessList() {
 		this.processList = new ArrayList<Process>();
 		List<Node> nodes = processTree.getLeafNodes();
 		int count =1;
@@ -1153,11 +1152,7 @@ public class ProjectConfigutration {
 			this.processList.add(process);
 			count ++;
 		}
-	}
-	public List<Process> getProcessList() {
-		if(processList == null) {
-			loadProcessList();
-		}
+	
 		return processList;
 	}
 
