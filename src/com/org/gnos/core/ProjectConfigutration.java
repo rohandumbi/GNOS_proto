@@ -1142,20 +1142,25 @@ public class ProjectConfigutration {
 	}
 
 	public List<Process> getProcessList() {
-		this.processList = new ArrayList<Process>();
+		
+		Map<String, Process> existingProcess = new HashMap<String, Process>();
+		for(Process process: this.processList){
+			existingProcess.put(process.getModel().getName(), process);
+		}
 		List<Node> nodes = processTree.getLeafNodes();
-		int count =1;
 		for(Node node: nodes) {
-			Process process = new Process();
-			process.setModel(node.getData());
-			process.setProcessNo(count);
-			this.processList.add(process);
-			count ++;
+			if(existingProcess.get(node.getData().getName()) == null){
+				Process  p = new Process();
+				p.setModel(node.getData());
+				p.setProcessNo(this.processList.size() +1);
+				this.processList.add(p);
+			}
 		}
 	
 		return processList;
 	}
 
+	
 	public List<ProcessJoin> getProcessJoins() {
 		return processJoins;
 	}
