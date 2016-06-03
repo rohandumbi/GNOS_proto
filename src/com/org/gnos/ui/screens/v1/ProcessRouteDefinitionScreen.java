@@ -112,7 +112,7 @@ public class ProcessRouteDefinitionScreen extends GnosScreen {
 		fd_lblAllProcessJoins.top = new FormAttachment(50);
 		fd_lblAllProcessJoins.left = new FormAttachment(0, 10);
 		lblAllProcessJoins.setLayoutData(fd_lblAllProcessJoins);
-		lblAllProcessJoins.setText("All Joins :");
+		lblAllProcessJoins.setText("All Process Joins :");
 		
 		Label lblProcessDiagram = new Label(this, SWT.NONE);
 		lblProcessDiagram.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));

@@ -461,6 +461,7 @@ public class OpexDefinitionGrid extends Composite {
 				System.out.println("\n Model: " + modelName + " inUse " + inUse + " isRevenue " + isRevenue);
 				opexData = new OpexData(model);
 				opexData.setScenarioId(this.scenario.getId());
+				rowOpexData.setData(opexData);
 				this.opexDataList.add(opexData);
 			}else{
 				//update of previously saved rowOpexData.
