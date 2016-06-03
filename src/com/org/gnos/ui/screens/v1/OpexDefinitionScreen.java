@@ -367,6 +367,12 @@ public class OpexDefinitionScreen extends GnosScreen {
 		}
 		this.opexGrid = new OpexDefinitionGrid(this.scOpexGridContainer, SWT.None, scenario);
 		this.scOpexGridContainer.setContent(this.opexGrid);
+		Rectangle r = opexGrid.getClientArea();
+		int gridWidth = r.width;
+		
+		int scrollableHeight = scOpexGridContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).y;
+		Point point = new Point(gridWidth, scrollableHeight);
+		scOpexGridContainer.setMinSize(point);
 	}
 
 	private void handleScenarioSelection(int index){

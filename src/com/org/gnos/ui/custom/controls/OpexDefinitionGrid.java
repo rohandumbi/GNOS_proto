@@ -68,15 +68,6 @@ public class OpexDefinitionGrid extends Composite {
 		this.createRows();
 	}
 
-	private boolean isModelNameDuplicate(String modelName){
-		boolean isPresentInModelGrid = false;
-		for(String str: presentmodelNames) {
-			if(str.trim().equalsIgnoreCase(modelName.trim()))
-				isPresentInModelGrid = true;
-		}
-		return isPresentInModelGrid;
-	}
-
 
 	private String[] getIdentifierComboItems(){
 		//List<Model> models = ProjectConfigutration.getInstance().getModels();
