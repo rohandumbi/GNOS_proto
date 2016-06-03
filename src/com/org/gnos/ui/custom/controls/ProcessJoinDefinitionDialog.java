@@ -6,10 +6,12 @@ import java.util.List;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -25,12 +27,9 @@ import org.eclipse.wb.swt.SWTResourceManager;
 import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.ProcessJoin;
-import com.org.gnos.services.ProcessRoute;
 
 public class ProcessJoinDefinitionDialog extends Dialog {
 
-	//private ProcessDefinitionFormScreen processDefinitionFormScreen;
-	private ProcessRoute definedProcessRoute;
 	private List<String> availableProcesses;
 	private Label lblProcessJoinName;
 	private Composite container;
@@ -40,6 +39,8 @@ public class ProcessJoinDefinitionDialog extends Dialog {
 	private Control presentRow;
 	private String processJoinName;
 	private ProcessJoin createdProcessJoin;
+	private ScrolledComposite scrollContainer;
+	private Composite processListContainerComposite;
 	
 	
 	public ProcessJoinDefinitionDialog(Shell parentShell, List<String> availableProcesses) {
@@ -83,7 +84,24 @@ public class ProcessJoinDefinitionDialog extends Dialog {
 		this.btnAddProcess.setLayoutData(fd_btnAddProcess);
 		this.btnAddProcess.setText("Add Process");
 		
-		this.presentRow = this.btnAddProcess;
+		this.scrollContainer = new ScrolledComposite(this.container, SWT.BORDER | SWT.V_SCROLL);
+		FormData fd_scrollContainer = new FormData(500,500);// temp hack else size of scrolled composite keeps on increasing
+		fd_scrollContainer.top = new FormAttachment(this.btnAddProcess);
+		fd_scrollContainer.bottom = new FormAttachment(100, -5);
+		fd_scrollContainer.right = new FormAttachment(100, -10);
+		fd_scrollContainer.left = new FormAttachment(0, 10);
+		
+		this.scrollContainer.setExpandHorizontal(true);
+		this.scrollContainer.setExpandVertical(true);
+		this.scrollContainer.setLayoutData(fd_scrollContainer);
+		
+		this.processListContainerComposite = new Composite(this.scrollContainer, SWT.NONE);
+		this.processListContainerComposite.setLayout(new FormLayout());
+		this.processListContainerComposite.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		this.scrollContainer.setContent(this.processListContainerComposite);
+		
+		Rectangle r = this.scrollContainer.getClientArea();
+		this.scrollContainer.setMinSize(this.scrollContainer.computeSize(SWT.DEFAULT, r.height, true));
 		
 		container.getShell().setText("Process Details");
 		this.setDialogLocation();
@@ -91,15 +109,20 @@ public class ProcessJoinDefinitionDialog extends Dialog {
 	}
 	
 	private void addProcessDefinitionRow() {
-		Label lblSelectProcess = new Label(container, SWT.NONE);
+		Label lblSelectProcess = new Label(this.processListContainerComposite, SWT.NONE);
 		lblSelectProcess.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
+		lblSelectProcess.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		FormData fd_lblSelectProcess = new FormData();
-		fd_lblSelectProcess.top = new FormAttachment(this.presentRow, 10);
+		if(this.presentRow == null){
+			fd_lblSelectProcess.top = new FormAttachment(0, 10);
+		}else{
+			fd_lblSelectProcess.top = new FormAttachment(this.presentRow, 10);
+		}
 		fd_lblSelectProcess.left = new FormAttachment(0, 10);
 		lblSelectProcess.setLayoutData(fd_lblSelectProcess);
 		lblSelectProcess.setText("Select Process:");
 		
-		Combo comboProcess = new Combo(container, SWT.NONE);
+		Combo comboProcess = new Combo(this.processListContainerComposite, SWT.NONE);
 		comboProcess.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
 		String[] comboParentItems = availableProcesses.toArray(new String[availableProcesses.size()]);
 		comboProcess.setItems(comboParentItems);
@@ -109,9 +132,12 @@ public class ProcessJoinDefinitionDialog extends Dialog {
 		fd_comboProcess.right = new FormAttachment(100, -10);
 		comboProcess.setLayoutData(fd_comboProcess);
 		
-		this.container.layout();
+		this.processListContainerComposite.layout();
 		this.presentRow = lblSelectProcess;
 		this.listOfChildProcessCombos.add(comboProcess);
+		
+		Rectangle r = this.scrollContainer.getClientArea();
+		this.scrollContainer.setMinSize(this.scrollContainer.computeSize((r.width - 20), SWT.DEFAULT, true));
 	}
 
 	@Override
@@ -122,7 +148,7 @@ public class ProcessJoinDefinitionDialog extends Dialog {
 
 	@Override
 	protected Point getInitialSize() {
-		return new Point(490, 325);
+		return new Point(735, 487);
 	}
 
 	@Override

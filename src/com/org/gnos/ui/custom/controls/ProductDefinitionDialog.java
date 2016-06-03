@@ -6,6 +6,7 @@ import java.util.List;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
@@ -37,6 +38,8 @@ public class ProductDefinitionDialog extends Dialog {
 	private Control presentRow;
 	private String productName;
 	private List<Expression> associatedExpressions;
+	private ScrolledComposite scrollContainer;
+	private Composite expressionListContainerComposite;
 	
 	
 	public ProductDefinitionDialog(Shell parentShell, String[] availableExpressionNames) {
@@ -81,7 +84,24 @@ public class ProductDefinitionDialog extends Dialog {
 		this.btnAddExpression.setLayoutData(fd_btnAddExpressions);
 		this.btnAddExpression.setText("Add Expression");
 		
-		this.presentRow = this.btnAddExpression;
+		this.scrollContainer = new ScrolledComposite(this.container, SWT.BORDER | SWT.V_SCROLL);
+		FormData fd_scrollContainer = new FormData(500,500);// temp hack else size of scrolled composite keeps on increasing
+		fd_scrollContainer.top = new FormAttachment(this.btnAddExpression);
+		fd_scrollContainer.bottom = new FormAttachment(100, -5);
+		fd_scrollContainer.right = new FormAttachment(100, -10);
+		fd_scrollContainer.left = new FormAttachment(0, 10);
+		
+		this.scrollContainer.setExpandHorizontal(true);
+		this.scrollContainer.setExpandVertical(true);
+		this.scrollContainer.setLayoutData(fd_scrollContainer);
+		
+		this.expressionListContainerComposite = new Composite(this.scrollContainer, SWT.NONE);
+		this.expressionListContainerComposite.setLayout(new FormLayout());
+		this.expressionListContainerComposite.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		this.scrollContainer.setContent(this.expressionListContainerComposite);
+		
+		Rectangle r = this.scrollContainer.getClientArea();
+		this.scrollContainer.setMinSize(this.scrollContainer.computeSize(SWT.DEFAULT, r.height, true));
 		
 		container.getShell().setText("Product Definition");
 		this.setDialogLocation();
@@ -89,26 +109,35 @@ public class ProductDefinitionDialog extends Dialog {
 	}
 	
 	private void addExpressionRow() {
-		Label lblSelectProcess = new Label(container, SWT.NONE);
-		lblSelectProcess.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
-		FormData fd_lblSelectProcess = new FormData();
-		fd_lblSelectProcess.top = new FormAttachment(this.presentRow, 10);
-		fd_lblSelectProcess.left = new FormAttachment(0, 10);
-		lblSelectProcess.setLayoutData(fd_lblSelectProcess);
-		lblSelectProcess.setText("Select Expression:");
+		Label lblSelectExpression = new Label(this.expressionListContainerComposite, SWT.NONE);
+		lblSelectExpression.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
+		lblSelectExpression.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		FormData fd_lblSelectExpression = new FormData();
+		if(this.presentRow == null){
+			fd_lblSelectExpression.top = new FormAttachment(0, 10);
+		}else{
+			fd_lblSelectExpression.top = new FormAttachment(this.presentRow, 10);
+		}
 		
-		Combo comboProcess = new Combo(container, SWT.NONE);
-		comboProcess.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
-		comboProcess.setItems(availableExpressionNames);
+		fd_lblSelectExpression.left = new FormAttachment(0, 10);
+		lblSelectExpression.setLayoutData(fd_lblSelectExpression);
+		lblSelectExpression.setText("Select Expression:");
+		
+		Combo comboExpression = new Combo(this.expressionListContainerComposite, SWT.NONE);
+		comboExpression.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
+		comboExpression.setItems(availableExpressionNames);
 		FormData fd_comboProcess = new FormData();
-		fd_comboProcess.top = new FormAttachment(lblSelectProcess, 0, SWT.TOP);
-		fd_comboProcess.left = new FormAttachment(lblSelectProcess, 6);
+		fd_comboProcess.top = new FormAttachment(lblSelectExpression, 0, SWT.TOP);
+		fd_comboProcess.left = new FormAttachment(lblSelectExpression, 6);
 		fd_comboProcess.right = new FormAttachment(100, -10);
-		comboProcess.setLayoutData(fd_comboProcess);
+		comboExpression.setLayoutData(fd_comboProcess);
 		
-		this.container.layout();
-		this.presentRow = lblSelectProcess;
-		this.listOfChildExpressionCombos.add(comboProcess);
+		this.expressionListContainerComposite.layout();
+		this.presentRow = lblSelectExpression;
+		this.listOfChildExpressionCombos.add(comboExpression);
+		
+		Rectangle r = this.scrollContainer.getClientArea();
+		this.scrollContainer.setMinSize(this.scrollContainer.computeSize((r.width - 20), SWT.DEFAULT, true));
 	}
 
 	@Override
@@ -119,7 +148,7 @@ public class ProductDefinitionDialog extends Dialog {
 
 	@Override
 	protected Point getInitialSize() {
-		return new Point(490, 325);
+		return new Point(735, 487);
 	}
 
 	@Override

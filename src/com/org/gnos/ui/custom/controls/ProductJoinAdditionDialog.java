@@ -6,6 +6,7 @@ import java.util.List;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
@@ -38,6 +39,8 @@ public class ProductJoinAdditionDialog extends Dialog {
 	private String productJoinName;
 	private List<ProductJoin> childProductJoins;
 	private String defaultProductJoinName;
+	private ScrolledComposite scrollContainer;
+	private Composite productJoinListContainerComposite;
 	
 	
 	public ProductJoinAdditionDialog(Shell parentShell, String[] availableProductJoinNames, String defaultProductJoinName) {
@@ -82,7 +85,26 @@ public class ProductJoinAdditionDialog extends Dialog {
 		fd_btnAddProduct.left = new FormAttachment(0, 10);
 		this.btnAddProductJoin.setLayoutData(fd_btnAddProduct);
 		this.btnAddProductJoin.setText("Add Product Joins");
-		this.presentRow = this.btnAddProductJoin;
+		//this.presentRow = this.btnAddProductJoin;
+		
+		this.scrollContainer = new ScrolledComposite(this.container, SWT.BORDER | SWT.V_SCROLL);
+		FormData fd_scrollContainer = new FormData(500,500);// temp hack else size of scrolled composite keeps on increasing
+		fd_scrollContainer.top = new FormAttachment(this.btnAddProductJoin);
+		fd_scrollContainer.bottom = new FormAttachment(100, -5);
+		fd_scrollContainer.right = new FormAttachment(100, -10);
+		fd_scrollContainer.left = new FormAttachment(0, 10);
+		
+		this.scrollContainer.setExpandHorizontal(true);
+		this.scrollContainer.setExpandVertical(true);
+		this.scrollContainer.setLayoutData(fd_scrollContainer);
+		
+		this.productJoinListContainerComposite = new Composite(this.scrollContainer, SWT.NONE);
+		this.productJoinListContainerComposite.setLayout(new FormLayout());
+		this.productJoinListContainerComposite.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		this.scrollContainer.setContent(this.productJoinListContainerComposite);
+		
+		Rectangle r = this.scrollContainer.getClientArea();
+		this.scrollContainer.setMinSize(this.scrollContainer.computeSize(SWT.DEFAULT, r.height, true));
 		
 		this.addProductJoinDefinitionRow(this.defaultProductJoinName);
 				
@@ -92,45 +114,59 @@ public class ProductJoinAdditionDialog extends Dialog {
 	}
 	
 	private void addProductJoinDefinitionRow() {
-		Label lblSelectProductJoin = new Label(container, SWT.NONE);
+		Label lblSelectProductJoin = new Label(this.productJoinListContainerComposite, SWT.NONE);
 		lblSelectProductJoin.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
+		lblSelectProductJoin.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		FormData fd_lblSelectProductJoin = new FormData();
-		fd_lblSelectProductJoin.top = new FormAttachment(this.presentRow, 10);
+		if(this.presentRow == null){
+			fd_lblSelectProductJoin.top = new FormAttachment(0, 10);
+		}else{
+			fd_lblSelectProductJoin.top = new FormAttachment(this.presentRow, 10);
+		}
 		fd_lblSelectProductJoin.left = new FormAttachment(0, 10);
 		lblSelectProductJoin.setLayoutData(fd_lblSelectProductJoin);
 		lblSelectProductJoin.setText("Select Join:");
 		
-		Combo comboProduct = new Combo(container, SWT.NONE);
-		comboProduct.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
-		comboProduct.setItems(this.availableProductJoinNames);
+		Combo comboProductJoin = new Combo(this.productJoinListContainerComposite, SWT.NONE);
+		comboProductJoin.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
+		comboProductJoin.setItems(this.availableProductJoinNames);
 		FormData fd_comboProduct = new FormData();
 		fd_comboProduct.top = new FormAttachment(lblSelectProductJoin, 0, SWT.TOP);
 		fd_comboProduct.left = new FormAttachment(lblSelectProductJoin, 6);
 		fd_comboProduct.right = new FormAttachment(100, -10);
-		comboProduct.setLayoutData(fd_comboProduct);
+		comboProductJoin.setLayoutData(fd_comboProduct);
 		
-		this.container.layout();
+		this.productJoinListContainerComposite.layout();
 		this.presentRow = lblSelectProductJoin;
-		this.listOfChildProductJoinCombos.add(comboProduct);
+		this.listOfChildProductJoinCombos.add(comboProductJoin);
+		
+		Rectangle r = this.scrollContainer.getClientArea();
+		this.scrollContainer.setMinSize(this.scrollContainer.computeSize((r.width - 20), SWT.DEFAULT, true));
 	}
 	
 	private void addProductJoinDefinitionRow(String selectedProductName) {
-		Label lblSelectProductJoin = new Label(container, SWT.NONE);
+		Label lblSelectProductJoin = new Label(this.productJoinListContainerComposite, SWT.NONE);
 		lblSelectProductJoin.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
+		lblSelectProductJoin.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		FormData fd_lblSelectProductJoin = new FormData();
+		if(this.presentRow == null){
+			fd_lblSelectProductJoin.top = new FormAttachment(0, 10);
+		}else{
+			fd_lblSelectProductJoin.top = new FormAttachment(this.presentRow, 10);
+		}
 		fd_lblSelectProductJoin.top = new FormAttachment(this.presentRow, 10);
 		fd_lblSelectProductJoin.left = new FormAttachment(0, 10);
 		lblSelectProductJoin.setLayoutData(fd_lblSelectProductJoin);
 		lblSelectProductJoin.setText("Select Join:");
 		
-		Combo comboProduct = new Combo(container, SWT.NONE);
-		comboProduct.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
-		comboProduct.setItems(this.availableProductJoinNames);
+		Combo comboProductJoin = new Combo(this.productJoinListContainerComposite, SWT.NONE);
+		comboProductJoin.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
+		comboProductJoin.setItems(this.availableProductJoinNames);
 		FormData fd_comboProduct = new FormData();
 		fd_comboProduct.top = new FormAttachment(lblSelectProductJoin, 0, SWT.TOP);
 		fd_comboProduct.left = new FormAttachment(lblSelectProductJoin, 6);
 		fd_comboProduct.right = new FormAttachment(100, -10);
-		comboProduct.setLayoutData(fd_comboProduct);
+		comboProductJoin.setLayoutData(fd_comboProduct);
 		
 		int defaultIndex = 0;
 		for(int i=0; i<this.availableProductJoinNames.length; i++){
@@ -139,11 +175,14 @@ public class ProductJoinAdditionDialog extends Dialog {
 				break;
 			}
 		}
-		comboProduct.select(defaultIndex);
+		comboProductJoin.select(defaultIndex);
 		
-		this.container.layout();
+		this.productJoinListContainerComposite.layout();
 		this.presentRow = lblSelectProductJoin;
-		this.listOfChildProductJoinCombos.add(comboProduct);
+		this.listOfChildProductJoinCombos.add(comboProductJoin);
+		
+		Rectangle r = this.scrollContainer.getClientArea();
+		this.scrollContainer.setMinSize(this.scrollContainer.computeSize((r.width - 20), SWT.DEFAULT, true));
 	}
 
 	@Override
@@ -154,7 +193,7 @@ public class ProductJoinAdditionDialog extends Dialog {
 
 	@Override
 	protected Point getInitialSize() {
-		return new Point(490, 325);
+		return new Point(735, 487);
 	}
 
 	@Override
