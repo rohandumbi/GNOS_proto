@@ -9,9 +9,8 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,11 +21,14 @@ import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.core.Tree;
 import com.org.gnos.db.DBManager;
-import com.org.gnos.db.model.Expression;
+import com.org.gnos.db.model.Dump;
 import com.org.gnos.db.model.FixedOpexCost;
 import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.OpexData;
+import com.org.gnos.db.model.Pit;
+import com.org.gnos.db.model.PitGroup;
 import com.org.gnos.db.model.Process;
+import com.org.gnos.db.model.Stockpile;
 
 public class ObjectiveFunctionEquationGenerator {
 
@@ -35,7 +37,8 @@ public class ObjectiveFunctionEquationGenerator {
 	private BufferedOutputStream output;
 	private ProjectConfigutration projectConfiguration;
 	private ScenarioConfigutration scenarioConfigutration;
-	private Map<Integer, List<CostRevenueData>> modelOpexDataMapping;
+	private Map<Integer, List<Integer>> pitDumpMapping;
+	private Map<Integer, Integer> pitStockpileMapping;
 	
 	private Set<Integer> processedBlocks;
 	private Tree processTree;
@@ -45,6 +48,7 @@ public class ObjectiveFunctionEquationGenerator {
 		projectConfiguration = ProjectConfigutration.getInstance();
 		scenarioConfigutration = ScenarioConfigutration.getInstance();
 		processedBlocks = new HashSet<Integer>();
+		
 
 		int bufferSize = 8 * 1024;
 		try {
@@ -86,7 +90,6 @@ public class ObjectiveFunctionEquationGenerator {
 			float miningcost = oreMiningCostMap.get(year);
 			
 			for(Block block: blocks) {
-				block.addProcess(processNumber);
 				float processValue = getProcessValue(block, process.getModel(), year);
 				float value = processValue - miningcost;
 				value = (float) (value * (1 / Math.pow ((1 + discount_rate), count)));
@@ -103,14 +106,18 @@ public class ObjectiveFunctionEquationGenerator {
 	
 	private void buildStockpileVariables(Set<Block> blocks) {
 		FixedOpexCost[] fixedOpexCost = scenarioConfigutration.getFixedCost();
+		if(fixedOpexCost == null || fixedOpexCost.length < 3) return;
+		parseStockpileData();
 		Map<Integer, Float> oreMiningCostMap = fixedOpexCost[0].getCostData();
 		Map<Integer, Float> stockPilingCostMap = fixedOpexCost[2].getCostData();
 		Set<Integer> keys = stockPilingCostMap.keySet();
 		int count = 1;
 		for(int year: keys){
 			float cost = stockPilingCostMap.get(year)+oreMiningCostMap.get(year);			
-			for(Block block: blocks) {			
-				String eq = " -"+cost+"p"+block.getPitNo()+"x"+block.getBlockNo()+"s"+getStockPileForPit(block.getPitNo())+"t"+count;
+			for(Block block: blocks) {
+				Integer stockpileNumber = this.pitStockpileMapping.get(block.getPitNo());
+				if(stockpileNumber == null) continue;
+				String eq = " -"+cost+"p"+block.getPitNo()+"x"+block.getBlockNo()+"s"+stockpileNumber+"t"+count;
 
 				write(eq);
 			}
@@ -121,6 +128,8 @@ public class ObjectiveFunctionEquationGenerator {
 	private void buildWasteBlockVariables() throws IOException {
 		List<Block> wasteblocks = findWasteBlocks();
 		FixedOpexCost[] fixedOpexCost = scenarioConfigutration.getFixedCost();
+		if(fixedOpexCost == null || fixedOpexCost.length < 2) return;
+		parseDumpData();
 		Map<Integer, Float> wasteMiningCostMap = fixedOpexCost[1].getCostData();
 		Set<Integer> keys = wasteMiningCostMap.keySet();
 
@@ -128,8 +137,13 @@ public class ObjectiveFunctionEquationGenerator {
 		for(int year: keys){
 			float cost = wasteMiningCostMap.get(year);		
 			for(Block block: wasteblocks) {
-				String eq = " -"+cost+"p"+block.getPitNo()+"x"+block.getBlockNo()+"w"+getDumpForPit(block.getPitNo())+"t"+count;
-				write(eq);
+				List<Integer> dumps = pitDumpMapping.get(block.getPitNo());
+				if(dumps == null) continue;
+				for(Integer dumpNo: dumps){
+					String eq = " -"+cost+"p"+block.getPitNo()+"x"+block.getBlockNo()+"w"+dumpNo+"t"+count;
+					write(eq);
+				}
+				
 			}
 			count++;
 		}
@@ -263,6 +277,45 @@ public class ObjectiveFunctionEquationGenerator {
 		return value;
 	}
 	
+	private void parseStockpileData() {
+		this.pitStockpileMapping = new HashMap<Integer, Integer>();
+		List<Stockpile> stockpileListData = projectConfiguration.getStockPileList();
+		for(Stockpile sp: stockpileListData){
+			Set<Integer> pits = flattenPitGroup(sp.getAssociatedPitGroup());
+			for(Integer pitNo: pits) {
+				this.pitStockpileMapping.put(pitNo, sp.getStockpileNumber());
+			}
+		}
+		
+	}
+
+	private void parseDumpData() {
+		this.pitDumpMapping = new HashMap<Integer, List<Integer>>();
+		List<Dump> dumpData = projectConfiguration.getDumpList();
+		for(Dump dump: dumpData){
+			Set<Integer> pits = flattenPitGroup(dump.getAssociatedPitGroup());
+			for(Integer pitNo: pits) {
+				List<Integer> dumps = this.pitDumpMapping.get(pitNo);
+				if(dumps == null){
+					dumps = new ArrayList<Integer>();
+					this.pitDumpMapping.put(pitNo, dumps);
+				}
+				dumps.add(dump.getDumpNumber());
+			}
+		}
+	}
+	
+	private Set<Integer> flattenPitGroup(PitGroup pg) {
+		 Set<Integer> pits = new HashSet<Integer>();
+		 for(Pit childPit: pg.getListChildPits()){
+			 pits.add(childPit.getPitNumber());
+		 }
+		 for(PitGroup childGroup: pg.getListChildPitGroups()) {
+			 pits.addAll(flattenPitGroup(childGroup));
+		 }
+		 
+		 return pits;
+	}
 	private boolean hasValue(String s) {
 		return (s !=null && s.trim().length() >0);
 	}

@@ -13,13 +13,11 @@ public class Block {
 	private int blockNo;
 	private int pitNo;
 	private int benchNo;
-	private Set<Integer> processNumbers;
 	
 	private Map<String, String> fields;
 
 	public Block() {
 		fields = new HashMap<String, String>();
-		processNumbers = new HashSet<Integer>();
 	}
 	
 	public int getId() {
@@ -62,22 +60,8 @@ public class Block {
 
 	public void addField(String key,  String ratio) {
 		this.fields.put(key, ratio);
-	}
+	}	
 	
-	
-	public void addProcess(int processNo) {
-		this.processNumbers.add(processNo);
-	}
-	
-	public List<String> getProcessVariables() {
-		List<String> variables = new ArrayList();
-		for(int processNumber: processNumbers){
-			String variable = "p"+this.getPitNo()+"x"+this.getBlockNo()+"p"+processNumber;
-			variables.add(variable);
-		}
-		
-		return variables;
-	}
 	@Override
 	public boolean equals(Object obj) {
 		return (this.blockNo == ((Block)obj).blockNo);
