@@ -37,15 +37,15 @@ public class ProjectConfigutration {
 	private Map<String, String> requiredFieldMapping = new LinkedHashMap<String, String>();
 	private List<Expression> expressions = new ArrayList<Expression>();
 	private List<Model> models = new ArrayList<Model>();
-	private Tree processTree = null;
-	private List<Process> processList = null;
+	private Tree processTree = new Tree();
+	private List<Process> processList = new ArrayList<Process>();
 	private List<ProcessJoin> processJoins = new ArrayList<ProcessJoin>();
 	private List<Product> productList = new ArrayList<Product>();
 	private List<ProductJoin> productJoinList = new ArrayList<ProductJoin>();
 	private List<PitGroup> pitGroupList = new ArrayList<PitGroup>();
 	private List<Dump> dumpList = new ArrayList<Dump>();
 	private List<Stockpile> stockPileList = new ArrayList<Stockpile>();
-	private List<Pit> pitList;
+	private List<Pit> pitList = new ArrayList<Pit>();
 
 	private boolean newProject = true;
 	private Map<String, String> savedRequiredFieldMapping;

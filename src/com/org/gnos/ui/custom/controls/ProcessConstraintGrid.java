@@ -80,15 +80,6 @@ public class ProcessConstraintGrid extends Composite {
 		this.createRows();
 	}
 
-	private boolean isModelNameDuplicate(String modelName){
-		boolean isPresentInModelGrid = false;
-		for(String str: presentmodelNames) {
-			if(str.trim().equalsIgnoreCase(modelName.trim()))
-				isPresentInModelGrid = true;
-		}
-		return isPresentInModelGrid;
-	}
-
 
 	private String[] getCoefficientComboItems(){
 		ProjectConfigutration projectConfigutration = ProjectConfigutration.getInstance();
@@ -497,10 +488,9 @@ public class ProcessConstraintGrid extends Composite {
 				processConstraintData.setCoefficientType(ProcessConstraintData.COEFFICIENT_PRODUCT_JOIN);
 			}		
 			processConstraintData.setCoefficient_name(coefficientName);
-			if(selectorSelectionIndex <= 0) {
+			if(selectorSelectionIndex < 0) {
 				processConstraintData.setSelectionType(ProcessConstraintData.SELECTION_NONE);
-			}
-			else if(selectorSelectionIndex <= processJoinEndIndex ) {
+			}else if(selectorSelectionIndex <= processJoinEndIndex ) {
 				processConstraintData.setSelectionType(ProcessConstraintData.SELECTION_PROCESS_JOIN);
 			} else if(selectorSelectionIndex <= processEndIndex ) {
 				processConstraintData.setSelectionType(ProcessConstraintData.SELECTION_PROCESS);
