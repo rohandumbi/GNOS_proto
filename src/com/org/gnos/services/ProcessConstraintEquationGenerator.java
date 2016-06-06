@@ -103,23 +103,28 @@ public class ProcessConstraintEquationGenerator {
 					String pitName = processConstraintData.getSelector_name();
 					Pit pit = projectConfiguration.getPitfromPitName(pitName);
 					if(pit != null)
+					
 					for( Process p: processList){
+						List<Block> blocks = new ArrayList<Block>();
 						for(Block b: p.getBlocks()){
 							if(b.getPitNo() == pit.getPitNumber()){
-								eq += buildProcessConstraintVariables(p.getProcessNo(), coefficients, p.getBlocks(), i);
+								blocks.add(b);
 							}
 						}
+						eq += buildProcessConstraintVariables(p.getProcessNo(), coefficients, blocks, i);
 					}
 					
 				} else if(selectorType == ProcessConstraintData.SELECTION_PIT_GROUP) {
 					PitGroup pg = projectConfiguration.getPitGroupfromName(processConstraintData.getSelector_name());
 					Set pitNumbers = getPitsFromPitGroup(pg);
 					for( Process p: processList){
+						List<Block> blocks = new ArrayList<Block>();
 						for(Block b: p.getBlocks()){
 							if(pitNumbers.contains(b.getPitNo())){
-								eq += buildProcessConstraintVariables(p.getProcessNo(), coefficients, p.getBlocks(), i);
+								blocks.add(b);
 							}
 						}
+						eq += buildProcessConstraintVariables(p.getProcessNo(), coefficients, blocks, i);
 					}
 				} else {
 					for( Process p: processList){

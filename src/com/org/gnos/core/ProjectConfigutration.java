@@ -1154,9 +1154,15 @@ public class ProjectConfigutration {
 				p.setModel(node.getData());
 				p.setProcessNo(this.processList.size() +1);
 				this.processList.add(p);
+			} else {
+				existingProcess.remove(node.getData().getName());
 			}
 		}
-	
+		Set<String> keys = existingProcess.keySet();
+		for(String key: keys){
+			Process p = existingProcess.get(key);
+			this.processList.remove(p);
+		}
 		return processList;
 	}
 

@@ -25,7 +25,6 @@ import org.eclipse.wb.swt.SWTResourceManager;
 import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.db.model.Expression;
-import com.org.gnos.db.model.OpexData;
 import com.org.gnos.db.model.Pit;
 import com.org.gnos.db.model.PitGroup;
 import com.org.gnos.db.model.Process;
@@ -33,7 +32,6 @@ import com.org.gnos.db.model.ProcessConstraintData;
 import com.org.gnos.db.model.ProcessJoin;
 import com.org.gnos.db.model.Product;
 import com.org.gnos.db.model.ProductJoin;
-import com.org.gnos.services.TimePeriod;
 
 public class ProcessConstraintGrid extends Composite {
 
