@@ -63,7 +63,8 @@ public class ProcessConstraintEquationGenerator {
 			int selectorType = processConstraintData.getSelectionType();
 			int coefficientType = processConstraintData.getCoefficientType();
 			List<String> coefficients = new ArrayList<String>();
-			//List<Block> blocks = new ArrayList<Block>(); // blocks list can contain duplicate blocks
+			Set<String> applicableProcesses = new HashSet<String>();
+			boolean applyProcessRestrictions = false;
 			if(coefficientType == ProcessConstraintData.COEFFICIENT_EXPRESSION){
 				coefficients.add(processConstraintData.getCoefficient_name());
 			} else if(coefficientType == ProcessConstraintData.COEFFICIENT_PRODUCT) {
@@ -71,11 +72,15 @@ public class ProcessConstraintEquationGenerator {
 				if(p != null){
 					for(Expression e : p.getListOfExpressions()){
 						coefficients.add(e.getName());
-					}					
+					}
+					applicableProcesses.add(p.getAssociatedProcess().getName());
+					applyProcessRestrictions = true;
 				}
 			} else if(coefficientType == ProcessConstraintData.COEFFICIENT_PRODUCT_JOIN) {
 				ProductJoin pj = projectConfiguration.getProductJoinByName(processConstraintData.getCoefficient_name());
 				coefficients.addAll(getExpressionsFromProductJoin(pj));
+				applicableProcesses.addAll(getProcessListFromProductJoin(pj));
+				applyProcessRestrictions = true;
 			}
 			
 			for(int i=1; i<= timePeriod; i++){
@@ -105,6 +110,7 @@ public class ProcessConstraintEquationGenerator {
 					if(pit != null)
 					
 					for( Process p: processList){
+						if(applyProcessRestrictions && !applicableProcesses.contains(p.getModel().getName())) continue;
 						List<Block> blocks = new ArrayList<Block>();
 						for(Block b: p.getBlocks()){
 							if(b.getPitNo() == pit.getPitNumber()){
@@ -118,6 +124,7 @@ public class ProcessConstraintEquationGenerator {
 					PitGroup pg = projectConfiguration.getPitGroupfromName(processConstraintData.getSelector_name());
 					Set pitNumbers = getPitsFromPitGroup(pg);
 					for( Process p: processList){
+						if(applyProcessRestrictions && !applicableProcesses.contains(p.getModel().getName())) continue;
 						List<Block> blocks = new ArrayList<Block>();
 						for(Block b: p.getBlocks()){
 							if(pitNumbers.contains(b.getPitNo())){
@@ -128,6 +135,7 @@ public class ProcessConstraintEquationGenerator {
 					}
 				} else {
 					for( Process p: processList){
+						if(applyProcessRestrictions && !applicableProcesses.contains(p.getModel().getName())) continue;
 						eq += buildProcessConstraintVariables(p.getProcessNo(), coefficients, p.getBlocks(), i);
 					}
 				}
@@ -178,7 +186,16 @@ public class ProcessConstraintEquationGenerator {
 		
 		return pitNumbers;
 	}
-	
+	private Set<String> getProcessListFromProductJoin(ProductJoin pj){
+		Set<String> processes = new HashSet<String>();
+		 for(Product childProduct: pj.getlistChildProducts()){
+			 processes.add(childProduct.getAssociatedProcess().getName());
+		 }
+		 for(ProductJoin childJoin: pj.getListChildProductJoins()) {
+			 processes.addAll(getProcessListFromProductJoin(childJoin));
+		 }
+		 return processes;
+	}
 	public String buildProcessConstraintVariables(int processNumber, List<String> coefficients, List<Block> blocks, int period) {
 		
 		String eq = "";
