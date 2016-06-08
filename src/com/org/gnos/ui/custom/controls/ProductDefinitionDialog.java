@@ -55,7 +55,7 @@ public class ProductDefinitionDialog extends Dialog {
 		this.container.setLayout(new FormLayout());
 		
 		this.lblProductName = new Label(this.container, SWT.NONE);
-		this.lblProductName.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
+		this.lblProductName.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		FormData fd_lblProductName = new FormData();
 		fd_lblProductName.top = new FormAttachment(0, 10);
 		fd_lblProductName.left = new FormAttachment(0, 10);
@@ -110,7 +110,7 @@ public class ProductDefinitionDialog extends Dialog {
 	
 	private void addExpressionRow() {
 		Label lblSelectExpression = new Label(this.expressionListContainerComposite, SWT.NONE);
-		lblSelectExpression.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
+		lblSelectExpression.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		lblSelectExpression.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		FormData fd_lblSelectExpression = new FormData();
 		if(this.presentRow == null){
@@ -124,7 +124,7 @@ public class ProductDefinitionDialog extends Dialog {
 		lblSelectExpression.setText("Select Expression:");
 		
 		Combo comboExpression = new Combo(this.expressionListContainerComposite, SWT.NONE);
-		comboExpression.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
+		comboExpression.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		comboExpression.setItems(availableExpressionNames);
 		FormData fd_comboProcess = new FormData();
 		fd_comboProcess.top = new FormAttachment(lblSelectExpression, 0, SWT.TOP);
