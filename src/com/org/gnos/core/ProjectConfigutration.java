@@ -316,7 +316,7 @@ public class ProjectConfigutration {
 	}
 	
 	public void loadProducts() {
-		String sql = "select name, associated_model_id, child_expression_id from product_defn where project_id = "
+		String sql = "select distinct name, associated_model_id, child_expression_id from product_defn where project_id = "
 				+ this.projectId + " order by name ";
 		Statement stmt = null;
 		ResultSet rs = null;
@@ -359,7 +359,7 @@ public class ProjectConfigutration {
 	}
 	
 	public void loadProductJoins() {
-		String sql = "select name, child_product_name, child_product_join_name from product_join_defn where project_id = "+ this.projectId  +
+		String sql = "select distinct name, child_product_name, child_product_join_name from product_join_defn where project_id = "+ this.projectId  +
 				" and ( child_product_name is not null  or child_product_join_name is not null ) order by child_product_name desc";
 
 		try (

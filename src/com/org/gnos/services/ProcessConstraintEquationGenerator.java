@@ -64,12 +64,12 @@ public class ProcessConstraintEquationGenerator {
 			if(!processConstraintData.isInUse()) continue;
 			int selectorType = processConstraintData.getSelectionType();
 			int coefficientType = processConstraintData.getCoefficientType();
-			Map<String, Set<String>> processExprMap = new HashMap<String, Set<String>>();
+			Map<String, List<String>> processExprMap = new HashMap<String, List<String>>();
 			boolean applyProcessRestrictions = false;
 			if(coefficientType == ProcessConstraintData.COEFFICIENT_PRODUCT) {
 				Product p = projectConfiguration.getProductByName(processConstraintData.getCoefficient_name());
 				if(p != null){
-					Set<String> coefficients = new HashSet<String>();
+					List<String> coefficients = new ArrayList<String>();
 					for(Expression e : p.getListOfExpressions()){
 						coefficients.add(e.getName());
 					}
@@ -81,9 +81,9 @@ public class ProcessConstraintEquationGenerator {
 				List<Product> products = getProductsFromProductJoin(pj);
 				for(Product p: products){
 					String processName = p.getAssociatedProcess().getName();
-					Set<String> coefficients = processExprMap.get(processName);
+					List<String> coefficients = processExprMap.get(processName);
 					if(coefficients == null){
-						coefficients = new HashSet<String>();
+						coefficients = new ArrayList<String>();
 						processExprMap.put(processName, coefficients);
 					}
 					for(Expression e : p.getListOfExpressions()){
@@ -101,14 +101,14 @@ public class ProcessConstraintEquationGenerator {
 						for(Model model: processJoin.getlistChildProcesses()){
 							for( Process p: processList){
 								if(p.getModel().getName().equals(model.getName())){
-									Set<String> coefficients;
+									List<String> coefficients;
 									if(applyProcessRestrictions){
 										coefficients = processExprMap.get(p.getModel().getName());
 										if(coefficients == null || coefficients.size() == 0) {
 											continue;
 										}
 									} else {
-										coefficients = new HashSet<>();
+										coefficients = new ArrayList<>();
 										coefficients.add(processConstraintData.getCoefficient_name());
 									}
 									eq += buildProcessConstraintVariables(p.getProcessNo(), coefficients, p.getBlocks(), i);
@@ -120,14 +120,14 @@ public class ProcessConstraintEquationGenerator {
 				}else if(selectorType == ProcessConstraintData.SELECTION_PROCESS) {
 					for( Process p: processList){
 						if(p.getModel().getName().equals(processConstraintData.getSelector_name())){
-							Set<String> coefficients;
+							List<String> coefficients;
 							if(applyProcessRestrictions){
 								coefficients = processExprMap.get(p.getModel().getName());
 								if(coefficients == null || coefficients.size() == 0) {
 									continue;
 								}
 							} else {
-								coefficients = new HashSet<>();
+								coefficients = new ArrayList<>();
 								coefficients.add(processConstraintData.getCoefficient_name());
 							}
 							eq += buildProcessConstraintVariables(p.getProcessNo(), coefficients, p.getBlocks(), i);
@@ -139,14 +139,14 @@ public class ProcessConstraintEquationGenerator {
 					Pit pit = projectConfiguration.getPitfromPitName(pitName);
 					if(pit != null) {
 						for( Process p: processList){
-							Set<String> coefficients;
+							List<String> coefficients;
 							if(applyProcessRestrictions){
 								coefficients = processExprMap.get(p.getModel().getName());
 								if(coefficients == null || coefficients.size() == 0) {
 									continue;
 								}
 							} else {
-								coefficients = new HashSet<>();
+								coefficients = new ArrayList<>();
 								coefficients.add(processConstraintData.getCoefficient_name());
 							}
 							List<Block> blocks = new ArrayList<Block>();
@@ -165,14 +165,14 @@ public class ProcessConstraintEquationGenerator {
 					PitGroup pg = projectConfiguration.getPitGroupfromName(processConstraintData.getSelector_name());
 					Set pitNumbers = getPitsFromPitGroup(pg);
 					for( Process p: processList){
-						Set<String> coefficients;
+						List<String> coefficients;
 						if(applyProcessRestrictions){
 							coefficients = processExprMap.get(p.getModel().getName());
 							if(coefficients == null || coefficients.size() == 0) {
 								continue;
 							}
 						} else {
-							coefficients = new HashSet<>();
+							coefficients = new ArrayList<>();
 							coefficients.add(processConstraintData.getCoefficient_name());
 						}
 						List<Block> blocks = new ArrayList<Block>();
@@ -185,14 +185,14 @@ public class ProcessConstraintEquationGenerator {
 					}
 				} else {
 					for( Process p: processList){
-						Set<String> coefficients;
+						List<String> coefficients;
 						if(applyProcessRestrictions){
 							coefficients = processExprMap.get(p.getModel().getName());
 							if(coefficients == null || coefficients.size() == 0) {
 								continue;
 							}
 						} else {
-							coefficients = new HashSet<>();
+							coefficients = new ArrayList<>();
 							coefficients.add(processConstraintData.getCoefficient_name());
 						}
 						eq += buildProcessConstraintVariables(p.getProcessNo(), coefficients, p.getBlocks(), i);
@@ -248,7 +248,7 @@ public class ProcessConstraintEquationGenerator {
 		 }
 		 return processes;
 	}
-	public String buildProcessConstraintVariables(int processNumber, Set<String> coefficients, List<Block> blocks, int period) {
+	public String buildProcessConstraintVariables(int processNumber, List<String> coefficients, List<Block> blocks, int period) {
 		
 		String eq = "";
 		for(Block block: blocks){
