@@ -173,14 +173,7 @@ public class ProcessDefinitionGraph extends Composite {
 		Product selectedProduct = ProjectConfigutration.getInstance().getProductByName(nodeName);
 		ProductPropertiesDialog productPropertiesDialog = new ProductPropertiesDialog(getShell(), selectedProduct);
 		if (Window.OK == productPropertiesDialog.open()) {
-			/*String definedProductJoinName = productJoinAdditionDialog.getProductJoinName();
-			List<ProductJoin> childProductJoins = productJoinAdditionDialog.getChildProductJoins();
 			
-			ProductJoin newProductJoin = new ProductJoin(definedProductJoinName);
-			newProductJoin.setListChildProductJoins(childProductJoins);
-			
-			this.addProductJoinToProductJoins(newProductJoin);
-			this.listOfProductJoins.add(newProductJoin);*/
 		}
 	}
 	
