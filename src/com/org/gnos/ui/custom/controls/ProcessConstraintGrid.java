@@ -8,6 +8,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -44,7 +48,6 @@ public class ProcessConstraintGrid extends Composite {
 	private List<Composite> allRows;
 	private Composite presentRow;
 	private Composite parent;
-	private List<String> presentmodelNames;
 	private Label firstSeparator;
 	private Label secondSeparator;
 	private Label thirdSeparator;
@@ -56,7 +59,7 @@ public class ProcessConstraintGrid extends Composite {
 	private int expressionEndIndex = 0;
 	private int productEndIndex = 0;
 	private int productJoinEndIndex = 0;
-	
+
 	private int processEndIndex = 0;
 	private int processJoinEndIndex = 0;
 	private int pitEndIndex = 0;
@@ -99,11 +102,11 @@ public class ProcessConstraintGrid extends Composite {
 		}
 		return comboItems;
 	}
-	
+
 	private String[] getSelectors(){
-		
+
 		ProjectConfigutration projectConfigutration = ProjectConfigutration.getInstance();
-			
+
 		List<ProcessJoin> processJoins = projectConfigutration.getProcessJoins();
 		List<Process> processes = projectConfigutration.getProcessList();
 		List<Pit> pits = projectConfigutration.getPitList();
@@ -219,7 +222,7 @@ public class ProcessConstraintGrid extends Composite {
 	}
 
 	private void createRows() {
-		
+
 		for(ProcessConstraintData pcd : this.processConstraintDataList) {
 			final Composite compositeRow = new Composite(this, SWT.BORDER);
 			compositeRow.setData(pcd);
@@ -233,7 +236,7 @@ public class ProcessConstraintGrid extends Composite {
 			fd_compositeRow.left = new FormAttachment(this.presentRow, 0, SWT.LEFT);
 			fd_compositeRow.right = new FormAttachment(this.presentRow, 0, SWT.RIGHT);
 			fd_compositeRow.top = new FormAttachment(this.presentRow);
-			
+
 			final Combo comboExpression = new Combo(compositeRow, SWT.NONE);
 			String[] itemsComboExpression = this.getCoefficientComboItems();
 			comboExpression.setItems(itemsComboExpression);
@@ -245,6 +248,12 @@ public class ProcessConstraintGrid extends Composite {
 					comboExpression.setItems(getCoefficientComboItems());
 					comboExpression.getParent().layout();
 					comboExpression.setListVisible(true);
+				}
+			});
+
+			comboExpression.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent e) {
+					System.out.println("Coefficient selected is: " + comboExpression.getText());
 				}
 			});
 			int start = 0;
@@ -267,14 +276,20 @@ public class ProcessConstraintGrid extends Composite {
 			fd_comboExpression.top = new FormAttachment(0);
 			fd_comboExpression.right = new FormAttachment(0, 115);
 			comboExpression.setLayoutData(fd_comboExpression);
-			
-			Button btnUse = new Button(compositeRow, SWT.CHECK);
+
+			final Button btnUse = new Button(compositeRow, SWT.CHECK);
 			btnUse.setSelection(pcd.isInUse());
 			FormData fd_btnUse = new FormData();
 			fd_btnUse.left = new FormAttachment(comboExpression, 12, SWT.RIGHT);
 			fd_btnUse.top = new FormAttachment(0, 2);
 			btnUse.setLayoutData(fd_btnUse);
-			
+
+			btnUse.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent e) {
+					System.out.println("Is button in use selected: " + btnUse.getSelection());
+				}
+			});
+
 			final Combo comboGroup = new Combo(compositeRow, SWT.NONE);
 			String[] itemsComboGroup = this.getSelectors();
 			comboGroup.setItems(itemsComboGroup);
@@ -288,6 +303,13 @@ public class ProcessConstraintGrid extends Composite {
 					comboGroup.setListVisible(true);
 				}
 			});
+
+			comboGroup.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent e) {
+					System.out.println("Group selected is: " + comboGroup.getText());
+				}
+			});
+
 			start = 0;
 			end = this.processJoinEndIndex;
 			if(pcd.getSelectionType() == ProcessConstraintData.SELECTION_PROCESS) {
@@ -306,13 +328,13 @@ public class ProcessConstraintGrid extends Composite {
 					break;
 				}
 			}
-			
+
 			FormData fd_comboGroup = new FormData();
 			fd_comboGroup.left = new FormAttachment(btnUse, 18);
 			fd_comboGroup.right = new FormAttachment(btnUse, 135);
 			fd_comboGroup.top = new FormAttachment(0);
 			comboGroup.setLayoutData(fd_comboGroup);
-			
+
 			final Combo comboMaxMin = new Combo(compositeRow, SWT.NONE);
 			comboMaxMin.setItems(new String[]{"Max", "Min"});
 			if(pcd.isMax()){
@@ -320,24 +342,41 @@ public class ProcessConstraintGrid extends Composite {
 			}else{
 				comboMaxMin.select(1);
 			}
+
+			comboMaxMin.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent e) {
+					System.out.println("Is equation for max value: " + (comboMaxMin.getSelectionIndex() == 0));
+				}
+			});
+
 			FormData fd_comboMaxMin = new FormData();
 			fd_comboMaxMin.left = new FormAttachment(comboGroup, 8);
 			fd_comboMaxMin.right = new FormAttachment(comboGroup, 116, SWT.RIGHT);
 			fd_comboMaxMin.top = new FormAttachment(0);
 			comboMaxMin.setLayoutData(fd_comboMaxMin);
-			
+
 			Control previousMember = comboMaxMin;
 			Map<Integer, Float> yearData = pcd.getConstraintData();
 			Set keys = yearData.keySet();
 			Iterator<Integer> it = keys.iterator();
+			int index = 0;
 			while(it.hasNext()){
+				index++;
+				final int z = index;
 				float value = yearData.get(it.next());
 				Text yearlyValue = new Text(compositeRow, SWT.BORDER);
+				yearlyValue.addModifyListener(new ModifyListener(){
+					public void modifyText(ModifyEvent event) {
+						// Get the widget whose text was modified
+						Text text = (Text) event.widget;
+						System.out.println("Input value for the " + z + "th year is " + text.getText());
+					}
+				});
 				yearlyValue.setText(String.valueOf(value));
 				FormData fd_yearlyValue = new FormData();
-				
-				 // Hacky calculation at the moment
-				 
+
+				// Hacky calculation at the moment
+
 				fd_yearlyValue.left = new FormAttachment(previousMember, 3);
 				fd_yearlyValue.right = new FormAttachment(previousMember, 76, SWT.RIGHT);
 				yearlyValue.setLayoutData(fd_yearlyValue);
@@ -349,13 +388,18 @@ public class ProcessConstraintGrid extends Composite {
 			compositeRow.setLayoutData(fd_compositeRow);
 			this.layout();
 		}
-		
+
 	}
 
 	public void addRow(){
 		final Composite compositeRow = new Composite(this, SWT.BORDER);
 		compositeRow.setLayout(new FormLayout());
 		Color backgroundColor = SWTResourceManager.getColor(SWT.COLOR_WHITE);
+
+		ProcessConstraintData processConstraintData  = new ProcessConstraintData();
+		this.processConstraintDataList.add(processConstraintData);
+		compositeRow.setData(processConstraintData);
+
 		if((this.allRows != null) && (this.allRows.size()%2 != 0)){
 			backgroundColor =  SWTResourceManager.getColor(245, 245, 245);
 		}
@@ -381,17 +425,30 @@ public class ProcessConstraintGrid extends Composite {
 				comboExpression.setListVisible(true);
 			}
 		});
+
+		comboExpression.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				System.out.println("Coefficient selected is: " + comboExpression.getText());
+			}
+		});
+
 		FormData fd_comboExpression = new FormData();
 		fd_comboExpression.left = new FormAttachment(0, 2);
 		fd_comboExpression.top = new FormAttachment(0);
 		fd_comboExpression.right = new FormAttachment(0, 115);
 		comboExpression.setLayoutData(fd_comboExpression);
 
-		Button btnUse = new Button(compositeRow, SWT.CHECK);
+		final Button btnUse = new Button(compositeRow, SWT.CHECK);
 		FormData fd_btnUse = new FormData();
 		fd_btnUse.left = new FormAttachment(comboExpression, 12, SWT.RIGHT);
 		fd_btnUse.top = new FormAttachment(0, 2);
 		btnUse.setLayoutData(fd_btnUse);
+
+		btnUse.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				System.out.println("Is button in use selected: " + btnUse.getSelection());
+			}
+		});
 
 		final Combo comboGroup = new Combo(compositeRow, SWT.NONE);
 		String[] items = this.getSelectors();
@@ -407,6 +464,13 @@ public class ProcessConstraintGrid extends Composite {
 				comboGroup.setListVisible(true);
 			}
 		});
+
+		comboGroup.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				System.out.println("Group selected is: " + comboGroup.getText());
+			}
+		});
+
 		FormData fd_comboGroup = new FormData();
 		fd_comboGroup.left = new FormAttachment(btnUse, 18);
 		fd_comboGroup.right = new FormAttachment(btnUse, 135);
@@ -423,6 +487,12 @@ public class ProcessConstraintGrid extends Composite {
 		fd_comboMaxMin.top = new FormAttachment(0);
 		comboMaxMin.setLayoutData(fd_comboMaxMin);
 
+		comboMaxMin.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				System.out.println("Is equation for max value: " + (comboMaxMin.getSelectionIndex() == 0));
+			}
+		});
+
 		this.addTimePeriodRowMembers(compositeRow, comboMaxMin);
 
 		this.presentRow = compositeRow;
@@ -434,7 +504,15 @@ public class ProcessConstraintGrid extends Composite {
 	private void addTimePeriodRowMembers(Composite parent, Control reference){
 		Control previousMember = reference;
 		for(int i=0; i<this.timePeriod; i++){
+			final int index = i;
 			Text yearlyValue = new Text(parent, SWT.BORDER);
+			yearlyValue.addModifyListener(new ModifyListener(){
+				public void modifyText(ModifyEvent event) {
+					// Get the widget whose text was modified
+					Text text = (Text) event.widget;
+					System.out.println("Input value for the " + index + "th year is " + text.getText());
+				}
+			});
 			FormData fd_yearlyValue = new FormData();
 			/*
 			 * Hacky calculation at the moment
@@ -463,9 +541,9 @@ public class ProcessConstraintGrid extends Composite {
 			String coefficientName = comboExpression.getText();
 			int coefficientSelectionIndex = comboExpression.getSelectionIndex();
 			int selectorSelectionIndex = comboGroup.getSelectionIndex();
-			
+
 			ProcessConstraintData processConstraintData = null;
-			
+
 			if(rowConstraintData.getData() == null){
 				//new row data, not update of previously saved rowOpexData.
 				processConstraintData  = new ProcessConstraintData();
@@ -475,8 +553,8 @@ public class ProcessConstraintGrid extends Composite {
 				//update of previously saved rowOpexData.
 				processConstraintData = (ProcessConstraintData)rowConstraintData.getData();
 			}
-			
-			
+
+
 			processConstraintData.setConstraintData(mapConstraintData);
 			if(coefficientSelectionIndex <= this.expressionEndIndex) {
 				processConstraintData.setCoefficientType(ProcessConstraintData.COEFFICIENT_EXPRESSION);
@@ -501,8 +579,8 @@ public class ProcessConstraintGrid extends Composite {
 			processConstraintData.setSelector_name(selectorName);
 			processConstraintData.setInUse(inUse);
 			processConstraintData.setMax(isMax);
-			
-			
+
+
 		}
 		return true;
 	}
