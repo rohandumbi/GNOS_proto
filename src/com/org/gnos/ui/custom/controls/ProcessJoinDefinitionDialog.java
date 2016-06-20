@@ -55,7 +55,7 @@ public class ProcessJoinDefinitionDialog extends Dialog {
 		this.container.setLayout(new FormLayout());
 		
 		this.lblProcessJoinName = new Label(this.container, SWT.NONE);
-		this.lblProcessJoinName.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
+		this.lblProcessJoinName.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		FormData fd_lblProcessJoinName = new FormData();
 		fd_lblProcessJoinName.top = new FormAttachment(0, 10);
 		fd_lblProcessJoinName.left = new FormAttachment(0, 10);
@@ -110,7 +110,7 @@ public class ProcessJoinDefinitionDialog extends Dialog {
 	
 	private void addProcessDefinitionRow() {
 		Label lblSelectProcess = new Label(this.processListContainerComposite, SWT.NONE);
-		lblSelectProcess.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
+		lblSelectProcess.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		lblSelectProcess.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		FormData fd_lblSelectProcess = new FormData();
 		if(this.presentRow == null){
@@ -123,7 +123,7 @@ public class ProcessJoinDefinitionDialog extends Dialog {
 		lblSelectProcess.setText("Select Process:");
 		
 		Combo comboProcess = new Combo(this.processListContainerComposite, SWT.NONE);
-		comboProcess.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
+		comboProcess.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		String[] comboParentItems = availableProcesses.toArray(new String[availableProcesses.size()]);
 		comboProcess.setItems(comboParentItems);
 		FormData fd_comboProcess = new FormData();

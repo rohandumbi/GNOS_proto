@@ -57,7 +57,7 @@ public class ProductJoinAdditionDialog extends Dialog {
 		this.container.setLayout(new FormLayout());
 		
 		this.lblProductJoinName = new Label(this.container, SWT.NONE);
-		this.lblProductJoinName.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
+		this.lblProductJoinName.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		FormData fd_lblProductJoinName = new FormData();
 		fd_lblProductJoinName.top = new FormAttachment(0, 10);
 		fd_lblProductJoinName.left = new FormAttachment(0, 10);
@@ -115,7 +115,7 @@ public class ProductJoinAdditionDialog extends Dialog {
 	
 	private void addProductJoinDefinitionRow() {
 		Label lblSelectProductJoin = new Label(this.productJoinListContainerComposite, SWT.NONE);
-		lblSelectProductJoin.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
+		lblSelectProductJoin.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		lblSelectProductJoin.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		FormData fd_lblSelectProductJoin = new FormData();
 		if(this.presentRow == null){
@@ -128,7 +128,7 @@ public class ProductJoinAdditionDialog extends Dialog {
 		lblSelectProductJoin.setText("Select Join:");
 		
 		Combo comboProductJoin = new Combo(this.productJoinListContainerComposite, SWT.NONE);
-		comboProductJoin.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
+		comboProductJoin.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		comboProductJoin.setItems(this.availableProductJoinNames);
 		FormData fd_comboProduct = new FormData();
 		fd_comboProduct.top = new FormAttachment(lblSelectProductJoin, 0, SWT.TOP);
@@ -146,7 +146,7 @@ public class ProductJoinAdditionDialog extends Dialog {
 	
 	private void addProductJoinDefinitionRow(String selectedProductName) {
 		Label lblSelectProductJoin = new Label(this.productJoinListContainerComposite, SWT.NONE);
-		lblSelectProductJoin.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
+		lblSelectProductJoin.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		lblSelectProductJoin.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		FormData fd_lblSelectProductJoin = new FormData();
 		if(this.presentRow == null){
@@ -160,7 +160,7 @@ public class ProductJoinAdditionDialog extends Dialog {
 		lblSelectProductJoin.setText("Select Join:");
 		
 		Combo comboProductJoin = new Combo(this.productJoinListContainerComposite, SWT.NONE);
-		comboProductJoin.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
+		comboProductJoin.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		comboProductJoin.setItems(this.availableProductJoinNames);
 		FormData fd_comboProduct = new FormData();
 		fd_comboProduct.top = new FormAttachment(lblSelectProductJoin, 0, SWT.TOP);

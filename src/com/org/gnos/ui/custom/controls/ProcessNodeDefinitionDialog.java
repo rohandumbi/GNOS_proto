@@ -37,7 +37,7 @@ public class ProcessNodeDefinitionDialog extends Dialog {
 		container.setLayout(new FormLayout());
 		
 		Label lblSelectParent = new Label(container, SWT.NONE);
-		lblSelectParent.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
+		lblSelectParent.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		FormData fd_lblSelectParent = new FormData();
 		fd_lblSelectParent.top = new FormAttachment(0, 10);
 		fd_lblSelectParent.left = new FormAttachment(0, 10);
@@ -45,7 +45,7 @@ public class ProcessNodeDefinitionDialog extends Dialog {
 		lblSelectParent.setText("Select Parent:");
 		
 		comboParent = new Combo(container, SWT.NONE);
-		comboParent.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
+		comboParent.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		String[] comboParentItems = availableParents.toArray(new String[availableParents.size()]);
 		comboParent.setItems(comboParentItems);
 		FormData fd_comboParent = new FormData();

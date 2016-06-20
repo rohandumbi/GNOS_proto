@@ -36,6 +36,7 @@ import com.org.gnos.db.model.ProductJoin;
 import com.org.gnos.ui.custom.controls.ProductDefinitionDialog;
 import com.org.gnos.ui.custom.controls.ProductJoinAdditionDialog;
 import com.org.gnos.ui.custom.controls.ProductJoinDefinitionDialog;
+import com.org.gnos.ui.custom.controls.ProductPropertiesDialog;
 import com.org.gnos.utilities.SWTResourceManager;
 
 public class ProcessDefinitionGraph extends Composite {
@@ -141,6 +142,15 @@ public class ProcessDefinitionGraph extends Composite {
 								handleCreateProductJoin(nodeName);
 							}
 						});
+						MenuItem itemShowProperties = new MenuItem(menu, SWT.NONE);
+						itemShowProperties.setText("Properties");
+						itemShowProperties.addListener(SWT.Selection, new Listener() {
+							public void handleEvent(Event e) {
+								//handleCreateProductJoin(nodeName);
+								System.out.println("show properties");
+								handleShowProductProperties(nodeName);
+							}
+						});
 						menu.setVisible(true);
 					}else if(isProductJoinNode(nodeName)){
 						Menu menu = new Menu(getShell(), SWT.POP_UP);
@@ -157,6 +167,14 @@ public class ProcessDefinitionGraph extends Composite {
 			}
 		});
 		this.displayProcess(processTree.getRoot());
+	}
+	
+	private void handleShowProductProperties(String nodeName){
+		Product selectedProduct = ProjectConfigutration.getInstance().getProductByName(nodeName);
+		ProductPropertiesDialog productPropertiesDialog = new ProductPropertiesDialog(getShell(), selectedProduct);
+		if (Window.OK == productPropertiesDialog.open()) {
+			
+		}
 	}
 	
 	private void handleCombineProductJoins(String initialProductJoinName){

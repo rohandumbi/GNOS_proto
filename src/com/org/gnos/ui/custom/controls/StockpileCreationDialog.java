@@ -38,7 +38,7 @@ public class StockpileCreationDialog extends Dialog {
 		container.setLayout(new FormLayout());
 		
 		Label lblStockpileName = new Label(container, SWT.NONE);
-		lblStockpileName.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
+		lblStockpileName.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		FormData fd_lblStockpileName = new FormData();
 		fd_lblStockpileName.top = new FormAttachment(0, 10);
 		fd_lblStockpileName.left = new FormAttachment(0, 10);
@@ -46,7 +46,7 @@ public class StockpileCreationDialog extends Dialog {
 		lblStockpileName.setText("Stockpile Name:");
 		
 		this.textStockpileName = new Text(container, SWT.BORDER);
-		this.textStockpileName.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
+		this.textStockpileName.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		FormData fd_textStockpileName = new FormData();
 		fd_textStockpileName.top = new FormAttachment(0, 10);
 		fd_textStockpileName.left = new FormAttachment(lblStockpileName, 6);
@@ -55,7 +55,7 @@ public class StockpileCreationDialog extends Dialog {
 		
 		Label lblPitGroupName = new Label(container, SWT.NONE);
 		lblPitGroupName.setText("Pit Group:");
-		lblPitGroupName.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
+		lblPitGroupName.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		FormData fd_lblPitGroupName = new FormData();
 		fd_lblPitGroupName.top = new FormAttachment(lblStockpileName, 12);
 		fd_lblPitGroupName.left = new FormAttachment(lblStockpileName, 0, SWT.LEFT);

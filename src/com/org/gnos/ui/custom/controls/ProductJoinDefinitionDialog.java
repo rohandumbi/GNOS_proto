@@ -57,7 +57,7 @@ public class ProductJoinDefinitionDialog extends Dialog {
 		this.container.setLayout(new FormLayout());
 		
 		this.lblProductName = new Label(this.container, SWT.NONE);
-		this.lblProductName.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
+		this.lblProductName.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		FormData fd_lblProductName = new FormData();
 		fd_lblProductName.top = new FormAttachment(0, 10);
 		fd_lblProductName.left = new FormAttachment(0, 10);
@@ -114,7 +114,7 @@ public class ProductJoinDefinitionDialog extends Dialog {
 	
 	private void addProductDefinitionRow() {
 		Label lblSelectProduct = new Label(productListContainerComposite, SWT.NONE);
-		lblSelectProduct.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
+		lblSelectProduct.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		lblSelectProduct.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		FormData fd_lblSelectProduct = new FormData();
 		if(this.presentRow == null){
@@ -127,7 +127,7 @@ public class ProductJoinDefinitionDialog extends Dialog {
 		lblSelectProduct.setText("Select Product:");
 		
 		Combo comboProduct = new Combo(productListContainerComposite, SWT.NONE);
-		comboProduct.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
+		comboProduct.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		comboProduct.setItems(this.availableProductNames);
 		FormData fd_comboProduct = new FormData();
 		fd_comboProduct.top = new FormAttachment(lblSelectProduct, 0, SWT.TOP);
@@ -145,7 +145,7 @@ public class ProductJoinDefinitionDialog extends Dialog {
 	
 	private void addProductDefinitionRow(String selectedProductName) {
 		Label lblSelectProduct = new Label(productListContainerComposite, SWT.NONE);
-		lblSelectProduct.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
+		lblSelectProduct.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		lblSelectProduct.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		FormData fd_lblSelectProduct = new FormData();
 		if(this.presentRow == null){
@@ -158,7 +158,7 @@ public class ProductJoinDefinitionDialog extends Dialog {
 		lblSelectProduct.setText("Select Product:");
 		
 		Combo comboProduct = new Combo(productListContainerComposite, SWT.NONE);
-		comboProduct.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
+		comboProduct.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		comboProduct.setItems(this.availableProductNames);
 		FormData fd_comboProduct = new FormData();
 		fd_comboProduct.top = new FormAttachment(lblSelectProduct, 0, SWT.TOP);
