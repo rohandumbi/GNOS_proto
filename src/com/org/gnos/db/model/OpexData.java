@@ -20,6 +20,12 @@ public class OpexData {
 		this.costData = new LinkedHashMap<Integer, Float>();
 	}
 	
+	public OpexData(){
+		super();
+		this.id = -1;
+		this.costData = new LinkedHashMap<Integer, Float>();
+	}
+	
 	public int getId() {
 		return id;
 	}
