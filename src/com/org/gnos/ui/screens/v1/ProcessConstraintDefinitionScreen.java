@@ -143,7 +143,7 @@ public class ProcessConstraintDefinitionScreen extends GnosScreen {
 		this.btnAddConstraintRow.setLayoutData(fd_btnAddRow);
 		this.btnAddConstraintRow.setText("+");
 		
-		Button btnSaveOpexData = new Button(this, SWT.NONE);
+		/*Button btnSaveOpexData = new Button(this, SWT.NONE);
 		btnSaveOpexData.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -159,7 +159,7 @@ public class ProcessConstraintDefinitionScreen extends GnosScreen {
 		FormData fd_btnSaveOpexData = new FormData();
 		fd_btnSaveOpexData.top = new FormAttachment(this.btnAddConstraintRow, 5, SWT.BOTTOM);
 		fd_btnSaveOpexData.right = new FormAttachment(100, -5);
-		btnSaveOpexData.setLayoutData(fd_btnSaveOpexData);
+		btnSaveOpexData.setLayoutData(fd_btnSaveOpexData);*/
 	}
 	
 	public void refreshGrid(){

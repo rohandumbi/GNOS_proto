@@ -223,7 +223,7 @@ public class ProcessConstraintGrid extends Composite {
 
 	private void createRows() {
 
-		for(ProcessConstraintData pcd : this.processConstraintDataList) {
+		for(final ProcessConstraintData pcd : this.processConstraintDataList) {
 			final Composite compositeRow = new Composite(this, SWT.BORDER);
 			compositeRow.setData(pcd);
 			compositeRow.setLayout(new FormLayout());
@@ -253,7 +253,17 @@ public class ProcessConstraintGrid extends Composite {
 
 			comboExpression.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent e) {
-					System.out.println("Coefficient selected is: " + comboExpression.getText());
+					String coefficientName = comboExpression.getText();
+					System.out.println("Coefficient selected is: " + coefficientName);
+					int coefficientSelectionIndex = comboExpression.getSelectionIndex();
+					if(coefficientSelectionIndex <= expressionEndIndex) {
+						pcd.setCoefficientType(ProcessConstraintData.COEFFICIENT_EXPRESSION);
+					} else if(coefficientSelectionIndex <= productEndIndex) {
+						pcd.setCoefficientType(ProcessConstraintData.COEFFICIENT_PRODUCT);
+					} else {
+						pcd.setCoefficientType(ProcessConstraintData.COEFFICIENT_PRODUCT_JOIN);
+					}		
+					pcd.setCoefficient_name(coefficientName);
 				}
 			});
 			int start = 0;
@@ -287,6 +297,7 @@ public class ProcessConstraintGrid extends Composite {
 			btnUse.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent e) {
 					System.out.println("Is button in use selected: " + btnUse.getSelection());
+					pcd.setInUse(btnUse.getSelection());
 				}
 			});
 
@@ -306,7 +317,22 @@ public class ProcessConstraintGrid extends Composite {
 
 			comboGroup.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent e) {
-					System.out.println("Group selected is: " + comboGroup.getText());
+					String selectorName = comboGroup.getText();
+					System.out.println("Group selected is: " + selectorName);
+					int selectorSelectionIndex = comboGroup.getSelectionIndex();
+					if(selectorSelectionIndex < 0) {
+						pcd.setSelectionType(ProcessConstraintData.SELECTION_NONE);
+					}else if(selectorSelectionIndex <= processJoinEndIndex ) {
+						pcd.setSelectionType(ProcessConstraintData.SELECTION_PROCESS_JOIN);
+					} else if(selectorSelectionIndex <= processEndIndex ) {
+						pcd.setSelectionType(ProcessConstraintData.SELECTION_PROCESS);
+					} else if(selectorSelectionIndex <= pitEndIndex ) {
+						pcd.setSelectionType(ProcessConstraintData.SELECTION_PIT);
+					} else {
+						pcd.setSelectionType(ProcessConstraintData.SELECTION_PIT_GROUP);
+					}
+
+					pcd.setSelector_name(selectorName);
 				}
 			});
 
@@ -346,6 +372,8 @@ public class ProcessConstraintGrid extends Composite {
 			comboMaxMin.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent e) {
 					System.out.println("Is equation for max value: " + (comboMaxMin.getSelectionIndex() == 0));
+					boolean isMax = (comboMaxMin.getSelectionIndex() == 0);//0=max; 1=min
+					pcd.setMax(isMax);
 				}
 			});
 
@@ -357,32 +385,28 @@ public class ProcessConstraintGrid extends Composite {
 
 			Control previousMember = comboMaxMin;
 			Map<Integer, Float> yearData = pcd.getConstraintData();
-			Set keys = yearData.keySet();
-			Iterator<Integer> it = keys.iterator();
-			int index = 0;
-			while(it.hasNext()){
-				index++;
-				final int z = index;
-				float value = yearData.get(it.next());
+			for(int i=0; i<this.timePeriod; i++){
 				Text yearlyValue = new Text(compositeRow, SWT.BORDER);
+				final int targetYear = this.startYear + i;
+				yearlyValue.setText(String.valueOf(yearData.get(targetYear)));
 				yearlyValue.addModifyListener(new ModifyListener(){
 					public void modifyText(ModifyEvent event) {
 						// Get the widget whose text was modified
 						Text text = (Text) event.widget;
-						System.out.println("Input value for the " + z + "th year is " + text.getText());
+						String yearlyValue = text.getText();
+						System.out.println("Input value for the " + targetYear + " year is " + yearlyValue);
+						LinkedHashMap<Integer, Float> constraintData = pcd.getConstraintData();
+						constraintData.put(targetYear, Float.valueOf(yearlyValue));
 					}
 				});
-				yearlyValue.setText(String.valueOf(value));
+				
 				FormData fd_yearlyValue = new FormData();
-
 				// Hacky calculation at the moment
-
 				fd_yearlyValue.left = new FormAttachment(previousMember, 3);
 				fd_yearlyValue.right = new FormAttachment(previousMember, 76, SWT.RIGHT);
 				yearlyValue.setLayoutData(fd_yearlyValue);
 				previousMember = yearlyValue;
 			}
-
 			this.presentRow = compositeRow;
 			this.allRows.add(compositeRow);
 			compositeRow.setLayoutData(fd_compositeRow);
@@ -396,7 +420,7 @@ public class ProcessConstraintGrid extends Composite {
 		compositeRow.setLayout(new FormLayout());
 		Color backgroundColor = SWTResourceManager.getColor(SWT.COLOR_WHITE);
 
-		ProcessConstraintData processConstraintData  = new ProcessConstraintData();
+		final ProcessConstraintData processConstraintData  = new ProcessConstraintData();
 		this.processConstraintDataList.add(processConstraintData);
 		compositeRow.setData(processConstraintData);
 
@@ -428,7 +452,17 @@ public class ProcessConstraintGrid extends Composite {
 
 		comboExpression.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				System.out.println("Coefficient selected is: " + comboExpression.getText());
+				String coefficientName = comboExpression.getText();
+				System.out.println("Coefficient selected is: " + coefficientName);
+				int coefficientSelectionIndex = comboExpression.getSelectionIndex();
+				if(coefficientSelectionIndex <= expressionEndIndex) {
+					processConstraintData.setCoefficientType(ProcessConstraintData.COEFFICIENT_EXPRESSION);
+				} else if(coefficientSelectionIndex <= productEndIndex) {
+					processConstraintData.setCoefficientType(ProcessConstraintData.COEFFICIENT_PRODUCT);
+				} else {
+					processConstraintData.setCoefficientType(ProcessConstraintData.COEFFICIENT_PRODUCT_JOIN);
+				}		
+				processConstraintData.setCoefficient_name(coefficientName);
 			}
 		});
 
@@ -447,6 +481,7 @@ public class ProcessConstraintGrid extends Composite {
 		btnUse.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				System.out.println("Is button in use selected: " + btnUse.getSelection());
+				processConstraintData.setInUse(btnUse.getSelection());
 			}
 		});
 
@@ -467,7 +502,22 @@ public class ProcessConstraintGrid extends Composite {
 
 		comboGroup.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				System.out.println("Group selected is: " + comboGroup.getText());
+				String selectorName = comboGroup.getText();
+				System.out.println("Group selected is: " + selectorName);
+				int selectorSelectionIndex = comboGroup.getSelectionIndex();
+				if(selectorSelectionIndex < 0) {
+					processConstraintData.setSelectionType(ProcessConstraintData.SELECTION_NONE);
+				}else if(selectorSelectionIndex <= processJoinEndIndex ) {
+					processConstraintData.setSelectionType(ProcessConstraintData.SELECTION_PROCESS_JOIN);
+				} else if(selectorSelectionIndex <= processEndIndex ) {
+					processConstraintData.setSelectionType(ProcessConstraintData.SELECTION_PROCESS);
+				} else if(selectorSelectionIndex <= pitEndIndex ) {
+					processConstraintData.setSelectionType(ProcessConstraintData.SELECTION_PIT);
+				} else {
+					processConstraintData.setSelectionType(ProcessConstraintData.SELECTION_PIT_GROUP);
+				}
+
+				processConstraintData.setSelector_name(selectorName);
 			}
 		});
 
@@ -490,6 +540,8 @@ public class ProcessConstraintGrid extends Composite {
 		comboMaxMin.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				System.out.println("Is equation for max value: " + (comboMaxMin.getSelectionIndex() == 0));
+				boolean isMax = (comboMaxMin.getSelectionIndex() == 0);//0=max; 1=min
+				processConstraintData.setMax(isMax);
 			}
 		});
 
@@ -501,16 +553,19 @@ public class ProcessConstraintGrid extends Composite {
 		this.layout();
 	}
 
-	private void addTimePeriodRowMembers(Composite parent, Control reference){
+	private void addTimePeriodRowMembers(final Composite parent, Control reference){
 		Control previousMember = reference;
 		for(int i=0; i<this.timePeriod; i++){
-			final int index = i;
 			Text yearlyValue = new Text(parent, SWT.BORDER);
+			final int targetYear = this.startYear + i;
 			yearlyValue.addModifyListener(new ModifyListener(){
 				public void modifyText(ModifyEvent event) {
 					// Get the widget whose text was modified
 					Text text = (Text) event.widget;
-					System.out.println("Input value for the " + index + "th year is " + text.getText());
+					System.out.println("Input value for the " + targetYear + " year is " + text.getText());
+					ProcessConstraintData processConstraintData = (ProcessConstraintData)parent.getData();
+					LinkedHashMap<Integer, Float> constraintData = processConstraintData.getConstraintData();
+					constraintData.put(targetYear, Float.valueOf(text.getText()));
 				}
 			});
 			FormData fd_yearlyValue = new FormData();
@@ -522,67 +577,6 @@ public class ProcessConstraintGrid extends Composite {
 			yearlyValue.setLayoutData(fd_yearlyValue);
 			previousMember = yearlyValue;
 		}
-	}
-
-	public boolean saveProcessConstraintData(){
-		for(Composite rowConstraintData: this.allRows){
-			Control[] rowChildren = rowConstraintData.getChildren();
-			Combo comboExpression = (Combo)rowChildren[0];
-			Button isInUse = (Button)rowChildren[1];
-			Combo comboGroup = (Combo)rowChildren[2];
-			Combo comboMaxMin = (Combo)rowChildren[3];
-			LinkedHashMap<Integer, Float> mapConstraintData = new LinkedHashMap<Integer, Float>();
-			for(int j=0; j<this.timePeriod; j++){
-				mapConstraintData.put((this.startYear + j), Float.valueOf(((Text)rowChildren[4+j]).getText())); // cost input data starts from 4th indexed row child.
-			}
-			boolean inUse = isInUse.getSelection();
-			boolean isMax = (comboMaxMin.getSelectionIndex() == 0);//0=max; 1=min
-			String selectorName = comboGroup.getText();
-			String coefficientName = comboExpression.getText();
-			int coefficientSelectionIndex = comboExpression.getSelectionIndex();
-			int selectorSelectionIndex = comboGroup.getSelectionIndex();
-
-			ProcessConstraintData processConstraintData = null;
-
-			if(rowConstraintData.getData() == null){
-				//new row data, not update of previously saved rowOpexData.
-				processConstraintData  = new ProcessConstraintData();
-				this.processConstraintDataList.add(processConstraintData);
-				rowConstraintData.setData(processConstraintData);
-			}else{
-				//update of previously saved rowOpexData.
-				processConstraintData = (ProcessConstraintData)rowConstraintData.getData();
-			}
-
-
-			processConstraintData.setConstraintData(mapConstraintData);
-			if(coefficientSelectionIndex <= this.expressionEndIndex) {
-				processConstraintData.setCoefficientType(ProcessConstraintData.COEFFICIENT_EXPRESSION);
-			} else if(coefficientSelectionIndex <= this.productEndIndex) {
-				processConstraintData.setCoefficientType(ProcessConstraintData.COEFFICIENT_PRODUCT);
-			} else {
-				processConstraintData.setCoefficientType(ProcessConstraintData.COEFFICIENT_PRODUCT_JOIN);
-			}		
-			processConstraintData.setCoefficient_name(coefficientName);
-			if(selectorSelectionIndex < 0) {
-				processConstraintData.setSelectionType(ProcessConstraintData.SELECTION_NONE);
-			}else if(selectorSelectionIndex <= processJoinEndIndex ) {
-				processConstraintData.setSelectionType(ProcessConstraintData.SELECTION_PROCESS_JOIN);
-			} else if(selectorSelectionIndex <= processEndIndex ) {
-				processConstraintData.setSelectionType(ProcessConstraintData.SELECTION_PROCESS);
-			} else if(selectorSelectionIndex <= pitEndIndex ) {
-				processConstraintData.setSelectionType(ProcessConstraintData.SELECTION_PIT);
-			} else {
-				processConstraintData.setSelectionType(ProcessConstraintData.SELECTION_PIT_GROUP);
-			}
-
-			processConstraintData.setSelector_name(selectorName);
-			processConstraintData.setInUse(inUse);
-			processConstraintData.setMax(isMax);
-
-
-		}
-		return true;
 	}
 
 	public void resetAllRows(){
