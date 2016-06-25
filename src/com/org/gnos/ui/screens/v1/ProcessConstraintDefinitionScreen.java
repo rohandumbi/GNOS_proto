@@ -143,23 +143,6 @@ public class ProcessConstraintDefinitionScreen extends GnosScreen {
 		this.btnAddConstraintRow.setLayoutData(fd_btnAddRow);
 		this.btnAddConstraintRow.setText("+");
 		
-		/*Button btnSaveOpexData = new Button(this, SWT.NONE);
-		btnSaveOpexData.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				//TO DO implement row add
-				if(processConstraintGrid != null){
-					processConstraintGrid.saveProcessConstraintData();
-				}
-				
-			}
-		});
-		btnSaveOpexData.setFont(SWTResourceManager.getFont("Segoe UI", 16, SWT.BOLD));
-		btnSaveOpexData.setImage(SWTResourceManager.getImage(ProcessConstraintDefinitionScreen.class, "/com/org/gnos/resources/save.png"));
-		FormData fd_btnSaveOpexData = new FormData();
-		fd_btnSaveOpexData.top = new FormAttachment(this.btnAddConstraintRow, 5, SWT.BOTTOM);
-		fd_btnSaveOpexData.right = new FormAttachment(100, -5);
-		btnSaveOpexData.setLayoutData(fd_btnSaveOpexData);*/
 	}
 	
 	public void refreshGrid(){

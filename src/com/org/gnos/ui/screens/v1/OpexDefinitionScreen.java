@@ -280,21 +280,6 @@ public class OpexDefinitionScreen extends GnosScreen {
 		
 		Rectangle r = this.scFixedCostGridContainer.getClientArea();
 		this.scFixedCostGridContainer.setMinSize(this.scFixedCostGridContainer.computeSize(SWT.DEFAULT, r.height, true));
-		
-		this.saveFixedCost = new Button(this, SWT.NONE);
-		this.saveFixedCost.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				FixedOpexCost[] fixedOpexCost = fixedCostGrid.getCostData();//indexing fixed; 0-OreMiningCost, 1-WasteMiningCost, 2-StockpilingCost, 3-StockpileReclaimingCost
-				ScenarioConfigutration.getInstance().setFixedCost(fixedOpexCost);
-			}
-		});
-		this.saveFixedCost.setFont(SWTResourceManager.getFont("Segoe UI", 16, SWT.BOLD));
-		this.saveFixedCost.setImage(SWTResourceManager.getImage(OpexDefinitionScreen.class, "/com/org/gnos/resources/save.png"));
-		FormData fd_btnSaveFixedCostData = new FormData();
-		fd_btnSaveFixedCostData.top = new FormAttachment(this.scFixedCostGridContainer, 2, SWT.TOP);
-		fd_btnSaveFixedCostData.right = new FormAttachment(100, -5);
-		this.saveFixedCost.setLayoutData(fd_btnSaveFixedCostData);
 	}
 	
 	private void refreshFixedCostGrid(Scenario scenario){

@@ -29,7 +29,7 @@ public class ScenarioConfigutration {
 	final static ScenarioConfigutration instance = new ScenarioConfigutration();
 
 	private List<OpexData> opexDataList = new ArrayList<OpexData>();
-	private FixedOpexCost[] fixedCost;
+	private FixedOpexCost[] fixedCost = new FixedOpexCost[4];// fixed opex cost has 4 fixed categories
 	private List<ProcessJoin> processJoins = new ArrayList<ProcessJoin>();
 	private List<ProcessConstraintData> processConstraintDataList = new ArrayList<ProcessConstraintData>();
 	private Scenario scenarioData ;

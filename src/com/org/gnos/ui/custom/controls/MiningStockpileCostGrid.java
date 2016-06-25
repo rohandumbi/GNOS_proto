@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -20,6 +22,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
 import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.db.model.FixedOpexCost;
 import com.org.gnos.db.model.OreMiningCost;
+import com.org.gnos.db.model.ProcessConstraintData;
 import com.org.gnos.db.model.Scenario;
 import com.org.gnos.db.model.StockpileReclaimingCost;
 import com.org.gnos.db.model.StockpilingCost;
@@ -122,12 +125,29 @@ public class MiningStockpileCostGrid extends Composite {
 	}
 	
 	private void addRows(){
+		FixedOpexCost fixedOpexCost = null;
 		for(int i=0; i<4; i++){
 			Color backgroundColor = SWTResourceManager.getColor(SWT.COLOR_WHITE);
 			if((i%2 != 0)){
 				backgroundColor =  SWTResourceManager.getColor(245, 245, 245);
 			}
 			Composite compositeRow = new Composite(this, SWT.BORDER);
+			
+			if(this.existingFixedOpexCost[i] == null){
+				if(i==0){
+					fixedOpexCost = new OreMiningCost();
+				}else if(i==1){
+					fixedOpexCost = new WasteMiningCost();
+				}else if(i==2){
+					fixedOpexCost = new StockpilingCost();
+				}else if(i==3){
+					fixedOpexCost = new StockpileReclaimingCost();
+				}
+				fixedOpexCost.setScenarioId(scenario.getId());
+				this.existingFixedOpexCost[i] = fixedOpexCost;
+			}
+			
+			compositeRow.setData(this.existingFixedOpexCost[i]);
 			compositeRow.setLayout(new FormLayout());
 			compositeRow.setBackground(backgroundColor);
 			FormData fd_compositeRow = new FormData();
@@ -145,11 +165,9 @@ public class MiningStockpileCostGrid extends Composite {
 			fd_labelCategory.top = new FormAttachment(0);
 			fd_labelCategory.right = new FormAttachment(0, 168);
 			labelCategory.setLayoutData(fd_labelCategory);
-			if(this.existingFixedOpexCost != null && this.existingFixedOpexCost[i] != null){
-				this.addTimePeriodRowMembers(compositeRow, labelCategory, this.existingFixedOpexCost[i]);
-			}else{
-				this.addTimePeriodRowMembers(compositeRow, labelCategory);
-			}
+			
+			this.addTimePeriodRowMembers_V2(compositeRow, labelCategory);
+			
 			this.allRows.add(compositeRow);
 			this.presentRow = compositeRow;
 			this.layout();
@@ -157,90 +175,37 @@ public class MiningStockpileCostGrid extends Composite {
 	}
 	
 	
-	
-	private void addTimePeriodRowMembers(Composite parent, Control reference){
+	private void addTimePeriodRowMembers_V2(Composite parent, Control reference){
 		Control previousMember = reference;
+		FixedOpexCost associatedFixedCost = (FixedOpexCost)parent.getData();
+		final Map<Integer, Float> associatedFixedCostData = associatedFixedCost.getCostData();
 		for(int i=0; i<this.scenario.getTimePeriod(); i++){
 			Text yearlyValue = new Text(parent, SWT.BORDER);
-			FormData fd_yearlyValue = new FormData();
-			/*
-			 * Hacky calculation at the moment
-			 */
-			fd_yearlyValue.left = new FormAttachment(previousMember, 3);
-			fd_yearlyValue.right = new FormAttachment(previousMember, 76, SWT.RIGHT);
-			yearlyValue.setLayoutData(fd_yearlyValue);
-			previousMember = yearlyValue;
-		}
-	}
-	
-	private void addTimePeriodRowMembers(Composite parent, Control reference, FixedOpexCost fixedOpexCost){
-		Control previousMember = reference;
-		Map<Integer, Float> fixedOpexCostData = fixedOpexCost.getCostData();
-		for(int i=0; i<this.scenario.getTimePeriod(); i++){
-			Text yearlyValue = new Text(parent, SWT.BORDER);
-			FormData fd_yearlyValue = new FormData();
-			Float value = fixedOpexCostData.get(this.scenario.getStartYear() + i);
-			yearlyValue.setText(Float.toString(value));
-			/*
-			 * Hacky calculation at the moment
-			 */
-			fd_yearlyValue.left = new FormAttachment(previousMember, 3);
-			fd_yearlyValue.right = new FormAttachment(previousMember, 76, SWT.RIGHT);
-			yearlyValue.setLayoutData(fd_yearlyValue);
-			previousMember = yearlyValue;
-		}
-	}
-	
-	public FixedOpexCost[] getCostData(){
-		//this.opexDataList = new ArrayList<OpexData>();
-		int i = 0;
-		FixedOpexCost[] fixedOpexCostArray = new FixedOpexCost[4];
-		FixedOpexCost fixedOpexCost = null;
-		for(Composite rowCostData : this.allRows){
-			Control[] rowChildren = rowCostData.getChildren();
-			
-			if(i==0){
-				fixedOpexCost = new OreMiningCost();
-			}else if(i==1){
-				fixedOpexCost = new WasteMiningCost();
-			}else if(i==2){
-				fixedOpexCost = new StockpilingCost();
-			}else if(i==3){
-				fixedOpexCost = new StockpileReclaimingCost();
+			final int targetYear = this.scenario.getStartYear() + i;
+			Float value = associatedFixedCostData.get(targetYear);
+			if(value != null){
+				yearlyValue.setText(Float.toString(value));
 			}
-			fixedOpexCost.setScenarioId(scenario.getId());
-			HashMap<Integer, Float> mapCostData = new LinkedHashMap<Integer, Float>();
-			for(int j=0; j<this.scenario.getTimePeriod(); j++){
-				String fixedCostValue = ((Text)rowChildren[1+j]).getText();
-				if(fixedCostValue.equals("") || fixedCostValue == null){
-					mapCostData.put((this.scenario.getStartYear() + j), 0f); // cost input data starts from 1st indexed row child.
-				}else{
-					mapCostData.put((this.scenario.getStartYear() + j), Float.valueOf(fixedCostValue)); // cost input data starts from 1st indexed row child.
+			yearlyValue.addModifyListener(new ModifyListener(){
+				public void modifyText(ModifyEvent event) {
+					// Get the widget whose text was modified
+					Text text = (Text) event.widget;
+					System.out.println("Input value for the " + targetYear + " year is " + text.getText());
+					associatedFixedCostData.put(targetYear, Float.valueOf(text.getText()));
 				}
-				
-			}
-			
-			fixedOpexCost.setCostData(mapCostData);
-			fixedOpexCostArray[i] = fixedOpexCost;
-			
-			/*if(rowOpexData.getData() == null){
-				//new row data, not update of previously saved rowOpexData.
-				System.out.println("\n Model: " + modelName + " inUse " + inUse + " isRevenue " + isRevenue);
-				opexData = new OpexData(model);
-				this.opexDataList.add(opexData);
-			}else{
-				//update of previously saved rowOpexData.
-				opexData = (OpexData)rowOpexData.getData();
-				opexData.setModel(model);
-			}*/
-			
-			
-			i++;
+			});
+			FormData fd_yearlyValue = new FormData();
+			/*
+			 * Hacky calculation at the moment
+			 */
+			fd_yearlyValue.left = new FormAttachment(previousMember, 3);
+			fd_yearlyValue.right = new FormAttachment(previousMember, 76, SWT.RIGHT);
+			yearlyValue.setLayoutData(fd_yearlyValue);
+			previousMember = yearlyValue;
 		}
-		//ProjectConfigutration.getInstance().setOpexDataList(this.opexDataList);
-		return fixedOpexCostArray;
 	}
-
+	
+	
 	public void resetAllRows(){
 		for(Composite existingRow : this.allRows){
 			existingRow.setEnabled(false);
