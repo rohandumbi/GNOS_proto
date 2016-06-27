@@ -7,6 +7,10 @@ public class Model {
 	private String condition;
 	
 	
+	public Model(){
+		this.id = -1;
+	}
+	
 	public Model(String name) {
 		super();
 		this.id = -1;

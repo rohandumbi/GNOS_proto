@@ -1,10 +1,15 @@
 package com.org.gnos.ui.custom.controls;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -33,7 +38,7 @@ public class ModelDefinitionGrid extends Composite {
 	private List<Composite> allRows;
 	private String[] sourceFieldsComboItems;
 	private Composite presentRow;
-	private List<Model> models;
+	private List<Model> existingModels;
 	private Composite parent;
 	private List<String> presentmodelNames;
 
@@ -41,7 +46,7 @@ public class ModelDefinitionGrid extends Composite {
 		super(parent, style);
 		this.parent = parent;
 		this.allRows = new ArrayList<Composite>();
-		this.models = ProjectConfigutration.getInstance().getModels();
+		this.existingModels = ProjectConfigutration.getInstance().getModels();
 		this.createContent(parent);
 	}
 	
@@ -128,7 +133,7 @@ public class ModelDefinitionGrid extends Composite {
 
 	private void createRows() {
 		
-		for(Model model: this.models) {
+		for(final Model model: this.existingModels) {
 			final Composite compositeRow = new Composite(this, SWT.BORDER);
 			compositeRow.setData(model);
 			compositeRow.setLayout(new FormLayout());
@@ -147,24 +152,57 @@ public class ModelDefinitionGrid extends Composite {
 
 			Text modelName = new Text(compositeRow, SWT.BORDER);
 			modelName.setText(model.getName());
+			modelName.addModifyListener(new ModifyListener(){
+				public void modifyText(ModifyEvent event) {
+					// Get the widget whose text was modified
+					Text text = (Text) event.widget;
+					String modelName = text.getText();
+					model.setName(modelName);
+				}
+			});
 			FormData fd_modelName = new FormData();
 			fd_modelName.left = new FormAttachment(0, 10);
 			fd_modelName.top = new FormAttachment(0);
 			fd_modelName.right = new FormAttachment(20, -5);
-			
 			modelName.setLayoutData(fd_modelName);
 			
-			Text expressionName = new Text(compositeRow, SWT.BORDER);
-			expressionName.setText(model.getExpression().getName());
-			FormData fd_expressionDefinition = new FormData();
-			fd_expressionDefinition.right = new FormAttachment(60, -5);
-			fd_expressionDefinition.left = new FormAttachment(33, 5);
-			expressionName.setLayoutData(fd_expressionDefinition);
-			expressionName.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
+			final Combo comboExpressionList = new Combo(compositeRow, SWT.NONE);
+			FormData fd_comboExpressionList = new FormData();
+			fd_comboExpressionList.right = new FormAttachment(60, -5);
+			fd_comboExpressionList.left = new FormAttachment(33, 5);
+			comboExpressionList.setLayoutData(fd_comboExpressionList);
+			comboExpressionList.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
+			comboExpressionList.setItems(getExpressionComboItems());
+			comboExpressionList.setText(model.getExpression().getName());
+			comboExpressionList.addListener(SWT.MouseDown, new Listener(){
+				@Override
+				public void handleEvent(Event event) {
+					// TODO Auto-generated method stub
+					//System.out.println("detected combo click");
+					comboExpressionList.removeAll();
+					comboExpressionList.setItems(getExpressionComboItems());
+					comboExpressionList.getParent().layout();
+					comboExpressionList.setListVisible(true);
+				}
+			});
+			comboExpressionList.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent e) {
+					String expressionName = comboExpressionList.getText();
+					model.setExpression(ProjectConfigutration.getInstance().getExpressionByName(expressionName));
+				}
+			});
 
 
 			Text textCondition = new Text(compositeRow, SWT.BORDER);
 			if(model.getCondition() != null) textCondition.setText(model.getCondition());
+			textCondition.addModifyListener(new ModifyListener(){
+				public void modifyText(ModifyEvent event) {
+					// Get the widget whose text was modified
+					Text text = (Text) event.widget;
+					String condition = text.getText();
+					model.setCondition(condition);
+				}
+			});
 			FormData fd_textCondition = new FormData();
 			fd_textCondition.left = new FormAttachment(66, 2);
 			fd_textCondition.right = new FormAttachment(100, -2);
@@ -178,6 +216,9 @@ public class ModelDefinitionGrid extends Composite {
 	
 	public void addRow(){
 		final Composite compositeRow = new Composite(this, SWT.BORDER);
+		final Model newModel = new Model();
+		this.existingModels.add(newModel);
+		compositeRow.setData(newModel);
 		compositeRow.setLayout(new FormLayout());
 		Color backgroundColor = SWTResourceManager.getColor(SWT.COLOR_WHITE);
 		if((this.allRows != null) && (this.allRows.size()%2 != 0)){
@@ -194,33 +235,55 @@ public class ModelDefinitionGrid extends Composite {
 
 		Text modelName = new Text(compositeRow, SWT.BORDER);
 		//fd_grade.top = new FormAttachment(expressionName, 2, SWT.TOP);
+		modelName.addModifyListener(new ModifyListener(){
+			public void modifyText(ModifyEvent event) {
+				// Get the widget whose text was modified
+				Text text = (Text) event.widget;
+				String modelName = text.getText();
+				newModel.setName(modelName);
+			}
+		});
 		FormData fd_modelName = new FormData();
 		fd_modelName.left = new FormAttachment(0, 10);
 		fd_modelName.top = new FormAttachment(0);
 		fd_modelName.right = new FormAttachment(20, -5);
 		modelName.setLayoutData(fd_modelName);
 		
-		final Combo comboModelDefinition = new Combo(compositeRow, SWT.NONE);
+		final Combo comboExpressionList = new Combo(compositeRow, SWT.NONE);
 		FormData fd_comboExpressionDefinition = new FormData();
 		fd_comboExpressionDefinition.right = new FormAttachment(60, -5);
 		fd_comboExpressionDefinition.left = new FormAttachment(33, 5);
-		comboModelDefinition.setLayoutData(fd_comboExpressionDefinition);
-		comboModelDefinition.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
-		comboModelDefinition.setItems(getExpressionComboItems());
-		comboModelDefinition.setText("Field Value");
-		comboModelDefinition.addListener(SWT.MouseDown, new Listener(){
+		comboExpressionList.setLayoutData(fd_comboExpressionDefinition);
+		comboExpressionList.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
+		comboExpressionList.setItems(getExpressionComboItems());
+		comboExpressionList.setText("Field Value");
+		comboExpressionList.addListener(SWT.MouseDown, new Listener(){
 			@Override
 			public void handleEvent(Event event) {
 				// TODO Auto-generated method stub
 				//System.out.println("detected combo click");
-				comboModelDefinition.removeAll();
-				comboModelDefinition.setItems(getExpressionComboItems());
-				comboModelDefinition.getParent().layout();
-				comboModelDefinition.setListVisible(true);
+				comboExpressionList.removeAll();
+				comboExpressionList.setItems(getExpressionComboItems());
+				comboExpressionList.getParent().layout();
+				comboExpressionList.setListVisible(true);
+			}
+		});
+		comboExpressionList.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				String expressionName = comboExpressionList.getText();
+				newModel.setExpression(ProjectConfigutration.getInstance().getExpressionByName(expressionName));
 			}
 		});
 
 		Text textCondition = new Text(compositeRow, SWT.BORDER);
+		textCondition.addModifyListener(new ModifyListener(){
+			public void modifyText(ModifyEvent event) {
+				// Get the widget whose text was modified
+				Text text = (Text) event.widget;
+				String condition = text.getText();
+				newModel.setCondition(condition);
+			}
+		});
 		FormData fd_textCondition = new FormData();
 		fd_textCondition.left = new FormAttachment(66, 2);
 		fd_textCondition.right = new FormAttachment(100, -2);
@@ -229,76 +292,9 @@ public class ModelDefinitionGrid extends Composite {
 		this.presentRow = compositeRow;
 		this.allRows.add(compositeRow);
 		compositeRow.setLayoutData(fd_compositeRow);
+		this.layout();
 	}
 
-	public void resetAllRows(){
-		for(Composite existingRow : this.allRows){
-			existingRow.setEnabled(false);
-		}
-		this.allRows = new ArrayList<Composite>();
-		//this.presentRow = compositeGridHeader;
-	}
-
-	public List<Composite> getAllRowsComposite(){
-		return this.allRows;
-	}
-
-	public List<Model> getDefinedModels(){
-		Control[] rowChildren = null;
-		this.presentmodelNames = new ArrayList<String>();
-		List<Expression> expressions = ProjectConfigutration.getInstance().getExpressions();
-		for(int i = 0; i < allRows.size(); i++){
-			Composite row = allRows.get(i);
-			rowChildren = row.getChildren();
-			String modelName = null;
-			String modelValue = null;
-			String modelCondition = null;
-			Model model = (Model)row.getData();
-
-			Text modelNameText = (Text)rowChildren[0];
-			Control modelValueComp = rowChildren[1];
-			Text modelConditionText = (Text)rowChildren[2];
-			
-			modelName = modelNameText.getText();
-			if(modelValueComp instanceof Text){
-				modelValue = ((Text)modelValueComp).getText();
-			} else {
-				modelValue = ((Combo)modelValueComp).getText();
-			}
-			
-			modelCondition = modelConditionText.getText();
-			
-			if(modelName == null || modelName == ""){
-				MessageDialog.openError(this.parent.getShell(), "GNOS Error", "Please enter a valid name for model.");
-				return null;
-			}else if(modelValue == null){
-				MessageDialog.openError(this.parent.getShell(), "GNOS Error", "Please enter a valid value for model " + modelName);
-				return null;
-			}
-			
-			if(isModelNameDuplicate(modelName)){
-				MessageDialog.openError(this.parent.getShell(), "GNOS Error", "Model name: " + modelName + " already exists. Please use a unique model name.");
-				return null;
-			}else{
-				if(model == null){
-					model = new Model(modelName);
-					this.models.add(model);
-				}
-				
-				for(Expression expression: expressions) {
-					if(expression.getName().equals(modelValue)){
-						model.setExpression(expression);
-						break;
-					}
-				}
-				model.setCondition(modelCondition);
-				presentmodelNames.add(modelName);
-				
-			}
-		}
-			
-		return this.models;
-	}
 
 	@Override
 	protected void checkSubclass() {
