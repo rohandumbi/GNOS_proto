@@ -3,7 +3,6 @@ package com.org.gnos.ui.custom.controls;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -17,7 +16,6 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
@@ -43,8 +41,6 @@ public class ExpressionBuilderGrid extends Composite {
 	private Composite presentRow;
 	private List<Expression> existingExpressions;
 	private String[] arithemeticOperatorsArray;
-	private Composite parent;
-	private List<String> presentExpressionNames;
 	private Label firstSeparator;
 	private Label secondSeparator;
 	private Label thirdSeparator;
@@ -52,7 +48,6 @@ public class ExpressionBuilderGrid extends Composite {
 
 	public ExpressionBuilderGrid(Composite parent, int style) {
 		super(parent, style);
-		this.parent = parent;
 		this.allSourceFields = ProjectConfigutration.getInstance().getFields();
 		this.allRows = new ArrayList<Composite>();
 		this.existingExpressions = ProjectConfigutration.getInstance().getExpressions();
@@ -62,7 +57,6 @@ public class ExpressionBuilderGrid extends Composite {
 	
 	private void createContent(Composite parent){
 		this.setLayout(new FormLayout());
-		//this.createSourceFieldsComboItems();
 		this.createHeader();
 		this.createRows();
 	}
@@ -148,83 +142,12 @@ public class ExpressionBuilderGrid extends Composite {
 
 	private void createRows() {
 		for(final Expression expression: existingExpressions){
-			final Composite compositeRow = new Composite(this, SWT.BORDER);
-			compositeRow.setEnabled(false);
-			compositeRow.setData(expression);
-			compositeRow.setLayout(new FormLayout());
-			Color backgroundColor = SWTResourceManager.getColor(SWT.COLOR_WHITE);
-			if((this.allRows != null) && (this.allRows.size()%2 != 0)){
-				backgroundColor =  SWTResourceManager.getColor(245, 245, 245);
-			}
-
-			compositeRow.setBackground(backgroundColor);
-			FormData fd_compositeRow = new FormData();
-			fd_compositeRow.left = new FormAttachment(this.presentRow, 0, SWT.LEFT);
-			fd_compositeRow.right = new FormAttachment(this.presentRow, 0, SWT.RIGHT);
-			fd_compositeRow.top = new FormAttachment(this.presentRow);
-
-			final Button grade = new Button(compositeRow, SWT.CHECK);
-			grade.setSelection(expression.isGrade());
-			FormData fd_grade = new FormData();
-			fd_grade.left = new FormAttachment(0, 10);
-			fd_grade.top = new FormAttachment(compositeRow, 2, SWT.TOP);			
-			grade.setLayoutData(fd_grade);
-			grade.addSelectionListener(new SelectionAdapter() {
-				public void widgetSelected(SelectionEvent e) {
-					expression.setGrade(grade.getSelection());
-				}
-			});
-
-			Text expressionName = new Text(compositeRow, SWT.BORDER);
-			expressionName.setText(expression.getName());
-			FormData fd_expressionName = new FormData();
-			fd_expressionName.left = new FormAttachment(5, 5);
-			fd_expressionName.top = new FormAttachment(0);
-			fd_expressionName.right = new FormAttachment(20, -5);
-			expressionName.setLayoutData(fd_expressionName);
-
-			Button buttonIsComplex = new Button(compositeRow, SWT.CHECK);
-			buttonIsComplex.setSelection(expression.isComplex());
-			FormData fd_buttonIsComplex = new FormData();
-			fd_buttonIsComplex.left = new FormAttachment(24);
-			//fd_buttonIsComplex.right = new FormAttachment(30, -5);
-			fd_buttonIsComplex.top = new FormAttachment(0,2);
-			buttonIsComplex.setLayoutData(fd_buttonIsComplex);
-
-			Text textExpression = new Text(compositeRow, SWT.BORDER);
-			textExpression.setText(expression.getExprvalue());
-			FormData fd_textExpression = new FormData();
-			fd_textExpression.right = new FormAttachment(62, -2);
-			fd_textExpression.left = new FormAttachment(30, 2);
-			textExpression.setLayoutData(fd_textExpression);
-			
-			Text textCondition = new Text(compositeRow, SWT.BORDER);
-			if(expression.getFilter() != null)
-				textCondition.setText(expression.getFilter());
-			FormData fd_textCondition = new FormData();
-			fd_textCondition.left = new FormAttachment(62, 2);
-			fd_textCondition.right = new FormAttachment(100, -2);
-			textCondition.setLayoutData(fd_textCondition);
-
-			this.presentRow = compositeRow;
-			this.allRows.add(compositeRow);
-			compositeRow.setLayoutData(fd_compositeRow);
+			this.addRow(expression);
 		}
 	}
 	
-	private boolean isExpressionNameDuplicate(String expressionName){
-		boolean isPresentInExpressionGrid = false;
-		boolean isPresentInSavedGrid = false;
-		for(String str: presentExpressionNames) {
-		    if(str.trim().equalsIgnoreCase(expressionName.trim()))
-		    	isPresentInExpressionGrid = true;
-		}
-		return isPresentInExpressionGrid||isPresentInSavedGrid;
-	}
-
 	private String[] getSourceFieldsComboItems(){
 		int i = 0;
-		int sourceFieldSize = this.allSourceFields.size();
 		this.numericSourceFields = new ArrayList<String>();
 		for(Field field: this.allSourceFields){
 			if(field.getDataType() == Field.TYPE_NUMBER){
@@ -238,28 +161,75 @@ public class ExpressionBuilderGrid extends Composite {
 		return this.sourceFieldsComboItems;
 	}
 	
-	private void toggleExpressionType(Composite compositeRow, boolean isComplexExpression){
+	/*
+	 * returns a complex expression broken into an arraylist
+	 * with 0th index containing the operator, 1st index containing the left operand
+	 * and 2nd index containing right operand
+	 */
+	
+	private List<String> getExpressionDefinitionComponents(String expressionDefinition){
+		List<String> expressionComponents = new ArrayList<String>();
+		String delim = null;
+		if(expressionDefinition.indexOf('*') != -1){
+			delim = "*";
+		}else if(expressionDefinition.indexOf('/') != -1){
+			delim = "/";
+		}else if(expressionDefinition.indexOf('+') != -1){
+			delim = "+";
+		}else if(expressionDefinition.indexOf('-') != -1){
+			delim = "-";
+		}
+		
+		if(delim == null){
+			expressionComponents.add(expressionDefinition);
+			return expressionComponents;
+		}else{
+			expressionComponents.add(delim);
+			String[] tokens = expressionDefinition.split(delim);
+			for(String token : tokens){
+				expressionComponents.add(token);
+			}
+		}
+		return expressionComponents;
+	}
+	
+	private void toggleExpressionType(Composite compositeRow){
 
 		Composite expressionComposite = new Composite(compositeRow, SWT.NONE);
 		final Expression associatedExpression = (Expression)compositeRow.getData();
+		boolean isComplexExpression = associatedExpression.isComplex();
 		expressionComposite.setLayout(new FillLayout(SWT.HORIZONTAL));
-		//expressionComposite.setBackground(backgroundColor);
+		String expressionDefinition = associatedExpression.getExprvalue();
 		FormData fd_expressionComposite = new FormData();
 		fd_expressionComposite.right = new FormAttachment(62, -5);
 		fd_expressionComposite.left = new FormAttachment(30, 5);
 		expressionComposite.setLayoutData(fd_expressionComposite);
 		String[] comboItems = this.getSourceFieldsComboItems();
-
+		
 		if(isComplexExpression == true){
+			String oper = null;
+			String left = null;
+			String right = null;
+			if(expressionDefinition != null){
+				List<String> expressionComponents = this.getExpressionDefinitionComponents(expressionDefinition);
+				
+				oper = expressionComponents.get(0);
+				left = expressionComponents.get(1);
+				right = expressionComponents.get(2);
+			}
+			
 			final Combo comboLeftOperand = new Combo(expressionComposite, SWT.NONE);
 			comboLeftOperand.setItems(comboItems);
 			comboLeftOperand.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
-			comboLeftOperand.setText("Field Value");
+			if(left != null){
+				comboLeftOperand.setText(left);
+			}else{
+				comboLeftOperand.setText("Field Value");
+			}
 			comboLeftOperand.addListener(SWT.MouseDown, new Listener(){
 				@Override
 				public void handleEvent(Event event) {
 					// TODO Auto-generated method stub
-					//System.out.println("detected combo click");
 					comboLeftOperand.removeAll();
 					comboLeftOperand.setItems(getSourceFieldsComboItems());
 					comboLeftOperand.getParent().layout();
@@ -270,12 +240,20 @@ public class ExpressionBuilderGrid extends Composite {
 			final Combo comboOperator = new Combo(expressionComposite, SWT.NONE);
 			comboOperator.setItems(this.arithemeticOperatorsArray);
 			comboOperator.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
-			comboOperator.setText("Operator");
+			if(oper != null){
+				comboOperator.setText(oper);
+			}else{
+				comboOperator.setText("Operator");
+			}
 
 			final Combo comboRightOperand = new Combo(expressionComposite, SWT.NONE);
 			comboRightOperand.setItems(comboItems);
 			comboRightOperand.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
-			comboRightOperand.setText("Field Value");
+			if(right != null){
+				comboRightOperand.setText(right);
+			}else{
+				comboRightOperand.setText("Field Value");
+			}
 			comboRightOperand.addListener(SWT.MouseDown, new Listener(){
 				@Override
 				public void handleEvent(Event event) {
@@ -320,12 +298,15 @@ public class ExpressionBuilderGrid extends Composite {
 			final Combo comboExpressionDefinition = new Combo(expressionComposite, SWT.NONE);
 			comboExpressionDefinition.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
 			comboExpressionDefinition.setItems(comboItems);
-			comboExpressionDefinition.setText("Field Value");
+			if((expressionDefinition != null)){
+				comboExpressionDefinition.setText(expressionDefinition);
+			}else{
+				comboExpressionDefinition.setText("Field Value");
+			}
 			comboExpressionDefinition.addListener(SWT.MouseDown, new Listener(){
 				@Override
 				public void handleEvent(Event event) {
 					// TODO Auto-generated method stub
-					//System.out.println("detected combo click");
 					comboExpressionDefinition.removeAll();
 					comboExpressionDefinition.setItems(getSourceFieldsComboItems());
 					comboExpressionDefinition.getParent().layout();
@@ -341,14 +322,11 @@ public class ExpressionBuilderGrid extends Composite {
 		}
 		compositeRow.layout();
 	}
-
-	public void addRow(){
-
+	
+	private void addRow(final Expression expression){
 		final Composite compositeRow = new Composite(this, SWT.BORDER);
-		final Expression newExpression = new Expression();
-		this.existingExpressions.add(newExpression);
 		compositeRow.setLayout(new FormLayout());
-		compositeRow.setData(newExpression);
+		compositeRow.setData(expression);
 		Color backgroundColor = SWTResourceManager.getColor(SWT.COLOR_WHITE);
 		if((this.allRows != null) && (this.allRows.size()%2 != 0)){
 			backgroundColor =  SWTResourceManager.getColor(245, 245, 245);
@@ -367,34 +345,36 @@ public class ExpressionBuilderGrid extends Composite {
 		grade.setLayoutData(fd_grade);
 		grade.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				newExpression.setGrade(grade.getSelection());
+				expression.setGrade(grade.getSelection());
 			}
 		});
+		grade.setSelection(expression.isGrade());
 
-		final Text expressionName = new Text(compositeRow, SWT.BORDER);
+		final Text textExpressionName = new Text(compositeRow, SWT.BORDER);
 		//fd_grade.top = new FormAttachment(expressionName, 2, SWT.TOP);
 		FormData fd_expressionName = new FormData();
 		fd_expressionName.left = new FormAttachment(5, 5);
 		fd_expressionName.top = new FormAttachment(0);
 		fd_expressionName.right = new FormAttachment(20, -5);
-		expressionName.setLayoutData(fd_expressionName);
-		expressionName.addModifyListener(new ModifyListener(){
+		textExpressionName.setLayoutData(fd_expressionName);
+		textExpressionName.addModifyListener(new ModifyListener(){
 			public void modifyText(ModifyEvent event) {
 				// Get the widget whose text was modified
 				Text text = (Text) event.widget;
-				String modelName = text.getText();
-				newExpression.setName(modelName);
+				String expressionName = text.getText();
+				expression.setName(expressionName);
 			}
 		});
+		String expressionName = expression.getName();
+		if(expressionName != null){
+			textExpressionName.setText(expressionName);
+		}
 
 		Button buttonIsComplex = new Button(compositeRow, SWT.CHECK);
 		FormData fd_buttonIsComplex = new FormData();
 		fd_buttonIsComplex.left = new FormAttachment(24);
 		fd_buttonIsComplex.top = new FormAttachment(0,2);
 		buttonIsComplex.setLayoutData(fd_buttonIsComplex);
-		//final Composite me = this;
-		this.toggleExpressionType(compositeRow, false);
-
 		buttonIsComplex.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -405,10 +385,13 @@ public class ExpressionBuilderGrid extends Composite {
 				}else{
 					compositeRow.getChildren()[3].dispose();
 				}
-				toggleExpressionType(compositeRow, isComplex);
-				newExpression.setComplex(isComplex);
+				expression.setComplex(isComplex);
+				toggleExpressionType(compositeRow);
 			}
 		});
+		buttonIsComplex.setSelection(expression.isComplex());
+		
+		this.toggleExpressionType(compositeRow);
 		
 		Text textCondition = new Text(compositeRow, SWT.BORDER);
 		FormData fd_textCondition = new FormData();
@@ -420,9 +403,13 @@ public class ExpressionBuilderGrid extends Composite {
 				// Get the widget whose text was modified
 				Text text = (Text) event.widget;
 				String filter = text.getText();
-				newExpression.setFilter(filter);
+				expression.setFilter(filter);
 			}
 		});
+		String condition = expression.getFilter();
+		if(condition != null){
+			textCondition.setText(condition);
+		}
 
 		this.presentRow = compositeRow;
 		this.allRows.add(compositeRow);
@@ -430,129 +417,10 @@ public class ExpressionBuilderGrid extends Composite {
 		this.layout();
 	}
 
-	public void resetAllRows(){
-		for(Composite existingRow : this.allRows){
-			existingRow.setEnabled(false);
-		}
-		this.allRows = new ArrayList<Composite>();
-	}
-
-	public List<Composite> getAllRowsComposite(){
-		return this.allRows;
-	}
-
-	public List<Expression> getDefinedExpressions(){
-		Control[] rowChildren = null;
-		this.presentExpressionNames = new ArrayList<String>();
-		for(int i = 0; i < allRows.size(); i++){
-			Composite row = allRows.get(i);
-			Expression expression= (Expression)row.getData();
-			
-			rowChildren = row.getChildren();
-			boolean isGrade = false;
-			boolean isComplex = false;
-			String expressionName = null;
-			String expressionValue = null;
-
-			Control controlGrade = rowChildren[0];
-			Control controlExpressionName = rowChildren[1];
-			Control controlIsComplex = rowChildren[2];
-			Control controlExpressionValue = null;
-			Text textCondition = null;
-			
-			/*
-			 * The order of expression composite changes dynamically. If its type is toggled,
-			 * it disposes its original 3rd index and becomes 4th indexed row child.
-			 * Below is hacky way to determine that.
-			 */
-			if((Control)rowChildren[4] instanceof Text){
-				controlExpressionValue = rowChildren[3];
-				textCondition = (Text)rowChildren[4];
-			}else{
-				textCondition = (Text)rowChildren[3];
-				controlExpressionValue = rowChildren[4];
-			}
-
-			if(controlGrade instanceof Button){
-				Button buttonControlGrade = (Button)controlGrade;
-				isGrade = buttonControlGrade.getSelection();
-			}
-
-			if(controlIsComplex instanceof Button){
-				Button buttonIsComplex = (Button)controlIsComplex;
-				isComplex = buttonIsComplex.getSelection();
-			}
-
-			if(controlExpressionName instanceof Text){
-				Text textControlExpressionName = (Text)controlExpressionName;
-				expressionName = textControlExpressionName.getText();				
-			}
-
-			if(expressionName == null || expressionName == ""){
-				continue;
-			}
-			
-			if(isExpressionNameDuplicate(expressionName)){
-				MessageDialog.openError(this.parent.getShell(), "GNOS Error", "Expression name: " + expressionName + " already exists. Please use a unique expression name.");
-				return null;
-			}else{
-				presentExpressionNames.add(expressionName);
-			}
-
-			if(expression == null){
-				expression = new Expression(expressionName);
-				this.existingExpressions.add(expression);
-			}
-
-			if(controlExpressionValue instanceof Composite){
-				Composite compositeExpressionValue = (Composite)controlExpressionValue;
-				if(isComplex == true){
-					Combo leftOperand = (Combo)compositeExpressionValue.getChildren()[0];
-					Combo operator = (Combo)compositeExpressionValue.getChildren()[1];
-					Combo rightOperand = (Combo)compositeExpressionValue.getChildren()[2];
-
-					String leftOperandValue = leftOperand.getText();
-					String rightOperandValue = rightOperand.getText();
-					String operatorValue = operator.getText();
-
-					expression.setExprvalue(leftOperandValue + operatorValue + rightOperandValue);
-
-				}else{
-					Combo sourceField = (Combo)compositeExpressionValue.getChildren()[0];
-					expressionValue = sourceField.getText();
-					int index = -1;
-					for (int j=0; j<this.allSourceFields.size(); j++) {
-						String columnName = this.allSourceFields.get(j).getName();
-
-						if (columnName.equalsIgnoreCase(expressionValue)) {
-							index = j;
-							break;
-						}
-					}
-					if(index<0){
-						MessageDialog.openError(this.parent.getShell(), "GNOS Error", "Please map a proper value for the expression: " + expressionName);
-						return null;
-					}
-					expression.setExprvalue(expressionValue);
-				}
-			}
-
-			expression.setGrade(isGrade);
-			expression.setComplex(isComplex);
-			String condition = textCondition.getText();
-			expression.setFilter(condition);
-/*			if(condition == null || condition == ""){
-				condition = "[bin]==[bin]";
-				System.out.println("Condition: " + condition);//temporary hack to set everything when no condition
-			}
-			boolean isConditionValid = expression.setCondition(condition);
-			System.out.println("Condition: " + isConditionValid);
-			if(!isConditionValid){
-				MessageDialog.openError(this.parent.getShell(), "GNOS Error", "Conditions not defined properly.");
-				return null;
-			} */
-		}
-		return this.existingExpressions;
+	public void addRow(){
+		Expression newExpression = new Expression();
+		this.existingExpressions.add(newExpression);
+		this.addRow(newExpression);
 	}
 
 	@Override
