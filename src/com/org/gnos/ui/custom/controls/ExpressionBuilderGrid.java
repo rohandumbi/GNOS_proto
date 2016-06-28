@@ -141,7 +141,7 @@ public class ExpressionBuilderGrid extends Composite {
 	}
 
 	private void createRows() {
-		for(final Expression expression: existingExpressions){
+		for(Expression expression: existingExpressions){
 			this.addRow(expression);
 		}
 	}
@@ -352,11 +352,11 @@ public class ExpressionBuilderGrid extends Composite {
 
 		final Text textExpressionName = new Text(compositeRow, SWT.BORDER);
 		//fd_grade.top = new FormAttachment(expressionName, 2, SWT.TOP);
-		FormData fd_expressionName = new FormData();
-		fd_expressionName.left = new FormAttachment(5, 5);
-		fd_expressionName.top = new FormAttachment(0);
-		fd_expressionName.right = new FormAttachment(20, -5);
-		textExpressionName.setLayoutData(fd_expressionName);
+		FormData fd_textExpressionName = new FormData();
+		fd_textExpressionName.left = new FormAttachment(5, 5);
+		fd_textExpressionName.top = new FormAttachment(0);
+		fd_textExpressionName.right = new FormAttachment(20, -5);
+		textExpressionName.setLayoutData(fd_textExpressionName);
 		textExpressionName.addModifyListener(new ModifyListener(){
 			public void modifyText(ModifyEvent event) {
 				// Get the widget whose text was modified
