@@ -257,7 +257,8 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				//TO DO implement row add
-				ProjectConfigutration.getInstance().saveExpressionData();
+				//ProjectConfigutration.getInstance().saveExpressionData();
+				(new ExpressionProcessor()).store();
 			}
 		});
 		this.btnComputeExpressionValues.setFont(SWTResourceManager.getFont("Segoe UI", 16, SWT.BOLD));
@@ -266,6 +267,7 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 		fd_btnComputeExpressionValues.right = new FormAttachment(100, -5);
 		this.btnComputeExpressionValues.setLayoutData(fd_btnComputeExpressionValues);
 		this.btnComputeExpressionValues.setText("C");
+		
 		
 	}
 	
