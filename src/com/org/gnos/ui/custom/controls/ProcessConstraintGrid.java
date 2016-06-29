@@ -47,7 +47,6 @@ public class ProcessConstraintGrid extends Composite {
 	private Composite compositeGridHeader;
 	private List<Composite> allRows;
 	private Composite presentRow;
-	private Composite parent;
 	private Label firstSeparator;
 	private Label secondSeparator;
 	private Label thirdSeparator;
@@ -67,7 +66,6 @@ public class ProcessConstraintGrid extends Composite {
 
 	public ProcessConstraintGrid(Composite parent, int style) {
 		super(parent, style);
-		this.parent = parent;
 		this.allRows = new ArrayList<Composite>();
 		this.timePeriod = ScenarioConfigutration.getInstance().getTimePeriod();
 		this.startYear = ScenarioConfigutration.getInstance().getStartYear();
@@ -371,7 +369,6 @@ public class ProcessConstraintGrid extends Composite {
 
 			comboMaxMin.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent e) {
-					System.out.println("Is equation for max value: " + (comboMaxMin.getSelectionIndex() == 0));
 					boolean isMax = (comboMaxMin.getSelectionIndex() == 0);//0=max; 1=min
 					pcd.setMax(isMax);
 				}

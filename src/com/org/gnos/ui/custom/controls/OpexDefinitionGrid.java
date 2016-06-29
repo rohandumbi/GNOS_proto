@@ -47,7 +47,7 @@ public class OpexDefinitionGrid extends Composite {
 	private String[] sourceFieldsComboItems;
 	private String[] sourceExpressionComboItems;
 	private Composite presentRow;
-	private List<OpexData> opexDataList;
+	private List<OpexData> existingOpexDataList;
 	private Composite parent;
 	private List<String> presentmodelNames;
 	private Scenario scenario;
@@ -60,7 +60,7 @@ public class OpexDefinitionGrid extends Composite {
 		super(parent, style);
 		this.parent = parent;
 		this.allRows = new ArrayList<Composite>();
-		this.opexDataList = ScenarioConfigutration.getInstance().getOpexDataList();
+		this.existingOpexDataList = ScenarioConfigutration.getInstance().getOpexDataList();
 		this.scenario = scenario;
 		this.createContent(parent);
 	}
@@ -192,170 +192,15 @@ public class OpexDefinitionGrid extends Composite {
 	}
 
 	private void createRows() {
-
-		for(final OpexData od: this.opexDataList) {
-			final Composite compositeRow = new Composite(this, SWT.BORDER);
-			compositeRow.setData(od);
-			compositeRow.setLayout(new FormLayout());
-			Color backgroundColor = SWTResourceManager.getColor(SWT.COLOR_WHITE);
-			if((this.allRows != null) && (this.allRows.size()%2 != 0)){
-				backgroundColor =  SWTResourceManager.getColor(245, 245, 245);
-			}
-			compositeRow.setBackground(backgroundColor);
-
-			FormData fd_compositeRow = new FormData();
-			fd_compositeRow.left = new FormAttachment(this.presentRow, 0, SWT.LEFT);
-			//fd_compositeRow.bottom = new FormAttachment(this.presentRow, 26, SWT.BOTTOM);
-			fd_compositeRow.right = new FormAttachment(this.presentRow, 0, SWT.RIGHT);
-			fd_compositeRow.top = new FormAttachment(this.presentRow);
-
-
-			final Combo comboClassification = new Combo(compositeRow, SWT.NONE);
-			comboClassification.setItems(new String[]{"PCost", "Rev"});
-			if(od.isRevenue()) {
-				comboClassification.select(1);
-			} else {
-				comboClassification.select(0);
-			}
-			comboClassification.addSelectionListener(new SelectionAdapter() {
-				public void widgetSelected(SelectionEvent e) {
-					boolean isRevenue = (comboClassification.getSelectionIndex() == 1);//0=cost; 1=revenue
-					od.setRevenue(isRevenue);
-				}
-			});
-			FormData fd_comboClassification = new FormData();
-			fd_comboClassification.left = new FormAttachment(0, 2);
-			fd_comboClassification.top = new FormAttachment(0);
-			fd_comboClassification.right = new FormAttachment(0, 89);
-			comboClassification.setLayoutData(fd_comboClassification);
-
-			final Button btnUse = new Button(compositeRow, SWT.CHECK);
-			btnUse.setSelection(od.isInUse());
-			btnUse.addSelectionListener(new SelectionAdapter() {
-				public void widgetSelected(SelectionEvent e) {
-					System.out.println("Is button in use selected: " + btnUse.getSelection());
-					od.setInUse(btnUse.getSelection());
-				}
-			});
-			FormData fd_btnUse = new FormData();
-			fd_btnUse.left = new FormAttachment(comboClassification, 10, SWT.RIGHT);
-			fd_btnUse.top = new FormAttachment(0, 2);
-			btnUse.setLayoutData(fd_btnUse);
-
-			final Combo comboIdentifier = new Combo(compositeRow, SWT.NONE);
-			String[] items = this.getIdentifierComboItems();
-			comboIdentifier.setItems(items);
-			for(int i=0; i< items.length; i++){
-				if(items[i].equals(od.getModel().getName())) {
-					comboIdentifier.select(i);
-					break;
-				}
-			}
-			//comboIdentifier.setText("Select Model");
-			FormData fd_comboIdentifier = new FormData();
-			fd_comboIdentifier.left = new FormAttachment(btnUse, 21);
-			fd_comboIdentifier.right = new FormAttachment(btnUse, 135);
-			fd_comboIdentifier.top = new FormAttachment(0);
-			comboIdentifier.setLayoutData(fd_comboIdentifier);
-			comboIdentifier.addListener(SWT.MouseDown, new Listener(){
-				@Override
-				public void handleEvent(Event event) {
-					// TODO Auto-generated method stub
-					//System.out.println("detected combo click");
-					comboIdentifier.removeAll();
-					comboIdentifier.setItems(getIdentifierComboItems());
-					comboIdentifier.getParent().layout();
-					comboIdentifier.setListVisible(true);
-				}
-			});
-			comboIdentifier.addSelectionListener(new SelectionAdapter() {
-				public void widgetSelected(SelectionEvent e) {
-					String modelName = comboIdentifier.getText();
-					od.setModel(ProjectConfigutration.getInstance().getModelByName(modelName));;
-				}
-			});
-
-			final Combo comboExpression = new Combo(compositeRow, SWT.NONE);
-			String[] expressionItems = this.getExpressionComboItems();
-			comboExpression.setItems(expressionItems);
-			for(int i=0; i< expressionItems.length; i++){
-				if(od.getExpression() == null){
-					comboExpression.setEnabled(false);
-				}else if(expressionItems[i].equals(od.getExpression().getName())) {
-					comboExpression.select(i);
-					break;
-				}
-			}
-			//comboExpression.setText("Select Expression");
-			comboExpression.addListener(SWT.MouseDown, new Listener(){
-				@Override
-				public void handleEvent(Event event) {
-					// TODO Auto-generated method stub
-					//System.out.println("detected combo click");
-					comboExpression.removeAll();
-					comboExpression.setItems(getExpressionComboItems());
-					comboExpression.getParent().layout();
-					comboExpression.setListVisible(true);
-				}
-			});
-			comboExpression.addSelectionListener(new SelectionAdapter() {
-				public void widgetSelected(SelectionEvent e) {
-					String expressionName = comboExpression.getText();
-					od.setExpression(ProjectConfigutration.getInstance().getExpressionByName(expressionName));;
-				}
-			});
-			FormData fd_comboExpression = new FormData();
-			fd_comboExpression.left = new FormAttachment(comboIdentifier, 4);
-			fd_comboExpression.right = new FormAttachment(comboIdentifier, 120, SWT.RIGHT);
-			fd_comboExpression.top = new FormAttachment(0);
-			comboExpression.setLayoutData(fd_comboExpression);
-			
-			
-			comboClassification.addSelectionListener(new SelectionAdapter() {
-				public void widgetSelected(SelectionEvent e) {
-					if (comboClassification.getSelectionIndex() == 0) {
-						comboExpression.setEnabled(false);
-					}else {
-						comboExpression.setEnabled(true);
-					}
-				}
-			});
-
-			Control previousMember = comboExpression;
-			Map<Integer, Float> yearData = od.getCostData();
-			for(int i=0; i<this.scenario.getTimePeriod(); i++){
-				final int targetYear = this.scenario.getStartYear() + i;
-				Text yearlyValue = new Text(compositeRow, SWT.BORDER);
-				yearlyValue.setText(String.valueOf(yearData.get(targetYear)));
-				yearlyValue.addModifyListener(new ModifyListener(){
-					public void modifyText(ModifyEvent event) {
-						// Get the widget whose text was modified
-						Text text = (Text) event.widget;
-						String yearlyValue = text.getText();
-						System.out.println("Input value for the " + targetYear + " year is " + yearlyValue);
-						Map<Integer, Float> costData = od.getCostData();
-						costData.put(targetYear, Float.valueOf(yearlyValue));
-					}
-				});
-				FormData fd_yearlyValue = new FormData();
-				/*
-				 * Hacky calculation at the moment
-				 */
-				fd_yearlyValue.left = new FormAttachment(previousMember, 3);
-				fd_yearlyValue.right = new FormAttachment(previousMember, 76, SWT.RIGHT);
-				yearlyValue.setLayoutData(fd_yearlyValue);
-				previousMember = yearlyValue;
-			}
-			
-			this.presentRow = compositeRow;
-			this.allRows.add(compositeRow);
-			compositeRow.setLayoutData(fd_compositeRow);
-			this.layout();
+		for(OpexData od: this.existingOpexDataList) {
+			this.addRow(od);
 		}
 	}
-
-	public void addRow(){
+	
+	private void addRow(final OpexData opexData){
 		final Composite compositeRow = new Composite(this, SWT.BORDER);
+		boolean isNewOpexData = (opexData.getId() == -1);
+		compositeRow.setData(opexData);
 		compositeRow.setLayout(new FormLayout());
 		Color backgroundColor = SWTResourceManager.getColor(SWT.COLOR_WHITE);
 		if((this.allRows != null) && (this.allRows.size()%2 != 0)){
@@ -363,11 +208,6 @@ public class OpexDefinitionGrid extends Composite {
 		}
 
 		compositeRow.setBackground(backgroundColor);
-		
-		final OpexData opexData = new OpexData();
-		opexData.setScenarioId(this.scenario.getId());
-		this.opexDataList.add(opexData);
-		compositeRow.setData(opexData);
 		
 		FormData fd_compositeRow = new FormData();
 		fd_compositeRow.left = new FormAttachment(this.presentRow, 0, SWT.LEFT);
@@ -390,6 +230,13 @@ public class OpexDefinitionGrid extends Composite {
 				opexData.setRevenue(isRevenue);
 			}
 		});
+		if(!isNewOpexData){
+			if(opexData.isRevenue()) {
+				comboClassification.select(1);
+			} else {
+				comboClassification.select(0);
+			}
+		}
 
 		final Button btnUse = new Button(compositeRow, SWT.CHECK);
 		FormData fd_btnUse = new FormData();
@@ -402,6 +249,7 @@ public class OpexDefinitionGrid extends Composite {
 				opexData.setInUse(btnUse.getSelection());
 			}
 		});
+		btnUse.setSelection(opexData.isInUse());
 
 		final Combo comboIdentifier = new Combo(compositeRow, SWT.NONE);
 		String[] items = this.getIdentifierComboItems();
@@ -424,6 +272,10 @@ public class OpexDefinitionGrid extends Composite {
 				opexData.setModel(ProjectConfigutration.getInstance().getModelByName(modelName));;
 			}
 		});
+		if(!isNewOpexData){
+			String modelName = opexData.getModel().getName();
+			comboIdentifier.setText(modelName);
+		}
 		
 		FormData fd_comboIdentifier = new FormData();
 		fd_comboIdentifier.left = new FormAttachment(btnUse, 21);
@@ -447,6 +299,13 @@ public class OpexDefinitionGrid extends Composite {
 				comboExpression.setListVisible(true);
 			}
 		});
+		if(!isNewOpexData){
+			if(!opexData.isRevenue()) {
+				comboExpression.setEnabled(false);;
+			} else {
+				comboExpression.setText(opexData.getExpression().getName());
+			}
+		}
 		comboExpression.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				String expressionName = comboExpression.getText();
@@ -477,19 +336,30 @@ public class OpexDefinitionGrid extends Composite {
 		this.layout();
 	}
 
+	public void addRow(){
+		OpexData opexData = new OpexData();
+		opexData.setScenarioId(this.scenario.getId());
+		this.existingOpexDataList.add(opexData);
+		this.addRow(opexData);
+	}
+
 	private void addTimePeriodRowMembers(final Composite parent, Control reference){
 		Control previousMember = reference;
+		final OpexData associatedOpexData = (OpexData)parent.getData();
+		final Map<Integer, Float> constraintData = associatedOpexData.getCostData();
+		boolean isNewOpexData = (associatedOpexData.getId() == -1);
 		for(int i=0; i<this.scenario.getTimePeriod(); i++){
 			Text yearlyValue = new Text(parent, SWT.BORDER);
 			FormData fd_yearlyValue = new FormData();
 			final int targetYear = this.scenario.getStartYear() + i;
+			String value = String.valueOf(constraintData.get(targetYear));
+			if(!isNewOpexData && value!=null){
+				yearlyValue.setText(value);
+			}
 			yearlyValue.addModifyListener(new ModifyListener(){
 				public void modifyText(ModifyEvent event) {
 					// Get the widget whose text was modified
 					Text text = (Text) event.widget;
-					System.out.println("Input value for the " + targetYear + " year is " + text.getText());
-					OpexData opexData = (OpexData)parent.getData();
-					Map<Integer, Float> constraintData = opexData.getCostData();
 					constraintData.put(targetYear, Float.valueOf(text.getText()));
 				}
 			});

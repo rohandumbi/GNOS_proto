@@ -166,7 +166,7 @@ public class MiningStockpileCostGrid extends Composite {
 			fd_labelCategory.right = new FormAttachment(0, 168);
 			labelCategory.setLayoutData(fd_labelCategory);
 			
-			this.addTimePeriodRowMembers_V2(compositeRow, labelCategory);
+			this.addTimePeriodRowMembers(compositeRow, labelCategory);
 			
 			this.allRows.add(compositeRow);
 			this.presentRow = compositeRow;
@@ -175,7 +175,7 @@ public class MiningStockpileCostGrid extends Composite {
 	}
 	
 	
-	private void addTimePeriodRowMembers_V2(Composite parent, Control reference){
+	private void addTimePeriodRowMembers(Composite parent, Control reference){
 		Control previousMember = reference;
 		FixedOpexCost associatedFixedCost = (FixedOpexCost)parent.getData();
 		final Map<Integer, Float> associatedFixedCostData = associatedFixedCost.getCostData();
