@@ -1,5 +1,6 @@
 package com.org.gnos.ui.graph;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -29,6 +30,7 @@ import com.org.gnos.core.Node;
 import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.core.Tree;
 import com.org.gnos.db.model.Expression;
+import com.org.gnos.db.model.Grade;
 import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.ProcessJoin;
 import com.org.gnos.db.model.Product;
@@ -227,11 +229,15 @@ public class ProcessDefinitionGraph extends Composite {
 		if (Window.OK == productDefinitionDialog.open()) {
 			String definedProductName = productDefinitionDialog.getProductName();
 			List<Expression> associatedExpressions = productDefinitionDialog.getAssociatedExpressions();
+			ArrayList<Grade> associatedGrades = productDefinitionDialog.getAssociatedGrades();
 			String createdProductName = processName + '_' + definedProductName;
 			Model associatedProcess = ProjectConfigutration.getInstance().getModelByName(processName);
 			
 			Product newProduct = new Product(createdProductName, associatedProcess);
 			newProduct.setListOfExpressions(associatedExpressions);
+			if(associatedGrades.size() > 0){
+				newProduct.setListOfGrades(associatedGrades);
+			}
 			
 			this.addProduct(newProduct);
 			this.listOfProducts.add(newProduct);

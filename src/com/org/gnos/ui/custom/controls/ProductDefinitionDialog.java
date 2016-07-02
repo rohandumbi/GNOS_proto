@@ -1,12 +1,15 @@
 package com.org.gnos.ui.custom.controls;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
@@ -25,6 +28,8 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.db.model.Expression;
+import com.org.gnos.db.model.Grade;
+import com.org.gnos.db.model.ProcessConstraintData;
 
 public class ProductDefinitionDialog extends Dialog {
 
@@ -34,12 +39,17 @@ public class ProductDefinitionDialog extends Dialog {
 	private Composite container;
 	private Text textProductName;
 	private Button btnAddExpression;
+	private Button btnAddGrade;
 	private ArrayList<Combo> listOfChildExpressionCombos;
 	private Control presentRow;
 	private String productName;
 	private List<Expression> associatedExpressions;
-	private ScrolledComposite scrollContainer;
+	private ArrayList<Grade> associatedGrades;
+	private ScrolledComposite scrollContainerExpressions;
+	private ScrolledComposite scrollContainerGrades;
 	private Composite expressionListContainerComposite;
+	private Composite gradeListContainerComposite;
+	private Composite presentGrid;
 	
 	
 	public ProductDefinitionDialog(Shell parentShell, String[] availableExpressionNames) {
@@ -47,6 +57,7 @@ public class ProductDefinitionDialog extends Dialog {
 		this.availableExpressionNames = availableExpressionNames;
 		this.listOfChildExpressionCombos = new ArrayList<Combo>();
 		this.associatedExpressions = new ArrayList<Expression>();
+		this.associatedGrades = new ArrayList<Grade>();
 	}
 	
 	@Override
@@ -84,28 +95,136 @@ public class ProductDefinitionDialog extends Dialog {
 		this.btnAddExpression.setLayoutData(fd_btnAddExpressions);
 		this.btnAddExpression.setText("Add Expression");
 		
-		this.scrollContainer = new ScrolledComposite(this.container, SWT.BORDER | SWT.V_SCROLL);
+		this.scrollContainerExpressions = new ScrolledComposite(this.container, SWT.BORDER | SWT.V_SCROLL);
 		FormData fd_scrollContainer = new FormData(500,500);// temp hack else size of scrolled composite keeps on increasing
 		fd_scrollContainer.top = new FormAttachment(this.btnAddExpression);
-		fd_scrollContainer.bottom = new FormAttachment(100, -5);
+		fd_scrollContainer.bottom = new FormAttachment(50);
 		fd_scrollContainer.right = new FormAttachment(100, -10);
 		fd_scrollContainer.left = new FormAttachment(0, 10);
 		
-		this.scrollContainer.setExpandHorizontal(true);
-		this.scrollContainer.setExpandVertical(true);
-		this.scrollContainer.setLayoutData(fd_scrollContainer);
+		this.scrollContainerExpressions.setExpandHorizontal(true);
+		this.scrollContainerExpressions.setExpandVertical(true);
+		this.scrollContainerExpressions.setLayoutData(fd_scrollContainer);
 		
-		this.expressionListContainerComposite = new Composite(this.scrollContainer, SWT.NONE);
+		this.expressionListContainerComposite = new Composite(this.scrollContainerExpressions, SWT.NONE);
 		this.expressionListContainerComposite.setLayout(new FormLayout());
 		this.expressionListContainerComposite.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		this.scrollContainer.setContent(this.expressionListContainerComposite);
+		this.scrollContainerExpressions.setContent(this.expressionListContainerComposite);
 		
-		Rectangle r = this.scrollContainer.getClientArea();
-		this.scrollContainer.setMinSize(this.scrollContainer.computeSize(SWT.DEFAULT, r.height, true));
+		this.btnAddGrade = new Button(container, SWT.NONE);
+		this.btnAddGrade.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				//TODO add implementation for button click
+				//addExpressionRow();
+				Grade newGrade = new Grade();
+				associatedGrades.add(newGrade);
+				addGradeRow(newGrade);
+			}
+		});
+		FormData fd_btnAddGrade = new FormData();
+		fd_btnAddGrade.right = new FormAttachment(textProductName, 0, SWT.RIGHT);
+		fd_btnAddGrade.top = new FormAttachment(this.scrollContainerExpressions, 20);
+		fd_btnAddGrade.left = new FormAttachment(0, 10);
+		this.btnAddGrade.setLayoutData(fd_btnAddGrade);
+		this.btnAddGrade.setText("Add Grade");
+		
+		this.scrollContainerGrades = new ScrolledComposite(this.container, SWT.BORDER | SWT.V_SCROLL);
+		FormData fd_scrollContainerGrades = new FormData(500,500);// temp hack else size of scrolled composite keeps on increasing
+		fd_scrollContainerGrades.top = new FormAttachment(this.btnAddGrade);
+		fd_scrollContainerGrades.bottom = new FormAttachment(100, -5);
+		fd_scrollContainerGrades.right = new FormAttachment(100, -10);
+		fd_scrollContainerGrades.left = new FormAttachment(0, 10);
+		
+		this.scrollContainerGrades.setExpandHorizontal(true);
+		this.scrollContainerGrades.setExpandVertical(true);
+		this.scrollContainerGrades.setLayoutData(fd_scrollContainerGrades);
+		
+		this.gradeListContainerComposite = new Composite(this.scrollContainerGrades, SWT.NONE);
+		this.gradeListContainerComposite.setLayout(new FormLayout());
+		this.gradeListContainerComposite.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		this.scrollContainerGrades.setContent(this.gradeListContainerComposite);
+		
+		Rectangle r1 = this.scrollContainerExpressions.getClientArea();
+		this.scrollContainerExpressions.setMinSize(this.scrollContainerExpressions.computeSize(SWT.DEFAULT, r1.height, true));
+		
+		Rectangle r2 = this.scrollContainerGrades.getClientArea();
+		this.scrollContainerGrades.setMinSize(this.scrollContainerGrades.computeSize(SWT.DEFAULT, r2.height, true));
 		
 		container.getShell().setText("Product Definition");
 		this.setDialogLocation();
 		return this.container;
+	}
+	
+	private String[] getGradeExpressionNames(){
+		List<Expression> gradeExpressions = ProjectConfigutration.getInstance().getGradeExpressions();
+		int gradeExpressionSize = gradeExpressions.size();
+		String[] gradeExpressionNames = new String[gradeExpressionSize];
+		for(int i=0; i<gradeExpressionSize; i++){
+			gradeExpressionNames[i] = gradeExpressions.get(i).getName();
+		}
+		return gradeExpressionNames;
+	}
+	
+	private void addGradeRow(final Grade grade) {
+		final Composite compositeGradeRow = new Composite(this.gradeListContainerComposite, SWT.NONE);
+		compositeGradeRow.setData(grade);
+		compositeGradeRow.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		compositeGradeRow.setLayout(new FormLayout());
+		FormData fd_compositeGradeRow = new FormData();
+		if(this.presentGrid == null){
+			fd_compositeGradeRow.top = new FormAttachment(0, 10);
+		}else{
+			fd_compositeGradeRow.top = new FormAttachment(this.presentGrid, 10);
+		}
+		fd_compositeGradeRow.left = new FormAttachment(0, 10);
+		fd_compositeGradeRow.right = new FormAttachment(100, -10);
+		compositeGradeRow.setLayoutData(fd_compositeGradeRow);
+		
+		Label lblGradeName = new Label(compositeGradeRow, SWT.NONE);
+		lblGradeName.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
+		lblGradeName.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		lblGradeName.setText("Name:");
+		FormData fd_lblGradeName = new FormData();
+		fd_lblGradeName.left = new FormAttachment(0, 10);
+		fd_lblGradeName.right = new FormAttachment(10, 10);
+		lblGradeName.setLayoutData(fd_lblGradeName);
+		
+		final Text textGradeName = new Text(compositeGradeRow, SWT.BORDER);
+		textGradeName.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
+		textGradeName.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		FormData fd_textGradeName = new FormData();
+		fd_textGradeName.left = new FormAttachment(lblGradeName);
+		fd_textGradeName.right = new FormAttachment(50, 10);
+		textGradeName.setLayoutData(fd_textGradeName);
+
+		textGradeName.addModifyListener(new ModifyListener(){
+			public void modifyText(ModifyEvent event) {
+				String name = textGradeName.getText();
+				grade.setName(name);
+			}
+		});
+		
+		final Combo comboGradeExpressions = new Combo(compositeGradeRow, SWT.NONE);
+		comboGradeExpressions.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
+		comboGradeExpressions.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		comboGradeExpressions.setItems(this.getGradeExpressionNames());
+		FormData fd_comboGradeExpressions = new FormData();
+		fd_comboGradeExpressions.left = new FormAttachment(textGradeName);
+		fd_comboGradeExpressions.right = new FormAttachment(100);
+		comboGradeExpressions.setLayoutData(fd_comboGradeExpressions);
+		comboGradeExpressions.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				String expressionName = comboGradeExpressions.getText();
+				Expression expression = ProjectConfigutration.getInstance().getExpressionByName(expressionName);
+				grade.setExpression(expression);
+			}
+		});
+		
+		this.presentGrid = compositeGradeRow;
+		this.gradeListContainerComposite.layout();
+		Rectangle r = this.scrollContainerGrades.getClientArea();
+		this.scrollContainerGrades.setMinSize(this.scrollContainerGrades.computeSize((r.width - 20), SWT.DEFAULT, true));
 	}
 	
 	private void addExpressionRow() {
@@ -136,8 +255,8 @@ public class ProductDefinitionDialog extends Dialog {
 		this.presentRow = lblSelectExpression;
 		this.listOfChildExpressionCombos.add(comboExpression);
 		
-		Rectangle r = this.scrollContainer.getClientArea();
-		this.scrollContainer.setMinSize(this.scrollContainer.computeSize((r.width - 20), SWT.DEFAULT, true));
+		Rectangle r = this.scrollContainerExpressions.getClientArea();
+		this.scrollContainerExpressions.setMinSize(this.scrollContainerExpressions.computeSize((r.width - 20), SWT.DEFAULT, true));
 	}
 
 	@Override
@@ -180,6 +299,10 @@ public class ProductDefinitionDialog extends Dialog {
 	
 	public List<Expression> getAssociatedExpressions() {
 		return this.associatedExpressions;
+	}
+	
+	public ArrayList<Grade> getAssociatedGrades() {
+		return this.associatedGrades;
 	}
 	
 	

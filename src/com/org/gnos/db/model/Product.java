@@ -7,11 +7,13 @@ public class Product {
 	private String name;
 	private Model associatedProcess;
 	private List<Expression> listOfExpressions;
+	private ArrayList<Grade> listOfGrades;
 	
 	public Product(String name, Model associatedProcess){
 		this.associatedProcess = associatedProcess;
 		this.name = name;
 		this.listOfExpressions = new ArrayList<Expression>();
+		this.listOfGrades = new ArrayList<Grade>();
 	}
 
 	public Model getAssociatedProcess() {
@@ -32,6 +34,14 @@ public class Product {
 
 	public void addExpression(Expression expression){
 		this.listOfExpressions.add(expression);
+	}
+
+	public List<Grade> getListOfGrades() {
+		return listOfGrades;
+	}
+
+	public void setListOfGrades(ArrayList<Grade> listOfGrades) {
+		this.listOfGrades = listOfGrades;
 	}
 	
 }
