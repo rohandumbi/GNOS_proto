@@ -49,7 +49,7 @@ public class ProductDefinitionDialog extends Dialog {
 	private ScrolledComposite scrollContainerGrades;
 	private Composite expressionListContainerComposite;
 	private Composite gradeListContainerComposite;
-	private Composite presentGrid;
+	private Composite presentGrade;
 	
 	
 	public ProductDefinitionDialog(Shell parentShell, String[] availableExpressionNames) {
@@ -172,10 +172,10 @@ public class ProductDefinitionDialog extends Dialog {
 		compositeGradeRow.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		compositeGradeRow.setLayout(new FormLayout());
 		FormData fd_compositeGradeRow = new FormData();
-		if(this.presentGrid == null){
+		if(this.presentGrade == null){
 			fd_compositeGradeRow.top = new FormAttachment(0, 10);
 		}else{
-			fd_compositeGradeRow.top = new FormAttachment(this.presentGrid, 10);
+			fd_compositeGradeRow.top = new FormAttachment(this.presentGrade, 10);
 		}
 		fd_compositeGradeRow.left = new FormAttachment(0, 10);
 		fd_compositeGradeRow.right = new FormAttachment(100, -10);
@@ -221,7 +221,7 @@ public class ProductDefinitionDialog extends Dialog {
 			}
 		});
 		
-		this.presentGrid = compositeGradeRow;
+		this.presentGrade = compositeGradeRow;
 		this.gradeListContainerComposite.layout();
 		Rectangle r = this.scrollContainerGrades.getClientArea();
 		this.scrollContainerGrades.setMinSize(this.scrollContainerGrades.computeSize((r.width - 20), SWT.DEFAULT, true));

@@ -202,9 +202,11 @@ public class ProcessDefinitionGraph extends Composite {
 		if (Window.OK == productJoinDefinitionDialog.open()) {
 			String definedProductJoinName = productJoinDefinitionDialog.getProductJoinName();
 			List<Product> associatedProducts = productJoinDefinitionDialog.getAssociatedProducts();
+			ArrayList<String> associatedGradeNames = productJoinDefinitionDialog.getAssociatedGradeNames();
 			
 			ProductJoin newProductJoin = new ProductJoin(definedProductJoinName);
 			newProductJoin.setListChildProducts(associatedProducts);
+			newProductJoin.setGradeNames(associatedGradeNames);
 			
 			this.addProductJoin(newProductJoin);
 			this.listOfProductJoins.add(newProductJoin);

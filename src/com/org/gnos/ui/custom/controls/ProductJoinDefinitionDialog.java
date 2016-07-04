@@ -25,6 +25,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.db.model.Expression;
+import com.org.gnos.db.model.Grade;
 import com.org.gnos.db.model.Product;
 
 public class ProductJoinDefinitionDialog extends Dialog {
@@ -40,7 +41,17 @@ public class ProductJoinDefinitionDialog extends Dialog {
 	private List<Product> associatedProducts;
 	private String defaultProductName;
 	private ScrolledComposite scrollContainer;
+	private ScrolledComposite scrollContainerGrades;
 	private Composite productListContainerComposite;
+	private Composite gradeListContainerComposite;
+	private Composite presentGrade;
+	private Label lblInfoMessageDefinedGrades;
+	private ArrayList<Text> listOfGradeNames;
+	private Label lblGradeName;
+	private Text textGradeName;
+	private Text lastGrade;
+	private ArrayList<String> associatedGradeNames;
+	
 	
 	
 	public ProductJoinDefinitionDialog(Shell parentShell, String[] availableProductNames, String defaultProductName) {
@@ -49,6 +60,7 @@ public class ProductJoinDefinitionDialog extends Dialog {
 		this.defaultProductName = defaultProductName;
 		this.listOfChildProductCombos = new ArrayList<Combo>();
 		this.associatedProducts = new ArrayList<Product>();
+		this.listOfGradeNames = new ArrayList<Text>();
 	}
 	
 	@Override
@@ -89,7 +101,7 @@ public class ProductJoinDefinitionDialog extends Dialog {
 		this.scrollContainer = new ScrolledComposite(this.container, SWT.BORDER | SWT.V_SCROLL);
 		FormData fd_scrollContainer = new FormData(500,500);// temp hack else size of scrolled composite keeps on increasing
 		fd_scrollContainer.top = new FormAttachment(this.btnAddProduct);
-		fd_scrollContainer.bottom = new FormAttachment(100, -5);
+		fd_scrollContainer.bottom = new FormAttachment(60);
 		fd_scrollContainer.right = new FormAttachment(100, -10);
 		fd_scrollContainer.left = new FormAttachment(0, 10);
 		
@@ -102,14 +114,70 @@ public class ProductJoinDefinitionDialog extends Dialog {
 		this.productListContainerComposite.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		this.scrollContainer.setContent(this.productListContainerComposite);
 		
-		Rectangle r = this.scrollContainer.getClientArea();
-		this.scrollContainer.setMinSize(this.scrollContainer.computeSize(SWT.DEFAULT, r.height, true));
+		this.scrollContainerGrades = new ScrolledComposite(this.container, SWT.BORDER | SWT.V_SCROLL);
+		FormData fd_scrollContainerGrades = new FormData(500,500);// temp hack else size of scrolled composite keeps on increasing
+		fd_scrollContainerGrades.top = new FormAttachment(scrollContainer, 40);
+		fd_scrollContainerGrades.bottom = new FormAttachment(100, -5);
+		fd_scrollContainerGrades.right = new FormAttachment(100, -10);
+		fd_scrollContainerGrades.left = new FormAttachment(0, 10);
+		
+		this.scrollContainerGrades.setExpandHorizontal(true);
+		this.scrollContainerGrades.setExpandVertical(true);
+		this.scrollContainerGrades.setLayoutData(fd_scrollContainerGrades);
+		
+		this.gradeListContainerComposite = new Composite(this.scrollContainerGrades, SWT.NONE);
+		this.gradeListContainerComposite.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		this.gradeListContainerComposite.setLayout(new FormLayout());
+		this.scrollContainerGrades.setContent(this.gradeListContainerComposite);
+		
+		
+		Rectangle r1 = this.scrollContainer.getClientArea();
+		this.scrollContainer.setMinSize(this.scrollContainer.computeSize(SWT.DEFAULT, r1.height, true));
+		
+		Rectangle r2 = this.scrollContainerGrades.getClientArea();
+		this.scrollContainerGrades.setMinSize(this.scrollContainerGrades.computeSize(SWT.DEFAULT, r2.height, true));
+		
+		lblInfoMessageDefinedGrades = new Label(container, SWT.NONE);
+		lblInfoMessageDefinedGrades.setText("Provide names for the associated grade groups inherited from products:");
+		FormData fd_lblInfoMessageDefinedGrades = new FormData();
+		fd_lblInfoMessageDefinedGrades.bottom = new FormAttachment(scrollContainerGrades, -6);
+		fd_lblInfoMessageDefinedGrades.left = new FormAttachment(0, 10);
+		lblInfoMessageDefinedGrades.setLayoutData(fd_lblInfoMessageDefinedGrades);
 		
 		this.addProductDefinitionRow(this.defaultProductName);
+		this.prepareGradeDefinitionForm(this.defaultProductName);
 				
 		container.getShell().setText("Join Products");
 		this.setDialogLocation();
 		return this.container;
+	}
+	
+	private void prepareGradeDefinitionForm(String selectedProductName) {
+		Product assoiatedProduct = ProjectConfigutration.getInstance().getProductByName(selectedProductName);
+		int i = 0;
+		for(Grade grade: assoiatedProduct.getListOfGrades()){
+			i++;
+			Label lblGradeName = new Label(gradeListContainerComposite, SWT.NONE);
+			FormData fd_lblGradeName = new FormData();
+			if(this.lastGrade == null){
+				fd_lblGradeName.top = new FormAttachment(0, 20);
+			}else{
+				fd_lblGradeName.top = new FormAttachment(this.lastGrade, 10);
+			}
+			fd_lblGradeName.left = new FormAttachment(0, 10);
+			lblGradeName.setLayoutData(fd_lblGradeName);
+			lblGradeName.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+			lblGradeName.setText("Grade " + i + ":");
+			
+			Text textGradeName = new Text(gradeListContainerComposite, SWT.BORDER);
+			FormData fd_textGradeName = new FormData();
+			fd_textGradeName.right = new FormAttachment(100, -20);
+			fd_textGradeName.top = new FormAttachment(lblGradeName, 0, SWT.TOP);
+			fd_textGradeName.left = new FormAttachment(lblGradeName, 10, SWT.RIGHT);
+			textGradeName.setLayoutData(fd_textGradeName);
+			listOfGradeNames.add(textGradeName);
+			this.lastGrade = textGradeName;
+		}
 	}
 	
 	private void addProductDefinitionRow() {
@@ -203,6 +271,11 @@ public class ProductJoinDefinitionDialog extends Dialog {
 			Product product = ProjectConfigutration.getInstance().getProductByName(productName);
 			this.associatedProducts.add(product);
 		}
+		
+		for(Text text: listOfGradeNames){
+			String gradeName = text.getText();
+			associatedGradeNames.add(gradeName);
+		}
 		super.okPressed();
 	}
 
@@ -225,5 +298,7 @@ public class ProductJoinDefinitionDialog extends Dialog {
 		return this.associatedProducts;
 	}
 	
-	
+	public ArrayList<String> getAssociatedGradeNames() {
+		return this.associatedGradeNames;
+	}
 }
