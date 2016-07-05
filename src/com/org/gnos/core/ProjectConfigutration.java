@@ -1195,6 +1195,16 @@ public class ProjectConfigutration {
 		return productJoinList;
 	}
 	
+	public List<ProductJoin> getProductJoinWithGrades() {
+		List<ProductJoin> productJoinWithGrades = new ArrayList<ProductJoin>();
+		for(ProductJoin pj: productJoinList){
+			if(pj.getGradeNames().size() > 0){
+				productJoinWithGrades.add(pj);
+			}
+		}
+		return productJoinWithGrades;
+	}
+	
 	public List<ProductJoin> getProductJoinOfProductsList() {
 		List<ProductJoin> productJoinOfProducts = new ArrayList<ProductJoin>();
 		for(ProductJoin pj: productJoinList){

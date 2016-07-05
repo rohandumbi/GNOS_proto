@@ -186,6 +186,7 @@ public class MainConfigurationViewPort extends GnosScreen{
 		//processConstraintDefinitionScreen = new ProcessConstraintDefinitionScreen(this.dummyShell, SWT.NONE);
 		//processConstraintDefinitionScreen.registerEventListener(this);
 		processConstraintDefinitionScreen.refreshGrid();
+		gradeConstraintScreen.refreshGrid();
 		//this.layout();
 	}
 	

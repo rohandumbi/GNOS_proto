@@ -61,6 +61,7 @@ public class ProductJoinDefinitionDialog extends Dialog {
 		this.listOfChildProductCombos = new ArrayList<Combo>();
 		this.associatedProducts = new ArrayList<Product>();
 		this.listOfGradeNames = new ArrayList<Text>();
+		this.associatedGradeNames = new ArrayList<String>();
 	}
 	
 	@Override

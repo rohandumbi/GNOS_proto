@@ -14,6 +14,7 @@ import com.org.gnos.db.DBManager;
 import com.org.gnos.db.dao.ScenarioDAO;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.FixedOpexCost;
+import com.org.gnos.db.model.GradeConstraintData;
 import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.OpexData;
 import com.org.gnos.db.model.OreMiningCost;
@@ -32,6 +33,7 @@ public class ScenarioConfigutration {
 	private FixedOpexCost[] fixedCost = new FixedOpexCost[4];// fixed opex cost has 4 fixed categories
 	private List<ProcessJoin> processJoins = new ArrayList<ProcessJoin>();
 	private List<ProcessConstraintData> processConstraintDataList = new ArrayList<ProcessConstraintData>();
+	private List<GradeConstraintData> gradeConstraintDataList = new ArrayList<GradeConstraintData>();
 	private Scenario scenarioData ;
 
 	private int scenarioId = -1;
@@ -457,6 +459,10 @@ public class ScenarioConfigutration {
 
 	public void setProcessConstraintDataList(List<ProcessConstraintData> processConstraintDataList) {
 		this.processConstraintDataList = processConstraintDataList;
+	}
+	
+	public List<GradeConstraintData> getGradeConstraintDataList() {
+		return gradeConstraintDataList;
 	}
 
 	public void addProcessJoin(ProcessJoin processJoin) {
