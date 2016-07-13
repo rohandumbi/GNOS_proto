@@ -4,9 +4,7 @@ import java.util.LinkedHashMap;
 
 public class GradeConstraintData {
 
-	/*public static final int COEFFICIENT_EXPRESSION =1;
-	public static final int COEFFICIENT_PRODUCT =2;
-	public static final int COEFFICIENT_PRODUCT_JOIN =3;*/
+
 	
 	public static final int SELECTION_NONE = 0;
 	public static final int SELECTION_PROCESS_JOIN = 1;
@@ -18,6 +16,7 @@ public class GradeConstraintData {
 	private boolean inUse;
 	private String productJoinName;
 	private int selectedGradeIndex;
+	private String selectedGradeName;
 	private boolean isMax;
 	private int selectionType;
 	private String selectorName;
@@ -52,8 +51,14 @@ public class GradeConstraintData {
 	public void setMax(boolean isMax) {
 		this.isMax = isMax;
 	}
-	
-	
+
+	public String getSelectedGradeName() {
+		return selectedGradeName;
+	}
+
+	public void setSelectedGradeName(String selectedGradeName) {
+		this.selectedGradeName = selectedGradeName;
+	}
 
 	public String getProductJoinName() {
 		return productJoinName;

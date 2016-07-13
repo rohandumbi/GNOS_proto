@@ -1,11 +1,7 @@
 package com.org.gnos.ui.screens.v1;
 
-import java.util.List;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
@@ -18,23 +14,15 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import com.org.gnos.core.ProjectConfigutration;
-import com.org.gnos.db.model.Expression;
-import com.org.gnos.db.model.Field;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.services.ExpressionProcessor;
 import com.org.gnos.ui.custom.controls.ExpressionBuilderGrid;
 import com.org.gnos.ui.custom.controls.GnosScreen;
-import com.org.gnos.ui.custom.controls.ModelDefinitionGrid;
 
 public class ExpressionDefinitionScreen extends GnosScreen {
 	
 	private ScrolledComposite scGridContainer;
 	private ExpressionBuilderGrid expressionBuilderGrid;
-	private List<Field> fields;
-	private List<Expression> allDefinedExpressions;
-	private List<Expression> expressions;
-	private Composite parent;
 	private Label labelScreenDescription;
 	private Button btnAddExpression;
 	private Button btnComputeExpressionValues;
@@ -48,9 +36,6 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 		setForeground(SWTResourceManager.getColor(30, 144, 255));
 		setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
 		setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		this.parent = parent;
-		this.fields = ProjectConfigutration.getInstance().getFields();
-		this.expressions = ProjectConfigutration.getInstance().getExpressions();
 		this.createContent();
 	}
 	
@@ -88,7 +73,6 @@ public class ExpressionDefinitionScreen extends GnosScreen {
 		fd_scGridContainer.top = new FormAttachment(this.labelScreenDescription, 10, SWT.BOTTOM);
 		fd_scGridContainer.left = new FormAttachment(this.labelScreenDescription, 0, SWT.LEFT);
 		fd_scGridContainer.bottom = new FormAttachment(100, -10);
-		//fd_scGridContainer.bottom = new FormAttachment(50);
 		fd_scGridContainer.right = new FormAttachment(100, -35);
 		
 		this.scGridContainer.setExpandHorizontal(true);

@@ -30,7 +30,6 @@ public class ProcessConstraintEquationGenerator {
 	private BufferedOutputStream output;
 	private ProjectConfigutration projectConfiguration;
 	private ScenarioConfigutration scenarioConfigutration;
-	private List<Process> porcesses;
 	private List<ProcessConstraintData> processConstraintDataList;
 	
 	private int bytesWritten = 0;
@@ -39,7 +38,6 @@ public class ProcessConstraintEquationGenerator {
 	public void generate() {
 		projectConfiguration = ProjectConfigutration.getInstance();
 		scenarioConfigutration = ScenarioConfigutration.getInstance();
-		porcesses = projectConfiguration.getProcessList();
 		processConstraintDataList = scenarioConfigutration.getProcessConstraintDataList();
 		
 		int bufferSize = 8 * 1024;

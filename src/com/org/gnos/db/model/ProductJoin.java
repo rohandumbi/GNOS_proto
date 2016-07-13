@@ -7,7 +7,7 @@ public class ProductJoin {
 	private String name;
 	private List<Product> listChildProducts;
 	private List<ProductJoin> listChildProductJoins;
-	private ArrayList<String> gradeNames;
+	private List<String> gradeNames;
 
 	public ProductJoin(String name){
 		super();
@@ -45,13 +45,15 @@ public class ProductJoin {
 		this.listChildProductJoins.add(productJoin);
 	}
 
-	public ArrayList<String> getGradeNames() {
+	public List<String> getGradeNames() {
 		return gradeNames;
 	}
 
-	public void setGradeNames(ArrayList<String> gradeNames) {
+	public void setGradeNames(List<String> gradeNames) {
 		this.gradeNames = gradeNames;
 	}
-	
+	public void addGradeName(String gradeName) {
+		this.gradeNames.add(gradeName);
+	}
 	
 }

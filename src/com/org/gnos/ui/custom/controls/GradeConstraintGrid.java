@@ -30,7 +30,6 @@ import com.org.gnos.db.model.GradeConstraintData;
 import com.org.gnos.db.model.Pit;
 import com.org.gnos.db.model.PitGroup;
 import com.org.gnos.db.model.Process;
-import com.org.gnos.db.model.ProcessConstraintData;
 import com.org.gnos.db.model.ProcessJoin;
 import com.org.gnos.db.model.Product;
 import com.org.gnos.db.model.ProductJoin;
@@ -231,199 +230,6 @@ public class GradeConstraintGrid extends Composite {
 			previousColumn = lblYear;
 		}
 	}
-
-	/*private void createRows() {
-
-		for(final ProcessConstraintData pcd : this.processConstraintDataList) {
-			final Composite compositeRow = new Composite(this, SWT.BORDER);
-			compositeRow.setData(pcd);
-			compositeRow.setLayout(new FormLayout());
-			Color backgroundColor = SWTResourceManager.getColor(SWT.COLOR_WHITE);
-			if((this.allRows != null) && (this.allRows.size()%2 != 0)){
-				backgroundColor =  SWTResourceManager.getColor(245, 245, 245);
-			}
-			compositeRow.setBackground(backgroundColor);
-			FormData fd_compositeRow = new FormData();
-			fd_compositeRow.left = new FormAttachment(this.presentRow, 0, SWT.LEFT);
-			fd_compositeRow.right = new FormAttachment(this.presentRow, 0, SWT.RIGHT);
-			fd_compositeRow.top = new FormAttachment(this.presentRow);
-
-			final Combo comboExpression = new Combo(compositeRow, SWT.NONE);
-			String[] itemsComboExpression = this.getCoefficientComboItems();
-			comboExpression.setItems(itemsComboExpression);
-			comboExpression.addListener(SWT.MouseDown, new Listener(){
-				@Override
-				public void handleEvent(Event event) {
-					// TODO Auto-generated method stub
-					comboExpression.removeAll();
-					comboExpression.setItems(getCoefficientComboItems());
-					comboExpression.getParent().layout();
-					comboExpression.setListVisible(true);
-				}
-			});
-
-			comboExpression.addSelectionListener(new SelectionAdapter() {
-				public void widgetSelected(SelectionEvent e) {
-					String coefficientName = comboExpression.getText();
-					System.out.println("Coefficient selected is: " + coefficientName);
-					int coefficientSelectionIndex = comboExpression.getSelectionIndex();
-					if(coefficientSelectionIndex <= expressionEndIndex) {
-						pcd.setCoefficientType(ProcessConstraintData.COEFFICIENT_EXPRESSION);
-					} else if(coefficientSelectionIndex <= productEndIndex) {
-						pcd.setCoefficientType(ProcessConstraintData.COEFFICIENT_PRODUCT);
-					} else {
-						pcd.setCoefficientType(ProcessConstraintData.COEFFICIENT_PRODUCT_JOIN);
-					}		
-					pcd.setCoefficient_name(coefficientName);
-				}
-			});
-			int start = 0;
-			int end = this.expressionEndIndex;
-			if(pcd.getCoefficientType() == ProcessConstraintData.COEFFICIENT_PRODUCT) {
-				start = this.expressionEndIndex +1 ;
-				end = this.productEndIndex;
-			} else if (pcd.getCoefficientType() == ProcessConstraintData.COEFFICIENT_PRODUCT_JOIN) {
-				start = this.productEndIndex +1 ;
-				end = this.productJoinEndIndex;
-			}
-			for(; start <= end; start++){
-				if(itemsComboExpression[start].equals(pcd.getCoefficient_name())) {
-					comboExpression.select(start);
-					break;
-				}
-			}
-			FormData fd_comboExpression = new FormData();
-			fd_comboExpression.left = new FormAttachment(0, 2);
-			fd_comboExpression.top = new FormAttachment(0);
-			fd_comboExpression.right = new FormAttachment(0, 115);
-			comboExpression.setLayoutData(fd_comboExpression);
-
-			final Button btnUse = new Button(compositeRow, SWT.CHECK);
-			btnUse.setSelection(pcd.isInUse());
-			FormData fd_btnUse = new FormData();
-			fd_btnUse.left = new FormAttachment(comboExpression, 12, SWT.RIGHT);
-			fd_btnUse.top = new FormAttachment(0, 2);
-			btnUse.setLayoutData(fd_btnUse);
-
-			btnUse.addSelectionListener(new SelectionAdapter() {
-				public void widgetSelected(SelectionEvent e) {
-					System.out.println("Is button in use selected: " + btnUse.getSelection());
-					pcd.setInUse(btnUse.getSelection());
-				}
-			});
-
-			final Combo comboGroup = new Combo(compositeRow, SWT.NONE);
-			String[] itemsComboGroup = this.getSelectors();
-			comboGroup.setItems(itemsComboGroup);
-			comboGroup.addListener(SWT.MouseDown, new Listener(){
-				@Override
-				public void handleEvent(Event event) {
-					// TODO Auto-generated method stub
-					comboGroup.removeAll();
-					comboGroup.setItems(getSelectors());
-					comboGroup.getParent().layout();
-					comboGroup.setListVisible(true);
-				}
-			});
-
-			comboGroup.addSelectionListener(new SelectionAdapter() {
-				public void widgetSelected(SelectionEvent e) {
-					String selectorName = comboGroup.getText();
-					System.out.println("Group selected is: " + selectorName);
-					int selectorSelectionIndex = comboGroup.getSelectionIndex();
-					if(selectorSelectionIndex < 0) {
-						pcd.setSelectionType(ProcessConstraintData.SELECTION_NONE);
-					}else if(selectorSelectionIndex <= processJoinEndIndex ) {
-						pcd.setSelectionType(ProcessConstraintData.SELECTION_PROCESS_JOIN);
-					} else if(selectorSelectionIndex <= processEndIndex ) {
-						pcd.setSelectionType(ProcessConstraintData.SELECTION_PROCESS);
-					} else if(selectorSelectionIndex <= pitEndIndex ) {
-						pcd.setSelectionType(ProcessConstraintData.SELECTION_PIT);
-					} else {
-						pcd.setSelectionType(ProcessConstraintData.SELECTION_PIT_GROUP);
-					}
-
-					pcd.setSelector_name(selectorName);
-				}
-			});
-
-			start = 0;
-			end = this.processJoinEndIndex;
-			if(pcd.getSelectionType() == ProcessConstraintData.SELECTION_PROCESS) {
-				start = this.processJoinEndIndex +1 ;
-				end = this.processEndIndex;
-			} else if (pcd.getSelectionType() == ProcessConstraintData.SELECTION_PIT) {
-				start = this.processEndIndex +1 ;
-				end = this.pitEndIndex;
-			} else if (pcd.getSelectionType() == ProcessConstraintData.SELECTION_PIT_GROUP) {
-				start = this.pitEndIndex +1 ;
-				end = this.pitGroupEndIndex;
-			}
-			for(; start <= end; start++){
-				if(itemsComboGroup[start].equals(pcd.getSelector_name())) {
-					comboGroup.select(start);
-					break;
-				}
-			}
-
-			FormData fd_comboGroup = new FormData();
-			fd_comboGroup.left = new FormAttachment(btnUse, 18);
-			fd_comboGroup.right = new FormAttachment(btnUse, 135);
-			fd_comboGroup.top = new FormAttachment(0);
-			comboGroup.setLayoutData(fd_comboGroup);
-
-			final Combo comboMaxMin = new Combo(compositeRow, SWT.NONE);
-			comboMaxMin.setItems(new String[]{"Max", "Min"});
-			if(pcd.isMax()){
-				comboMaxMin.select(0);
-			}else{
-				comboMaxMin.select(1);
-			}
-
-			comboMaxMin.addSelectionListener(new SelectionAdapter() {
-				public void widgetSelected(SelectionEvent e) {
-					boolean isMax = (comboMaxMin.getSelectionIndex() == 0);//0=max; 1=min
-					pcd.setMax(isMax);
-				}
-			});
-
-			FormData fd_comboMaxMin = new FormData();
-			fd_comboMaxMin.left = new FormAttachment(comboGroup, 8);
-			fd_comboMaxMin.right = new FormAttachment(comboGroup, 116, SWT.RIGHT);
-			fd_comboMaxMin.top = new FormAttachment(0);
-			comboMaxMin.setLayoutData(fd_comboMaxMin);
-
-			Control previousMember = comboMaxMin;
-			Map<Integer, Float> yearData = pcd.getConstraintData();
-			for(int i=0; i<this.timePeriod; i++){
-				Text yearlyValue = new Text(compositeRow, SWT.BORDER);
-				final int targetYear = this.startYear + i;
-				yearlyValue.setText(String.valueOf(yearData.get(targetYear)));
-				yearlyValue.addModifyListener(new ModifyListener(){
-					public void modifyText(ModifyEvent event) {
-						// Get the widget whose text was modified
-						Text text = (Text) event.widget;
-						String yearlyValue = text.getText();
-						System.out.println("Input value for the " + targetYear + " year is " + yearlyValue);
-						LinkedHashMap<Integer, Float> constraintData = pcd.getConstraintData();
-						constraintData.put(targetYear, Float.valueOf(yearlyValue));
-					}
-				});
-				
-				FormData fd_yearlyValue = new FormData();
-				// Hacky calculation at the moment
-				fd_yearlyValue.left = new FormAttachment(previousMember, 3);
-				fd_yearlyValue.right = new FormAttachment(previousMember, 76, SWT.RIGHT);
-				yearlyValue.setLayoutData(fd_yearlyValue);
-				previousMember = yearlyValue;
-			}
-			this.presentRow = compositeRow;
-			this.allRows.add(compositeRow);
-			compositeRow.setLayoutData(fd_compositeRow);
-			this.layout();
-		}
-
-	}*/
 	
 	private String[] getProductJoinsWithGrades(){
 		List<ProductJoin> listOfProductJoinsWithGrades = ProjectConfigutration.getInstance().getProductJoinWithGrades();
@@ -502,6 +308,7 @@ public class GradeConstraintGrid extends Composite {
 		comboAvailableGrades.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				gradeConstraintData.setSelectedGradeIndex(comboAvailableGrades.getSelectionIndex());
+				gradeConstraintData.setSelectedGradeName(comboAvailableGrades.getText());
 			}
 		});
 
@@ -538,15 +345,15 @@ public class GradeConstraintGrid extends Composite {
 				System.out.println("Group selected is: " + selectorName);
 				int selectorSelectionIndex = comboGroup.getSelectionIndex();
 				if(selectorSelectionIndex < 0) {
-					gradeConstraintData.setSelectionType(ProcessConstraintData.SELECTION_NONE);
+					gradeConstraintData.setSelectionType(GradeConstraintData.SELECTION_NONE);
 				}else if(selectorSelectionIndex <= processJoinEndIndex ) {
-					gradeConstraintData.setSelectionType(ProcessConstraintData.SELECTION_PROCESS_JOIN);
+					gradeConstraintData.setSelectionType(GradeConstraintData.SELECTION_PROCESS_JOIN);
 				} else if(selectorSelectionIndex <= processEndIndex ) {
-					gradeConstraintData.setSelectionType(ProcessConstraintData.SELECTION_PROCESS);
+					gradeConstraintData.setSelectionType(GradeConstraintData.SELECTION_PROCESS);
 				} else if(selectorSelectionIndex <= pitEndIndex ) {
-					gradeConstraintData.setSelectionType(ProcessConstraintData.SELECTION_PIT);
+					gradeConstraintData.setSelectionType(GradeConstraintData.SELECTION_PIT);
 				} else {
-					gradeConstraintData.setSelectionType(ProcessConstraintData.SELECTION_PIT_GROUP);
+					gradeConstraintData.setSelectionType(GradeConstraintData.SELECTION_PIT_GROUP);
 				}
 
 				gradeConstraintData.setSelectorName(selectorName);
@@ -595,8 +402,8 @@ public class GradeConstraintGrid extends Composite {
 					// Get the widget whose text was modified
 					Text text = (Text) event.widget;
 					System.out.println("Input value for the " + targetYear + " year is " + text.getText());
-					ProcessConstraintData processConstraintData = (ProcessConstraintData)parent.getData();
-					LinkedHashMap<Integer, Float> constraintData = processConstraintData.getConstraintData();
+					GradeConstraintData gradeConstraintData = (GradeConstraintData)parent.getData();
+					LinkedHashMap<Integer, Float> constraintData = gradeConstraintData.getConstraintData();
 					constraintData.put(targetYear, Float.valueOf(text.getText()));
 				}
 			});

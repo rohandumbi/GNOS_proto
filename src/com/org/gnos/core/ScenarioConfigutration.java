@@ -58,6 +58,8 @@ public class ScenarioConfigutration {
 		loadOpexData();
 		loadFixedCost();
 		loadProcessConstraintData();
+		loadGradeConstraintData();
+		loadBenchConstraintData();
 	}
 
 	private void loadScenarioData(int scenarioId) {
@@ -210,11 +212,63 @@ public class ScenarioConfigutration {
 		}
 	}
 
+	public void loadGradeConstraintData() {
+		this.gradeConstraintDataList = new ArrayList<GradeConstraintData>();
+		String sql = "select id, selector_name, selector_type, grade, product_join_name, in_use, is_max, year, value from grade_constraint_defn, grade_constraint_year_mapping where id = grade_constraint_id and scenario_id = "
+				+ this.scenarioId + " order by id, year";
+		Statement stmt = null;
+		ResultSet rs = null;
+		Connection conn = DBManager.getConnection();
+		try {
+			stmt = conn.createStatement();
+			stmt.execute(sql);
+			rs = stmt.getResultSet();
+			GradeConstraintData gcd;
+			while (rs.next()) {
+				int id = rs.getInt(1);
+
+				gcd = getGradeConstraintDataById(id);
+				if (gcd == null) {
+					gcd = new GradeConstraintData();					
+					gcd.setId(id);
+					gcd.setSelectorName(rs.getString(2));
+					gcd.setSelectionType(rs.getInt(3));
+					gcd.setSelectedGradeName(rs.getString(4));
+					gcd.setProductJoinName(rs.getString(5));
+					gcd.setInUse(rs.getBoolean(6));
+					gcd.setMax(rs.getBoolean(7));
+
+					this.gradeConstraintDataList.add(gcd);
+				}
+				gcd.addYear(rs.getInt("year"), rs.getFloat("value"));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (stmt != null)
+					stmt.close();
+				if (rs != null)
+					rs.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public void loadBenchConstraintData() {
+		
+	}
+	
 	public void save() {
 		this.projectConfiguration = ProjectConfigutration.getInstance();
 		saveOpexData();
 		saveFixedCostData();
 		saveProcessConstraintData();
+		saveGradeConstraintData();
+		saveBenchConstraintData();
 	}
 
 
@@ -281,6 +335,72 @@ public class ScenarioConfigutration {
 		}
 	}
 	
+	public void saveGradeConstraintData() {
+		Connection conn = DBManager.getConnection();
+		String insert_sql = "insert into grade_constraint_defn (scenario_id, grade, product_join_name, selector_name, selector_type, in_use, is_max) values (?, ?, ?, ?, ?, ?, ?)";
+		String mapping_sql = "insert into grade_constraint_year_mapping (grade_constraint_id, year, value) values (?, ?, ?)";
+		PreparedStatement pstmt = null;
+		PreparedStatement pstmt1 = null;
+		ResultSet rs = null;
+		boolean autoCommit = true;
+
+		try {
+			autoCommit = conn.getAutoCommit();
+			conn.setAutoCommit(false);
+			pstmt = conn.prepareStatement(insert_sql,
+					Statement.RETURN_GENERATED_KEYS);
+			pstmt1 = conn.prepareStatement(mapping_sql);
+			
+			for(GradeConstraintData gcd : this.gradeConstraintDataList) {
+				if (gcd.getId() > 0)
+					continue;
+				//pstmt.setInt(1, this.projectConfiguration.getProjectId());
+				pstmt.setInt(1, this.scenarioId);
+				pstmt.setString(2, gcd.getSelectedGradeName());
+				pstmt.setString(3, gcd.getProductJoinName());
+				pstmt.setString(4, gcd.getSelectorName());
+				pstmt.setInt(5, gcd.getSelectionType());
+				pstmt.setBoolean(6, gcd.isInUse());
+				pstmt.setBoolean(7, gcd.isMax());
+				pstmt.executeUpdate();
+				rs = pstmt.getGeneratedKeys();
+				
+				if (rs.next()){
+					int id = rs.getInt(1);
+					gcd.setId(id);
+
+					Set keys = gcd.getConstraintData().keySet();
+					Iterator<Integer> it = keys.iterator();
+					while (it.hasNext()) {
+						int key = it.next();
+						pstmt1.setInt(1, gcd.getId());
+						pstmt1.setInt(2, key);
+						pstmt1.setFloat(3, gcd.getConstraintData().get(key));
+						pstmt1.executeUpdate();
+					}
+				}
+			}
+
+			conn.commit();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				conn.setAutoCommit(autoCommit);
+				if (pstmt != null)
+					pstmt.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public void saveBenchConstraintData() {
+
+	}
 	public void saveOpexData() {
 		Connection conn = DBManager.getConnection();
 		String insert_sql = "insert into opex_defn (scenario_id, model_id, expression_id, in_use, is_revenue) values ( ?, ?, ?, ?, ?)";
@@ -363,6 +483,7 @@ public class ScenarioConfigutration {
 
 			for (int i = 0; i < fixedCost.length; i++) {
 				FixedOpexCost fixedOpexCost = fixedCost[i];
+				if(fixedOpexCost == null || fixedOpexCost.getCostData() == null) continue;
 				Set keys = fixedOpexCost.getCostData().keySet();
 				Iterator<Integer> it = keys.iterator();
 				while (it.hasNext()) {
@@ -378,7 +499,7 @@ public class ScenarioConfigutration {
 			conn.commit();
 
 		} catch (SQLException e) {
-			e.printStackTrace();
+			System.err.println("Failed saving Fixed cost."+e.getMessage());
 		} finally {
 			try {
 				conn.setAutoCommit(autoCommit);
@@ -427,6 +548,17 @@ public class ScenarioConfigutration {
 		return null;
 	}
 
+	public GradeConstraintData getGradeConstraintDataById(int id) {
+		if (this.gradeConstraintDataList == null)
+			return null;
+		for (GradeConstraintData gcd : this.gradeConstraintDataList) {
+			if (gcd.getId() == id) {
+				return gcd;
+			}
+		}
+		return null;
+	}
+	
 
 	public List<OpexData> getOpexDataList() {
 		return opexDataList;

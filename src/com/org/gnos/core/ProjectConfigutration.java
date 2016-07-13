@@ -19,6 +19,7 @@ import com.org.gnos.db.dao.FieldDAO;
 import com.org.gnos.db.model.Dump;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Field;
+import com.org.gnos.db.model.Grade;
 import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.Pit;
 import com.org.gnos.db.model.PitGroup;
@@ -316,8 +317,8 @@ public class ProjectConfigutration {
 	}
 	
 	public void loadProducts() {
-		String sql = "select distinct name, associated_model_id, child_expression_id from product_defn where project_id = "
-				+ this.projectId + " order by name ";
+		String sql = "select distinct a.name, associated_model_id, child_expression_id, b.id, b.name, b.value from product_defn a, grade b where a.project_id = "
+				+ this.projectId + " and b.product_name = a.name  order by a.name";
 		Statement stmt = null;
 		ResultSet rs = null;
 		Connection conn = DBManager.getConnection();
@@ -341,6 +342,17 @@ public class ProjectConfigutration {
 				if(expression != null){
 					product.addExpression(expression);
 				}
+				int gradeId = rs.getInt(4);
+				if(gradeId > 0){
+					Grade grade = new Grade();
+					String gradeName = rs.getString(5);
+					String value = rs.getString(6);
+					Expression expr = this.getExpressionByName(value);
+					grade.setName(gradeName);
+					grade.setExpression(expr);
+					grade.setId(gradeId);
+					product.addGrade(grade);
+				}
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -361,12 +373,15 @@ public class ProjectConfigutration {
 	public void loadProductJoins() {
 		String sql = "select distinct name, child_product_name, child_product_join_name from product_join_defn where project_id = "+ this.projectId  +
 				" and ( child_product_name is not null  or child_product_join_name is not null ) order by child_product_name desc";
+		
+		String grade_sql = "select distinct id, name from product_join_grade_name_mapping where project_id = "+ this.projectId  +
+				" and product_join_name = ?  order by id asc";
 
 		try (
 				Connection conn = DBManager.getConnection();
 				Statement stmt = conn.createStatement();
 				ResultSet rs = stmt.executeQuery(sql);
-				
+				PreparedStatement pstmt = conn.prepareStatement(grade_sql);
 			){
 			
 			while(rs.next()){
@@ -375,6 +390,28 @@ public class ProjectConfigutration {
 				if(productJoin == null){
 					productJoin = new ProductJoin(productJoinName);
 					this.productJoinList.add(productJoin);
+					
+					// Add grade to product join .. but there must be a better place to do this
+					
+					ResultSet rs1 = null;
+					try {
+						pstmt.setString(1, productJoinName);
+						rs1 = pstmt.executeQuery();
+						while(rs1.next()){
+							productJoin.addGradeName(rs1.getString("name"));
+						}
+					} catch(SQLException sqle){
+						System.err.println("Failed to load grades for product Join. "+sqle.getMessage());
+					} finally {
+						try{
+							if(rs1 != null) {
+								rs1.close();
+							}
+						} catch(SQLException sqle){
+							System.err.println("Failed to close resultset. "+sqle.getMessage());
+						}
+					}
+					
 				}
 				String childProductName = rs.getString(2);
 				if(childProductName != null) {
@@ -387,7 +424,6 @@ public class ProjectConfigutration {
 					ProductJoin childProductJoin = this.getProductJoinByName(childProductJoinName);
 					productJoin.addProductJoin(childProductJoin);
 				}
-	
 			}
 			
 		} catch (SQLException e) {
@@ -800,7 +836,7 @@ public class ProjectConfigutration {
 			}
 			conn.commit();
 		}catch (SQLException e) {
-			e.printStackTrace();
+			System.err.println("Failed saving process join. "+e.getMessage());
 		} finally {
 			try {
 				conn.setAutoCommit(autoCommit);
@@ -817,7 +853,9 @@ public class ProjectConfigutration {
 	public void saveProductJoins() {
 		Connection conn = DBManager.getConnection();
 		String insert_sql = " insert into product_join_defn (project_id, name, child_product_name, child_product_join_name) values (?, ?, ?, ?)";
+		String insert_grade_sql = " insert into product_join_grade_name_mapping (project_id, name, product_join_name) values (?, ?, ?)";
 		PreparedStatement pstmt = null;
+		PreparedStatement pstmt1 = null;
 		boolean autoCommit = true;
 
 		if(this.productJoinList.size() < 1){ // no process joins defined
@@ -828,6 +866,7 @@ public class ProjectConfigutration {
 			autoCommit = conn.getAutoCommit();
 			conn.setAutoCommit(false);
 			pstmt = conn.prepareStatement(insert_sql);
+			pstmt1 = conn.prepareStatement(insert_grade_sql);
 			
 			for(ProductJoin productJoin : this.productJoinList) {
 				String productJoinName = productJoin.getName();
@@ -848,6 +887,17 @@ public class ProjectConfigutration {
 						pstmt.setNull(3, java.sql.Types.VARCHAR);
 						pstmt.setString(4, chilsProductJoin.getName());
 						pstmt.executeUpdate();
+					}
+				}
+				List<String> gradeNames = productJoin.getGradeNames();
+				for(String gradeName: gradeNames){
+					try {
+						pstmt1.setInt(1, this.projectId);
+						pstmt1.setString(2, gradeName);
+						pstmt1.setString(3, productJoinName);
+						pstmt1.executeUpdate();					
+					} catch(SQLException sqle) {
+						System.err.println("Failed saving grade data."+sqle.getMessage());
 					}
 				}
 			}
@@ -871,7 +921,9 @@ public class ProjectConfigutration {
 	public void saveProducts() {
 		Connection conn = DBManager.getConnection();
 		String insert_sql = " insert into product_defn (project_id, name, associated_model_id, child_expression_id) values (?, ?, ?, ?)";
+		String insert_grade_sql = " insert into grade (project_id, name, product_name, value) values (?, ?, ?, ?)";
 		PreparedStatement pstmt = null;
+		PreparedStatement pstmt1 = null;
 		boolean autoCommit = true;
 
 		if(this.productList.size() < 1){ // no products defined
@@ -882,7 +934,8 @@ public class ProjectConfigutration {
 			autoCommit = conn.getAutoCommit();
 			conn.setAutoCommit(false);
 			pstmt = conn.prepareStatement(insert_sql);
-
+			pstmt1 = conn.prepareStatement(insert_grade_sql);
+			
 			for(Product product : this.productList){
 				String productName = product.getName();
 				int modelId = product.getAssociatedProcess().getId();
@@ -895,6 +948,19 @@ public class ProjectConfigutration {
 					pstmt.setInt(4, expId);
 					pstmt.executeUpdate();
 				}
+				List<Grade> grades = product.getListOfGrades();
+				for(Grade grade: grades){
+					try {
+						pstmt1.setInt(1, this.projectId);
+						pstmt1.setString(2, grade.getName());
+						pstmt1.setString(3, product.getName());
+						pstmt1.setString(4, grade.getExpression().getName());
+						pstmt1.executeUpdate();					
+					} catch(SQLException sqle) {
+						System.err.println("Failed saving grade data."+sqle.getMessage());
+					}
+				}
+
 			}
 			conn.commit();
 		}catch (SQLException e) {
@@ -911,6 +977,7 @@ public class ProjectConfigutration {
 			}
 		}
 	}
+	
 
 	public void savePitGroups() {
 		String insert_sql = "insert into pitgroup_pit_mapping ( project_id , name, child_pit_name, child_pitgroup_name) values ( ? , ?, ?, ?) ";
@@ -938,7 +1005,7 @@ public class ProjectConfigutration {
 			}
 			
 		} catch (SQLException e) {
-			e.printStackTrace();
+			System.err.println("Failed saving pit groups. "+e.getMessage());
 		}
 	}
 	public void saveDumps() {
@@ -957,7 +1024,7 @@ public class ProjectConfigutration {
 			}
 			
 		} catch (SQLException e) {
-			e.printStackTrace();
+			System.err.println("Failed saving dump data. "+e.getMessage());
 		}
 	}
 	
@@ -977,7 +1044,7 @@ public class ProjectConfigutration {
 			}
 			
 		} catch (SQLException e) {
-			e.printStackTrace();
+			System.err.println("Failed saving stockpile data. "+e.getMessage());
 		}
 	}
 	

@@ -44,4 +44,13 @@ public class Product {
 		this.listOfGrades = listOfGrades;
 	}
 	
+	public boolean addGrade(Grade grade){
+		for(Grade g: this.listOfGrades){
+			if(g.getName().equals(grade.getName())){
+				return false;
+			}
+		}
+		this.listOfGrades.add(grade);
+		return true;
+	}
 }

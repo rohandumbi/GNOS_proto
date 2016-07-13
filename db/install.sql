@@ -220,3 +220,50 @@ CREATE TABLE stockpile_pit_mapping(
    primary key (id),
    unique key(project_id, name, pitgroup_name)
 );
+
+DROP TABLE IF EXISTS grade; 
+
+CREATE TABLE grade(
+   id INT NOT NULL AUTO_INCREMENT,
+   project_id INT NOT NULL,
+   product_name VARCHAR(50) NOT NULL,
+   name VARCHAR(50),
+   value VARCHAR(50),
+   PRIMARY KEY ( id ),
+   unique key(project_id, name, product_name)
+);
+
+
+DROP TABLE IF EXISTS grade_constraint_defn; 
+
+CREATE TABLE grade_constraint_defn(
+   id INT NOT NULL AUTO_INCREMENT,
+   scenario_id INT NOT NULL,
+   grade VARCHAR(50) NOT NULL,
+   product_join_name  VARCHAR(50),
+   selector_name VARCHAR(50),
+   selector_type TINYINT,
+   in_use TINYINT NOT NULL default 1,
+   is_max TINYINT NOT NULL default 1,
+   PRIMARY KEY ( id )
+);
+
+DROP TABLE IF EXISTS grade_constraint_year_mapping; 
+
+CREATE TABLE grade_constraint_year_mapping(
+   grade_constraint_id INT NOT NULL,
+   year INT NOT NULL,
+   value FLOAT NOT NULL,
+   unique key( grade_constraint_id, year)
+);
+
+DROP TABLE IF EXISTS product_join_grade_name_mapping; 
+
+CREATE TABLE product_join_grade_name_mapping(
+   id INT NOT NULL AUTO_INCREMENT,
+   project_id INT NOT NULL,
+   product_join_name VARCHAR(50) NOT NULL,
+   name VARCHAR(50),
+   PRIMARY KEY ( id ),
+   unique key(project_id, name, product_join_name)
+);
