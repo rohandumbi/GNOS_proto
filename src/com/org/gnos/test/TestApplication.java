@@ -5,6 +5,7 @@ import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.db.dao.ProjectDAO;
 import com.org.gnos.db.model.Project;
+import com.org.gnos.services.GradeConstraintEquationGenerator;
 import com.org.gnos.services.ObjectiveFunctionEquationGenerator;
 import com.org.gnos.services.ProcessConstraintEquationGenerator;
 import com.org.gnos.services.csv.GNOSCSVDataProcessor;
@@ -50,7 +51,7 @@ public class TestApplication {
 		ScenarioConfigutration.getInstance().load(1);
 		new ObjectiveFunctionEquationGenerator().generate();
 		new ProcessConstraintEquationGenerator().generate();
-
+		new GradeConstraintEquationGenerator().generate();
 	}
 
 }

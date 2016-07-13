@@ -1,6 +1,7 @@
 package com.org.gnos.core;
 
 import com.org.gnos.db.DBManager;
+import com.org.gnos.services.GradeConstraintEquationGenerator;
 import com.org.gnos.services.ObjectiveFunctionEquationGenerator;
 import com.org.gnos.services.ProcessConstraintEquationGenerator;
 
@@ -24,5 +25,6 @@ public class Application {
 	public static void generate() {
 		new ObjectiveFunctionEquationGenerator().generate();
 		new ProcessConstraintEquationGenerator().generate();
+		new GradeConstraintEquationGenerator().generate();
 	}
 }
