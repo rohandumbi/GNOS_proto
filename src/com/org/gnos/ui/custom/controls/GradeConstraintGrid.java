@@ -75,10 +75,13 @@ public class GradeConstraintGrid extends Composite {
 		this.setLayout(new FormLayout());
 		this.createHeader();
 		//this.createRows();
+		for(GradeConstraintData gradeConstraintData : this.gradeConstraintDataList){
+			this.addRow(gradeConstraintData);
+		}
 	}
 
 
-	private String[] getCoefficientComboItems(){
+	/*private String[] getCoefficientComboItems(){
 		ProjectConfigutration projectConfigutration = ProjectConfigutration.getInstance();
 		List<Expression> expressions = projectConfigutration.getNonGradeExpressions();
 		List<Product> products = projectConfigutration.getProductList();
@@ -97,7 +100,7 @@ public class GradeConstraintGrid extends Composite {
 			comboItems[this.productEndIndex+ i +1] = productJoins.get(i).getName();
 		}
 		return comboItems;
-	}
+	}*/
 
 	private String[] getSelectors(){
 
@@ -239,16 +242,12 @@ public class GradeConstraintGrid extends Composite {
 		}
 		return namesOfProductJoinsWithGrades;
 	}
-
-	public void addRow(){
+	
+	public void addRow(final GradeConstraintData gradeConstraintData){
 		final Composite compositeRow = new Composite(this, SWT.BORDER);
 		compositeRow.setLayout(new FormLayout());
 		Color backgroundColor = SWTResourceManager.getColor(SWT.COLOR_WHITE);
-
-		final GradeConstraintData gradeConstraintData  = new GradeConstraintData();
-		this.gradeConstraintDataList.add(gradeConstraintData);
 		compositeRow.setData(gradeConstraintData);
-
 		if((this.allRows != null) && (this.allRows.size()%2 != 0)){
 			backgroundColor =  SWTResourceManager.getColor(245, 245, 245);
 		}
@@ -265,24 +264,33 @@ public class GradeConstraintGrid extends Composite {
 		fd_btnUse.left = new FormAttachment(0,10);
 		fd_btnUse.top = new FormAttachment(0, 2);
 		btnUse.setLayoutData(fd_btnUse);
-
+		btnUse.setSelection(gradeConstraintData.isInUse());
 		btnUse.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				System.out.println("Is button in use selected: " + btnUse.getSelection());
 				gradeConstraintData.setInUse(btnUse.getSelection());
 			}
 		});
-
-
+		
 		final Combo comboProductJoins = new Combo(compositeRow, SWT.NONE);
 		comboProductJoins.setItems(this.getProductJoinsWithGrades());
-		comboProductJoins.setText("Select Join");
+		String associatedProductJoinName  = gradeConstraintData.getProductJoinName();
+		if(associatedProductJoinName != null){
+			comboProductJoins.setText(associatedProductJoinName);
+		}else{
+			comboProductJoins.setText("Select Join");
+		}
+		
 		
 		final Combo comboAvailableGrades = new Combo(compositeRow, SWT.NONE);
-		String[] items = this.getSelectors();
-		comboAvailableGrades.setItems(items);
-		comboAvailableGrades.setText("Select Join");
-		
+		String associatedGradeName = gradeConstraintData.getSelectedGradeName();
+		if(associatedGradeName != null){
+			ProductJoin selectedProductJoin = ProjectConfigutration.getInstance().getProductJoinByName(associatedProductJoinName);
+			comboAvailableGrades.setItems(selectedProductJoin.getGradeNames().toArray(new String[0]));
+			comboAvailableGrades.setText(associatedGradeName);
+		}else{
+			comboAvailableGrades.setText("Select Join");
+		}
 		
 		comboProductJoins.addListener(SWT.MouseDown, new Listener(){
 			@Override
@@ -302,6 +310,7 @@ public class GradeConstraintGrid extends Composite {
 				ProductJoin selectedProductJoin = ProjectConfigutration.getInstance().getProductJoinByName(selectedProductJoinName);
 				comboAvailableGrades.setItems(selectedProductJoin.getGradeNames().toArray(new String[0]));
 				comboAvailableGrades.select(0);
+				gradeConstraintData.setSelectedGradeName(comboAvailableGrades.getText());
 			}
 		});
 		
@@ -323,11 +332,17 @@ public class GradeConstraintGrid extends Composite {
 		fd_comboAvailableGrades.top = new FormAttachment(0);
 		fd_comboAvailableGrades.right = new FormAttachment(comboProductJoins, 140, SWT.RIGHT);
 		comboAvailableGrades.setLayoutData(fd_comboAvailableGrades);
-
+		
 		final Combo comboGroup = new Combo(compositeRow, SWT.NONE);
 		String[] availableGroupingNames = this.getSelectors();
 		comboGroup.setItems(availableGroupingNames);
-		comboGroup.setText("Select Group");
+		
+		String associatedSelectorName = gradeConstraintData.getSelectorName();
+		if(associatedSelectorName != null){
+			comboGroup.setText(associatedSelectorName);
+		}else{
+			comboGroup.setText("Select Group");
+		}
 		comboGroup.addListener(SWT.MouseDown, new Listener(){
 			@Override
 			public void handleEvent(Event event) {
@@ -365,11 +380,14 @@ public class GradeConstraintGrid extends Composite {
 		fd_comboGroup.right = new FormAttachment(comboAvailableGrades, 115, SWT.RIGHT);
 		fd_comboGroup.top = new FormAttachment(0);
 		comboGroup.setLayoutData(fd_comboGroup);
-
-
+		
 		final Combo comboMaxMin = new Combo(compositeRow, SWT.NONE);
 		comboMaxMin.setItems(new String[]{"Max", "Min"});
-		comboMaxMin.setText("Max/Min");
+		if(gradeConstraintData.isMax() == true){
+			comboMaxMin.select(0);
+		}else{
+			comboMaxMin.select(1);
+		}
 		FormData fd_comboMaxMin = new FormData();
 		fd_comboMaxMin.left = new FormAttachment(comboGroup, 4);
 		fd_comboMaxMin.right = new FormAttachment(comboGroup, 108, SWT.RIGHT);
@@ -390,19 +408,31 @@ public class GradeConstraintGrid extends Composite {
 		this.allRows.add(compositeRow);
 		compositeRow.setLayoutData(fd_compositeRow);
 		this.layout();
+		
+		
+	}
+
+	public void addRow(){
+		GradeConstraintData gradeConstraintData  = new GradeConstraintData();
+		this.gradeConstraintDataList.add(gradeConstraintData);
+		this.addRow(gradeConstraintData);
 	}
 
 	private void addTimePeriodRowMembers(final Composite parent, Control reference){
 		Control previousMember = reference;
+		final GradeConstraintData gradeConstraintData = (GradeConstraintData)parent.getData();
 		for(int i=0; i<this.timePeriod; i++){
 			Text yearlyValue = new Text(parent, SWT.BORDER);
 			final int targetYear = this.startYear + i;
+			if(gradeConstraintData.getConstraintData().get(targetYear) != null){
+				yearlyValue.setText(String.valueOf(gradeConstraintData.getConstraintData().get(targetYear)));
+			}
 			yearlyValue.addModifyListener(new ModifyListener(){
 				public void modifyText(ModifyEvent event) {
 					// Get the widget whose text was modified
 					Text text = (Text) event.widget;
 					System.out.println("Input value for the " + targetYear + " year is " + text.getText());
-					GradeConstraintData gradeConstraintData = (GradeConstraintData)parent.getData();
+					//GradeConstraintData gradeConstraintData = (GradeConstraintData)parent.getData();
 					LinkedHashMap<Integer, Float> constraintData = gradeConstraintData.getConstraintData();
 					constraintData.put(targetYear, Float.valueOf(text.getText()));
 				}

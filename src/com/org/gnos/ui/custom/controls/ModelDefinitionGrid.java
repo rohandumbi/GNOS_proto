@@ -190,12 +190,19 @@ public class ModelDefinitionGrid extends Composite {
 				model.setExpression(ProjectConfigutration.getInstance().getExpressionByName(expressionName));
 			}
 		});
-		String expressionName = model.getExpression().getName();
+		
+		Expression associatedExpression = model.getExpression();
+		if(associatedExpression != null){
+			comboExpressionList.setText(associatedExpression.getName());
+		}else{
+			comboExpressionList.setText("Field Value");
+		}
+		/*String expressionName = model.getExpression().getName();
 		if(expressionName != null){
 			comboExpressionList.setText(expressionName);
 		}else{
 			comboExpressionList.setText("Field Value");
-		}
+		}*/
 		
 		Text textCondition = new Text(compositeRow, SWT.BORDER);
 		textCondition.addModifyListener(new ModifyListener(){
