@@ -17,6 +17,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.db.model.Expression;
+import com.org.gnos.db.model.Grade;
 import com.org.gnos.db.model.Product;
 import com.org.gnos.services.ProcessRoute;
 
@@ -66,14 +67,34 @@ public class ProductPropertiesDialog extends Dialog {
 		
 		List listExpressions = new List(container, SWT.BORDER);
 		FormData fd_listExpressions = new FormData();
-		fd_listExpressions.bottom = new FormAttachment(100, -10);
-		fd_listExpressions.top = new FormAttachment(lblExpressionList, 15);
+		fd_listExpressions.bottom = new FormAttachment(50, 10);
+		fd_listExpressions.top = new FormAttachment(lblExpressionList, 5);
 		fd_listExpressions.right = new FormAttachment(textGroupName, 0, SWT.RIGHT);
 		fd_listExpressions.left = new FormAttachment(0, 10);
 		listExpressions.setLayoutData(fd_listExpressions);
 		
+		Label lblGradeList = new Label(container, SWT.NONE);
+		lblGradeList.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
+		FormData fd_lblGradeList = new FormData();
+		fd_lblGradeList.top = new FormAttachment(listExpressions, 10);
+		fd_lblGradeList.left = new FormAttachment(0, 10);
+		lblGradeList.setLayoutData(fd_lblGradeList);
+		lblGradeList.setText("Contained Grades:");
+		
+		List listGrades = new List(container, SWT.BORDER);
+		FormData fd_listGrades = new FormData();
+		fd_listGrades.bottom = new FormAttachment(100, -10);
+		fd_listGrades.top = new FormAttachment(lblGradeList, 5);
+		fd_listGrades.right = new FormAttachment(textGroupName, 0, SWT.RIGHT);
+		fd_listGrades.left = new FormAttachment(0, 10);
+		listGrades.setLayoutData(fd_listGrades);
+		
 		for(Expression expression : this.product.getListOfExpressions()){
 			listExpressions.add(expression.getName());
+		}
+		
+		for(Grade grade : this.product.getListOfGrades()){
+			listGrades.add(grade.getName());
 		}
 		
 		container.getShell().setText("Product Details");
