@@ -242,11 +242,9 @@ public class GradeConstraintEquationGenerator {
 			if(processRatio == 0) continue;
 			String gradeExpr = grade.getExpression().getName().replaceAll("\\s+","_");
 			float bloackGrade = block.getRatioField(gradeExpr);
-			if(bloackGrade > targetGrade) {
+			if(targetGrade > bloackGrade) {
 				eq +=  "+ ";
-			} else {
-				eq +=  "- ";
-			}
+			} 
 			eq +=   processRatio*(targetGrade-bloackGrade)+"p"+block.getPitNo()+"x"+block.getBlockNo()+"p"+processNumber+"t"+period;
 		}			
 		return eq;
