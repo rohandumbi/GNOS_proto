@@ -32,8 +32,14 @@ public class Product {
 		return name;
 	}
 
-	public void addExpression(Expression expression){
+	public boolean addExpression(Expression expression){
+		for(Expression e: this.listOfExpressions){
+			if(e.getName().equals(expression.getName())){
+				return false;
+			}
+		}
 		this.listOfExpressions.add(expression);
+		return true;
 	}
 
 	public List<Grade> getListOfGrades() {
