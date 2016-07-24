@@ -240,6 +240,7 @@ public class GradeConstraintEquationGenerator {
 			}
 
 			if(processRatio == 0) continue;
+			if(grade.getExpression() == null) continue;
 			String gradeExpr = grade.getExpression().getName().replaceAll("\\s+","_");
 			float bloackGrade = block.getRatioField(gradeExpr);
 			if(targetGrade > bloackGrade) {
