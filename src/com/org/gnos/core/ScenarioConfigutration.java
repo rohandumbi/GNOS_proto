@@ -18,6 +18,7 @@ import com.org.gnos.db.model.GradeConstraintData;
 import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.OpexData;
 import com.org.gnos.db.model.OreMiningCost;
+import com.org.gnos.db.model.PitBenchConstraintData;
 import com.org.gnos.db.model.ProcessConstraintData;
 import com.org.gnos.db.model.ProcessJoin;
 import com.org.gnos.db.model.Scenario;
@@ -34,6 +35,7 @@ public class ScenarioConfigutration {
 	private List<ProcessJoin> processJoins = new ArrayList<ProcessJoin>();
 	private List<ProcessConstraintData> processConstraintDataList = new ArrayList<ProcessConstraintData>();
 	private List<GradeConstraintData> gradeConstraintDataList = new ArrayList<GradeConstraintData>();
+	private List<PitBenchConstraintData> pitBenchConstraintDataList = new ArrayList<PitBenchConstraintData>();
 	private Scenario scenarioData ;
 
 	private int scenarioId = -1;
@@ -595,6 +597,15 @@ public class ScenarioConfigutration {
 	
 	public List<GradeConstraintData> getGradeConstraintDataList() {
 		return gradeConstraintDataList;
+	}
+	
+	public List<PitBenchConstraintData> getPitBenchConstraintDataList() {
+		return pitBenchConstraintDataList;
+	}
+
+	public void setPitBenchConstraintDataList(
+			List<PitBenchConstraintData> pitBenchConstraintDataList) {
+		this.pitBenchConstraintDataList = pitBenchConstraintDataList;
 	}
 
 	public void addProcessJoin(ProcessJoin processJoin) {

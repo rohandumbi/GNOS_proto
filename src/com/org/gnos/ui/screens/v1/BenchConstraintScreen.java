@@ -7,7 +7,7 @@ import org.eclipse.swt.widgets.Text;
 import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.ui.custom.controls.GnosScreen;
-import com.org.gnos.ui.custom.controls.GradeConstraintGrid;
+import com.org.gnos.ui.custom.controls.PitBenchConstraintGrid;
 
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -25,7 +25,7 @@ public class BenchConstraintScreen extends GnosScreen {
 
 	private Text textScenarioName;
 	private ScrolledComposite scGridContainer;
-	private GradeConstraintGrid gradeConstraintGrid;
+	private PitBenchConstraintGrid pitBenchConstraintGrid;
 	private Label labelScreenName;
 	private String scenarioName;
 	private Button btnAddConstraintRow;
@@ -114,8 +114,8 @@ public class BenchConstraintScreen extends GnosScreen {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				//TO DO implement row add
-				gradeConstraintGrid.addRow();
-				Rectangle r = gradeConstraintGrid.getClientArea();
+				pitBenchConstraintGrid.addRow();
+				Rectangle r = pitBenchConstraintGrid.getClientArea();
 				int gridWidth = r.width;
 				
 				int scrollableHeight = scGridContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).y;
@@ -138,11 +138,11 @@ public class BenchConstraintScreen extends GnosScreen {
 			this.textScenarioName.setText(this.scenarioName);
 		}
 		
-		if(this.gradeConstraintGrid != null){
-			this.gradeConstraintGrid.dispose();
+		if(this.pitBenchConstraintGrid != null){
+			this.pitBenchConstraintGrid.dispose();
 		}
-		this.gradeConstraintGrid = new GradeConstraintGrid(scGridContainer, SWT.None);
-		this.scGridContainer.setContent(this.gradeConstraintGrid);
+		this.pitBenchConstraintGrid = new PitBenchConstraintGrid(scGridContainer, SWT.None);
+		this.scGridContainer.setContent(this.pitBenchConstraintGrid);
 	}
 	
 	@Override
