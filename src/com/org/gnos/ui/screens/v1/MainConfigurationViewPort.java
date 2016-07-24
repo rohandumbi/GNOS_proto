@@ -182,11 +182,9 @@ public class MainConfigurationViewPort extends GnosScreen{
 		 * Since opex screen is reloaded at the selection of a scenario 
 		 * we don't need to reload it again although it is a scenario screen
 		 */
-		//reload process constraint
-		//processConstraintDefinitionScreen = new ProcessConstraintDefinitionScreen(this.dummyShell, SWT.NONE);
-		//processConstraintDefinitionScreen.registerEventListener(this);
 		processConstraintDefinitionScreen.refreshGrid();
 		gradeConstraintScreen.refreshGrid();
+		benchConstraintScreen.refreshGrid();
 		//this.layout();
 	}
 	
