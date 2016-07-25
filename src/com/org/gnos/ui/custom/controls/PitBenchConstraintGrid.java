@@ -232,8 +232,8 @@ public class PitBenchConstraintGrid extends Composite {
 					Text text = (Text) event.widget;
 					System.out.println("Input value for the " + targetYear + " year is " + text.getText());
 					//GradeConstraintData gradeConstraintData = (GradeConstraintData)parent.getData();
-					LinkedHashMap<Integer, Float> constraintData = pitBenchConstraintData.getConstraintData();
-					constraintData.put(targetYear, Float.valueOf(text.getText()));
+					LinkedHashMap<Integer, Integer> constraintData = pitBenchConstraintData.getConstraintData();
+					constraintData.put(targetYear, Integer.valueOf(text.getText()));
 				}
 			});
 			FormData fd_yearlyValue = new FormData();

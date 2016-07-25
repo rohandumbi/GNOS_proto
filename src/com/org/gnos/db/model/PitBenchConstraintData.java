@@ -6,12 +6,12 @@ public class PitBenchConstraintData {
 	private int id;
 	private boolean inUse;
 	private String pitName;
-	private LinkedHashMap<Integer, Float> constraintData;
+	private LinkedHashMap<Integer, Integer> constraintData;
 	
 	public PitBenchConstraintData() {
 		super();
 		this.id = -1;
-		this.constraintData = new LinkedHashMap<Integer, Float>();
+		this.constraintData = new LinkedHashMap<Integer, Integer>();
 	}
 	
 	public int getId() {
@@ -38,15 +38,15 @@ public class PitBenchConstraintData {
 		this.pitName = pitName;
 	}
 
-	public LinkedHashMap<Integer, Float> getConstraintData() {
+	public LinkedHashMap<Integer, Integer> getConstraintData() {
 		return constraintData;
 	}
 
-	public void setConstraintData(LinkedHashMap<Integer, Float> constraintData) {
+	public void setConstraintData(LinkedHashMap<Integer, Integer> constraintData) {
 		this.constraintData = constraintData;
 	}
 
-	public void addYear(int year, float value) {
+	public void addYear(int year, int value) {
 		this.constraintData.put(year, value);
 	}
 	

@@ -261,7 +261,43 @@ public class ScenarioConfigutration {
 	}
 	
 	public void loadBenchConstraintData() {
-		
+		this.pitBenchConstraintDataList = new ArrayList<PitBenchConstraintData>();
+		String sql = "select id, pit_name, in_use, year, value from bench_constraint_defn, bench_constraint_year_mapping where id = bench_constraint_id and scenario_id =" + this.scenarioId + " order by id, year";
+		Statement stmt = null;
+		ResultSet rs = null;
+		Connection conn = DBManager.getConnection();
+		try {
+			stmt = conn.createStatement();
+			stmt.execute(sql);
+			rs = stmt.getResultSet();
+			PitBenchConstraintData pcd;
+			while (rs.next()) {
+				int id = rs.getInt(1);
+
+				pcd = getBenchConstraintDataById(id);
+				if (pcd == null) {
+					pcd = new PitBenchConstraintData();					
+					pcd.setId(id);
+					pcd.setPitName(rs.getString(2));
+					pcd.setInUse(rs.getBoolean(3));
+					this.pitBenchConstraintDataList.add(pcd);
+				}
+				pcd.addYear(rs.getInt("year"), rs.getInt("value"));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (stmt != null)
+					stmt.close();
+				if (rs != null)
+					rs.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	public void save() {
@@ -401,7 +437,62 @@ public class ScenarioConfigutration {
 	}
 	
 	public void saveBenchConstraintData() {
+		Connection conn = DBManager.getConnection();
+		String insert_sql = "insert into bench_constraint_defn (scenario_id, pit_name, in_use) values (?, ?, ?)";
+		String mapping_sql = "insert into bench_constraint_year_mapping (bench_constraint_id, year, value) values (?, ?, ?)";
+		PreparedStatement pstmt = null;
+		PreparedStatement pstmt1 = null;
+		ResultSet rs = null;
+		boolean autoCommit = true;
 
+		try {
+			autoCommit = conn.getAutoCommit();
+			conn.setAutoCommit(false);
+			pstmt = conn.prepareStatement(insert_sql,
+					Statement.RETURN_GENERATED_KEYS);
+			pstmt1 = conn.prepareStatement(mapping_sql);
+			
+			for(PitBenchConstraintData pcd : this.pitBenchConstraintDataList) {
+				if (pcd.getId() > 0)
+					continue;
+				//pstmt.setInt(1, this.projectConfiguration.getProjectId());
+				pstmt.setInt(1, this.scenarioId);
+				pstmt.setString(2, pcd.getPitName());
+				pstmt.setBoolean(3, pcd.isInUse());
+				pstmt.executeUpdate();
+				rs = pstmt.getGeneratedKeys();
+				
+				if (rs.next()){
+					int id = rs.getInt(1);
+					pcd.setId(id);
+
+					Set keys = pcd.getConstraintData().keySet();
+					Iterator<Integer> it = keys.iterator();
+					while (it.hasNext()) {
+						int key = it.next();
+						pstmt1.setInt(1, pcd.getId());
+						pstmt1.setInt(2, key);
+						pstmt1.setFloat(3, pcd.getConstraintData().get(key));
+						pstmt1.executeUpdate();
+					}
+				}
+			}
+
+			conn.commit();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				conn.setAutoCommit(autoCommit);
+				if (pstmt != null)
+					pstmt.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	public void saveOpexData() {
 		Connection conn = DBManager.getConnection();
@@ -561,6 +652,16 @@ public class ScenarioConfigutration {
 		return null;
 	}
 	
+	public PitBenchConstraintData getBenchConstraintDataById(int id) {
+		if (this.pitBenchConstraintDataList == null)
+			return null;
+		for (PitBenchConstraintData pcd : this.pitBenchConstraintDataList) {
+			if (pcd.getId() == id) {
+				return pcd;
+			}
+		}
+		return null;
+	}
 
 	public List<OpexData> getOpexDataList() {
 		return opexDataList;
