@@ -1016,11 +1016,14 @@ public class ProjectConfigutration {
 				PreparedStatement pstmt = conn.prepareStatement(insert_sql);
 				
 			){
+			int count = 1;
 			for(Dump dump : dumpList) {
 				pstmt.setInt(1, projectId);
 				pstmt.setString(2, dump.getName());
 				pstmt.setString(3, dump.getAssociatedPitGroup().getName());
 				pstmt.executeUpdate();
+				dump.setDumpNumber(count);				
+				count++;
 			}
 			
 		} catch (SQLException e) {
@@ -1036,11 +1039,14 @@ public class ProjectConfigutration {
 				PreparedStatement pstmt = conn.prepareStatement(insert_sql);
 				
 			){
+			int count = 1;
 			for(Stockpile stockpile : stockPileList) {
 				pstmt.setInt(1, projectId);
 				pstmt.setString(2, stockpile.getName());
 				pstmt.setString(3, stockpile.getAssociatedPitGroup().getName());
 				pstmt.executeUpdate();
+				stockpile.setStockpileNumber(count);				
+				count++;
 			}
 			
 		} catch (SQLException e) {
