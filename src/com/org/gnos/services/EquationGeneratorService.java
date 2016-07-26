@@ -1,5 +1,6 @@
 package com.org.gnos.services;
 
+import com.org.gnos.equation.BenchConstraintEquationGenerator;
 import com.org.gnos.equation.BinaryVariableGenerator;
 import com.org.gnos.equation.BoundaryVariableGenerator;
 import com.org.gnos.equation.GradeConstraintEquationGenerator;
@@ -23,6 +24,7 @@ public class EquationGeneratorService {
 		new ProcessConstraintEquationGenerator(data).generate();
 		new GradeConstraintEquationGenerator(data).generate();
 		new BinaryVariableGenerator(data).generate();
+		new BenchConstraintEquationGenerator(data).generate();
 		new BoundaryVariableGenerator(data).generate();
 		
 	}	
