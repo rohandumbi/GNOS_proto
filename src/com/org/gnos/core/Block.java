@@ -1,23 +1,19 @@
 package com.org.gnos.core;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class Block {
 
 	private int id;
 	private int blockNo;
-	private int pitNo;
-	private int benchNo;
 	
 	private Map<String, String> fields;
+	private Map<String, String> computedFields;
 
 	public Block() {
 		fields = new HashMap<String, String>();
+		computedFields = new HashMap<String, String>();
 	}
 	
 	public int getId() {
@@ -37,30 +33,30 @@ public class Block {
 	}
 
 	public int getPitNo() {
-		return Integer.parseInt(this.fields.get("pit_no"));
+		return Integer.parseInt(this.computedFields.get("pit_no"));
 	}
 
 	public int getBenchNo() {		
-		return Integer.parseInt(this.fields.get("bench_no"));
+		return Integer.parseInt(this.computedFields.get("bench_no"));
 	}
 	
-	public Float getRatioField(String fieldName) {
-		String val = this.fields.get(fieldName);
+	public Float getComputedField(String fieldName) {
+		String val = this.computedFields.get(fieldName);
 		if(val == null ) return new Float(0);
 		else return Float.parseFloat(val);
 	}
 	
-	public Map<String, String> getFields() {
-		return fields;
-	}
-
-	public void setFields(Map<String, String> fields) {
-		this.fields = fields;
+	public String getField(String fieldName) {
+		return this.fields.get(fieldName);
 	}
 
 	public void addField(String key,  String ratio) {
 		this.fields.put(key, ratio);
 	}	
+	
+	public void addComputedField(String key,  String ratio) {
+		this.computedFields.put(key, ratio);
+	}
 	
 	@Override
 	public boolean equals(Object obj) {

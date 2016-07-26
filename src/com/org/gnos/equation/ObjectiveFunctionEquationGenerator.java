@@ -1,11 +1,10 @@
-package com.org.gnos.services;
+package com.org.gnos.equation;
 
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -30,26 +29,27 @@ import com.org.gnos.db.model.PitGroup;
 import com.org.gnos.db.model.Process;
 import com.org.gnos.db.model.Stockpile;
 
-public class ObjectiveFunctionEquationGenerator {
+public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 
-	static final int BYTES_PER_LINE = 128;
-	
-	private BufferedOutputStream output;
-	private ProjectConfigutration projectConfiguration;
-	private ScenarioConfigutration scenarioConfigutration;
 	private Map<Integer, List<Integer>> pitDumpMapping;
 	private Map<Integer, Integer> pitStockpileMapping;
 	
-	private Set<Integer> processedBlocks;
 	private Tree processTree;
 	private int bytesWritten = 0;
 	private float discount_rate = 0; //this has to be made an input variable later
+	
+	private Set<Integer> processedBlocks;
+	
+	public ObjectiveFunctionEquationGenerator(InstanceData data) {
+		super(data);
+	}
+	
+	@Override
 	public void generate() {
 		projectConfiguration = ProjectConfigutration.getInstance();
 		scenarioConfigutration = ScenarioConfigutration.getInstance();
 		processedBlocks = new HashSet<Integer>();
 		
-
 		int bufferSize = 8 * 1024;
 		try {
 			discount_rate = scenarioConfigutration.getDiscount()/100;
@@ -78,6 +78,7 @@ public class ObjectiveFunctionEquationGenerator {
 			processBlocks.addAll(blocks);
 			buildProcessVariables(process, blocks, process.getProcessNo());		
 		}
+		serviceInstanceData.setProcessBlocks(processBlocks);
 		buildStockpileVariables(processBlocks);
 	}
 	
@@ -93,12 +94,14 @@ public class ObjectiveFunctionEquationGenerator {
 				float processValue = getProcessValue(block, process.getModel(), year);
 				float value = processValue - miningcost;
 				value = (float) (value * (1 / Math.pow ((1 + discount_rate), count)));
-				String eq = " "+value+"p"+block.getPitNo()+"x"+block.getBlockNo()+"p"+processNumber+"t"+count;
+				String variable = "p"+block.getPitNo()+"x"+block.getBlockNo()+"p"+processNumber+"t"+count;
+				String eq = " "+value+variable;
 				if(value > 0){
 					eq = " +"+eq;
 				} 
 				write(eq);
 				
+				serviceInstanceData.addVariable(block, variable);
 			}
 			count ++;
 		}
@@ -117,16 +120,19 @@ public class ObjectiveFunctionEquationGenerator {
 			for(Block block: blocks) {
 				Integer stockpileNumber = this.pitStockpileMapping.get(block.getPitNo());
 				if(stockpileNumber == null) continue;
-				String eq = " -"+cost+"p"+block.getPitNo()+"x"+block.getBlockNo()+"s"+stockpileNumber+"t"+count;
-
+				String variable = "p"+block.getPitNo()+"x"+block.getBlockNo()+"s"+stockpileNumber+"t"+count;
+				String eq = " -"+cost+ variable;
 				write(eq);
+				
+				serviceInstanceData.addVariable(block, variable);
 			}
 			count++;
 		}
 	}
 	
 	private void buildWasteBlockVariables() throws IOException {
-		List<Block> wasteblocks = findWasteBlocks();
+		Set<Block> wasteblocks = findWasteBlocks();
+		serviceInstanceData.setWasteBlocks(wasteblocks);
 		FixedOpexCost[] fixedOpexCost = scenarioConfigutration.getFixedCost();
 		if(fixedOpexCost == null || fixedOpexCost.length < 2) return;
 		parseDumpData();
@@ -140,8 +146,11 @@ public class ObjectiveFunctionEquationGenerator {
 				List<Integer> dumps = pitDumpMapping.get(block.getPitNo());
 				if(dumps == null) continue;
 				for(Integer dumpNo: dumps){
-					String eq = " -"+cost+"p"+block.getPitNo()+"x"+block.getBlockNo()+"w"+dumpNo+"t"+count;
+					String variable = "p"+block.getPitNo()+"x"+block.getBlockNo()+"w"+dumpNo+"t"+count;
+					String eq = " -"+cost+variable;
 					write(eq);
+					
+					serviceInstanceData.addVariable(block, variable);
 				}
 				
 			}
@@ -191,9 +200,9 @@ public class ObjectiveFunctionEquationGenerator {
 	
 	private List<Block> findBlocks(String condition) {
 		List<Block> blocks = new ArrayList<Block>();
-		String sql = "select b.* from gnos_data_"+projectConfiguration.getProjectId()+" a, gnos_computed_data_"+projectConfiguration.getProjectId()+" b where a.id = b.row_id";
+		String sql = "select id from gnos_data_"+projectConfiguration.getProjectId() ;
 		if(hasValue(condition)) {
-			sql += " AND "+condition;
+			sql += " where "+condition;
 		}
 		
 		try (
@@ -202,18 +211,11 @@ public class ObjectiveFunctionEquationGenerator {
 				ResultSet rs = stmt.executeQuery(sql);			
 			)
 		{
-			ResultSetMetaData md = rs.getMetaData();
-			int columnCount = md.getColumnCount();
 			while(rs.next()){
-				
-				Block block = new Block();
-				block.setId(rs.getInt("row_id"));
-				block.setBlockNo(rs.getInt("block_no"));
-				for(int i=1; i<=columnCount; i++){
-					block.addField(md.getColumnName(i), rs.getString(i));
-				}
+				int id = rs.getInt("id");
+				Block block = serviceInstanceData.getBlocks().get(id);
 				blocks.add(block);
-				processedBlocks.add(block.getBlockNo());
+				processedBlocks.add(block.getId());
 			}
 			
 		} catch (SQLException e) {
@@ -223,36 +225,17 @@ public class ObjectiveFunctionEquationGenerator {
 		return blocks;
 	}
 	
-	private List<Block> findWasteBlocks() {
-		List<Block> blocks = new ArrayList<Block>();
-		String sql = "select * from gnos_computed_data_"+projectConfiguration.getProjectId();
-		
-		try (
-				Connection conn = DBManager.getConnection();
-				Statement stmt  = conn.createStatement();
-				ResultSet rs = stmt.executeQuery(sql);
-			)
-		{
-			ResultSetMetaData md = rs.getMetaData();
-			int columnCount = md.getColumnCount();
-			while(rs.next()){
-				int blockNo = rs.getInt("block_no");
-				if(processedBlocks.contains(blockNo)) continue;
-
-				Block block = new Block();
-				block.setId(rs.getInt("row_id"));
-				block.setBlockNo(blockNo);
-				for(int i=1; i<=columnCount; i++){
-					block.addField(md.getColumnName(i), rs.getString(i));
+	private Set<Block> findWasteBlocks() {
+		Set<Block> blocks = new HashSet<Block>();
+		Map<Integer, Block> allBlocks = serviceInstanceData.getBlocks();
+		if(allBlocks != null){
+			Set<Integer> blockIds = allBlocks.keySet();
+			for(Integer blockId: blockIds){
+				if(!processedBlocks.contains(blockId)){
+					blocks.add(allBlocks.get(blockId));
 				}
-				blocks.add(block);
-				processedBlocks.add(block.getBlockNo());
 			}
-			
-		} catch (SQLException e) {
-			e.printStackTrace();
 		}
-		
 		return blocks;
 	}
 	
@@ -266,7 +249,7 @@ public class ObjectiveFunctionEquationGenerator {
 			if(opexData.getModel().getId() == model.getId()){
 				if(opexData.isRevenue()){
 					String expressionName = opexData.getExpression().getName().replaceAll("\\s+","_");
-					float expr_value = b.getRatioField(expressionName);
+					float expr_value = b.getComputedField(expressionName);
 					revenue = revenue + expr_value * opexData.getCostData().get(year);
 				} else {
 					pcost = pcost + opexData.getCostData().get(year);
@@ -320,14 +303,8 @@ public class ObjectiveFunctionEquationGenerator {
 		return (s !=null && s.trim().length() >0);
 	}
 	
-	private int getStockPileForPit(int pitNo){
-		return pitNo;
-	}
-	private int getDumpForPit(int pitNo){
-		return pitNo;
-	}
-	
-	private void write(String s) {
+	@Override
+	protected void write(String s) {
 
 		try {
 			byte[] bytes = s.getBytes();
@@ -343,14 +320,6 @@ public class ObjectiveFunctionEquationGenerator {
 			e.printStackTrace();
 		}
 
-	}
-	
-	private class CostRevenueData {
-		int year;
-		float cost;
-		float revenue;
-		String expressionName;
-	}
-	
+	}	
 	
 }

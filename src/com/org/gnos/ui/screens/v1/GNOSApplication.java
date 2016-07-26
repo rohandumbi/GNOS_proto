@@ -18,11 +18,11 @@ import org.eclipse.swt.widgets.Shell;
 import com.org.gnos.core.Application;
 import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.db.model.Field;
+import com.org.gnos.equation.ObjectiveFunctionEquationGenerator;
+import com.org.gnos.equation.ProcessConstraintEquationGenerator;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.events.GnosEventWithAttributeMap;
 import com.org.gnos.events.interfaces.GnosEventListener;
-import com.org.gnos.services.ObjectiveFunctionEquationGenerator;
-import com.org.gnos.services.ProcessConstraintEquationGenerator;
 import com.org.gnos.services.csv.GNOSCSVDataProcessor;
 import com.org.gnos.ui.custom.controls.GnosScreen;
 

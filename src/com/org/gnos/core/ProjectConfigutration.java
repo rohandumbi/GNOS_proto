@@ -186,11 +186,11 @@ public class ProjectConfigutration {
 				+ dataTableName + " a, " + computedDataTableName
 				+ " b where a.id = b.row_id";
 
-		try (Connection conn = DBManager.getConnection();
+		try (
+				Connection conn = DBManager.getConnection();
 				Statement stmt = conn.createStatement();
 				ResultSet rs = stmt.executeQuery(sql);
-
-				) {
+			) {
 
 			while (rs.next()) {
 				String pit_name = rs.getString(1);

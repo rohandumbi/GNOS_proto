@@ -1,4 +1,4 @@
-package com.org.gnos.services;
+package com.org.gnos.equation;
 
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
@@ -23,18 +23,17 @@ import com.org.gnos.db.model.ProcessJoin;
 import com.org.gnos.db.model.Product;
 import com.org.gnos.db.model.ProductJoin;
 
-public class ProcessConstraintEquationGenerator {
+public class ProcessConstraintEquationGenerator extends EquationGenerator{
 
-	static final int BYTES_PER_LINE = 256;
-	
-	private BufferedOutputStream output;
-	private ProjectConfigutration projectConfiguration;
-	private ScenarioConfigutration scenarioConfigutration;
 	private List<ProcessConstraintData> processConstraintDataList;
-	
 	private int bytesWritten = 0;
 
+
+	public ProcessConstraintEquationGenerator(InstanceData data) {
+		super(data);
+	}
 	
+	@Override
 	public void generate() {
 		projectConfiguration = ProjectConfigutration.getInstance();
 		scenarioConfigutration = ScenarioConfigutration.getInstance();
@@ -212,40 +211,6 @@ public class ProcessConstraintEquationGenerator {
 		
 	}
 
-	private List<Product> getProductsFromProductJoin(ProductJoin pj) {
-		List<Product> products = new ArrayList<Product>();
-		if(pj == null) return products;
-		products.addAll(pj.getlistChildProducts());
-		if(pj.getListChildProductJoins().size() > 0){
-			for(ProductJoin pji: pj.getListChildProductJoins()) {
-				products.addAll(getProductsFromProductJoin(pji));
-			}
-		}
-		return products;
-	}
-	
-	private Set<Integer> getPitsFromPitGroup(PitGroup pg) {
-		Set<Integer> pitNumbers = new HashSet<Integer>();
-		if(pg == null) return pitNumbers;
-		for(Pit p: pg.getListChildPits()){
-			pitNumbers.add(p.getPitNumber());
-		}
-		for(PitGroup pgi: pg.getListChildPitGroups()){
-			pitNumbers.addAll(getPitsFromPitGroup(pgi));
-		}
-		
-		return pitNumbers;
-	}
-	private Set<String> getProcessListFromProductJoin(ProductJoin pj){
-		Set<String> processes = new HashSet<String>();
-		 for(Product childProduct: pj.getlistChildProducts()){
-			 processes.add(childProduct.getAssociatedProcess().getName());
-		 }
-		 for(ProductJoin childJoin: pj.getListChildProductJoins()) {
-			 processes.addAll(getProcessListFromProductJoin(childJoin));
-		 }
-		 return processes;
-	}
 	public String buildProcessConstraintVariables(int processNumber, List<String> coefficients, List<Block> blocks, int period) {
 		
 		String eq = "";
@@ -253,7 +218,7 @@ public class ProcessConstraintEquationGenerator {
 			float processRatio = 0;
 			for(String coefficient: coefficients){
 				String expressionName = coefficient.replaceAll("\\s+","_");
-				processRatio += block.getRatioField(expressionName);					
+				processRatio += block.getComputedField(expressionName);					
 			}
 			if(processRatio == 0) continue;
 			
@@ -261,26 +226,5 @@ public class ProcessConstraintEquationGenerator {
 		}			
 		return eq;
 	}
-	
-
-	private void write(String s) {
-
-		try {
-			s = s +"\r\n";
-			byte[] bytes = s.getBytes();
-			/*if(bytes.length + bytesWritten > BYTES_PER_LINE){
-				output.write("\r\n".getBytes());
-				output.flush();
-				bytesWritten = 0;
-			}*/
-			output.write(bytes);
-			output.flush();
-			//bytesWritten = bytesWritten + bytes.length;
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-	}	
 	
 }
