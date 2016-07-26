@@ -10,6 +10,7 @@ import java.util.Set;
 import com.org.gnos.core.Bench;
 import com.org.gnos.core.Block;
 import com.org.gnos.core.Pit;
+import com.org.gnos.db.model.PitBenchConstraintData;
 
 public class BenchConstraintEquationGenerator extends EquationGenerator{
 
@@ -30,6 +31,7 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 			output = new BufferedOutputStream(new FileOutputStream("pitBenchConstraint.txt"), bufferSize);
 			bytesWritten = 0;
 			buildBenchConstraintVariables();
+			buildBenchUserConstraintVariables();
 			output.flush();
 			output.close();
 		} catch(Exception e) {
@@ -83,6 +85,62 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 			}
 		}
 	}
+	
+	private void buildBenchUserConstraintVariables() {
+		List<PitBenchConstraintData> pitBenchConstraintDataList = scenarioConfigutration.getPitBenchConstraintDataList();
+		int timePeriod = scenarioConfigutration.getTimePeriod();
+		int startyear = scenarioConfigutration.getStartYear();
+		boolean hasDefaultConstraint = false;
+		List<Integer> exclusionList = new ArrayList<Integer>();
+		PitBenchConstraintData defaultConstraint = null;
+		for(PitBenchConstraintData pitBenchConstraintData:pitBenchConstraintDataList){
+			if(!pitBenchConstraintData.isInUse()) continue;
+			if(pitBenchConstraintData.getPitName().equals("Default")){
+				hasDefaultConstraint = true;
+				defaultConstraint = pitBenchConstraintData;
+				continue;
+			}
+			String pitName = pitBenchConstraintData.getPitName();
+			com.org.gnos.db.model.Pit pit = projectConfiguration.getPitfromPitName(pitName);
+			exclusionList.add(pit.getPitNumber());
+			Pit pitdata = serviceInstanceData.getPits().get(pit.getPitNumber());
+			for(int i=1; i<= timePeriod; i++){
+				int yearvalue = pitBenchConstraintData.getConstraintData().get(startyear+ i-1);
+				buildEquationForPit(pitdata, i, yearvalue);
+			}
+			
+		}
+		if(hasDefaultConstraint){
+			Map<Integer, Pit> pits = serviceInstanceData.getPits();
+			Set<Integer> pitNos = pits.keySet();
+			for(Integer pitNo: pitNos){
+				if(exclusionList.contains(pitNo)) continue;
+				
+				Pit pit = pits.get(pitNo);
+				for(int i=1; i<= timePeriod; i++){
+					int yearvalue = defaultConstraint.getConstraintData().get(startyear+ i-1);
+					buildEquationForPit(pit, i, yearvalue);
+				}
+			}
+		}
+	}
+	
+	private void buildEquationForPit(Pit pit, int timeperiod, int yearvalue){
+		StringBuilder sb1 = new StringBuilder();
+		StringBuilder sb2 = new StringBuilder();
+		List<Bench> benches = pit.getBenches();
+		
+		for(Bench bench:benches){
+			sb1.append("+"+"p"+pit.getPitNo()+"b"+bench.getBenchNo()+"t"+timeperiod);
+			if(timeperiod > 1){
+				sb2.append("-"+"p"+pit.getPitNo()+"b"+bench.getBenchNo()+"t"+(timeperiod-1));
+			}			
+		}
+		String eq = sb1.toString().substring(1) + sb2.toString() + " <= "+ (yearvalue-1);
+		write(eq);
+		
+	}
+	
 	private List<String> getAllVariablesForBench(Bench bench){
 		List<String> variables = new ArrayList<String>();
 		List<Block> blocks= bench.getBlocks();
