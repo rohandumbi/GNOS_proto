@@ -267,3 +267,22 @@ CREATE TABLE product_join_grade_name_mapping(
    PRIMARY KEY ( id ),
    unique key(project_id, name, product_join_name)
 );
+
+DROP TABLE IF EXISTS bench_constraint_defn; 
+
+CREATE TABLE bench_constraint_defn(
+   id INT NOT NULL AUTO_INCREMENT,
+   scenario_id INT NOT NULL,
+   pit_name  VARCHAR(50),
+   in_use TINYINT NOT NULL default 1,
+   PRIMARY KEY ( id )
+);
+
+DROP TABLE IF EXISTS bench_constraint_year_mapping; 
+
+CREATE TABLE bench_constraint_year_mapping(
+   bench_constraint_id INT NOT NULL,
+   year INT NOT NULL,
+   value INT NOT NULL,
+   unique key( bench_constraint_id, year)
+);

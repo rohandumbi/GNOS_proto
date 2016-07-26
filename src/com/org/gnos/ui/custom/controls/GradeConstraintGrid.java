@@ -351,6 +351,7 @@ public class GradeConstraintGrid extends Composite {
 				comboGroup.setItems(getSelectors());
 				comboGroup.getParent().layout();
 				comboGroup.setListVisible(true);
+				gradeConstraintData.setSelectionType(GradeConstraintData.SELECTION_NONE);
 			}
 		});
 

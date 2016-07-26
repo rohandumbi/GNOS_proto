@@ -318,7 +318,7 @@ public class ProjectConfigutration {
 	
 	public void loadProducts() {
 		String sql = "select distinct a.name, associated_model_id, child_expression_id, b.id, b.name, b.value from product_defn a, grade b where a.project_id = "
-				+ this.projectId + " and b.product_name = a.name  order by a.name, b.id asc";
+				+ this.projectId +" and b.product_name = a.name" + " and b.project_id="+ this.projectId + " order by a.name, b.id asc";
 		Statement stmt = null;
 		ResultSet rs = null;
 		Connection conn = DBManager.getConnection();

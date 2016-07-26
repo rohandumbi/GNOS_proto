@@ -222,18 +222,6 @@ public class WorkbenchScreen extends GnosScreen {
 		gnosStepBenchConstraintsDefinitionLabel.setLayoutData(fd_gnosStepBenchConstraintsDefinitionLabel);
 		gnosStepBenchConstraintsDefinitionLabel.registerEventListener(this);
 		
-		/*gnosStepStockpileDefinitionLabel = new GnosConfigurationStepLabel(this, SWT.NONE, "Stockpile Definition");
-		FormData fd_gnosStepStockpileDefinitionLabel = new FormData();
-		fd_gnosStepStockpileDefinitionLabel.bottom = new FormAttachment(gnosStepBenchConstraintsDefinitionLabel, 40, SWT.BOTTOM);
-		fd_gnosStepStockpileDefinitionLabel.right = new FormAttachment(label, -6);
-		fd_gnosStepStockpileDefinitionLabel.top = new FormAttachment(gnosStepBenchConstraintsDefinitionLabel);
-		fd_gnosStepStockpileDefinitionLabel.left = new FormAttachment(gnosStepBenchConstraintsDefinitionLabel, 0, SWT.LEFT);
-		gnosStepStockpileDefinitionLabel.setLayoutData(fd_gnosStepStockpileDefinitionLabel);
-		gnosStepStockpileDefinitionLabel.registerEventListener(this);*/
-		
-		
-
-		//this.scViewPortContainer = new ScrolledComposite(this, SWT.H_SCROLL | SWT.V_SCROLL | SWT.NONE);
 		this.scViewPortContainer = new ScrolledComposite(this, SWT.V_SCROLL | SWT.NONE);
 		FormData fd_scViewPortContainer = new FormData();
 		fd_scViewPortContainer.right = new FormAttachment(labelWorkbenchHeader, -6, SWT.RIGHT);
