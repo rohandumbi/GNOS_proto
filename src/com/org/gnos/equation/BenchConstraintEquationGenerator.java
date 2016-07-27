@@ -60,7 +60,7 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 					for(String variable: variables){
 						String lastChar= variable.substring(variable.length() - 1);
 						int year = Integer.parseInt(lastChar);
-						if(year > i) break;
+						if(year > i) continue;
 						sb1.append(" -"+variable);
 						if(lastBench != null){
 							sb2.append(" +"+variable);
