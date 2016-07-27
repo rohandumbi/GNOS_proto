@@ -69,8 +69,8 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 					}
 					if(lastBench != null){
 						float lastBenchTonnesWeight = getBenchTonnesWt(lastBench);
-						
-						sb2.append("-"+ lastBenchTonnesWeight+benchVariable +" <= 0 ");
+						String lastBenchVariable = "p"+pitNo+"b"+lastBench.getBenchNo()+"t"+i;
+						sb2.append("-"+ lastBenchTonnesWeight+lastBenchVariable +" <= 0 ");
 					}
 					sb1.append(" <= 0 ");
 					write(sb1.toString());
