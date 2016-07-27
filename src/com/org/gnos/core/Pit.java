@@ -1,16 +1,16 @@
 package com.org.gnos.core;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Pit {
 
 	private int pitNo;
 	private String pitName;
-	private List<Bench> benches;
+	private Set<Bench> benches;
 	
 	public Pit() {
-		benches = new ArrayList<Bench>();
+		benches = new HashSet<Bench>();
 	}
 	
 	public int getPitNo() {
@@ -25,10 +25,10 @@ public class Pit {
 	public void setPitName(String pitName) {
 		this.pitName = pitName;
 	}
-	public List<Bench> getBenches() {
+	public Set<Bench> getBenches() {
 		return benches;
 	}
-	public void setBenches(List<Bench> benches) {
+	public void setBenches(Set<Bench> benches) {
 		this.benches = benches;
 	}	
 	public void addBench(Bench bench) {

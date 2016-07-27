@@ -34,4 +34,14 @@ public class Bench {
 	public void addBlock(Block block) {
 		this.blocks.add(block);
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		return (this.benchNo == ((Bench)obj).benchNo);
+	}
+	
+	@Override
+	public int hashCode() {
+		return new Integer(this.benchNo).hashCode();
+	}
 }
