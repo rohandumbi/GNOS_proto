@@ -39,7 +39,7 @@ public class BinaryVariableGenerator extends EquationGenerator{
 		Set<Integer> pitNos = pits.keySet();
 		for(Integer pitNo:pitNos){
 			Pit pit = pits.get(pitNo);
-			List<Bench> benches = pit.getBenches();
+			Set<Bench> benches = pit.getBenches();
 			for(Bench b: benches){
 				for(int i=1; i<= timePeriod;i++){
 					String eq = "p"+pitNo+"b"+b.getBenchNo()+"t"+i+" ";
