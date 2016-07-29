@@ -95,6 +95,7 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 		PitBenchConstraintData defaultConstraint = null;
 		for(PitBenchConstraintData pitBenchConstraintData:pitBenchConstraintDataList){
 			if(!pitBenchConstraintData.isInUse()) continue;
+			System.out.println("PitBenchConstraint:"+ pitBenchConstraintData.getPitName());
 			if(pitBenchConstraintData.getPitName().equals("Default")){
 				hasDefaultConstraint = true;
 				defaultConstraint = pitBenchConstraintData;
@@ -111,6 +112,7 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 			
 		}
 		if(hasDefaultConstraint){
+			System.out.println("PitBenchConstraint: Inside default constraint");
 			Map<Integer, Pit> pits = serviceInstanceData.getPits();
 			Set<Integer> pitNos = pits.keySet();
 			for(Integer pitNo: pitNos){
@@ -145,7 +147,11 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 		List<String> variables = new ArrayList<String>();
 		List<Block> blocks= bench.getBlocks();
 		for(Block block: blocks){
-			variables.addAll(this.blockVariableMapping.get(block.getId()));
+			List<String> variableList = this.blockVariableMapping.get(block.getId());
+			if(variableList != null){
+				System.out.println("Block Id :"+ block.getId()+ " Variable Size:"+variableList.size());
+				variables.addAll(this.blockVariableMapping.get(block.getId()));
+			}		
 		}
 		
 		return variables;
