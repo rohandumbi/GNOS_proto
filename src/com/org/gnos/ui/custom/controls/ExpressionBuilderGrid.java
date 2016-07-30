@@ -185,7 +185,7 @@ public class ExpressionBuilderGrid extends Composite {
 			return expressionComponents;
 		}else{
 			expressionComponents.add(delim);
-			String[] tokens = expressionDefinition.split(delim);
+			String[] tokens = expressionDefinition.split("\\"+delim);
 			for(String token : tokens){
 				expressionComponents.add(token);
 			}
