@@ -1,41 +1,33 @@
 package com.org.gnos.ui.screens.v1;
 
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Text;
 
-import java.util.List;
-import java.util.Map;
+import com.org.gnos.core.ScenarioConfigutration;
+import com.org.gnos.events.GnosEvent;
+import com.org.gnos.ui.custom.controls.GnosScreen;
+import com.org.gnos.ui.custom.controls.PitBenchConstraintGrid;
+import com.org.gnos.ui.custom.controls.PitDependencyGrid;
 
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import com.org.gnos.core.ScenarioConfigutration;
-import com.org.gnos.db.model.OpexData;
-import com.org.gnos.db.model.ProcessConstraintData;
-import com.org.gnos.db.model.Scenario;
-import com.org.gnos.events.GnosEvent;
-import com.org.gnos.services.TimePeriod;
-import com.org.gnos.ui.custom.controls.GnosScreen;
-import com.org.gnos.ui.custom.controls.ProcessConstraintGrid;
-
-public class ProcessConstraintDefinitionScreen extends GnosScreen {
+public class PitDependencyScreen extends GnosScreen {
 
 	private Text textScenarioName;
 	private ScrolledComposite scGridContainer;
-	private ProcessConstraintGrid processConstraintGrid;
+	private PitDependencyGrid pitDependencyGrid;
 	private Label labelScreenName;
-	private int timePeriod;
-	private int startYear;
 	private String scenarioName;
 	private Button btnAddConstraintRow;
 	/**
@@ -43,18 +35,18 @@ public class ProcessConstraintDefinitionScreen extends GnosScreen {
 	 * @param parent
 	 * @param style
 	 */
-	public ProcessConstraintDefinitionScreen(Composite parent, int style) {
+	public PitDependencyScreen(Composite parent, int style) {
 		super(parent, style);
 		setForeground(SWTResourceManager.getColor(30, 144, 255));
 		setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		this.timePeriod = ScenarioConfigutration.getInstance().getTimePeriod();
-		this.startYear = ScenarioConfigutration.getInstance().getStartYear();
+		//this.timePeriod = ScenarioConfigutration.getInstance().getTimePeriod();
+		//this.startYear = ScenarioConfigutration.getInstance().getStartYear();
 		this.scenarioName = ScenarioConfigutration.getInstance().getName();
 		this.createContent();
 
 	}
-	
+
 	private void createContent(){
 		setLayout(new FormLayout());
 		labelScreenName = new Label(this, SWT.NONE);
@@ -65,7 +57,7 @@ public class ProcessConstraintDefinitionScreen extends GnosScreen {
 		fd_labelScreenName.left = new FormAttachment(0, 10);
 		labelScreenName.setLayoutData(fd_labelScreenName);
 		labelScreenName.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.BOLD));
-		labelScreenName.setText("Process Constraint Definition");
+		labelScreenName.setText("Pit Dependency Definition");
 		
 		Label labelScreenDescription = new Label(this, SWT.NONE);
 		labelScreenDescription.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
@@ -75,7 +67,7 @@ public class ProcessConstraintDefinitionScreen extends GnosScreen {
 		fd_labelScreenDescription.left = new FormAttachment(0, 10);
 		//fd_labelScreenDescription.right = new FormAttachment(0, 866);
 		labelScreenDescription.setLayoutData(fd_labelScreenDescription);
-		labelScreenDescription.setText("Define your process contraints.");
+		labelScreenDescription.setText("Define your pit dependencies");
 		
 		Label lblScenarioName = new Label(this, SWT.NONE);
 		lblScenarioName.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
@@ -108,11 +100,7 @@ public class ProcessConstraintDefinitionScreen extends GnosScreen {
 		fd_scGridContainer.top = new FormAttachment(textScenarioName, 10, SWT.BOTTOM);
 		fd_scGridContainer.left = new FormAttachment(labelScreenName, 0, SWT.LEFT);
 		fd_scGridContainer.bottom = new FormAttachment(100, -10);
-		//fd_scGridContainer.bottom = new FormAttachment(50);
 		fd_scGridContainer.right = new FormAttachment(100, -35);
-		
-		//processConstraintGrid = new ProcessConstraintGrid(scGridContainer, SWT.None);
-		//scGridContainer.setContent(processConstraintGrid);
 		
 		this.scGridContainer.setExpandHorizontal(true);
 		this.scGridContainer.setExpandVertical(true);
@@ -127,8 +115,8 @@ public class ProcessConstraintDefinitionScreen extends GnosScreen {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				//TO DO implement row add
-				processConstraintGrid.addRow();
-				Rectangle r = processConstraintGrid.getClientArea();
+				pitDependencyGrid.addRow();
+				Rectangle r = pitDependencyGrid.getClientArea();
 				int gridWidth = r.width;
 				
 				int scrollableHeight = scGridContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).y;
@@ -151,11 +139,11 @@ public class ProcessConstraintDefinitionScreen extends GnosScreen {
 			this.textScenarioName.setText(this.scenarioName);
 		}
 		
-		if(this.processConstraintGrid != null){
-			this.processConstraintGrid.dispose();
+		if(this.pitDependencyGrid != null){
+			this.pitDependencyGrid.dispose();
 		}
-		this.processConstraintGrid = new ProcessConstraintGrid(scGridContainer, SWT.None);
-		this.scGridContainer.setContent(this.processConstraintGrid);
+		this.pitDependencyGrid = new PitDependencyGrid(scGridContainer, SWT.None);
+		this.scGridContainer.setContent(this.pitDependencyGrid);
 	}
 	
 	@Override
@@ -168,4 +156,5 @@ public class ProcessConstraintDefinitionScreen extends GnosScreen {
 		// TODO Auto-generated method stub
 		
 	}
+
 }
