@@ -275,7 +275,8 @@ CREATE TABLE bench_constraint_defn(
    scenario_id INT NOT NULL,
    pit_name  VARCHAR(50),
    in_use TINYINT NOT NULL default 1,
-   PRIMARY KEY ( id )
+   PRIMARY KEY ( id ),
+   unique key(scenario_id, pit_name)
 );
 
 DROP TABLE IF EXISTS bench_constraint_year_mapping; 
