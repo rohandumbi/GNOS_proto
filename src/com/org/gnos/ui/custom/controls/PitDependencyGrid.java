@@ -1,7 +1,6 @@
 package com.org.gnos.ui.custom.controls;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
@@ -16,7 +15,6 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
@@ -27,6 +25,7 @@ import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.db.model.Pit;
 import com.org.gnos.db.model.PitBenchConstraintData;
+import com.org.gnos.db.model.PitDependencyData;
 
 public class PitDependencyGrid extends Composite {
 
@@ -46,39 +45,41 @@ public class PitDependencyGrid extends Composite {
 	private Label sixthSeparator;
 	private Label seventhSeparator;
 	private Label eigthSeparator;
-	private List<PitBenchConstraintData> pitBenchConstraintDataList;
-	private int startYear;
-	private int timePeriod;
+	private List<PitDependencyData> pitDependencyDataList;
 
 	public PitDependencyGrid(Composite parent, int style) {
 		super(parent, style);
 		this.allRows = new ArrayList<Composite>();
-		this.timePeriod = ScenarioConfigutration.getInstance().getTimePeriod();
-		this.startYear = ScenarioConfigutration.getInstance().getStartYear();
-		this.pitBenchConstraintDataList = ScenarioConfigutration.getInstance().getPitBenchConstraintDataList();
+		this.pitDependencyDataList = ScenarioConfigutration.getInstance().getPitDependencyDataList();
 		this.createContent(parent);
 	}
 
 	private void createContent(Composite parent){
 		this.setLayout(new FormLayout());
 		this.createHeader();
-		/*for(PitBenchConstraintData pitBenchConstraintData : this.pitBenchConstraintDataList){
-			this.addRow(pitBenchConstraintData);
+		for(PitDependencyData pitDependencyData : this.pitDependencyDataList){
+			this.addRow(pitDependencyData);
 		}
-		if(this.pitBenchConstraintDataList.size() == 0){
-			this.addRow();
-		}*/
 	}
 
 	private String[] getPits(){
 
 		ProjectConfigutration projectConfigutration = ProjectConfigutration.getInstance();
 		List<Pit> pits = projectConfigutration.getPitList();
-		//List<PitGroup> pitGroups = projectConfigutration.getPitGroupList();
-		
 		String[] comboItems = new String[pits.size()];
 		for(int i=0; i < pits.size(); i++){
 			comboItems[i] = pits.get(i).getPitName();
+		}
+		return comboItems;
+	}
+	
+	private String[] getBenchesForPitName(String pitName){
+
+		ProjectConfigutration projectConfigutration = ProjectConfigutration.getInstance();
+		List<String> benchNames = projectConfigutration.getBenchNamesAssociatedWithPit(pitName);
+		String[] comboItems = new String[benchNames.size()];
+		for(int i=0; i < benchNames.size(); i++){
+			comboItems[i] = benchNames.get(i);
 		}
 		return comboItems;
 	}
@@ -214,7 +215,7 @@ public class PitDependencyGrid extends Composite {
 
 	}
 
-	private void addTimePeriodHeaderColumns(Control reference){
+	/*private void addTimePeriodHeaderColumns(Control reference){
 		Control previousColumn = reference;
 		for(int i=0; i<this.timePeriod; i++){
 			Label separator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
@@ -233,13 +234,13 @@ public class PitDependencyGrid extends Composite {
 
 			previousColumn = lblYear;
 		}
-	}
+	}*/
 	
-	public void addRow(final PitBenchConstraintData pitBenchConstraintData){
+	public void addRow(final PitDependencyData pitDependencyData){
 		final Composite compositeRow = new Composite(this, SWT.BORDER);
 		compositeRow.setLayout(new FormLayout());
 		Color backgroundColor = SWTResourceManager.getColor(SWT.COLOR_WHITE);
-		compositeRow.setData(pitBenchConstraintData);
+		compositeRow.setData(pitDependencyData);
 		if((this.allRows != null) && (this.allRows.size()%2 != 0)){
 			backgroundColor =  SWTResourceManager.getColor(245, 245, 245);
 		}
@@ -255,53 +256,167 @@ public class PitDependencyGrid extends Composite {
 		fd_btnUse.left = new FormAttachment(0,10);
 		fd_btnUse.top = new FormAttachment(0, 2);
 		btnUse.setLayoutData(fd_btnUse);
-		btnUse.setSelection(pitBenchConstraintData.isInUse());
+		btnUse.setSelection(pitDependencyData.isInUse());
 		btnUse.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				System.out.println("Is button in use selected: " + btnUse.getSelection());
-				pitBenchConstraintData.setInUse(btnUse.getSelection());
+				pitDependencyData.setInUse(btnUse.getSelection());
 			}
 		});
 		
-		final Combo comboPits = new Combo(compositeRow, SWT.NONE);
-		comboPits.setItems(this.getPits());
-		String associatedPitName  = pitBenchConstraintData.getPitName();
-		if(associatedPitName != null){
-			comboPits.setText(associatedPitName);
-		}else{
-			comboPits.setText("Select Pit");
-		}
-		if(this.allRows.size() == 0){//if first row add default data
-			comboPits.setText("Default");
-			comboPits.setEnabled(false);
-			pitBenchConstraintData.setPitName("Default");
-		}else{
-			comboPits.addListener(SWT.MouseDown, new Listener(){
-				@Override
-				public void handleEvent(Event event) {
-					// TODO Auto-generated method stub
-					comboPits.removeAll();
-					comboPits.setItems(getPits());
-					comboPits.getParent().layout();
-					comboPits.setListVisible(true);
-				}
-			});
-
-			comboPits.addSelectionListener(new SelectionAdapter() {
-				public void widgetSelected(SelectionEvent e) {
-					String selectedPitName = comboPits.getText();
-					pitBenchConstraintData.setPitName(selectedPitName);
-				}
-			});
-		}
-
-		FormData fd_comboPits = new FormData();
-		fd_comboPits.left = new FormAttachment(btnUse, 18);
-		fd_comboPits.top = new FormAttachment(0);
-		fd_comboPits.right = new FormAttachment(0, 150);
-		comboPits.setLayoutData(fd_comboPits);
+		final Combo comboFirstPits = new Combo(compositeRow, SWT.NONE);
+		comboFirstPits.setItems(this.getPits());
+		String associatedFirstPitName  = pitDependencyData.getFirstPitName();
+		FormData fd_comboFirstPits = new FormData();
+		fd_comboFirstPits.left = new FormAttachment(btnUse, 18);
+		fd_comboFirstPits.top = new FormAttachment(0);
+		fd_comboFirstPits.right = new FormAttachment(0, 150);
+		comboFirstPits.setLayoutData(fd_comboFirstPits);
 		
-		this.addTimePeriodRowMembers(compositeRow, comboPits);
+		final Combo comboAssociatedFirstPitBenches = new Combo(compositeRow, SWT.NONE);
+		String accociatedFirstPitBenchName = pitDependencyData.getFirstPitAssociatedBench();
+		FormData fd_comboAssociatedFirstPitBenches = new FormData();
+		fd_comboAssociatedFirstPitBenches.left = new FormAttachment(comboFirstPits, 2, SWT.RIGHT);
+		fd_comboAssociatedFirstPitBenches.top = new FormAttachment(0);
+		fd_comboAssociatedFirstPitBenches.right = new FormAttachment(comboFirstPits, 140, SWT.RIGHT);
+		comboAssociatedFirstPitBenches.setLayoutData(fd_comboAssociatedFirstPitBenches);
+		
+		
+		if(associatedFirstPitName != null){
+			comboFirstPits.setText(associatedFirstPitName);
+			comboAssociatedFirstPitBenches.setItems(this.getBenchesForPitName(associatedFirstPitName));
+		}else{
+			comboFirstPits.setText("Select Pit");
+		}
+		
+		if(accociatedFirstPitBenchName != null){
+			comboAssociatedFirstPitBenches.setText(accociatedFirstPitBenchName);
+		}else{
+			comboAssociatedFirstPitBenches.setText("Select First Pit");
+		}
+		
+		comboFirstPits.addListener(SWT.MouseDown, new Listener(){
+			@Override
+			public void handleEvent(Event event) {
+				// TODO Auto-generated method stub
+				comboFirstPits.removeAll();
+				comboFirstPits.setItems(getPits());
+				comboFirstPits.getParent().layout();
+				comboFirstPits.setListVisible(true);
+			}
+		});
+
+		comboFirstPits.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				String selectedPitName = comboFirstPits.getText();
+				pitDependencyData.setFirstPitName(selectedPitName);
+				comboAssociatedFirstPitBenches.setItems(getBenchesForPitName(selectedPitName));
+			}
+		});
+		
+		comboAssociatedFirstPitBenches.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				String selectedBenchName = comboAssociatedFirstPitBenches.getText();
+				pitDependencyData.setFirstPitAssociatedBench(selectedBenchName);
+			}
+		});
+		
+		final Combo comboDependentPits = new Combo(compositeRow, SWT.NONE);
+		comboDependentPits.setItems(this.getPits());
+		String associatedDependentPitName  = pitDependencyData.getDependentPitName();
+		FormData fd_comboDependentPits = new FormData();
+		fd_comboDependentPits.left = new FormAttachment(comboAssociatedFirstPitBenches, 2, SWT.RIGHT);
+		fd_comboDependentPits.top = new FormAttachment(0);
+		fd_comboDependentPits.right = new FormAttachment(comboAssociatedFirstPitBenches, 148, SWT.RIGHT);
+		comboDependentPits.setLayoutData(fd_comboDependentPits);
+		
+		final Combo comboAssociatedDependentPitBenches = new Combo(compositeRow, SWT.NONE);
+		String accociatedDependentPitBenchName = pitDependencyData.getDependentPitAssociatedBench();
+		FormData fd_comboAssociatedDependentPitBenches = new FormData();
+		fd_comboAssociatedDependentPitBenches.left = new FormAttachment(comboDependentPits, 2, SWT.RIGHT);
+		fd_comboAssociatedDependentPitBenches.top = new FormAttachment(0);
+		fd_comboAssociatedDependentPitBenches.right = new FormAttachment(comboDependentPits, 140, SWT.RIGHT);
+		comboAssociatedDependentPitBenches.setLayoutData(fd_comboAssociatedDependentPitBenches);
+		
+		if(associatedDependentPitName != null){
+			comboDependentPits.setText(associatedDependentPitName);
+		}else{
+			comboDependentPits.setText("Select Pit");
+		}
+		
+		if(accociatedDependentPitBenchName != null){
+			comboAssociatedDependentPitBenches.setText(accociatedDependentPitBenchName);
+		}else{
+			comboAssociatedDependentPitBenches.setText("Select Dependent Pit");
+		}
+
+		comboDependentPits.addListener(SWT.MouseDown, new Listener(){
+			@Override
+			public void handleEvent(Event event) {
+				// TODO Auto-generated method stub
+				comboDependentPits.removeAll();
+				comboDependentPits.setItems(getPits());
+				comboDependentPits.getParent().layout();
+				comboDependentPits.setListVisible(true);
+			}
+		});
+
+		comboDependentPits.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				String selectedPitName = comboDependentPits.getText();
+				pitDependencyData.setDependentPitName(selectedPitName);
+				comboAssociatedDependentPitBenches.setItems(getBenchesForPitName(selectedPitName));
+			}
+		});
+		
+		comboAssociatedDependentPitBenches.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				String selectedBenchName = comboAssociatedDependentPitBenches.getText();
+				pitDependencyData.setDependentPitAssociatedBench(selectedBenchName);
+			}
+		});
+		
+		final Text textMinLead = new Text(compositeRow, SWT.BORDER);
+		int associatedMinLead = pitDependencyData.getMinLead();
+		if(associatedMinLead != -1){
+			textMinLead.setText(String.valueOf(associatedMinLead));
+		}
+		FormData fd_textMinLead = new FormData();
+		fd_textMinLead.left = new FormAttachment(comboAssociatedDependentPitBenches, 2, SWT.RIGHT);
+		fd_textMinLead.top = new FormAttachment(0);
+		fd_textMinLead.right = new FormAttachment(comboAssociatedDependentPitBenches, 92, SWT.RIGHT);
+		textMinLead.setLayoutData(fd_textMinLead);
+		textMinLead.addModifyListener(new ModifyListener(){
+			public void modifyText(ModifyEvent event) {
+				// Get the widget whose text was modified
+				pitDependencyData.setMinLead(Integer.valueOf(textMinLead.getText()));
+			}
+		});
+		
+		final Text textMaxLead = new Text(compositeRow, SWT.BORDER);
+		int associatedMaxLead = pitDependencyData.getMaxLead();
+		if(associatedMaxLead != -1){
+			textMaxLead.setText(String.valueOf(associatedMaxLead));
+		}
+		FormData fd_textMaxLead = new FormData();
+		fd_textMaxLead.left = new FormAttachment(textMinLead, 2, SWT.RIGHT);
+		fd_textMaxLead.top = new FormAttachment(0);
+		fd_textMaxLead.right = new FormAttachment(textMinLead, 92, SWT.RIGHT);
+		textMaxLead.setLayoutData(fd_textMaxLead);
+		textMaxLead.addModifyListener(new ModifyListener(){
+			public void modifyText(ModifyEvent event) {
+				// Get the widget whose text was modified
+				pitDependencyData.setMaxLead(Integer.valueOf(textMaxLead.getText()));
+			}
+		});
+		
+		final Text textDescription = new Text(compositeRow, SWT.BORDER);
+		FormData fd_textDescription = new FormData();
+		fd_textDescription.left = new FormAttachment(textMaxLead, 2, SWT.RIGHT);
+		fd_textDescription.top = new FormAttachment(0);
+		fd_textDescription.right = new FormAttachment(textMaxLead, 460, SWT.RIGHT);
+		textDescription.setLayoutData(fd_textDescription);
+		
 		this.presentRow = compositeRow;
 		this.allRows.add(compositeRow);
 		compositeRow.setLayoutData(fd_compositeRow);
@@ -311,39 +426,9 @@ public class PitDependencyGrid extends Composite {
 	}
 
 	public void addRow(){
-		PitBenchConstraintData pitBenchConstraintData  = new PitBenchConstraintData();
-		this.pitBenchConstraintDataList.add(pitBenchConstraintData);
-		this.addRow(pitBenchConstraintData);
-	}
-
-	private void addTimePeriodRowMembers(final Composite parent, Control reference){
-		Control previousMember = reference;
-		final PitBenchConstraintData pitBenchConstraintData = (PitBenchConstraintData)parent.getData();
-		for(int i=0; i<this.timePeriod; i++){
-			Text yearlyValue = new Text(parent, SWT.BORDER);
-			final int targetYear = this.startYear + i;
-			if(pitBenchConstraintData.getConstraintData().get(targetYear) != null){
-				yearlyValue.setText(String.valueOf(pitBenchConstraintData.getConstraintData().get(targetYear)));
-			}
-			yearlyValue.addModifyListener(new ModifyListener(){
-				public void modifyText(ModifyEvent event) {
-					// Get the widget whose text was modified
-					Text text = (Text) event.widget;
-					System.out.println("Input value for the " + targetYear + " year is " + text.getText());
-					//GradeConstraintData gradeConstraintData = (GradeConstraintData)parent.getData();
-					LinkedHashMap<Integer, Integer> constraintData = pitBenchConstraintData.getConstraintData();
-					constraintData.put(targetYear, Integer.valueOf(text.getText()));
-				}
-			});
-			FormData fd_yearlyValue = new FormData();
-			/*
-			 * Hacky calculation at the moment
-			 */
-			fd_yearlyValue.left = new FormAttachment(previousMember, 3);
-			fd_yearlyValue.right = new FormAttachment(previousMember, 76, SWT.RIGHT);
-			yearlyValue.setLayoutData(fd_yearlyValue);
-			previousMember = yearlyValue;
-		}
+		PitDependencyData pitDependencyData  = new PitDependencyData();
+		this.pitDependencyDataList.add(pitDependencyData);
+		this.addRow(pitDependencyData);
 	}
 
 	public void resetAllRows(){

@@ -205,6 +205,32 @@ public class ProjectConfigutration {
 
 		return this.pitList;
 	}
+	
+	public List<String> getBenchNamesAssociatedWithPit(String pitName) {
+		List<String> associatedBenchNames = new ArrayList<String>();
+		String dataTableName = "gnos_data_" + this.projectId;
+		String sql = "select  distinct bench_rl from "
+				+ dataTableName + " where pit_name=" + "'" + pitName +  "'";
+
+		try (
+				Connection conn = DBManager.getConnection();
+				Statement stmt = conn.createStatement();
+				ResultSet rs = stmt.executeQuery(sql);
+			) {
+
+			while (rs.next()) {
+				String bench_name = rs.getString(1);
+				/*int pit_no = rs.getInt(2);
+
+				Pit pit = new Pit(pit_no, pit_name);*/
+				associatedBenchNames.add(bench_name);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return associatedBenchNames;
+	}
 
 	public void loadProcessTree() {
 		String sql = "select model_id, parent_model_id from process_route_defn where project_id = "
