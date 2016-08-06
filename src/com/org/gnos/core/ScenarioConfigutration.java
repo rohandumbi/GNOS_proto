@@ -304,7 +304,7 @@ public class ScenarioConfigutration {
 	}
 	
 	public void loadPitDependencyData() {
-		this.pitBenchConstraintDataList = new ArrayList<PitBenchConstraintData>();
+		this.pitDependencyDataList = new ArrayList<PitDependencyData>();
 		String sql = "select id, in_use, first_pit_name, first_pit_bench_name, dependent_pit_name, dependent_pit_bench_name, min_lead, max_lead from pit_dependency_defn where scenario_id =" + this.scenarioId + " order by id";
 		Statement stmt = null;
 		ResultSet rs = null;

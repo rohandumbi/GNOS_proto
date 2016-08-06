@@ -83,7 +83,44 @@ public class PitDependencyGrid extends Composite {
 		}
 		return comboItems;
 	}
-
+	
+	private String getDescription(String firstPit, String firstPitAssociatedBench, String dependentPit, String dependentPitPitAssociatedBench, String minLead, String maxLead){
+		String description = null;
+		if(firstPitAssociatedBench == null){
+			firstPitAssociatedBench = "";
+		}
+		if(dependentPitPitAssociatedBench == null){
+			dependentPitPitAssociatedBench = "";
+		}
+		if((firstPit==null)||(dependentPit==null)||(firstPit.equals(""))||(dependentPit.equals(""))){
+			return "";
+		}else if((minLead.equals("-1")) && (maxLead.equals("-1"))){
+			description = firstPit + "/" + firstPitAssociatedBench + " will be totally mined before " + dependentPit + "/" + dependentPitPitAssociatedBench + " is started.";
+		}else if(maxLead.equals("-1")){
+			description = firstPit + "/" + firstPitAssociatedBench + " will be mined atleast " + minLead + " benches ahead of " + dependentPit + "/" + dependentPitPitAssociatedBench;
+		}else if(minLead.equals("-1")){
+			description = firstPit + "/" + firstPitAssociatedBench + " will be mined atmost " + maxLead + " benches ahead of " + dependentPit + "/" + dependentPitPitAssociatedBench;
+		}else if(!(minLead.equals("-1")) && !(maxLead.equals("-1"))){
+			description = firstPit + "/" + firstPitAssociatedBench + " will be mined atleast " + minLead + " benches ahead of " + dependentPit + "/" + dependentPitPitAssociatedBench + " AND " + firstPit + "/" + firstPitAssociatedBench + " will be mined atmost " + maxLead + " benches ahead of " + dependentPit + "/" + dependentPitPitAssociatedBench;
+		}
+		return description;
+	}
+	
+	private void updateRowDescription(Composite rowComposite){
+		PitDependencyData pitDependencyData = (PitDependencyData)rowComposite.getData();
+		String firstPit = pitDependencyData.getFirstPitName();
+		String firstPitAssociatedBench = pitDependencyData.getFirstPitAssociatedBench();
+		String dependentPit = pitDependencyData.getDependentPitName();
+		String dependentPitAssociatedBench = pitDependencyData.getDependentPitAssociatedBench();
+		String minLead = String.valueOf(pitDependencyData.getMinLead());
+		String maxLead = String.valueOf(pitDependencyData.getMaxLead());
+		
+		String description = getDescription(firstPit, firstPitAssociatedBench, dependentPit, dependentPitAssociatedBench, minLead, maxLead);
+		Text textDescription = (Text)rowComposite.getChildren()[7];
+		if(description != null){
+			textDescription.setText(description);
+		}
+	}
 
 	private void createHeader(){
 		compositeGridHeader = new Composite(this, SWT.BORDER);
@@ -211,31 +248,9 @@ public class PitDependencyGrid extends Composite {
 		
 		
 		this.presentRow = this.compositeGridHeader;//referring to the header as the 1st row when there are no rows inserted yet
-		//this.addTimePeriodHeaderColumns(lblPit);
 
 	}
 
-	/*private void addTimePeriodHeaderColumns(Control reference){
-		Control previousColumn = reference;
-		for(int i=0; i<this.timePeriod; i++){
-			Label separator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
-			FormData fd_separator = new FormData();
-			fd_separator.left = new FormAttachment(previousColumn, 25);
-			separator.setLayoutData(fd_separator);
-
-			Label lblYear = new Label(compositeGridHeader, SWT.NONE);
-			lblYear.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
-			FormData fd_lblYear = new FormData();
-			fd_lblYear.left = new FormAttachment(separator, 25);
-			fd_lblYear.top = new FormAttachment(0, 2);
-			lblYear.setText(String.valueOf(this.startYear + i));
-			lblYear.setBackground(SWTResourceManager.getColor(230, 230, 230));
-			lblYear.setLayoutData(fd_lblYear);
-
-			previousColumn = lblYear;
-		}
-	}*/
-	
 	public void addRow(final PitDependencyData pitDependencyData){
 		final Composite compositeRow = new Composite(this, SWT.BORDER);
 		compositeRow.setLayout(new FormLayout());
@@ -311,6 +326,7 @@ public class PitDependencyGrid extends Composite {
 				String selectedPitName = comboFirstPits.getText();
 				pitDependencyData.setFirstPitName(selectedPitName);
 				comboAssociatedFirstPitBenches.setItems(getBenchesForPitName(selectedPitName));
+				updateRowDescription(compositeRow);
 			}
 		});
 		
@@ -318,6 +334,7 @@ public class PitDependencyGrid extends Composite {
 			public void widgetSelected(SelectionEvent e) {
 				String selectedBenchName = comboAssociatedFirstPitBenches.getText();
 				pitDependencyData.setFirstPitAssociatedBench(selectedBenchName);
+				updateRowDescription(compositeRow);
 			}
 		});
 		
@@ -366,6 +383,8 @@ public class PitDependencyGrid extends Composite {
 				String selectedPitName = comboDependentPits.getText();
 				pitDependencyData.setDependentPitName(selectedPitName);
 				comboAssociatedDependentPitBenches.setItems(getBenchesForPitName(selectedPitName));
+				updateRowDescription(compositeRow);
+				
 			}
 		});
 		
@@ -373,6 +392,7 @@ public class PitDependencyGrid extends Composite {
 			public void widgetSelected(SelectionEvent e) {
 				String selectedBenchName = comboAssociatedDependentPitBenches.getText();
 				pitDependencyData.setDependentPitAssociatedBench(selectedBenchName);
+				updateRowDescription(compositeRow);
 			}
 		});
 		
@@ -389,7 +409,13 @@ public class PitDependencyGrid extends Composite {
 		textMinLead.addModifyListener(new ModifyListener(){
 			public void modifyText(ModifyEvent event) {
 				// Get the widget whose text was modified
-				pitDependencyData.setMinLead(Integer.valueOf(textMinLead.getText()));
+				String maxLead = textMinLead.getText();
+				if(maxLead.equals("")){
+					pitDependencyData.setMinLead(-1);
+				}else{
+					pitDependencyData.setMinLead(Integer.valueOf(textMinLead.getText()));
+				}
+				updateRowDescription(compositeRow);
 			}
 		});
 		
@@ -406,7 +432,13 @@ public class PitDependencyGrid extends Composite {
 		textMaxLead.addModifyListener(new ModifyListener(){
 			public void modifyText(ModifyEvent event) {
 				// Get the widget whose text was modified
-				pitDependencyData.setMaxLead(Integer.valueOf(textMaxLead.getText()));
+				String maxLead = textMaxLead.getText();
+				if(maxLead.equals("")){
+					pitDependencyData.setMaxLead(-1);
+				}else{
+					pitDependencyData.setMaxLead(Integer.valueOf(textMaxLead.getText()));
+				}
+				updateRowDescription(compositeRow);
 			}
 		});
 		
@@ -420,6 +452,7 @@ public class PitDependencyGrid extends Composite {
 		this.presentRow = compositeRow;
 		this.allRows.add(compositeRow);
 		compositeRow.setLayoutData(fd_compositeRow);
+		this.updateRowDescription(compositeRow);
 		this.layout();
 		
 		
