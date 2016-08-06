@@ -26,11 +26,15 @@ public class InstanceData {
 	private Map<Integer, Block> blocks = new LinkedHashMap<Integer,Block>();
 	private Map<Integer, Pit> pits = new LinkedHashMap<Integer,Pit>();
 	private Map<Integer, List<String>> blockVariableMapping = new HashMap<Integer, List<String>>();
+	private String pitFieldName;
+	private String benchFieldName;
 	
 	private ProjectConfigutration projectConfiguration;
 	
 	public InstanceData() {
 		projectConfiguration = ProjectConfigutration.getInstance();
+		pitFieldName = projectConfiguration.getRequiredFieldMapping().get("pit_name");
+		benchFieldName = projectConfiguration.getRequiredFieldMapping().get("bench_rl");
 		loadBlocks();
 	}
 
@@ -64,12 +68,14 @@ public class InstanceData {
 				Pit pit = pits.get(block.getPitNo());
 				if( pit == null ){
 					pit = new Pit();
-					pit.setPitNo(block.getPitNo());		
+					pit.setPitNo(block.getPitNo());
+					pit.setPitName(block.getField(pitFieldName));
 					pits.put(block.getPitNo(), pit);
 				}
 				Bench bench = pit.getBench(block.getBenchNo());
 				if(bench == null ){
 					bench = new Bench();
+					bench.setBenchName(block.getField(benchFieldName));
 					bench.setBenchNo(block.getBenchNo());
 				}
 				bench.addBlock(block);
