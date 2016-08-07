@@ -318,6 +318,9 @@ public class PitDependencyGrid extends Composite {
 				comboFirstPits.setItems(getPits());
 				comboFirstPits.getParent().layout();
 				comboFirstPits.setListVisible(true);
+				pitDependencyData.setFirstPitName("");
+				pitDependencyData.setFirstPitAssociatedBench("");
+				updateRowDescription(compositeRow);
 			}
 		});
 
@@ -326,6 +329,15 @@ public class PitDependencyGrid extends Composite {
 				String selectedPitName = comboFirstPits.getText();
 				pitDependencyData.setFirstPitName(selectedPitName);
 				comboAssociatedFirstPitBenches.setItems(getBenchesForPitName(selectedPitName));
+				updateRowDescription(compositeRow);
+			}
+		});
+		
+		comboAssociatedFirstPitBenches.addListener(SWT.MouseDown, new Listener(){
+			@Override
+			public void handleEvent(Event event) {
+				// TODO Auto-generated method stub
+				pitDependencyData.setFirstPitAssociatedBench("");
 				updateRowDescription(compositeRow);
 			}
 		});
@@ -375,6 +387,9 @@ public class PitDependencyGrid extends Composite {
 				comboDependentPits.setItems(getPits());
 				comboDependentPits.getParent().layout();
 				comboDependentPits.setListVisible(true);
+				pitDependencyData.setDependentPitName("");
+				pitDependencyData.setDependentPitAssociatedBench("");
+				updateRowDescription(compositeRow);
 			}
 		});
 
@@ -385,6 +400,15 @@ public class PitDependencyGrid extends Composite {
 				comboAssociatedDependentPitBenches.setItems(getBenchesForPitName(selectedPitName));
 				updateRowDescription(compositeRow);
 				
+			}
+		});
+		
+		comboAssociatedDependentPitBenches.addListener(SWT.MouseDown, new Listener(){
+			@Override
+			public void handleEvent(Event event) {
+				// TODO Auto-generated method stub
+				pitDependencyData.setDependentPitAssociatedBench("");
+				updateRowDescription(compositeRow);
 			}
 		});
 		
