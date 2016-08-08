@@ -208,8 +208,9 @@ public class ProjectConfigutration {
 	
 	public List<String> getBenchNamesAssociatedWithPit(String pitName) {
 		List<String> associatedBenchNames = new ArrayList<String>();
+		String bench_rl_name = this.getRequiredFieldMapping().get("bench_rl");
 		String dataTableName = "gnos_data_" + this.projectId;
-		String sql = "select  distinct bench_rl from "
+		String sql = "select  distinct "+ bench_rl_name+" from "
 				+ dataTableName + " where pit_name=" + "'" + pitName +  "'";
 
 		try (
