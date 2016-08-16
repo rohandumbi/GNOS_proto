@@ -29,6 +29,7 @@ public class MainConfigurationViewPort extends GnosScreen{
 	private GradeConstraintScreen gradeConstraintScreen;
 	private BenchConstraintScreen benchConstraintScreen;
 	private PitDependencyScreen pitDependencyScreen;
+	private CapexDefinitionScreen capexDefinitionScreen;
 	
 	private Shell dummyShell;
 	
@@ -70,6 +71,9 @@ public class MainConfigurationViewPort extends GnosScreen{
 		
 		pitDependencyScreen = new PitDependencyScreen(this.dummyShell, SWT.NONE);
 		pitDependencyScreen.registerEventListener(this);
+		
+		capexDefinitionScreen = new CapexDefinitionScreen(this.dummyShell, SWT.NONE);
+		capexDefinitionScreen.registerEventListener(this);
 	}
 	
 	public void loadFieldDatatypeDefinitionScreen(){
@@ -164,6 +168,14 @@ public class MainConfigurationViewPort extends GnosScreen{
 		this.layout();
 	}
 	
+	public void loadCapexScreen(){
+		this.viewPort.setParent(dummyShell);
+		this.viewPort = capexDefinitionScreen;
+		this.viewPort.setParent(this);
+		this.stackLayout.topControl = capexDefinitionScreen;
+		this.layout();
+	}
+	
 	private void datatypeDefinitionComplete(){
 		ProjectConfigutration.getInstance().saveFieldData();
 		loadMapRequiredFieldsScreen();
@@ -197,6 +209,7 @@ public class MainConfigurationViewPort extends GnosScreen{
 		gradeConstraintScreen.refreshGrid();
 		benchConstraintScreen.refreshGrid();
 		pitDependencyScreen.refreshGrid();
+		capexDefinitionScreen.refreshGrid();
 		//this.layout();
 	}
 	

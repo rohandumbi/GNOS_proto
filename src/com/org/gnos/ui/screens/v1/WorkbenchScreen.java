@@ -45,6 +45,7 @@ public class WorkbenchScreen extends GnosScreen {
 	private GnosConfigurationStepLabel gnosStepGradeConstraintsDefinitionLabel;
 	private GnosConfigurationStepLabel gnosStepBenchConstraintsDefinitionLabel;
 	private GnosConfigurationStepLabel gnosPitDependencyLabel;
+	private GnosConfigurationStepLabel gnosCapexDefinitionLabel;
 	private ScrolledComposite scViewPortContainer;
 	private MainConfigurationViewPort mainConfigurationViewPort;
 
@@ -232,6 +233,15 @@ public class WorkbenchScreen extends GnosScreen {
 		gnosPitDependencyLabel.setLayoutData(fd_gnosPitDependencyLabel);
 		gnosPitDependencyLabel.registerEventListener(this);
 		
+		gnosCapexDefinitionLabel = new GnosConfigurationStepLabel(this, SWT.NONE, "Capex Definition");
+		FormData fd_gnosCapexDefinitionLabel = new FormData();
+		fd_gnosCapexDefinitionLabel.bottom = new FormAttachment(gnosPitDependencyLabel, 40, SWT.BOTTOM);
+		fd_gnosCapexDefinitionLabel.right = new FormAttachment(label, -6);
+		fd_gnosCapexDefinitionLabel.top = new FormAttachment(gnosPitDependencyLabel);
+		fd_gnosCapexDefinitionLabel.left = new FormAttachment(gnosPitDependencyLabel, 0, SWT.LEFT);
+		gnosCapexDefinitionLabel.setLayoutData(fd_gnosCapexDefinitionLabel);
+		gnosCapexDefinitionLabel.registerEventListener(this);
+		
 		this.scViewPortContainer = new ScrolledComposite(this, SWT.V_SCROLL | SWT.NONE);
 		FormData fd_scViewPortContainer = new FormData();
 		fd_scViewPortContainer.right = new FormAttachment(labelWorkbenchHeader, -6, SWT.RIGHT);
@@ -292,6 +302,7 @@ public class WorkbenchScreen extends GnosScreen {
 		gnosStepGradeConstraintsDefinitionLabel.setDeselectedState();
 		gnosStepBenchConstraintsDefinitionLabel.setDeselectedState();
 		gnosPitDependencyLabel.setDeselectedState();
+		gnosCapexDefinitionLabel.setDeselectedState();
 
 		label.setSelectedState();
 	}
@@ -351,8 +362,10 @@ public class WorkbenchScreen extends GnosScreen {
 			mainConfigurationViewPort.loadBenchConstraintDefinitionScreen();
 		}else if(e.eventName == "Pit Dependency"){
 			selectStepLabel(gnosPitDependencyLabel);
-			System.out.println("Pit Dependency to show up");
 			mainConfigurationViewPort.loadPitDependencyScreen();
+		}else if(e.eventName == "Capex Definition"){
+			selectStepLabel(gnosCapexDefinitionLabel);
+			mainConfigurationViewPort.loadCapexScreen();
 		}
 		
 		
