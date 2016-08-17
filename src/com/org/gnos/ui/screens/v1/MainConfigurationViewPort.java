@@ -210,7 +210,6 @@ public class MainConfigurationViewPort extends GnosScreen{
 		benchConstraintScreen.refreshGrid();
 		pitDependencyScreen.refreshGrid();
 		capexDefinitionScreen.refreshGrid();
-		//this.layout();
 	}
 	
 	@Override
