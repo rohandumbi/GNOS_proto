@@ -35,17 +35,15 @@ public class CapexDefinitionGrid extends Composite {
 	 * @param style
 	 */
 	private Composite compositeGridHeader;
+	private Composite capexInfo;
 	private List<Composite> allRows;
 	private Composite presentRow;
-	private Label firstSeparator;
 	private Label secondSeparator;
 	private Label thirdSeparator;
 	private Label fourthSeparator;
 	private Label fifthSeparator;
-	private Label sixthSeparator;
-	private Label seventhSeparator;
-	private Label eigthSeparator;
 	private List<PitDependencyData> pitDependencyDataList;
+	private Text textCapexName;
 
 	public CapexDefinitionGrid(Composite parent, int style) {
 		super(parent, style);
@@ -56,10 +54,11 @@ public class CapexDefinitionGrid extends Composite {
 
 	private void createContent(Composite parent){
 		this.setLayout(new FormLayout());
+		this.addCapexInfo();
 		this.createHeader();
-		for(PitDependencyData pitDependencyData : this.pitDependencyDataList){
+		/*for(PitDependencyData pitDependencyData : this.pitDependencyDataList){
 			this.addRow(pitDependencyData);
-		}
+		}*/
 	}
 
 	private String[] getPits(){
@@ -84,81 +83,58 @@ public class CapexDefinitionGrid extends Composite {
 		return comboItems;
 	}
 	
-	private String getDescription(String firstPit, String firstPitAssociatedBench, String dependentPit, String dependentPitPitAssociatedBench, String minLead, String maxLead){
-		String description = null;
-		if(firstPitAssociatedBench == null){
-			firstPitAssociatedBench = "";
-		}
-		if(dependentPitPitAssociatedBench == null){
-			dependentPitPitAssociatedBench = "";
-		}
-		if((firstPit==null)||(dependentPit==null)||(firstPit.equals(""))||(dependentPit.equals(""))){
-			return "";
-		}else if((minLead.equals("-1")) && (maxLead.equals("-1"))){
-			description = firstPit + "/" + firstPitAssociatedBench + " will be totally mined before " + dependentPit + "/" + dependentPitPitAssociatedBench + " is started.";
-		}else if(maxLead.equals("-1")){
-			description = firstPit + "/" + firstPitAssociatedBench + " will be mined atleast " + minLead + " benches ahead of " + dependentPit + "/" + dependentPitPitAssociatedBench;
-		}else if(minLead.equals("-1")){
-			description = firstPit + "/" + firstPitAssociatedBench + " will be mined atmost " + maxLead + " benches ahead of " + dependentPit + "/" + dependentPitPitAssociatedBench;
-		}else if(!(minLead.equals("-1")) && !(maxLead.equals("-1"))){
-			description = firstPit + "/" + firstPitAssociatedBench + " will be mined atleast " + minLead + " benches ahead of " + dependentPit + "/" + dependentPitPitAssociatedBench + " AND " + firstPit + "/" + firstPitAssociatedBench + " will be mined atmost " + maxLead + " benches ahead of " + dependentPit + "/" + dependentPitPitAssociatedBench;
-		}
-		return description;
+	private void addCapexInfo(){
+		capexInfo = new Composite(this, SWT.BORDER);
+		capexInfo.setBackground(SWTResourceManager.getColor(230, 230, 230));
+		capexInfo.setLayout(new FormLayout());
+		FormData fd_capexInfo = new FormData();
+		fd_capexInfo.bottom = new FormAttachment(0, 28);
+		fd_capexInfo.top = new FormAttachment(0);
+		fd_capexInfo.left = new FormAttachment(0);
+		fd_capexInfo.right = new FormAttachment(0, 366);
+		capexInfo.setLayoutData(fd_capexInfo);
+		
+		Label lblCapexName = new Label(capexInfo, SWT.NONE);
+		lblCapexName.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
+		FormData fd_lblCapexName = new FormData();
+		fd_lblCapexName.right = new FormAttachment(0, 91);
+		fd_lblCapexName.left = new FormAttachment(0, 10);
+		fd_lblCapexName.top = new FormAttachment(0,2);
+		lblCapexName.setLayoutData(fd_lblCapexName);
+		lblCapexName.setText("Capex Name:");
+		lblCapexName.setBackground(SWTResourceManager.getColor(230, 230, 230));
+		
+		textCapexName = new Text(capexInfo, SWT.BORDER);
+		FormData fd_textCapexName = new FormData();
+		fd_textCapexName.left = new FormAttachment(lblCapexName, 10, SWT.RIGHT);
+		fd_textCapexName.right = new FormAttachment(0, 300);
+		textCapexName.setLayoutData(fd_textCapexName);
 	}
 	
-	private void updateRowDescription(Composite rowComposite){
-		PitDependencyData pitDependencyData = (PitDependencyData)rowComposite.getData();
-		String firstPit = pitDependencyData.getFirstPitName();
-		String firstPitAssociatedBench = pitDependencyData.getFirstPitAssociatedBench();
-		String dependentPit = pitDependencyData.getDependentPitName();
-		String dependentPitAssociatedBench = pitDependencyData.getDependentPitAssociatedBench();
-		String minLead = String.valueOf(pitDependencyData.getMinLead());
-		String maxLead = String.valueOf(pitDependencyData.getMaxLead());
-		
-		String description = getDescription(firstPit, firstPitAssociatedBench, dependentPit, dependentPitAssociatedBench, minLead, maxLead);
-		Text textDescription = (Text)rowComposite.getChildren()[7];
-		if(description != null){
-			textDescription.setText(description);
-		}
-	}
-
 	private void createHeader(){
 		compositeGridHeader = new Composite(this, SWT.BORDER);
 		compositeGridHeader.setBackground(SWTResourceManager.getColor(230, 230, 230));
 		compositeGridHeader.setLayout(new FormLayout());
 		FormData fd_compositeGridHeader = new FormData();
-		fd_compositeGridHeader.bottom = new FormAttachment(0, 31);
-		fd_compositeGridHeader.top = new FormAttachment(0);
+		fd_compositeGridHeader.bottom = new FormAttachment(capexInfo, 38, SWT.BOTTOM);
+		fd_compositeGridHeader.top = new FormAttachment(capexInfo, 5, SWT.BOTTOM);
 		fd_compositeGridHeader.left = new FormAttachment(0);
 		fd_compositeGridHeader.right = new FormAttachment(100);
 		compositeGridHeader.setLayoutData(fd_compositeGridHeader);
-
-		Label lblUse = new Label(compositeGridHeader, SWT.NONE);
-		lblUse.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
-		FormData fd_lblUse = new FormData();
-		fd_lblUse.top = new FormAttachment(0,2);
-		fd_lblUse.left = new FormAttachment(0, 10);
-		lblUse.setLayoutData(fd_lblUse);
-		lblUse.setText("Use");
-		lblUse.setBackground(SWTResourceManager.getColor(230, 230, 230));
-
-		firstSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
-		FormData fd_firstSeparator = new FormData();
-		fd_firstSeparator.left = new FormAttachment(lblUse, 10);
-		firstSeparator.setLayoutData(fd_firstSeparator);
 		
 		Label lblFirstPit = new Label(compositeGridHeader, SWT.NONE);
 		lblFirstPit.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		FormData fd_lblFirstPit = new FormData();
+		fd_lblFirstPit.right = new FormAttachment(0, 133);
+		fd_lblFirstPit.left = new FormAttachment(0, 10);
 		fd_lblFirstPit.top = new FormAttachment(0,2);
-		fd_lblFirstPit.left = new FormAttachment(firstSeparator, 35);
 		lblFirstPit.setLayoutData(fd_lblFirstPit);
-		lblFirstPit.setText("First Pit");
+		lblFirstPit.setText("Capex Instance Name");
 		lblFirstPit.setBackground(SWTResourceManager.getColor(230, 230, 230));
 		
 		secondSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
 		FormData fd_secondSeparator = new FormData();
-		fd_secondSeparator.left = new FormAttachment(lblFirstPit, 35);
+		fd_secondSeparator.left = new FormAttachment(lblFirstPit, 17);
 		secondSeparator.setLayoutData(fd_secondSeparator);
 		
 		Label lblFirstPitAssociatedBench = new Label(compositeGridHeader, SWT.NONE);
@@ -167,7 +143,7 @@ public class CapexDefinitionGrid extends Composite {
 		fd_lblFirstPitAssociatedBench.top = new FormAttachment(0,2);
 		fd_lblFirstPitAssociatedBench.left = new FormAttachment(secondSeparator, 35);
 		lblFirstPitAssociatedBench.setLayoutData(fd_lblFirstPitAssociatedBench);
-		lblFirstPitAssociatedBench.setText("Bench Name");
+		lblFirstPitAssociatedBench.setText("Process/Pit");
 		lblFirstPitAssociatedBench.setBackground(SWTResourceManager.getColor(230, 230, 230));
 		
 		thirdSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
@@ -181,7 +157,7 @@ public class CapexDefinitionGrid extends Composite {
 		fd_lblDependentPit.top = new FormAttachment(0,2);
 		fd_lblDependentPit.left = new FormAttachment(thirdSeparator, 35);
 		lblDependentPit.setLayoutData(fd_lblDependentPit);
-		lblDependentPit.setText("Dependent Pit");
+		lblDependentPit.setText("Capex($)");
 		lblDependentPit.setBackground(SWTResourceManager.getColor(230, 230, 230));
 		
 		fourthSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
@@ -209,49 +185,21 @@ public class CapexDefinitionGrid extends Composite {
 		fd_lblMinLead.top = new FormAttachment(0,2);
 		fd_lblMinLead.left = new FormAttachment(fifthSeparator, 20);
 		lblMinLead.setLayoutData(fd_lblMinLead);
-		lblMinLead.setText("Min Lead");
+		lblMinLead.setText("Expansion Capacity");
 		lblMinLead.setBackground(SWTResourceManager.getColor(230, 230, 230));
-		
-		sixthSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
-		FormData fd_sixthSeparator = new FormData();
-		fd_sixthSeparator.left = new FormAttachment(lblMinLead, 20);
-		sixthSeparator.setLayoutData(fd_sixthSeparator);
-		
-		Label lblMaxLead = new Label(compositeGridHeader, SWT.NONE);
-		lblMaxLead.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
-		FormData fd_lblMaxLead = new FormData();
-		fd_lblMaxLead.top = new FormAttachment(0,2);
-		fd_lblMaxLead.left = new FormAttachment(sixthSeparator, 20);
-		lblMaxLead.setLayoutData(fd_lblMaxLead);
-		lblMaxLead.setText("Max Lead");
-		lblMaxLead.setBackground(SWTResourceManager.getColor(230, 230, 230));
-		
-		seventhSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
-		FormData fd_seventhSeparator = new FormData();
-		fd_seventhSeparator.left = new FormAttachment(lblMaxLead, 20);
-		seventhSeparator.setLayoutData(fd_seventhSeparator);
-		
-		Label lblDescription = new Label(compositeGridHeader, SWT.NONE);
-		lblDescription.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
-		FormData fd_lblDescription = new FormData();
-		fd_lblDescription.top = new FormAttachment(0,2);
-		fd_lblDescription.left = new FormAttachment(seventhSeparator, 200);
-		lblDescription.setLayoutData(fd_lblDescription);
-		lblDescription.setText("Description");
-		lblDescription.setBackground(SWTResourceManager.getColor(230, 230, 230));
-		
-		eigthSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
-		FormData fd_eigthSeparator = new FormData();
-		fd_eigthSeparator.left = new FormAttachment(lblDescription, 200);
-		eigthSeparator.setLayoutData(fd_eigthSeparator);
 		
 		
 		
 		this.presentRow = this.compositeGridHeader;//referring to the header as the 1st row when there are no rows inserted yet
+		
+		Label label = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
+		FormData fd_label = new FormData();
+		fd_label.left = new FormAttachment(lblMinLead, 25);
+		label.setLayoutData(fd_label);
 
 	}
 
-	public void addRow(final PitDependencyData pitDependencyData){
+	/*public void addRow(final PitDependencyData pitDependencyData){
 		final Composite compositeRow = new Composite(this, SWT.BORDER);
 		compositeRow.setLayout(new FormLayout());
 		Color backgroundColor = SWTResourceManager.getColor(SWT.COLOR_WHITE);
@@ -480,12 +428,13 @@ public class CapexDefinitionGrid extends Composite {
 		this.layout();
 		
 		
-	}
+	}*/
 
 	public void addRow(){
-		PitDependencyData pitDependencyData  = new PitDependencyData();
-		this.pitDependencyDataList.add(pitDependencyData);
-		this.addRow(pitDependencyData);
+		//PitDependencyData pitDependencyData  = new PitDependencyData();
+		//this.pitDependencyDataList.add(pitDependencyData);
+		//this.addRow(pitDependencyData);
+		System.out.println("Should add a new row");
 	}
 
 	public void resetAllRows(){

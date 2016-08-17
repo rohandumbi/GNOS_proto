@@ -123,7 +123,7 @@ public class CapexDefinitionScreen extends GnosScreen {
 		Rectangle r = scGridContainer.getClientArea();
 		scGridContainer.setMinSize(scGridContainer.computeSize(SWT.DEFAULT, r.height, true));
 		
-		CapexDefinitionGrid capexGrid = new CapexDefinitionGrid(scGridContainer, SWT.NONE);
+		final CapexDefinitionGrid capexGrid = new CapexDefinitionGrid(scGridContainer, SWT.NONE);
 		scGridContainer.setContent(capexGrid);
 		
 		Button btnAddCapexInstance = new Button(this, SWT.NONE);
@@ -138,6 +138,7 @@ public class CapexDefinitionScreen extends GnosScreen {
 				int scrollableHeight = scGridContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).y;
 				Point point = new Point(gridWidth, scrollableHeight);
 				scGridContainer.setMinSize(point);*/
+				capexGrid.addRow();
 			}
 		});
 		btnAddCapexInstance.setFont(SWTResourceManager.getFont("Segoe UI", 16, SWT.BOLD));
