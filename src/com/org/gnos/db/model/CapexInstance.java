@@ -6,8 +6,8 @@ public class CapexInstance {
 	private String name;
 	private String groupingName;
 	private int groupingType;
-	private double capexAmount;
-	private double expansionCapacity;
+	private long capexAmount;
+	private long expansionCapacity;
 	
 	public static final int SELECTION_NONE = 0;
 	public static final int SELECTION_PROCESS_JOIN = 1;
@@ -55,16 +55,16 @@ public class CapexInstance {
 	public void setGroupingType(int groupingType) {
 		this.groupingType = groupingType;
 	}
-	public double getCapexAmount() {
+	public long getCapexAmount() {
 		return capexAmount;
 	}
-	public void setCapexAmount(double capexAmount) {
+	public void setCapexAmount(long capexAmount) {
 		this.capexAmount = capexAmount;
 	}
-	public double getExpansionCapacity() {
+	public long getExpansionCapacity() {
 		return expansionCapacity;
 	}
-	public void setExpansionCapacity(double expansionCapacity) {
+	public void setExpansionCapacity(long expansionCapacity) {
 		this.expansionCapacity = expansionCapacity;
 	}
 	

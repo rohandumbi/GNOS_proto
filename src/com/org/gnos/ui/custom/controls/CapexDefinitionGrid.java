@@ -12,7 +12,6 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
@@ -22,15 +21,11 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.core.ProjectConfigutration;
-import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.db.model.CapexData;
 import com.org.gnos.db.model.CapexInstance;
 import com.org.gnos.db.model.Pit;
-import com.org.gnos.db.model.PitBenchConstraintData;
-import com.org.gnos.db.model.PitDependencyData;
 import com.org.gnos.db.model.PitGroup;
 import com.org.gnos.db.model.Process;
-import com.org.gnos.db.model.ProcessConstraintData;
 import com.org.gnos.db.model.ProcessJoin;
 
 public class CapexDefinitionGrid extends Composite {
@@ -65,9 +60,10 @@ public class CapexDefinitionGrid extends Composite {
 		this.setLayout(new FormLayout());
 		this.addCapexInfo();
 		this.createHeader();
-		/*for(PitDependencyData pitDependencyData : this.pitDependencyDataList){
-			this.addRow(pitDependencyData);
-		}*/
+		ArrayList<CapexInstance> capexInstances = this.capexData.getListOfCapexInstances();
+		for(CapexInstance capexInstance: capexInstances){
+			this.addRow(capexInstance);
+		}
 	}
 	
 	private String[] getSelectors(){
@@ -251,9 +247,9 @@ public class CapexDefinitionGrid extends Composite {
 		fd_textCapexInstanceName.left = new FormAttachment(0, 5);
 		fd_textCapexInstanceName.right = new FormAttachment(0, 148);
 		textCapexInstanceName.setLayoutData(fd_textCapexInstanceName);
-		String capexName = capexData.getName();
-		if(capexName != null){
-			textCapexInstanceName.setText(capexName);
+		String capexInstanceName = capexInstance.getName();
+		if(capexInstanceName != null){
+			textCapexInstanceName.setText(capexInstanceName);
 		}
 		textCapexInstanceName.addModifyListener(new ModifyListener(){
 			public void modifyText(ModifyEvent event) {
@@ -297,6 +293,10 @@ public class CapexDefinitionGrid extends Composite {
 			}
 		});
 		
+		String groupName = capexInstance.getGroupingName();
+		if(groupName != null){
+			comboGroup.setText(groupName);
+		}
 		FormData fd_comboGroup = new FormData();
 		fd_comboGroup.left = new FormAttachment(textCapexInstanceName, 5, SWT.RIGHT);
 		fd_comboGroup.right = new FormAttachment(textCapexInstanceName, 130, SWT.RIGHT);
@@ -309,14 +309,14 @@ public class CapexDefinitionGrid extends Composite {
 		fd_textCapexAmount.left = new FormAttachment(comboGroup, 5, SWT.RIGHT);
 		fd_textCapexAmount.right = new FormAttachment(comboGroup, 120, SWT.RIGHT);
 		textCapexAmount.setLayoutData(fd_textCapexAmount);
-		Double capexAmount = capexInstance.getCapexAmount();
+		Long capexAmount = capexInstance.getCapexAmount();
 		if((capexAmount != null) && (capexAmount > 0)){
 			textCapexAmount.setText(String.valueOf(capexAmount));
 		}
 		textCapexAmount.addModifyListener(new ModifyListener(){
 			public void modifyText(ModifyEvent event) {
 				String capexAmount = textCapexAmount.getText();
-				capexInstance.setCapexAmount(Double.valueOf(capexAmount));
+				capexInstance.setCapexAmount(Long.valueOf(capexAmount));
 			}
 		});
 		
@@ -325,14 +325,14 @@ public class CapexDefinitionGrid extends Composite {
 		fd_textExpansionCapacity.left = new FormAttachment(textCapexAmount, 5, SWT.RIGHT);
 		fd_textExpansionCapacity.right = new FormAttachment(textCapexAmount, 120, SWT.RIGHT);
 		textExpansionCapacity.setLayoutData(fd_textExpansionCapacity);
-		Double expansionCapacity = capexInstance.getExpansionCapacity();
+		Long expansionCapacity = capexInstance.getExpansionCapacity();
 		if((expansionCapacity != null) && (expansionCapacity > 0)){
 			textExpansionCapacity.setText(String.valueOf(expansionCapacity));
 		}
 		textExpansionCapacity.addModifyListener(new ModifyListener(){
 			public void modifyText(ModifyEvent event) {
 				String expansionCapacity = textExpansionCapacity.getText();
-				capexInstance.setExpansionCapacity(Double.valueOf(expansionCapacity));
+				capexInstance.setExpansionCapacity(Long.valueOf(expansionCapacity));
 			}
 		});
 		
@@ -345,6 +345,8 @@ public class CapexDefinitionGrid extends Composite {
 	public void addRow(){
 		System.out.println("Should add a new row");
 		CapexInstance capexInstance = new CapexInstance();
+		this.capexData.getListOfCapexInstances().add(capexInstance);
+		capexInstance.setCapexId(this.capexData.getId());
 		this.addRow(capexInstance);
 	}
 

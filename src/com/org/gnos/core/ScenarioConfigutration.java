@@ -13,6 +13,7 @@ import java.util.Set;
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.dao.ScenarioDAO;
 import com.org.gnos.db.model.CapexData;
+import com.org.gnos.db.model.CapexInstance;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.FixedOpexCost;
 import com.org.gnos.db.model.GradeConstraintData;
@@ -67,6 +68,7 @@ public class ScenarioConfigutration {
 		loadGradeConstraintData();
 		loadBenchConstraintData();
 		loadPitDependencyData();
+		loadCapexData();
 	}
 
 	private void loadScenarioData(int scenarioId) {
@@ -348,6 +350,85 @@ public class ScenarioConfigutration {
 			}
 		}
 	}
+	
+	public void loadCapexData() {
+		this.capexDataList = new ArrayList<CapexData>();
+		String sql1 = "select a.id, a.scenario_id, a.name, b.id, b.name, b.capex_id, b.group_name, b.group_type, b.capex, b.expansion_capacity from capex_data a, capex_instance b where b.capex_id = a.id and scenario_id="
+				+ this.scenarioId;
+		//String sql1 = "select id, scenario_id, name from capex_data where scenario_id=" + this.scenarioId;
+		
+		
+		Statement stmt1 = null;
+		ResultSet rs1 = null;
+		Connection conn = DBManager.getConnection();
+		try {
+			stmt1 = conn.createStatement();
+			stmt1.execute(sql1);
+			rs1 = stmt1.getResultSet();
+			CapexData cd;
+			while (rs1.next()) {
+				/*int id = rs.getInt(1);
+
+				gcd = getGradeConstraintDataById(id);
+				if (gcd == null) {
+					gcd = new GradeConstraintData();					
+					gcd.setId(id);
+					gcd.setSelectorName(rs.getString(2));
+					gcd.setSelectionType(rs.getInt(3));
+					gcd.setSelectedGradeName(rs.getString(4));
+					gcd.setProductJoinName(rs.getString(5));
+					gcd.setInUse(rs.getBoolean(6));
+					gcd.setMax(rs.getBoolean(7));
+
+					this.gradeConstraintDataList.add(gcd);
+				}
+				gcd.addYear(rs.getInt("year"), rs.getFloat("value"));*/
+				
+				int capexId = rs1.getInt(1);
+				cd = getCapexDataById(capexId);
+				if (cd == null) {
+					cd = new CapexData();
+					cd.setId(capexId);
+					cd.setScenarioId(rs1.getInt(2));
+					cd.setName(rs1.getString(3));
+					
+					
+					
+					/*gcd.setId(id);
+					gcd.setSelectorName(rs.getString(2));
+					gcd.setSelectionType(rs.getInt(3));
+					gcd.setSelectedGradeName(rs.getString(4));
+					gcd.setProductJoinName(rs.getString(5));
+					gcd.setInUse(rs.getBoolean(6));
+					gcd.setMax(rs.getBoolean(7));*/
+
+					this.capexDataList.add(cd);
+				}
+				CapexInstance capexInstance = new CapexInstance();
+				capexInstance.setId(rs1.getInt(4));
+				capexInstance.setName(rs1.getString(5));
+				capexInstance.setCapexId(rs1.getInt(6));
+				capexInstance.setGroupingName(rs1.getString(7));
+				capexInstance.setGroupingType(rs1.getInt(8));
+				capexInstance.setCapexAmount(rs1.getLong(9));
+				capexInstance.setExpansionCapacity(rs1.getLong(10));
+				cd.addCapexInstance(capexInstance);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (stmt1 != null)
+					stmt1.close();
+				if (rs1 != null)
+					rs1.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
 	public void save() {
 		this.projectConfiguration = ProjectConfigutration.getInstance();
@@ -357,6 +438,7 @@ public class ScenarioConfigutration {
 		saveGradeConstraintData();
 		saveBenchConstraintData();
 		savePitDependencyList();
+		saveCapexData();
 	}
 
 
@@ -523,6 +605,66 @@ public class ScenarioConfigutration {
 						pstmt1.setInt(1, pcd.getId());
 						pstmt1.setInt(2, key);
 						pstmt1.setFloat(3, pcd.getConstraintData().get(key));
+						pstmt1.executeUpdate();
+					}
+				}
+			}
+
+			conn.commit();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				conn.setAutoCommit(autoCommit);
+				if (pstmt != null)
+					pstmt.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public void saveCapexData() {
+		Connection conn = DBManager.getConnection();
+		String insert_sql = "insert into capex_data (scenario_id, name) values (?, ?)";
+		String mapping_sql = "insert into capex_instance (name, capex_id, group_name, group_type, capex, expansion_capacity) values (?, ?, ?, ?, ?, ?)";
+		PreparedStatement pstmt = null;
+		PreparedStatement pstmt1 = null;
+		ResultSet rs = null;
+		boolean autoCommit = true;
+
+		try {
+			autoCommit = conn.getAutoCommit();
+			conn.setAutoCommit(false);
+			pstmt = conn.prepareStatement(insert_sql,
+					Statement.RETURN_GENERATED_KEYS);
+			pstmt1 = conn.prepareStatement(mapping_sql);
+
+			for(CapexData cd : this.capexDataList) {
+				if (cd.getId() > 0)
+					continue;
+				//pstmt.setInt(1, this.projectConfiguration.getProjectId());
+				pstmt.setInt(1, this.scenarioId);
+				pstmt.setString(2, cd.getName());
+				//pstmt.setBoolean(3, pcd.isInUse());
+				pstmt.executeUpdate();
+				rs = pstmt.getGeneratedKeys();
+
+				if (rs.next()){
+					int id = rs.getInt(1);
+					cd.setId(id);
+
+					for(CapexInstance ci: cd.getListOfCapexInstances()){
+						ci.setCapexId(cd.getId());
+						pstmt1.setString(1, ci.getName());
+						pstmt1.setInt(2, ci.getCapexId());
+						pstmt1.setString(3, ci.getGroupingName());
+						pstmt1.setInt(4, ci.getGroupingType());
+						pstmt1.setLong(5, ci.getCapexAmount());
+						pstmt1.setLong(6, ci.getExpansionCapacity());
 						pstmt1.executeUpdate();
 					}
 				}
@@ -749,6 +891,17 @@ public class ScenarioConfigutration {
 		for (GradeConstraintData gcd : this.gradeConstraintDataList) {
 			if (gcd.getId() == id) {
 				return gcd;
+			}
+		}
+		return null;
+	}
+	
+	public CapexData getCapexDataById(int id) {
+		if (this.capexDataList == null)
+			return null;
+		for (CapexData cd : this.capexDataList) {
+			if (cd.getId() == id) {
+				return cd;
 			}
 		}
 		return null;

@@ -47,5 +47,7 @@ public class CapexData {
 		this.listOfCapexInstances = listOfCapexInstances;
 	}
 	
-	
+	public void addCapexInstance(CapexInstance capexInstance){
+		this.listOfCapexInstances.add(capexInstance);
+	}
 }

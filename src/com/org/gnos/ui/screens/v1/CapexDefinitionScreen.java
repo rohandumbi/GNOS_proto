@@ -35,6 +35,8 @@ public class CapexDefinitionScreen extends GnosScreen {
 	private Button btnAddConstraintRow;
 	private Control referenceToAddNewGrid;
 	private ArrayList<CapexData> capexDataList;
+	private ArrayList<ScrolledComposite> allCapexGrids;
+	private ArrayList<Button> allAddRowButtons;
 	/**
 	 * Create the composite.
 	 * @param parent
@@ -45,6 +47,8 @@ public class CapexDefinitionScreen extends GnosScreen {
 		setForeground(SWTResourceManager.getColor(30, 144, 255));
 		setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		this.allCapexGrids = new ArrayList<ScrolledComposite>();
+		this.allAddRowButtons = new ArrayList<Button>();
 		this.createContent();
 
 	}
@@ -139,6 +143,7 @@ public class CapexDefinitionScreen extends GnosScreen {
 		scGridContainer.setContent(capexGrid);
 		
 		Button btnAddCapexInstance = new Button(this, SWT.NONE);
+		this.allAddRowButtons.add(btnAddCapexInstance);
 		btnAddCapexInstance.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -156,47 +161,9 @@ public class CapexDefinitionScreen extends GnosScreen {
 		fd_btnAddCapexInstance.right = new FormAttachment(100, -5);
 		btnAddCapexInstance.setLayoutData(fd_btnAddCapexInstance);
 		btnAddCapexInstance.setText("+");
+		this.allCapexGrids.add(scGridContainer);
 		referenceToAddNewGrid = scGridContainer;
 		this.layout();
-	}
-	
-	private void initializeGridContainer(){
-		this.scGridContainer = new ScrolledComposite(this, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		FormData fd_scGridContainer = new FormData(500,500);// temp hack else size of scrolled composite keeps on increasing
-		fd_scGridContainer.top = new FormAttachment(textScenarioName, 10, SWT.BOTTOM);
-		fd_scGridContainer.left = new FormAttachment(labelScreenName, 0, SWT.LEFT);
-		fd_scGridContainer.bottom = new FormAttachment(100, -10);
-		fd_scGridContainer.right = new FormAttachment(100, -35);
-		
-		this.scGridContainer.setExpandHorizontal(true);
-		this.scGridContainer.setExpandVertical(true);
-		this.scGridContainer.setLayoutData(fd_scGridContainer);
-		
-		Rectangle r = this.scGridContainer.getClientArea();
-		this.scGridContainer.setMinSize(this.scGridContainer.computeSize(SWT.DEFAULT, r.height, true));
-		
-		
-		this.btnAddConstraintRow = new Button(this, SWT.NONE);
-		this.btnAddConstraintRow.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				//TO DO implement row add
-				pitDependencyGrid.addRow();
-				Rectangle r = pitDependencyGrid.getClientArea();
-				int gridWidth = r.width;
-				
-				int scrollableHeight = scGridContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).y;
-				Point point = new Point(gridWidth, scrollableHeight);
-				scGridContainer.setMinSize(point);
-			}
-		});
-		this.btnAddConstraintRow.setFont(SWTResourceManager.getFont("Segoe UI", 16, SWT.BOLD));
-		FormData fd_btnAddRow = new FormData();
-		fd_btnAddRow.top = new FormAttachment(textScenarioName, 10, SWT.BOTTOM);
-		fd_btnAddRow.right = new FormAttachment(100, -5);
-		this.btnAddConstraintRow.setLayoutData(fd_btnAddRow);
-		this.btnAddConstraintRow.setText("+");
-		
 	}
 	
 	public void refreshGrid(){
@@ -205,12 +172,16 @@ public class CapexDefinitionScreen extends GnosScreen {
 		if(this.scenarioName != null){
 			this.textScenarioName.setText(this.scenarioName);
 		}
-		
-		/*if(this.pitDependencyGrid != null){
-			this.pitDependencyGrid.dispose();
+		for(ScrolledComposite capexGrid: this.allCapexGrids){
+			capexGrid.dispose();
+			for(Button button: this.allAddRowButtons){
+				button.dispose();
+			}
+			referenceToAddNewGrid = textScenarioName;
 		}
-		this.pitDependencyGrid = new PitDependencyGrid(scGridContainer, SWT.None);
-		this.scGridContainer.setContent(this.pitDependencyGrid);*/
+		for(CapexData capexData: this.capexDataList){
+			this.addCapexGrid(capexData);
+		}
 	}
 	
 	@Override
