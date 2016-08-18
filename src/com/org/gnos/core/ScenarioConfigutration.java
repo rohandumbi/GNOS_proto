@@ -12,6 +12,7 @@ import java.util.Set;
 
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.dao.ScenarioDAO;
+import com.org.gnos.db.model.CapexData;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.FixedOpexCost;
 import com.org.gnos.db.model.GradeConstraintData;
@@ -38,6 +39,7 @@ public class ScenarioConfigutration {
 	private List<GradeConstraintData> gradeConstraintDataList = new ArrayList<GradeConstraintData>();
 	private List<PitBenchConstraintData> pitBenchConstraintDataList = new ArrayList<PitBenchConstraintData>();
 	private List<PitDependencyData> pitDependencyDataList = new ArrayList<PitDependencyData>();
+	private ArrayList<CapexData> capexDataList = new ArrayList<CapexData>();
 	private Scenario scenarioData ;
 
 	private int scenarioId = -1;
@@ -835,6 +837,14 @@ public class ScenarioConfigutration {
 	public void setPitDependencyDataList(
 			List<PitDependencyData> pitDependencyDataList) {
 		this.pitDependencyDataList = pitDependencyDataList;
+	}
+	
+	public ArrayList<CapexData> getCapexDataList() {
+		return capexDataList;
+	}
+
+	public void setCapexDataList(ArrayList<CapexData> capexDataList) {
+		this.capexDataList = capexDataList;
 	}
 
 	public int getStartYear() {

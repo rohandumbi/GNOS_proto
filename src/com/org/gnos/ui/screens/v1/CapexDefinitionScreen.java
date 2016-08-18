@@ -1,5 +1,7 @@
 package com.org.gnos.ui.screens.v1;
 
+import java.util.ArrayList;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -17,6 +19,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.core.ScenarioConfigutration;
+import com.org.gnos.db.model.CapexData;
 import com.org.gnos.events.GnosEvent;
 import com.org.gnos.ui.custom.controls.CapexDefinitionGrid;
 import com.org.gnos.ui.custom.controls.GnosScreen;
@@ -31,6 +34,7 @@ public class CapexDefinitionScreen extends GnosScreen {
 	private String scenarioName;
 	private Button btnAddConstraintRow;
 	private Control referenceToAddNewGrid;
+	private ArrayList<CapexData> capexDataList;
 	/**
 	 * Create the composite.
 	 * @param parent
@@ -41,9 +45,6 @@ public class CapexDefinitionScreen extends GnosScreen {
 		setForeground(SWTResourceManager.getColor(30, 144, 255));
 		setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		//this.timePeriod = ScenarioConfigutration.getInstance().getTimePeriod();
-		//this.startYear = ScenarioConfigutration.getInstance().getStartYear();
-		this.scenarioName = ScenarioConfigutration.getInstance().getName();
 		this.createContent();
 
 	}
@@ -91,10 +92,15 @@ public class CapexDefinitionScreen extends GnosScreen {
 		btnAddCapex.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				addCapexGrid();
+				if(scenarioName == null){
+					return;
+				}else{
+					addCapexGrid();
+				}
 			}
 		});
 		FormData fd_btnAddCapex = new FormData();
+		fd_btnAddCapex.right = new FormAttachment(textScenarioName, 103, SWT.RIGHT);
 		fd_btnAddCapex.bottom = new FormAttachment(textScenarioName, 0, SWT.BOTTOM);
 		fd_btnAddCapex.left = new FormAttachment(textScenarioName, 20);
 		btnAddCapex.setLayoutData(fd_btnAddCapex);
@@ -110,6 +116,12 @@ public class CapexDefinitionScreen extends GnosScreen {
 	}
 	
 	private void addCapexGrid(){
+		CapexData capexData = new CapexData();
+		this.capexDataList.add(capexData);
+		this.addCapexGrid(capexData);
+	}
+	
+	private void addCapexGrid(CapexData capexData){
 		final ScrolledComposite scGridContainer = new ScrolledComposite(this, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 		FormData fd_scGridContainer = new FormData(500,500);// temp hack else size of scrolled composite keeps on increasing
 		fd_scGridContainer.top = new FormAttachment(referenceToAddNewGrid, 10, SWT.BOTTOM);
@@ -123,22 +135,19 @@ public class CapexDefinitionScreen extends GnosScreen {
 		Rectangle r = scGridContainer.getClientArea();
 		scGridContainer.setMinSize(scGridContainer.computeSize(SWT.DEFAULT, r.height, true));
 		
-		final CapexDefinitionGrid capexGrid = new CapexDefinitionGrid(scGridContainer, SWT.NONE);
+		final CapexDefinitionGrid capexGrid = new CapexDefinitionGrid(scGridContainer, SWT.NONE, capexData);
 		scGridContainer.setContent(capexGrid);
 		
 		Button btnAddCapexInstance = new Button(this, SWT.NONE);
 		btnAddCapexInstance.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				//TO DO implement row add
-				/*pitDependencyGrid.addRow();
-				Rectangle r = pitDependencyGrid.getClientArea();
+				capexGrid.addRow();
+				Rectangle r = capexGrid.getClientArea();
 				int gridWidth = r.width;
-				
 				int scrollableHeight = scGridContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).y;
 				Point point = new Point(gridWidth, scrollableHeight);
-				scGridContainer.setMinSize(point);*/
-				capexGrid.addRow();
+				scGridContainer.setMinSize(point);
 			}
 		});
 		btnAddCapexInstance.setFont(SWTResourceManager.getFont("Segoe UI", 16, SWT.BOLD));
@@ -192,6 +201,7 @@ public class CapexDefinitionScreen extends GnosScreen {
 	
 	public void refreshGrid(){
 		this.scenarioName = ScenarioConfigutration.getInstance().getName();
+		this.capexDataList = ScenarioConfigutration.getInstance().getCapexDataList();
 		if(this.scenarioName != null){
 			this.textScenarioName.setText(this.scenarioName);
 		}
