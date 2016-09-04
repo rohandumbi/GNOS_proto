@@ -4,7 +4,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class ProcessConstraintData {
-
+	
+	public static final int COEFFICIENT_NONE =0;
 	public static final int COEFFICIENT_EXPRESSION =1;
 	public static final int COEFFICIENT_PRODUCT =2;
 	public static final int COEFFICIENT_PRODUCT_JOIN =3;
