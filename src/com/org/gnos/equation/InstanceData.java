@@ -26,6 +26,7 @@ public class InstanceData {
 	private Map<Integer, Block> blocks = new LinkedHashMap<Integer,Block>();
 	private Map<Integer, Pit> pits = new LinkedHashMap<Integer,Pit>();
 	private Map<Integer, List<String>> blockVariableMapping = new HashMap<Integer, List<String>>();
+	private List<String> capexVariables = new ArrayList<String>();
 	private String pitFieldName;
 	private String benchFieldName;
 	

@@ -20,6 +20,8 @@ import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.core.Tree;
 import com.org.gnos.db.DBManager;
+import com.org.gnos.db.model.CapexData;
+import com.org.gnos.db.model.CapexInstance;
 import com.org.gnos.db.model.Dump;
 import com.org.gnos.db.model.FixedOpexCost;
 import com.org.gnos.db.model.Model;
@@ -58,6 +60,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 			bytesWritten = 0;
 			buildProcessBlockVariables();
 			buildWasteBlockVariables();
+			buildCapexVariables();
 			output.flush();
 			output.close();
 		} catch(Exception e) {
@@ -155,6 +158,24 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 				
 			}
 			count++;
+		}
+	}
+	
+	private void buildCapexVariables(){
+		int timeperiod = scenarioConfigutration.getTimePeriod();
+		List<CapexData> capexDataList = scenarioConfigutration.getCapexDataList();
+		int capexCount = 0;
+		for(CapexData cd: capexDataList) {
+			capexCount++;
+			List<CapexInstance> capexInstanceList = cd.getListOfCapexInstances();
+			int capexInstanceCount = 0;
+			for(CapexInstance ci: capexInstanceList){
+				capexInstanceCount++;
+				for(int i= 1; i <= timeperiod ; i++){
+					String cv = "c"+capexCount+"i"+capexInstanceCount+"t"+i;
+					write(" -"+ci.getCapexAmount()+cv);
+				}
+			}
 		}
 	}
 	

@@ -154,6 +154,14 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 							}
 							eq += buildProcessConstraintVariables(p.getProcessNo(), coefficients, blocks, i);
 						}
+						if(!applyProcessRestrictions) {
+							// Generate stockpile variables
+							//buildStockpileConstraintVariables(coefficients, blocks, i);
+							
+							//Generate Waste variables
+							//buildWasteConstraintVariables(coefficients, blocks, i);
+						}
+						
 					}
 					
 					
@@ -211,7 +219,7 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 		
 	}
 
-	public String buildProcessConstraintVariables(int processNumber, List<String> coefficients, List<Block> blocks, int period) {
+	private String buildProcessConstraintVariables(int processNumber, List<String> coefficients, List<Block> blocks, int period) {
 		
 		String eq = "";
 		for(Block block: blocks){
@@ -227,4 +235,35 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 		return eq;
 	}
 	
+	private String buildStockpileConstraintVariables(List<String> coefficients, List<Block> blocks, int period) {
+		
+		String eq = "";
+		for(Block block: blocks){
+			float processRatio = 0;
+			for(String coefficient: coefficients){
+				String expressionName = coefficient.replaceAll("\\s+","_");
+				processRatio += block.getComputedField(expressionName);					
+			}
+			if(processRatio == 0) continue;
+			
+			//eq +=  "+ "+ processRatio+"p"+block.getPitNo()+"x"+block.getBlockNo()+"p"+processNumber+"t"+period;
+		}			
+		return eq;
+	}
+
+	private String buildWasteConstraintVariables(List<String> coefficients, List<Block> blocks, int period) {
+	
+		String eq = "";
+		for(Block block: blocks){
+			float processRatio = 0;
+			for(String coefficient: coefficients){
+				String expressionName = coefficient.replaceAll("\\s+","_");
+				processRatio += block.getComputedField(expressionName);					
+			}
+			if(processRatio == 0) continue;
+			
+			//eq +=  "+ "+ processRatio+"p"+block.getPitNo()+"x"+block.getBlockNo()+"p"+processNumber+"t"+period;
+		}			
+		return eq;
+	}
 }
