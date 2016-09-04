@@ -32,9 +32,6 @@ import com.org.gnos.db.model.Process;
 import com.org.gnos.db.model.Stockpile;
 
 public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
-
-	private Map<Integer, List<Integer>> pitDumpMapping;
-	private Map<Integer, Integer> pitStockpileMapping;
 	
 	private Tree processTree;
 	private int bytesWritten = 0;
@@ -113,7 +110,6 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 	private void buildStockpileVariables(Set<Block> blocks) {
 		FixedOpexCost[] fixedOpexCost = scenarioConfigutration.getFixedCost();
 		if(fixedOpexCost == null || fixedOpexCost.length < 3) return;
-		parseStockpileData();
 		Map<Integer, Float> oreMiningCostMap = fixedOpexCost[0].getCostData();
 		Map<Integer, Float> stockPilingCostMap = fixedOpexCost[2].getCostData();
 		Set<Integer> keys = stockPilingCostMap.keySet();
@@ -121,7 +117,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		for(int year: keys){
 			float cost = stockPilingCostMap.get(year)+oreMiningCostMap.get(year);			
 			for(Block block: blocks) {
-				Integer stockpileNumber = this.pitStockpileMapping.get(block.getPitNo());
+				Integer stockpileNumber = this.serviceInstanceData.getPitStockpileMapping().get(block.getPitNo());
 				if(stockpileNumber == null) continue;
 				String variable = "p"+block.getPitNo()+"x"+block.getBlockNo()+"s"+stockpileNumber+"t"+count;
 				String eq = " -"+cost+ variable;
@@ -138,7 +134,6 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		serviceInstanceData.setWasteBlocks(wasteblocks);
 		FixedOpexCost[] fixedOpexCost = scenarioConfigutration.getFixedCost();
 		if(fixedOpexCost == null || fixedOpexCost.length < 2) return;
-		parseDumpData();
 		Map<Integer, Float> wasteMiningCostMap = fixedOpexCost[1].getCostData();
 		Set<Integer> keys = wasteMiningCostMap.keySet();
 
@@ -146,7 +141,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		for(int year: keys){
 			float cost = wasteMiningCostMap.get(year);		
 			for(Block block: wasteblocks) {
-				List<Integer> dumps = pitDumpMapping.get(block.getPitNo());
+				List<Integer> dumps = this.serviceInstanceData.getPitDumpMapping().get(block.getPitNo());
 				if(dumps == null) continue;
 				for(Integer dumpNo: dumps){
 					String variable = "p"+block.getPitNo()+"x"+block.getBlockNo()+"w"+dumpNo+"t"+count;
@@ -281,45 +276,6 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		return value;
 	}
 	
-	private void parseStockpileData() {
-		this.pitStockpileMapping = new HashMap<Integer, Integer>();
-		List<Stockpile> stockpileListData = projectConfiguration.getStockPileList();
-		for(Stockpile sp: stockpileListData){
-			Set<Integer> pits = flattenPitGroup(sp.getAssociatedPitGroup());
-			for(Integer pitNo: pits) {
-				this.pitStockpileMapping.put(pitNo, sp.getStockpileNumber());
-			}
-		}
-		
-	}
-
-	private void parseDumpData() {
-		this.pitDumpMapping = new HashMap<Integer, List<Integer>>();
-		List<Dump> dumpData = projectConfiguration.getDumpList();
-		for(Dump dump: dumpData){
-			Set<Integer> pits = flattenPitGroup(dump.getAssociatedPitGroup());
-			for(Integer pitNo: pits) {
-				List<Integer> dumps = this.pitDumpMapping.get(pitNo);
-				if(dumps == null){
-					dumps = new ArrayList<Integer>();
-					this.pitDumpMapping.put(pitNo, dumps);
-				}
-				dumps.add(dump.getDumpNumber());
-			}
-		}
-	}
-	
-	private Set<Integer> flattenPitGroup(PitGroup pg) {
-		 Set<Integer> pits = new HashSet<Integer>();
-		 for(Pit childPit: pg.getListChildPits()){
-			 pits.add(childPit.getPitNumber());
-		 }
-		 for(PitGroup childGroup: pg.getListChildPitGroups()) {
-			 pits.addAll(flattenPitGroup(childGroup));
-		 }
-		 
-		 return pits;
-	}
 	private boolean hasValue(String s) {
 		return (s !=null && s.trim().length() >0);
 	}

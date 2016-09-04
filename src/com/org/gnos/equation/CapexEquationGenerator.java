@@ -9,7 +9,7 @@ import java.util.Set;
 
 import com.org.gnos.core.Bench;
 import com.org.gnos.core.Block;
-import com.org.gnos.core.Pit;
+import com.org.gnos.db.model.Pit;
 import com.org.gnos.db.model.CapexData;
 import com.org.gnos.db.model.CapexInstance;
 import com.org.gnos.db.model.Expression;
@@ -85,8 +85,16 @@ public class CapexEquationGenerator extends EquationGenerator{
 			}
 			buildCapexEquationForProcesses(pList, cd, capexNumber,processConstraintData);
 		}  else if(groupType == CapexInstance.SELECTION_PIT){
-			
-		}
+			List<Integer> pList = new ArrayList<Integer>();
+			Pit pit = projectConfiguration.getPitfromPitName(groupName);
+			pList.add(pit.getPitNumber());
+			buildCapexEquationForPits(pList, cd, capexNumber, processConstraintData);
+		} else if(groupType == CapexInstance.SELECTION_PIT_GROUP){
+			List<Integer> pList = new ArrayList<Integer>();
+			PitGroup pg = projectConfiguration.getPitGroupfromName(groupName);
+			pList.addAll(getPitsFromPitGroup(pg));
+			buildCapexEquationForPits(pList, cd, capexNumber, processConstraintData);
+		} 
 	}
 	
 	private void buildSet2Equations(CapexData cd, int capexNumber) {
@@ -166,6 +174,65 @@ public class CapexEquationGenerator extends EquationGenerator{
 		}
 	}
 	
+	private void buildCapexEquationForPits(List<Integer> pitnumberList, CapexData cd, int capexNumber, Map<Integer, Float> processConstraintData){
+		List<CapexInstance> capexInstanceList = cd.getListOfCapexInstances();
+		List<Process> processList = projectConfiguration.getProcessList();
+		int timeperiod = scenarioConfigutration.getTimePeriod();
+		int startyear = scenarioConfigutration.getStartYear();
+		
+		for(int i= 1; i <= timeperiod; i++ ){
+			StringBuffer sb = new StringBuffer("");
+			int count = 0;
+			for( Process p: processList){
+				List<Block> blocks = p.getBlocks();
+				Expression exp = p.getModel().getExpression();
+				String expressionName = exp.getName().replaceAll("\\s+","_");
+				for(Block b: blocks){
+					if(!pitnumberList.contains(b.getPitNo())) continue;
+					if(count > 0){
+						sb.append(" + ");
+					}
+					sb.append(b.getComputedField(expressionName)+"p"+b.getPitNo()+"x"+b.getBlockNo()+"p"+p.getProcessNo()+"t"+i);
+					count ++;
+				}
+			}
+			for(Block b: serviceInstanceData.getProcessBlocks()){
+				if(!pitnumberList.contains(b.getPitNo())) continue;
+				if(count > 0){
+					sb.append(" + ");
+				}
+				sb.append("p"+b.getPitNo()+"x"+b.getBlockNo()+"s"+this.serviceInstanceData.getPitStockpileMapping().get(b.getPitNo())+"t"+i);
+				count ++;
+			}
+			for(Block b: serviceInstanceData.getWasteBlocks()){
+				if(!pitnumberList.contains(b.getPitNo())) continue;
+				if(count > 0){
+					sb.append(" + ");
+				}
+				List<Integer> dumps = this.serviceInstanceData.getPitDumpMapping().get(b.getPitNo());
+				if(dumps == null) continue;
+				for(Integer dumpNo: dumps){
+					sb.append("p"+b.getPitNo()+"x"+b.getBlockNo()+"w"+dumpNo+"t"+i);
+				}			
+				count ++;
+			}
+			int instanceNumber=0;
+			for(CapexInstance ci: capexInstanceList){
+				instanceNumber++;
+				for(int ii=1; ii<=i; ii++){
+					sb.append(" - "+ci.getExpansionCapacity()+"c"+capexNumber+"i"+instanceNumber+"t"+ii);
+				}				
+			}
+			if(processConstraintData != null){
+				sb.append(" <= "+processConstraintData.get(startyear + i -1));
+			} else {
+				sb.append(" <= 0 ");
+			}
+			
+			write(sb.toString());
+		}
+	}
+	
 	private Map<Integer, Float> getProcessConstraintData(String name, int type){
 		List<ProcessConstraintData> processConstraintDataList = scenarioConfigutration.getProcessConstraintDataList();
 		for(ProcessConstraintData pcd: processConstraintDataList){
@@ -178,45 +245,7 @@ public class CapexEquationGenerator extends EquationGenerator{
 		}
 		return null;
 	}
-	private String getBlockVariables(String groupName, int groupType, int timeperiod) {
-		String eq= "";
-		if( groupType == CapexInstance.SELECTION_PIT){
-			List<Block> blocks = new ArrayList<Block>();
-			com.org.gnos.db.model.Pit p = projectConfiguration.getPitfromPitName(groupName);
-			Pit pit = serviceInstanceData.getPits().get(p.getPitNumber());
-			Set<Bench> benches = pit.getBenches();
-			for(Bench b: benches){
-				blocks.addAll(b.getBlocks());
-			}
-		} else if(groupType == CapexInstance.SELECTION_PIT_GROUP){
-			List<Block> blocks = new ArrayList<Block>();
-			PitGroup pg = projectConfiguration.getPitGroupfromName(groupName);
-			Set<Integer> pitNumbers = getPitsFromPitGroup(pg);
-			for(int pitNumber: pitNumbers){
-				Pit pit = serviceInstanceData.getPits().get(pitNumber);
-				Set<Bench> benches = pit.getBenches();
-				for(Bench b: benches){
-					blocks.addAll(b.getBlocks());
-				}
-			}
-		}
-		return eq;		
-	}
 	
-	private void getBlocks(List<Block> blocks) {
-		Map<Integer, List<String>> blockVariableMapping = serviceInstanceData.getBlockVariableMapping();
-		Set<Integer> blockIds = blockVariableMapping.keySet();
-		for(int blockId: blockIds){
-			List<String> variables = blockVariableMapping.get(blockId);
-			Block b = blocks.get(blockId);
-			StringBuilder sb = new StringBuilder("");
-			for(String variable: variables){
-				write(variable + " >= 0" );
-				sb.append(variable +"+");
-			}
-			//String eq = sb.toString().substring(0,sb.length() -1) +" <= "+b.getField(tonnesWeightFieldName);
-			//write(eq);
-		}
-	}
+
 	
 }

@@ -3,16 +3,20 @@ package com.org.gnos.equation;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.core.ScenarioConfigutration;
+import com.org.gnos.db.model.Dump;
 import com.org.gnos.db.model.Pit;
 import com.org.gnos.db.model.PitGroup;
 import com.org.gnos.db.model.Product;
 import com.org.gnos.db.model.ProductJoin;
+import com.org.gnos.db.model.Stockpile;
 
 public abstract class EquationGenerator {
 	
@@ -22,6 +26,7 @@ public abstract class EquationGenerator {
 	protected ProjectConfigutration projectConfiguration;
 	protected ScenarioConfigutration scenarioConfigutration;
 	protected InstanceData serviceInstanceData = null;
+
 	
 	protected int bytesWritten = 0;
 	
