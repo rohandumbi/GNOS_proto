@@ -644,20 +644,19 @@ public class ScenarioConfigutration {
 			pstmt1 = conn.prepareStatement(mapping_sql);
 
 			for(CapexData cd : this.capexDataList) {
-				if (cd.getId() > 0)
-					continue;
-				//pstmt.setInt(1, this.projectConfiguration.getProjectId());
-				pstmt.setInt(1, this.scenarioId);
-				pstmt.setString(2, cd.getName());
-				//pstmt.setBoolean(3, pcd.isInUse());
-				pstmt.executeUpdate();
-				rs = pstmt.getGeneratedKeys();
-
-				if (rs.next()){
-					int id = rs.getInt(1);
-					cd.setId(id);
-
-					for(CapexInstance ci: cd.getListOfCapexInstances()){
+				int capexDataId = cd.getId();
+				if(capexDataId < 0){ // capex data not yet uploaded in DB
+					pstmt.setInt(1, this.scenarioId);
+					pstmt.setString(2, cd.getName());
+					pstmt.executeUpdate();
+					rs = pstmt.getGeneratedKeys();
+					if (rs.next()){
+						capexDataId = rs.getInt(1);
+						cd.setId(capexDataId);
+					}
+				}
+				for(CapexInstance ci: cd.getListOfCapexInstances()){
+					if(ci.getId() < 0){// this capex instance is not in DB
 						ci.setCapexId(cd.getId());
 						pstmt1.setString(1, ci.getName());
 						pstmt1.setInt(2, ci.getCapexId());
@@ -666,6 +665,8 @@ public class ScenarioConfigutration {
 						pstmt1.setLong(5, ci.getCapexAmount());
 						pstmt1.setLong(6, ci.getExpansionCapacity());
 						pstmt1.executeUpdate();
+					}else{
+						//update code TODO
 					}
 				}
 			}
