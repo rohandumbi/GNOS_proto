@@ -155,18 +155,20 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 							eq += buildProcessConstraintVariables(p.getProcessNo(), coefficients, blocks, i);
 						}
 						if(!applyProcessRestrictions) {
+							List<String> coefficients = new ArrayList<>();
+							coefficients.add(processConstraintData.getCoefficient_name());
+							List<Block> blocks = new ArrayList<Block>();
 							for(Block b: serviceInstanceData.getProcessBlocks()){
 								if(pit.getPitNumber() != b.getPitNo()) continue;
-								eq += "+ p"+b.getPitNo()+"x"+b.getBlockNo()+"s"+this.serviceInstanceData.getPitStockpileMapping().get(b.getPitNo())+"t"+i;
+								blocks.add(b);								
 							}
+							eq += buildStockpileConstraintVariables(coefficients, blocks, i);
+							blocks = new ArrayList<Block>();
 							for(Block b: serviceInstanceData.getWasteBlocks()){
 								if(pit.getPitNumber() != b.getPitNo()) continue;
-								List<Integer> dumps = this.serviceInstanceData.getPitDumpMapping().get(b.getPitNo());
-								if(dumps == null) continue;
-								for(Integer dumpNo: dumps){
-									eq += "+ p"+b.getPitNo()+"x"+b.getBlockNo()+"w"+dumpNo+"t"+i;
-								}			
+								blocks.add(b);			
 							}
+							eq += buildWasteConstraintVariables(coefficients, blocks, i);
 						}
 						
 					}
@@ -196,18 +198,20 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 						eq += buildProcessConstraintVariables(p.getProcessNo(), coefficients, blocks, i);
 					}
 					if(!applyProcessRestrictions) {
+						List<String> coefficients = new ArrayList<>();
+						coefficients.add(processConstraintData.getCoefficient_name());
+						List<Block> blocks = new ArrayList<Block>();
 						for(Block b: serviceInstanceData.getProcessBlocks()){
 							if(!pitNumbers.contains(b.getPitNo())) continue;
-							eq += "+ p"+b.getPitNo()+"x"+b.getBlockNo()+"s"+this.serviceInstanceData.getPitStockpileMapping().get(b.getPitNo())+"t"+i;
+							blocks.add(b);								
 						}
+						eq += buildStockpileConstraintVariables(coefficients, blocks, i);
+						blocks = new ArrayList<Block>();
 						for(Block b: serviceInstanceData.getWasteBlocks()){
 							if(!pitNumbers.contains(b.getPitNo())) continue;
-							List<Integer> dumps = this.serviceInstanceData.getPitDumpMapping().get(b.getPitNo());
-							if(dumps == null) continue;
-							for(Integer dumpNo: dumps){
-								eq += "+ p"+b.getPitNo()+"x"+b.getBlockNo()+"w"+dumpNo+"t"+i;
-							}			
+							blocks.add(b);			
 						}
+						eq += buildWasteConstraintVariables(coefficients, blocks, i);
 					}
 					
 				} else {
@@ -225,16 +229,14 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 						eq += buildProcessConstraintVariables(p.getProcessNo(), coefficients, p.getBlocks(), i);
 					}
 					if(!applyProcessRestrictions) {
-						for(Block b: serviceInstanceData.getProcessBlocks()){
-							eq += "+ p"+b.getPitNo()+"x"+b.getBlockNo()+"s"+this.serviceInstanceData.getPitStockpileMapping().get(b.getPitNo())+"t"+i;
-						}
-						for(Block b: serviceInstanceData.getWasteBlocks()){
-							List<Integer> dumps = this.serviceInstanceData.getPitDumpMapping().get(b.getPitNo());
-							if(dumps == null) continue;
-							for(Integer dumpNo: dumps){
-								eq += "+ p"+b.getPitNo()+"x"+b.getBlockNo()+"w"+dumpNo+"t"+i;
-							}			
-						}
+						List<String> coefficients = new ArrayList<>();
+						coefficients.add(processConstraintData.getCoefficient_name());
+						List<Block> blocks = new ArrayList<Block>();
+						blocks.addAll(serviceInstanceData.getProcessBlocks());
+						eq += buildStockpileConstraintVariables(coefficients, blocks, i);
+						blocks = new ArrayList<Block>();
+						blocks.addAll(serviceInstanceData.getWasteBlocks());
+						eq += buildWasteConstraintVariables(coefficients, blocks, i);
 					}
 				}
 				
@@ -280,7 +282,7 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 			}
 			if(processRatio == 0) continue;
 			
-			//eq +=  "+ "+ processRatio+"p"+block.getPitNo()+"x"+block.getBlockNo()+"p"+processNumber+"t"+period;
+			eq +=  "+ "+processRatio+"p"+block.getPitNo()+"x"+block.getBlockNo()+"s"+this.serviceInstanceData.getPitStockpileMapping().get(block.getPitNo())+"t"+period;
 		}			
 		return eq;
 	}
@@ -296,7 +298,11 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 			}
 			if(processRatio == 0) continue;
 			
-			//eq +=  "+ "+ processRatio+"p"+block.getPitNo()+"x"+block.getBlockNo()+"p"+processNumber+"t"+period;
+			List<Integer> dumps = this.serviceInstanceData.getPitDumpMapping().get(block.getPitNo());
+			if(dumps == null) continue;
+			for(Integer dumpNo: dumps){
+				eq += "+ "+processRatio+"p"+block.getPitNo()+"x"+block.getBlockNo()+"w"+dumpNo+"t"+period;
+			}
 		}			
 		return eq;
 	}

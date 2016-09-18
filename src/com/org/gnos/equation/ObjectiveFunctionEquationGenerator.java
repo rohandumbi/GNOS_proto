@@ -168,7 +168,8 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 				capexInstanceCount++;
 				for(int i= 1; i <= timeperiod ; i++){
 					String cv = "c"+capexCount+"i"+capexInstanceCount+"t"+i;
-					write(" -"+ci.getCapexAmount()+cv);
+					float value = (float) (ci.getCapexAmount() * (1 / Math.pow ((1 + discount_rate), i)));
+					write(" -"+value+cv);
 				}
 			}
 		}
