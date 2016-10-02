@@ -280,7 +280,7 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 		fd_btnAddDumpToGroup.bottom = new FormAttachment(lblAllDumps, 5, SWT.BOTTOM);
 		fd_btnAddDumpToGroup.left = new FormAttachment(lblAllDumps, 2);
 		btnAddDumpToGroup.setLayoutData(fd_btnAddDumpToGroup);
-		btnAddDumpToGroup.setText("Add");
+		btnAddDumpToGroup.setText("Add Dump");
 		
 		/*
 		 * Add stockpile to group button
