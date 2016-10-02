@@ -133,119 +133,103 @@ public class DumpDefinitionGrid extends Composite {
 		fd_compositeGridHeader.right = new FormAttachment(100);
 		compositeGridHeader.setLayoutData(fd_compositeGridHeader);
 
-		Label lblUse = new Label(compositeGridHeader, SWT.NONE);
-		lblUse.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
-		FormData fd_lblUse = new FormData();
-		fd_lblUse.top = new FormAttachment(0,2);
-		fd_lblUse.left = new FormAttachment(0, 10);
-		lblUse.setLayoutData(fd_lblUse);
-		lblUse.setText("Use");
-		lblUse.setBackground(SWTResourceManager.getColor(230, 230, 230));
+		Label lblDumpType = new Label(compositeGridHeader, SWT.NONE);
+		lblDumpType.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
+		FormData fd_lblDumpType = new FormData();
+		fd_lblDumpType.top = new FormAttachment(0,2);
+		fd_lblDumpType.left = new FormAttachment(0, 10);
+		lblDumpType.setLayoutData(fd_lblDumpType);
+		lblDumpType.setText("External/Inpit Dump");
+		lblDumpType.setBackground(SWTResourceManager.getColor(230, 230, 230));
 
 		firstSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
 		FormData fd_firstSeparator = new FormData();
-		fd_firstSeparator.left = new FormAttachment(lblUse, 10);
+		fd_firstSeparator.left = new FormAttachment(lblDumpType, 10, SWT.RIGHT);
 		firstSeparator.setLayoutData(fd_firstSeparator);
 		
-		Label lblFirstPit = new Label(compositeGridHeader, SWT.NONE);
-		lblFirstPit.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
-		FormData fd_lblFirstPit = new FormData();
-		fd_lblFirstPit.top = new FormAttachment(0,2);
-		fd_lblFirstPit.left = new FormAttachment(firstSeparator, 35);
-		lblFirstPit.setLayoutData(fd_lblFirstPit);
-		lblFirstPit.setText("First Pit");
-		lblFirstPit.setBackground(SWTResourceManager.getColor(230, 230, 230));
+		Label lblDumpName = new Label(compositeGridHeader, SWT.NONE);
+		lblDumpName.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
+		FormData fd_lblDumpName = new FormData();
+		fd_lblDumpName.top = new FormAttachment(0,2);
+		fd_lblDumpName.left = new FormAttachment(firstSeparator, 35);
+		lblDumpName.setLayoutData(fd_lblDumpName);
+		lblDumpName.setText("Dump Name");
+		lblDumpName.setBackground(SWTResourceManager.getColor(230, 230, 230));
 		
 		secondSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
 		FormData fd_secondSeparator = new FormData();
-		fd_secondSeparator.left = new FormAttachment(lblFirstPit, 35);
+		fd_secondSeparator.left = new FormAttachment(lblDumpName, 35, SWT.RIGHT);
 		secondSeparator.setLayoutData(fd_secondSeparator);
 		
-		Label lblFirstPitAssociatedBench = new Label(compositeGridHeader, SWT.NONE);
-		lblFirstPitAssociatedBench.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
+		Label lblPitGroup = new Label(compositeGridHeader, SWT.NONE);
+		lblPitGroup.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		FormData fd_lblFirstPitAssociatedBench = new FormData();
 		fd_lblFirstPitAssociatedBench.top = new FormAttachment(0,2);
-		fd_lblFirstPitAssociatedBench.left = new FormAttachment(secondSeparator, 35);
-		lblFirstPitAssociatedBench.setLayoutData(fd_lblFirstPitAssociatedBench);
-		lblFirstPitAssociatedBench.setText("Bench Name");
-		lblFirstPitAssociatedBench.setBackground(SWTResourceManager.getColor(230, 230, 230));
+		fd_lblFirstPitAssociatedBench.left = new FormAttachment(secondSeparator, 60);
+		lblPitGroup.setLayoutData(fd_lblFirstPitAssociatedBench);
+		lblPitGroup.setText("Pit/Pit Group");
+		lblPitGroup.setBackground(SWTResourceManager.getColor(230, 230, 230));
 		
 		thirdSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
 		FormData fd_thirdSeparator = new FormData();
-		fd_thirdSeparator.left = new FormAttachment(lblFirstPitAssociatedBench, 35);
+		fd_thirdSeparator.left = new FormAttachment(lblPitGroup, 60, SWT.RIGHT);
 		thirdSeparator.setLayoutData(fd_thirdSeparator);
 		
-		Label lblDependentPit = new Label(compositeGridHeader, SWT.NONE);
-		lblDependentPit.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
-		FormData fd_lblDependentPit = new FormData();
-		fd_lblDependentPit.top = new FormAttachment(0,2);
-		fd_lblDependentPit.left = new FormAttachment(thirdSeparator, 35);
-		lblDependentPit.setLayoutData(fd_lblDependentPit);
-		lblDependentPit.setText("Dependent Pit");
-		lblDependentPit.setBackground(SWTResourceManager.getColor(230, 230, 230));
+		Label lblExpression = new Label(compositeGridHeader, SWT.NONE);
+		lblExpression.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
+		FormData fd_lblExpression = new FormData();
+		fd_lblExpression.top = new FormAttachment(0,2);
+		fd_lblExpression.left = new FormAttachment(thirdSeparator, 80);
+		lblExpression.setLayoutData(fd_lblExpression);
+		lblExpression.setText("Expression");
+		lblExpression.setBackground(SWTResourceManager.getColor(230, 230, 230));
 		
 		fourthSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
 		FormData fd_fourthSeparator = new FormData();
-		fd_fourthSeparator.left = new FormAttachment(lblDependentPit, 35);
+		fd_fourthSeparator.left = new FormAttachment(lblExpression, 80, SWT.RIGHT);
 		fourthSeparator.setLayoutData(fd_fourthSeparator);
 		
-		Label lblDependentPitAssociatedBench = new Label(compositeGridHeader, SWT.NONE);
-		lblDependentPitAssociatedBench.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
-		FormData fd_lblDependentPitAssociatedBench = new FormData();
-		fd_lblDependentPitAssociatedBench.top = new FormAttachment(0,2);
-		fd_lblDependentPitAssociatedBench.left = new FormAttachment(fourthSeparator, 35);
-		lblDependentPitAssociatedBench.setLayoutData(fd_lblDependentPitAssociatedBench);
-		lblDependentPitAssociatedBench.setText("Bench Name");
-		lblDependentPitAssociatedBench.setBackground(SWTResourceManager.getColor(230, 230, 230));
+		Label lblHasCapacity = new Label(compositeGridHeader, SWT.NONE);
+		lblHasCapacity.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
+		FormData fd_lblHasCapacity = new FormData();
+		fd_lblHasCapacity.top = new FormAttachment(0,2);
+		fd_lblHasCapacity.left = new FormAttachment(fourthSeparator, 5);
+		lblHasCapacity.setLayoutData(fd_lblHasCapacity);
+		lblHasCapacity.setText("has capacity");
+		lblHasCapacity.setBackground(SWTResourceManager.getColor(230, 230, 230));
 		
 		fifthSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
 		FormData fd_fifthSeparator = new FormData();
-		fd_fifthSeparator.left = new FormAttachment(lblDependentPitAssociatedBench, 35);
+		fd_fifthSeparator.left = new FormAttachment(lblHasCapacity, 5);
 		fifthSeparator.setLayoutData(fd_fifthSeparator);
 		
-		Label lblMinLead = new Label(compositeGridHeader, SWT.NONE);
-		lblMinLead.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
-		FormData fd_lblMinLead = new FormData();
-		fd_lblMinLead.top = new FormAttachment(0,2);
-		fd_lblMinLead.left = new FormAttachment(fifthSeparator, 20);
-		lblMinLead.setLayoutData(fd_lblMinLead);
-		lblMinLead.setText("Min Lead");
-		lblMinLead.setBackground(SWTResourceManager.getColor(230, 230, 230));
+		Label lblCapacity = new Label(compositeGridHeader, SWT.NONE);
+		lblCapacity.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
+		FormData fd_lblCapacity = new FormData();
+		fd_lblCapacity.top = new FormAttachment(0,2);
+		fd_lblCapacity.left = new FormAttachment(fifthSeparator, 60);
+		lblCapacity.setLayoutData(fd_lblCapacity);
+		lblCapacity.setText("Capacity");
+		lblCapacity.setBackground(SWTResourceManager.getColor(230, 230, 230));
 		
 		sixthSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
 		FormData fd_sixthSeparator = new FormData();
-		fd_sixthSeparator.left = new FormAttachment(lblMinLead, 20);
+		fd_sixthSeparator.left = new FormAttachment(lblCapacity, 60);
 		sixthSeparator.setLayoutData(fd_sixthSeparator);
 		
-		Label lblMaxLead = new Label(compositeGridHeader, SWT.NONE);
-		lblMaxLead.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
-		FormData fd_lblMaxLead = new FormData();
-		fd_lblMaxLead.top = new FormAttachment(0,2);
-		fd_lblMaxLead.left = new FormAttachment(sixthSeparator, 20);
-		lblMaxLead.setLayoutData(fd_lblMaxLead);
-		lblMaxLead.setText("Max Lead");
-		lblMaxLead.setBackground(SWTResourceManager.getColor(230, 230, 230));
+		Label lblReclaim = new Label(compositeGridHeader, SWT.NONE);
+		lblReclaim.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
+		FormData fd_lblReclaim = new FormData();
+		fd_lblReclaim.top = new FormAttachment(0,2);
+		fd_lblReclaim.left = new FormAttachment(sixthSeparator, 5);
+		lblReclaim.setLayoutData(fd_lblReclaim);
+		lblReclaim.setText("reclaim");
+		lblReclaim.setBackground(SWTResourceManager.getColor(230, 230, 230));
 		
 		seventhSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
 		FormData fd_seventhSeparator = new FormData();
-		fd_seventhSeparator.left = new FormAttachment(lblMaxLead, 20);
+		fd_seventhSeparator.left = new FormAttachment(lblReclaim, 5);
 		seventhSeparator.setLayoutData(fd_seventhSeparator);
-		
-		Label lblDescription = new Label(compositeGridHeader, SWT.NONE);
-		lblDescription.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
-		FormData fd_lblDescription = new FormData();
-		fd_lblDescription.top = new FormAttachment(0,2);
-		fd_lblDescription.left = new FormAttachment(seventhSeparator, 200);
-		lblDescription.setLayoutData(fd_lblDescription);
-		lblDescription.setText("Description");
-		lblDescription.setBackground(SWTResourceManager.getColor(230, 230, 230));
-		
-		eigthSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
-		FormData fd_eigthSeparator = new FormData();
-		fd_eigthSeparator.left = new FormAttachment(lblDescription, 200);
-		eigthSeparator.setLayoutData(fd_eigthSeparator);
-		
-		
 		
 		this.presentRow = this.compositeGridHeader;//referring to the header as the 1st row when there are no rows inserted yet
 
