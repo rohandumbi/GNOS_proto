@@ -4,27 +4,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.db.model.Pit;
-import com.org.gnos.db.model.PitBenchConstraintData;
 import com.org.gnos.db.model.PitDependencyData;
 
 public class DumpDefinitionGrid extends Composite {
@@ -234,6 +230,20 @@ public class DumpDefinitionGrid extends Composite {
 		this.presentRow = this.compositeGridHeader;//referring to the header as the 1st row when there are no rows inserted yet
 
 	}
+	
+	private void createDumpNameWidget(Composite dumpNameComposite, int type){
+		for (Control control : dumpNameComposite.getChildren()) {
+	        control.dispose();
+	    }
+		Control dumpNameWidget;
+		if(type == 0){
+			dumpNameWidget = new Text(dumpNameComposite, SWT.NONE);
+		}else{
+			dumpNameWidget = new Combo(dumpNameComposite, SWT.NONE);
+			((Combo) dumpNameWidget).setItems(getPits());
+		}
+		dumpNameComposite.layout();
+	}
 
 	public void addRow(final PitDependencyData pitDependencyData){
 		final Composite compositeRow = new Composite(this, SWT.BORDER);
@@ -250,7 +260,35 @@ public class DumpDefinitionGrid extends Composite {
 		fd_compositeRow.right = new FormAttachment(this.presentRow, 0, SWT.RIGHT);
 		fd_compositeRow.top = new FormAttachment(this.presentRow);
 		
-		final Button btnUse = new Button(compositeRow, SWT.CHECK);
+		System.out.println("first sepertor: " + firstSeparator.getLocation().x);
+		final Combo comboDumpType = new Combo(compositeRow, SWT.NONE);
+		String[] accociatedTypes = new String[]{"External", "Internal"};
+		FormData fd_comboDumpType = new FormData();
+		fd_comboDumpType.left = new FormAttachment(0);
+		fd_comboDumpType.top = new FormAttachment(0);
+		fd_comboDumpType.right = new FormAttachment(0, firstSeparator.getLocation().x);
+		comboDumpType.setLayoutData(fd_comboDumpType);
+		comboDumpType.setItems(accociatedTypes);
+		comboDumpType.select(0);
+		
+		final Composite dumpNameComposite = new Composite(compositeRow, SWT.BORDER);
+		FormData fd_dumpNameComposite = new FormData();
+		fd_dumpNameComposite.left = new FormAttachment(0, firstSeparator.getLocation().x);
+		fd_dumpNameComposite.top = new FormAttachment(0);
+		fd_dumpNameComposite.right = new FormAttachment(0, secondSeparator.getLocation().x);
+		fd_dumpNameComposite.bottom = new FormAttachment(comboDumpType, 0, SWT.BOTTOM);
+		dumpNameComposite.setLayoutData(fd_dumpNameComposite);
+		dumpNameComposite.setLayout(new FillLayout());
+		
+		createDumpNameWidget(dumpNameComposite, 0);
+		
+		comboDumpType.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				createDumpNameWidget(dumpNameComposite, comboDumpType.getSelectionIndex());
+			}
+		});
+		
+		/*final Button btnUse = new Button(compositeRow, SWT.CHECK);
 		FormData fd_btnUse = new FormData();
 		fd_btnUse.left = new FormAttachment(0,10);
 		fd_btnUse.top = new FormAttachment(0, 2);
@@ -459,8 +497,8 @@ public class DumpDefinitionGrid extends Composite {
 		
 		this.presentRow = compositeRow;
 		this.allRows.add(compositeRow);
+		this.updateRowDescription(compositeRow);*/
 		compositeRow.setLayoutData(fd_compositeRow);
-		this.updateRowDescription(compositeRow);
 		this.layout();
 		
 		
