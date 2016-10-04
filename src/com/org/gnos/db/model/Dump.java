@@ -1,22 +1,33 @@
 package com.org.gnos.db.model;
 
 public class Dump {
+	private int id;
 	private int dumpType; // 0=External; 1=Internal
 	private String name;
 	private PitGroup associatedPitGroup;
 	private int dumpNumber;
 	private boolean hasCapacity;
 	private String expression;
-	private double capacity;
+	private int capacity;
 	
 	public Dump(String name, PitGroup pitGroup){
+		this.id = -1;
 		this.name = name;
 		this.associatedPitGroup = pitGroup;
 	}
 
 	public Dump(){
+		this.id = -1;
 	}
 	
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -57,11 +68,11 @@ public class Dump {
 		this.expression = expression;
 	}
 
-	public double getCapacity() {
+	public int getCapacity() {
 		return capacity;
 	}
 
-	public void setCapacity(double capacity) {
+	public void setCapacity(int capacity) {
 		this.capacity = capacity;
 	}
 

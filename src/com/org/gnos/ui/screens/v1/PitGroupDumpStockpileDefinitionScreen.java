@@ -266,12 +266,19 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 				//TODO add group to group handler
 				DumpCreationDialog dialog = new DumpCreationDialog(getShell(), getSourcePitGroupItems());
 				if (Window.OK == dialog.open()) {
-					String dumpName = dialog.getCreatedDumpName();
+					/*String dumpName = dialog.getCreatedDumpName();
 					String associatedPitGroupName = dialog.getAssociatedPitGroupName();
 					Dump dump = new Dump(dumpName, getPitGroupByNameFromPitGroupList(associatedPitGroupName));
 					listOfDumps.add(dump);
 					dumpList.add(dumpName);
-					compositeGroupDiagram.addDumpToGroup(dump);
+					compositeGroupDiagram.addDumpToGroup(dump);*/
+					
+					for(Dump dump : listOfDumps){
+						if(dump.getId() == -1){//unsaved dumps have value -1
+							compositeGroupDiagram.addDumpToGroup(dump);
+							dumpList.add(dump.getName());
+						}
+					}
 				}
 			}
 		});

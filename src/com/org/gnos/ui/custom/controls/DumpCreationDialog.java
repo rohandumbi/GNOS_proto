@@ -172,10 +172,10 @@ public class DumpCreationDialog extends Dialog {
 
 	@Override
 	protected void okPressed() {
-		System.out.println("OK Pressed");
+		/*System.out.println("OK Pressed");
 		//this.definedProcessRoute = this.processDefinitionFormScreen.getDefinedProcess();
 		this.createdDumpName = textDumpName.getText();
-		this.associatedPitGroupName = comboPitGroup.getText();
+		this.associatedPitGroupName = comboPitGroup.getText();*/
 		super.okPressed();
 	}
 

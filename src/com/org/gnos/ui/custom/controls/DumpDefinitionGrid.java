@@ -43,8 +43,8 @@ public class DumpDefinitionGrid extends Composite {
 	private Label fourthSeparator;
 	private Label fifthSeparator;
 	private Label sixthSeparator;
-	private Label seventhSeparator;
-	private Label eigthSeparator;
+	/*private Label seventhSeparator;
+	private Label eigthSeparator;*/
 	private List<Dump> dumpList;
 	private final int FIRST_SEPARATOR_POSITION = 10;
 	private final int SECOND_SEPARATOR_POSITION = 20;
@@ -206,8 +206,8 @@ public class DumpDefinitionGrid extends Composite {
 		for (Control control : dumpNameComposite.getChildren()) {
 	        control.dispose();
 	    }
-		Control dumpNameWidget;
-		Dump dump = (Dump)rowComposite.getData();
+		final Control dumpNameWidget;
+		final Dump dump = (Dump)rowComposite.getData();
 		String dumpName = dump.getName();
 		if(type == 0){
 			dumpNameWidget = new Text(dumpNameComposite, SWT.NONE);
@@ -216,7 +216,7 @@ public class DumpDefinitionGrid extends Composite {
 			}
 			((Text)dumpNameWidget).addModifyListener(new ModifyListener(){
 				public void modifyText(ModifyEvent event) {
-					//TODO dump name change hander
+					dump.setName(((Text)dumpNameWidget).getText());
 				}
 			});
 		}else{
@@ -227,7 +227,7 @@ public class DumpDefinitionGrid extends Composite {
 			}
 			((Combo) dumpNameWidget).addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent e) {
-					//TODO implement handler
+					dump.setName(((Combo)dumpNameWidget).getText());
 				}
 			});
 		}
@@ -273,6 +273,7 @@ public class DumpDefinitionGrid extends Composite {
 		comboDumpType.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				createDumpNameWidget(compositeRow, dumpNameComposite, comboDumpType.getSelectionIndex());
+				dump.setDumpType(comboDumpType.getSelectionIndex());
 			}
 		});
 		
@@ -286,11 +287,15 @@ public class DumpDefinitionGrid extends Composite {
 		comboPitGroup.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				//TODO implement handler
+				PitGroup selectedPitGroup = ProjectConfigutration.getInstance().getPitGroupfromName(comboPitGroup.getText());
+				dump.setAssociatedPitGroup(selectedPitGroup);
 			}
 		});
-		String pitGroupName = dump.getAssociatedPitGroup().getName();
-		if(pitGroupName != null){
-			comboPitGroup.setText(pitGroupName);
+		if(dump.getAssociatedPitGroup() != null){
+			String pitGroupName = dump.getAssociatedPitGroup().getName();
+			if(pitGroupName != null){
+				comboPitGroup.setText(pitGroupName);
+			}
 		}
 		
 		final Text textExpression = new Text(compositeRow, SWT.BORDER);
@@ -302,21 +307,25 @@ public class DumpDefinitionGrid extends Composite {
 		textExpression.addModifyListener(new ModifyListener(){
 			public void modifyText(ModifyEvent event) {
 				//TODO implement handler
+				dump.setExpression(textExpression.getText());
 			}
 		});
+		String expression = dump.getExpression();
+		if(expression != null){
+			textExpression.setText(expression);
+		}
 		
 		final Button btnHasCapacity = new Button(compositeRow, SWT.CHECK);
 		FormData fd_btnHasCapacity = new FormData();
 		fd_btnHasCapacity.left = new FormAttachment(textExpression, 40, SWT.RIGHT);
 		fd_btnHasCapacity.top = new FormAttachment(0, 2);
 		btnHasCapacity.setLayoutData(fd_btnHasCapacity);
-		//btnHasCapacity.setSelection(pitDependencyData.isInUse());
 		btnHasCapacity.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				System.out.println("Is button has capacity selected: " + btnHasCapacity.getSelection());
-				//TODO implement handler
+				dump.setHasCapacity(btnHasCapacity.getSelection());
 			}
 		});
+		btnHasCapacity.setSelection(dump.isHasCapacity());
 		
 		final Text textCapacity = new Text(compositeRow, SWT.BORDER);
 		FormData fd_textCapacity = new FormData();
@@ -326,9 +335,13 @@ public class DumpDefinitionGrid extends Composite {
 		textCapacity.setLayoutData(fd_textCapacity);
 		textCapacity.addModifyListener(new ModifyListener(){
 			public void modifyText(ModifyEvent event) {
-				//TODO implement handler
+				dump.setCapacity(Integer.parseInt(textCapacity.getText()));
 			}
 		});
+		String capacity = String.valueOf(dump.getCapacity());
+		if((capacity!=null) && !(capacity.equals(""))){
+			textCapacity.setText(capacity);
+		}
 		
 		//comboPitGroup.select(0);
 		

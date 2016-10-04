@@ -493,7 +493,7 @@ public class ProjectConfigutration {
 	}
 	
 	public void loadDumps() {
-		String sql = "select id, name, pitgroup_name from dump_pit_mapping where project_id = "+ this.projectId +" order by id asc ";
+		String sql = "select id, project_id, dumpType, name, expression, pitgroup_name, has_capacity, capacity from dump_pit_mapping where project_id = "+ this.projectId +" order by id asc ";
 
 		try (
 				Connection conn = DBManager.getConnection();
@@ -503,10 +503,22 @@ public class ProjectConfigutration {
 			){
 			int count = 1;
 			while(rs.next()){
-				String name = rs.getString(2);
-				String pitGroupName = rs.getString(3);
+				int id = rs.getInt(1);
+				int dumpType = rs.getInt(3);
+				String name = rs.getString(4);
+				String expression = rs.getString(5);
+				String pitGroupName = rs.getString(6);
+				boolean hasCapacity = rs.getBoolean(7);
+				int capacity = rs.getInt(8);
 				PitGroup pitGroup = this.getPitGroupfromName(pitGroupName);
-				Dump dump = new Dump(name, pitGroup);
+				Dump dump = new Dump();
+				dump.setId(id);
+				dump.setDumpType(dumpType);
+				dump.setName(name);
+				dump.setExpression(expression);
+				dump.setAssociatedPitGroup(pitGroup);
+				dump.setHasCapacity(hasCapacity);
+				dump.setCapacity(capacity);
 				dump.setDumpNumber(count);
 				count ++;
 				this.dumpList.add(dump);
@@ -1036,19 +1048,34 @@ public class ProjectConfigutration {
 		}
 	}
 	public void saveDumps() {
-		String insert_sql = "insert into dump_pit_mapping ( project_id , name, pitgroup_name) values ( ? , ?, ?)";
-
+		String insert_sql = "insert into dump_pit_mapping ( project_id , dumpType, name, expression, pitgroup_name, has_capacity, capacity) values ( ? , ?, ?, ?, ?, ?, ?)";
+		String update_sql = "update dump_pit_mapping set dumpType= ? , name = ?, expression = ?, pitgroup_name = ?, has_capacity = ?, capacity = ? where id = ?";
 		try (
 				Connection conn = DBManager.getConnection();
-				PreparedStatement pstmt = conn.prepareStatement(insert_sql);
-				
+				PreparedStatement pstmt1 = conn.prepareStatement(insert_sql);
+				PreparedStatement pstmt2 = conn.prepareStatement(update_sql);
 			){
 			int count = 1;
 			for(Dump dump : dumpList) {
-				pstmt.setInt(1, projectId);
-				pstmt.setString(2, dump.getName());
-				pstmt.setString(3, dump.getAssociatedPitGroup().getName());
-				pstmt.executeUpdate();
+				if(dump.getId() == -1){
+					pstmt1.setInt(1, projectId);
+					pstmt1.setInt(2, dump.getDumpType());
+					pstmt1.setString(3, dump.getName());
+					pstmt1.setString(4, dump.getExpression());
+					pstmt1.setString(5, dump.getAssociatedPitGroup().getName());
+					pstmt1.setBoolean(6, dump.isHasCapacity());
+					pstmt1.setInt(7, dump.getCapacity());
+					pstmt1.executeUpdate();
+				}else{
+					pstmt2.setInt(1, dump.getDumpType());
+					pstmt2.setString(2, dump.getName());
+					pstmt2.setString(3, dump.getExpression());
+					pstmt2.setString(4, dump.getAssociatedPitGroup().getName());
+					pstmt2.setBoolean(5, dump.isHasCapacity());
+					pstmt2.setInt(6, dump.getCapacity());
+					pstmt2.setInt(7, dump.getId());
+					pstmt2.executeUpdate();
+				}
 				dump.setDumpNumber(count);				
 				count++;
 			}
