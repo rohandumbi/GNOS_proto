@@ -22,7 +22,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.core.ProjectConfigutration;
-import com.org.gnos.core.ScenarioConfigutration;
+import com.org.gnos.db.model.Dump;
 import com.org.gnos.db.model.Pit;
 import com.org.gnos.db.model.PitDependencyData;
 import com.org.gnos.db.model.PitGroup;
@@ -45,20 +45,27 @@ public class DumpDefinitionGrid extends Composite {
 	private Label sixthSeparator;
 	private Label seventhSeparator;
 	private Label eigthSeparator;
-	private List<PitDependencyData> pitDependencyDataList;
+	private List<Dump> dumpList;
+	private final int FIRST_SEPARATOR_POSITION = 10;
+	private final int SECOND_SEPARATOR_POSITION = 20;
+	private final int THIRD_SEPARATOR_POSITION = 35;
+	private final int FOURTH_SEPARATOR_POSITION = 55;
+	private final int FIFTH_SEPARATOR_POSITION = 60;
+	private final int SIXTH_SEPARATOR_POSITION = 70;
 
 	public DumpDefinitionGrid(Composite parent, int style) {
 		super(parent, style);
 		this.allRows = new ArrayList<Composite>();
-		this.pitDependencyDataList = ScenarioConfigutration.getInstance().getPitDependencyDataList();
+		//this.pitDependencyDataList = ScenarioConfigutration.getInstance().getPitDependencyDataList();
+		this.dumpList = ProjectConfigutration.getInstance().getDumpList();
 		this.createContent(parent);
 	}
 
 	private void createContent(Composite parent){
 		this.setLayout(new FormLayout());
 		this.createHeader();
-		for(PitDependencyData pitDependencyData : this.pitDependencyDataList){
-			this.addRow(pitDependencyData);
+		for(Dump dump: this.dumpList){
+			this.addRow(dump);
 		}
 	}
 
@@ -105,7 +112,7 @@ public class DumpDefinitionGrid extends Composite {
 
 		firstSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
 		FormData fd_firstSeparator = new FormData();
-		fd_firstSeparator.left = new FormAttachment(lblDumpType, 10, SWT.RIGHT);
+		fd_firstSeparator.left = new FormAttachment(FIRST_SEPARATOR_POSITION);
 		firstSeparator.setLayoutData(fd_firstSeparator);
 		
 		Label lblDumpName = new Label(compositeGridHeader, SWT.NONE);
@@ -119,49 +126,49 @@ public class DumpDefinitionGrid extends Composite {
 		
 		secondSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
 		FormData fd_secondSeparator = new FormData();
-		fd_secondSeparator.left = new FormAttachment(lblDumpName, 35, SWT.RIGHT);
+		fd_secondSeparator.left = new FormAttachment(SECOND_SEPARATOR_POSITION);
 		secondSeparator.setLayoutData(fd_secondSeparator);
 		
 		Label lblPitGroup = new Label(compositeGridHeader, SWT.NONE);
 		lblPitGroup.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		FormData fd_lblFirstPitAssociatedBench = new FormData();
 		fd_lblFirstPitAssociatedBench.top = new FormAttachment(0,2);
-		fd_lblFirstPitAssociatedBench.left = new FormAttachment(secondSeparator, 60);
+		fd_lblFirstPitAssociatedBench.left = new FormAttachment(secondSeparator, 80);
 		lblPitGroup.setLayoutData(fd_lblFirstPitAssociatedBench);
 		lblPitGroup.setText("Pit/Pit Group");
 		lblPitGroup.setBackground(SWTResourceManager.getColor(230, 230, 230));
 		
 		thirdSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
 		FormData fd_thirdSeparator = new FormData();
-		fd_thirdSeparator.left = new FormAttachment(lblPitGroup, 60, SWT.RIGHT);
+		fd_thirdSeparator.left = new FormAttachment(THIRD_SEPARATOR_POSITION);
 		thirdSeparator.setLayoutData(fd_thirdSeparator);
 		
 		Label lblExpression = new Label(compositeGridHeader, SWT.NONE);
 		lblExpression.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		FormData fd_lblExpression = new FormData();
 		fd_lblExpression.top = new FormAttachment(0,2);
-		fd_lblExpression.left = new FormAttachment(thirdSeparator, 80);
+		fd_lblExpression.left = new FormAttachment(thirdSeparator, 110);
 		lblExpression.setLayoutData(fd_lblExpression);
 		lblExpression.setText("Expression");
 		lblExpression.setBackground(SWTResourceManager.getColor(230, 230, 230));
 		
 		fourthSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
 		FormData fd_fourthSeparator = new FormData();
-		fd_fourthSeparator.left = new FormAttachment(lblExpression, 80, SWT.RIGHT);
+		fd_fourthSeparator.left = new FormAttachment(FOURTH_SEPARATOR_POSITION);
 		fourthSeparator.setLayoutData(fd_fourthSeparator);
 		
 		Label lblHasCapacity = new Label(compositeGridHeader, SWT.NONE);
 		lblHasCapacity.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		FormData fd_lblHasCapacity = new FormData();
 		fd_lblHasCapacity.top = new FormAttachment(0,2);
-		fd_lblHasCapacity.left = new FormAttachment(fourthSeparator, 5);
+		fd_lblHasCapacity.left = new FormAttachment(fourthSeparator, 2);
 		lblHasCapacity.setLayoutData(fd_lblHasCapacity);
 		lblHasCapacity.setText("has capacity");
 		lblHasCapacity.setBackground(SWTResourceManager.getColor(230, 230, 230));
 		
 		fifthSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
 		FormData fd_fifthSeparator = new FormData();
-		fd_fifthSeparator.left = new FormAttachment(lblHasCapacity, 5);
+		fd_fifthSeparator.left = new FormAttachment(FIFTH_SEPARATOR_POSITION);
 		fifthSeparator.setLayoutData(fd_fifthSeparator);
 		
 		Label lblCapacity = new Label(compositeGridHeader, SWT.NONE);
@@ -175,7 +182,7 @@ public class DumpDefinitionGrid extends Composite {
 		
 		sixthSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
 		FormData fd_sixthSeparator = new FormData();
-		fd_sixthSeparator.left = new FormAttachment(lblCapacity, 60);
+		fd_sixthSeparator.left = new FormAttachment(SIXTH_SEPARATOR_POSITION);
 		sixthSeparator.setLayoutData(fd_sixthSeparator);
 		
 		/*Label lblReclaim = new Label(compositeGridHeader, SWT.NONE);
@@ -193,16 +200,20 @@ public class DumpDefinitionGrid extends Composite {
 		seventhSeparator.setLayoutData(fd_seventhSeparator);*/
 		
 		this.presentRow = this.compositeGridHeader;//referring to the header as the 1st row when there are no rows inserted yet
-
 	}
 	
-	private void createDumpNameWidget(Composite dumpNameComposite, int type){
+	private void createDumpNameWidget(Composite rowComposite,Composite dumpNameComposite, int type){
 		for (Control control : dumpNameComposite.getChildren()) {
 	        control.dispose();
 	    }
 		Control dumpNameWidget;
+		Dump dump = (Dump)rowComposite.getData();
+		String dumpName = dump.getName();
 		if(type == 0){
 			dumpNameWidget = new Text(dumpNameComposite, SWT.NONE);
+			if(dumpName != null){
+				((Text)dumpNameWidget).setText(dumpName);
+			}
 			((Text)dumpNameWidget).addModifyListener(new ModifyListener(){
 				public void modifyText(ModifyEvent event) {
 					//TODO dump name change hander
@@ -211,6 +222,9 @@ public class DumpDefinitionGrid extends Composite {
 		}else{
 			dumpNameWidget = new Combo(dumpNameComposite, SWT.NONE);
 			((Combo) dumpNameWidget).setItems(getPits());
+			if(dumpName != null){
+				((Combo)dumpNameWidget).setText(dumpName);
+			}
 			((Combo) dumpNameWidget).addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent e) {
 					//TODO implement handler
@@ -220,11 +234,11 @@ public class DumpDefinitionGrid extends Composite {
 		dumpNameComposite.layout();
 	}
 
-	public void addRow(final PitDependencyData pitDependencyData){
+	public void addRow(final Dump dump){
 		final Composite compositeRow = new Composite(this, SWT.BORDER);
 		compositeRow.setLayout(new FormLayout());
 		Color backgroundColor = SWTResourceManager.getColor(SWT.COLOR_WHITE);
-		compositeRow.setData(pitDependencyData);
+		compositeRow.setData(dump);
 		if((this.allRows != null) && (this.allRows.size()%2 != 0)){
 			backgroundColor =  SWTResourceManager.getColor(245, 245, 245);
 		}
@@ -233,41 +247,40 @@ public class DumpDefinitionGrid extends Composite {
 		fd_compositeRow.left = new FormAttachment(this.presentRow, 0, SWT.LEFT);
 		//fd_compositeRow.bottom = new FormAttachment(this.presentRow, 26, SWT.BOTTOM);
 		fd_compositeRow.right = new FormAttachment(this.presentRow, 0, SWT.RIGHT);
-		fd_compositeRow.top = new FormAttachment(this.presentRow);
+		fd_compositeRow.top = new FormAttachment(this.presentRow, 0, SWT.BOTTOM);
 		
-		System.out.println("first sepertor: " + firstSeparator.getLocation().x);
 		final Combo comboDumpType = new Combo(compositeRow, SWT.NONE);
 		String[] accociatedTypes = new String[]{"External", "Internal"};
 		FormData fd_comboDumpType = new FormData();
 		fd_comboDumpType.left = new FormAttachment(0);
 		fd_comboDumpType.top = new FormAttachment(0);
-		fd_comboDumpType.right = new FormAttachment(0, firstSeparator.getLocation().x);
+		fd_comboDumpType.right = new FormAttachment(FIRST_SEPARATOR_POSITION);
 		comboDumpType.setLayoutData(fd_comboDumpType);
 		comboDumpType.setItems(accociatedTypes);
-		comboDumpType.select(0);
+		comboDumpType.select(dump.getDumpType());
 		
 		final Composite dumpNameComposite = new Composite(compositeRow, SWT.BORDER);
 		FormData fd_dumpNameComposite = new FormData();
-		fd_dumpNameComposite.left = new FormAttachment(0, firstSeparator.getLocation().x);
+		fd_dumpNameComposite.left = new FormAttachment(FIRST_SEPARATOR_POSITION);
 		fd_dumpNameComposite.top = new FormAttachment(0);
-		fd_dumpNameComposite.right = new FormAttachment(0, secondSeparator.getLocation().x);
+		fd_dumpNameComposite.right = new FormAttachment(SECOND_SEPARATOR_POSITION);
 		fd_dumpNameComposite.bottom = new FormAttachment(comboDumpType, 0, SWT.BOTTOM);
 		dumpNameComposite.setLayoutData(fd_dumpNameComposite);
 		dumpNameComposite.setLayout(new FillLayout());
 		
-		createDumpNameWidget(dumpNameComposite, 0);
+		createDumpNameWidget(compositeRow,dumpNameComposite, 0);
 		
 		comboDumpType.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				createDumpNameWidget(dumpNameComposite, comboDumpType.getSelectionIndex());
+				createDumpNameWidget(compositeRow, dumpNameComposite, comboDumpType.getSelectionIndex());
 			}
 		});
 		
 		final Combo comboPitGroup = new Combo(compositeRow, SWT.NONE);
 		FormData fd_comboPitGroup = new FormData();
-		fd_comboPitGroup.left = new FormAttachment(0, secondSeparator.getLocation().x);
+		fd_comboPitGroup.left = new FormAttachment(SECOND_SEPARATOR_POSITION);
 		fd_comboPitGroup.top = new FormAttachment(0);
-		fd_comboPitGroup.right = new FormAttachment(0, thirdSeparator.getLocation().x);
+		fd_comboPitGroup.right = new FormAttachment(THIRD_SEPARATOR_POSITION);
 		comboPitGroup.setLayoutData(fd_comboPitGroup);
 		comboPitGroup.setItems(getPitGroups());
 		comboPitGroup.addSelectionListener(new SelectionAdapter() {
@@ -275,12 +288,16 @@ public class DumpDefinitionGrid extends Composite {
 				//TODO implement handler
 			}
 		});
+		String pitGroupName = dump.getAssociatedPitGroup().getName();
+		if(pitGroupName != null){
+			comboPitGroup.setText(pitGroupName);
+		}
 		
 		final Text textExpression = new Text(compositeRow, SWT.BORDER);
 		FormData fd_textExpression = new FormData();
-		fd_textExpression.left = new FormAttachment(0, thirdSeparator.getLocation().x);
+		fd_textExpression.left = new FormAttachment(THIRD_SEPARATOR_POSITION);
 		fd_textExpression.top = new FormAttachment(0);
-		fd_textExpression.right = new FormAttachment(0, fourthSeparator.getLocation().x);
+		fd_textExpression.right = new FormAttachment(FOURTH_SEPARATOR_POSITION);
 		textExpression.setLayoutData(fd_textExpression);
 		textExpression.addModifyListener(new ModifyListener(){
 			public void modifyText(ModifyEvent event) {
@@ -290,7 +307,7 @@ public class DumpDefinitionGrid extends Composite {
 		
 		final Button btnHasCapacity = new Button(compositeRow, SWT.CHECK);
 		FormData fd_btnHasCapacity = new FormData();
-		fd_btnHasCapacity.left = new FormAttachment(textExpression, 45, SWT.RIGHT);
+		fd_btnHasCapacity.left = new FormAttachment(textExpression, 40, SWT.RIGHT);
 		fd_btnHasCapacity.top = new FormAttachment(0, 2);
 		btnHasCapacity.setLayoutData(fd_btnHasCapacity);
 		//btnHasCapacity.setSelection(pitDependencyData.isInUse());
@@ -303,9 +320,9 @@ public class DumpDefinitionGrid extends Composite {
 		
 		final Text textCapacity = new Text(compositeRow, SWT.BORDER);
 		FormData fd_textCapacity = new FormData();
-		fd_textCapacity.left = new FormAttachment(0, fifthSeparator.getLocation().x);
+		fd_textCapacity.left = new FormAttachment(FIFTH_SEPARATOR_POSITION);
 		fd_textCapacity.top = new FormAttachment(0);
-		fd_textCapacity.right = new FormAttachment(0, sixthSeparator.getLocation().x);
+		fd_textCapacity.right = new FormAttachment(SIXTH_SEPARATOR_POSITION);
 		textCapacity.setLayoutData(fd_textCapacity);
 		textCapacity.addModifyListener(new ModifyListener(){
 			public void modifyText(ModifyEvent event) {
@@ -533,9 +550,9 @@ public class DumpDefinitionGrid extends Composite {
 	}
 
 	public void addRow(){
-		PitDependencyData pitDependencyData  = new PitDependencyData();
-		this.pitDependencyDataList.add(pitDependencyData);
-		this.addRow(pitDependencyData);
+		Dump dump = new Dump();
+		this.dumpList.add(dump);
+		this.addRow(dump);
 	}
 
 	public List<Composite> getAllRowsComposite(){
