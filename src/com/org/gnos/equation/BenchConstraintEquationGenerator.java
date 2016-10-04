@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.org.gnos.core.Bench;
 import com.org.gnos.core.Block;
@@ -16,6 +18,7 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 
 	private String tonnesWeightFieldName;
 	private Map<Integer, List<String>> blockVariableMapping;
+	final Pattern lastIntPattern = Pattern.compile("[^0-9]+([0-9]+)$");
 	
 	public BenchConstraintEquationGenerator(InstanceData data) {
 		super(data);
@@ -58,13 +61,16 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 					String benchVariable = "p"+pitNo+"b"+bench.getBenchNo()+"t"+i;
 					sb1.append(tonnesWt+benchVariable);
 					for(String variable: variables){
-						String lastChar= variable.substring(variable.length() - 1);
-						int year = Integer.parseInt(lastChar);
-						if(year > i) continue;
-						sb1.append(" -"+variable);
-						if(lastBench != null){
-							sb2.append(" +"+variable);
-						}
+						Matcher matcher = lastIntPattern.matcher(variable);
+					      if (matcher.find()) {
+					          String someNumberStr = matcher.group(1);
+					          int year = Integer.parseInt(someNumberStr);
+					          if(year > i) continue;
+					          sb1.append(" -"+variable);
+					          if(lastBench != null){
+					        	  sb2.append(" +"+variable);
+					          }
+					      }
 						
 					}
 					if(lastBench != null){

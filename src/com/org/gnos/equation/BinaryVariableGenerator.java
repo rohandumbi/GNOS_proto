@@ -9,6 +9,8 @@ import java.util.Set;
 
 import com.org.gnos.core.Bench;
 import com.org.gnos.core.Pit;
+import com.org.gnos.db.model.CapexData;
+import com.org.gnos.db.model.CapexInstance;
 
 public class BinaryVariableGenerator extends EquationGenerator{
 
@@ -24,6 +26,7 @@ public class BinaryVariableGenerator extends EquationGenerator{
 			output = new BufferedOutputStream(new FileOutputStream("binaryVariable.txt"), bufferSize);
 			bytesWritten = 0;
 			buildBinaryVariables();
+			buildCapexBinaryVariables();
 			output.flush();
 			output.close();
 		} catch(Exception e) {
@@ -48,6 +51,24 @@ public class BinaryVariableGenerator extends EquationGenerator{
 			}
 		}
 		
+	}
+	
+	public void buildCapexBinaryVariables() {
+		int timeperiod = scenarioConfigutration.getTimePeriod();
+		List<CapexData> capexDataList = scenarioConfigutration.getCapexDataList();
+		int capexCount = 0;
+		for(CapexData cd: capexDataList) {
+			capexCount++;
+			List<CapexInstance> capexInstanceList = cd.getListOfCapexInstances();
+			int capexInstanceCount = 0;
+			for(CapexInstance ci: capexInstanceList){
+				capexInstanceCount++;
+				for(int i= 1; i <= timeperiod ; i++){
+					String cv = " c"+capexCount+"i"+capexInstanceCount+"t"+i;
+					write(cv);
+				}
+			}
+		}
 	}
 
 	@Override

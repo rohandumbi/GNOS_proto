@@ -287,3 +287,44 @@ CREATE TABLE bench_constraint_year_mapping(
    value INT NOT NULL,
    unique key( bench_constraint_id, year)
 );
+
+DROP TABLE IF EXISTS pit_dependency_defn; 
+
+CREATE TABLE pit_dependency_defn(
+   id INT NOT NULL AUTO_INCREMENT,
+   scenario_id INT NOT NULL,
+   in_use TINYINT NOT NULL default 1,
+   first_pit_name  VARCHAR(50) NOT NULL,
+   first_pit_bench_name  VARCHAR(50),
+   dependent_pit_name  VARCHAR(50) NOT NULL,
+   dependent_pit_bench_name  VARCHAR(50),
+   min_lead INT,
+   max_lead INT,
+   PRIMARY KEY ( id ),
+   unique key(scenario_id, first_pit_name, first_pit_bench_name, dependent_pit_name, dependent_pit_bench_name, min_lead, max_lead)
+);
+
+
+DROP TABLE IF EXISTS capex_data; 
+
+CREATE TABLE capex_data(
+   id INT NOT NULL AUTO_INCREMENT,
+   scenario_id INT NOT NULL,
+   name  VARCHAR(50) NOT NULL,
+   PRIMARY KEY ( id ),
+   unique key(scenario_id, name)
+);
+
+DROP TABLE IF EXISTS capex_instance; 
+
+CREATE TABLE capex_instance(
+   id INT NOT NULL AUTO_INCREMENT,
+   name VARCHAR(50) NOT NULL,
+   capex_id INT NOT NULL,
+   group_name VARCHAR(50),
+   group_type INT NOT NULL,
+   capex BIGINT,
+   expansion_capacity BIGINT,
+   PRIMARY KEY ( id ),
+   unique key(name, capex_id)
+);

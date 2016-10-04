@@ -154,6 +154,23 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 							}
 							eq += buildProcessConstraintVariables(p.getProcessNo(), coefficients, blocks, i);
 						}
+						if(!applyProcessRestrictions) {
+							List<String> coefficients = new ArrayList<>();
+							coefficients.add(processConstraintData.getCoefficient_name());
+							List<Block> blocks = new ArrayList<Block>();
+							for(Block b: serviceInstanceData.getProcessBlocks()){
+								if(pit.getPitNumber() != b.getPitNo()) continue;
+								blocks.add(b);								
+							}
+							eq += buildStockpileConstraintVariables(coefficients, blocks, i);
+							blocks = new ArrayList<Block>();
+							for(Block b: serviceInstanceData.getWasteBlocks()){
+								if(pit.getPitNumber() != b.getPitNo()) continue;
+								blocks.add(b);			
+							}
+							eq += buildWasteConstraintVariables(coefficients, blocks, i);
+						}
+						
 					}
 					
 					
@@ -180,6 +197,23 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 						}
 						eq += buildProcessConstraintVariables(p.getProcessNo(), coefficients, blocks, i);
 					}
+					if(!applyProcessRestrictions) {
+						List<String> coefficients = new ArrayList<>();
+						coefficients.add(processConstraintData.getCoefficient_name());
+						List<Block> blocks = new ArrayList<Block>();
+						for(Block b: serviceInstanceData.getProcessBlocks()){
+							if(!pitNumbers.contains(b.getPitNo())) continue;
+							blocks.add(b);								
+						}
+						eq += buildStockpileConstraintVariables(coefficients, blocks, i);
+						blocks = new ArrayList<Block>();
+						for(Block b: serviceInstanceData.getWasteBlocks()){
+							if(!pitNumbers.contains(b.getPitNo())) continue;
+							blocks.add(b);			
+						}
+						eq += buildWasteConstraintVariables(coefficients, blocks, i);
+					}
+					
 				} else {
 					for( Process p: processList){
 						List<String> coefficients;
@@ -193,6 +227,16 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 							coefficients.add(processConstraintData.getCoefficient_name());
 						}
 						eq += buildProcessConstraintVariables(p.getProcessNo(), coefficients, p.getBlocks(), i);
+					}
+					if(!applyProcessRestrictions) {
+						List<String> coefficients = new ArrayList<>();
+						coefficients.add(processConstraintData.getCoefficient_name());
+						List<Block> blocks = new ArrayList<Block>();
+						blocks.addAll(serviceInstanceData.getProcessBlocks());
+						eq += buildStockpileConstraintVariables(coefficients, blocks, i);
+						blocks = new ArrayList<Block>();
+						blocks.addAll(serviceInstanceData.getWasteBlocks());
+						eq += buildWasteConstraintVariables(coefficients, blocks, i);
 					}
 				}
 				
@@ -211,7 +255,7 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 		
 	}
 
-	public String buildProcessConstraintVariables(int processNumber, List<String> coefficients, List<Block> blocks, int period) {
+	private String buildProcessConstraintVariables(int processNumber, List<String> coefficients, List<Block> blocks, int period) {
 		
 		String eq = "";
 		for(Block block: blocks){
@@ -227,4 +271,39 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 		return eq;
 	}
 	
+	private String buildStockpileConstraintVariables(List<String> coefficients, List<Block> blocks, int period) {
+		
+		String eq = "";
+		for(Block block: blocks){
+			float processRatio = 0;
+			for(String coefficient: coefficients){
+				String expressionName = coefficient.replaceAll("\\s+","_");
+				processRatio += block.getComputedField(expressionName);					
+			}
+			if(processRatio == 0) continue;
+			
+			eq +=  "+ "+processRatio+"p"+block.getPitNo()+"x"+block.getBlockNo()+"s"+this.serviceInstanceData.getPitStockpileMapping().get(block.getPitNo())+"t"+period;
+		}			
+		return eq;
+	}
+
+	private String buildWasteConstraintVariables(List<String> coefficients, List<Block> blocks, int period) {
+	
+		String eq = "";
+		for(Block block: blocks){
+			float processRatio = 0;
+			for(String coefficient: coefficients){
+				String expressionName = coefficient.replaceAll("\\s+","_");
+				processRatio += block.getComputedField(expressionName);					
+			}
+			if(processRatio == 0) continue;
+			
+			List<Integer> dumps = this.serviceInstanceData.getPitDumpMapping().get(block.getPitNo());
+			if(dumps == null) continue;
+			for(Integer dumpNo: dumps){
+				eq += "+ "+processRatio+"p"+block.getPitNo()+"x"+block.getBlockNo()+"w"+dumpNo+"t"+period;
+			}
+		}			
+		return eq;
+	}
 }

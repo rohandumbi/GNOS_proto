@@ -88,7 +88,7 @@ public class OpexDefinitionScreen extends GnosScreen {
 		fd_labelScreenName.left = new FormAttachment(0, 10);
 		labelScreenName.setLayoutData(fd_labelScreenName);
 		labelScreenName.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.BOLD));
-		labelScreenName.setText("OPEX Defintion");
+		labelScreenName.setText("OPEX Definition");
 		
 		Label labelScreenDescription = new Label(this, SWT.NONE);
 		labelScreenDescription.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));

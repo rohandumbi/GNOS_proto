@@ -55,6 +55,7 @@ public class ProcessConstraintGrid extends Composite {
 	private int startYear;
 	private int timePeriod;
 
+	private int noSelectionEndIndex = 0;
 	private int expressionEndIndex = 0;
 	private int productEndIndex = 0;
 	private int productJoinEndIndex = 0;
@@ -85,12 +86,13 @@ public class ProcessConstraintGrid extends Composite {
 		List<Expression> expressions = projectConfigutration.getNonGradeExpressions();
 		List<Product> products = projectConfigutration.getProductList();
 		List<ProductJoin> productJoins = projectConfigutration.getProductJoinList();
-		this.expressionEndIndex = expressions.size() -1;
+		this.expressionEndIndex = this.noSelectionEndIndex + expressions.size();
 		this.productEndIndex = this.expressionEndIndex + products.size();
 		this.productJoinEndIndex = this.productEndIndex + productJoins.size();
 		String[] comboItems = new String[this.productJoinEndIndex+1];
+		comboItems[this.noSelectionEndIndex] = "--NONE--";
 		for(int i=0; i< expressions.size() ; i++){
-			comboItems[i] = expressions.get(i).getName();
+			comboItems[this.noSelectionEndIndex + i + 1] = expressions.get(i).getName();
 		}
 		for(int i=0; i < products.size(); i++){
 			comboItems[this.expressionEndIndex +i+1] = products.get(i).getName();
@@ -254,7 +256,9 @@ public class ProcessConstraintGrid extends Composite {
 					String coefficientName = comboExpression.getText();
 					System.out.println("Coefficient selected is: " + coefficientName);
 					int coefficientSelectionIndex = comboExpression.getSelectionIndex();
-					if(coefficientSelectionIndex <= expressionEndIndex) {
+					if(coefficientSelectionIndex <= noSelectionEndIndex){
+						pcd.setCoefficientType(ProcessConstraintData.COEFFICIENT_NONE);
+					}else if(coefficientSelectionIndex <= expressionEndIndex) {
 						pcd.setCoefficientType(ProcessConstraintData.COEFFICIENT_EXPRESSION);
 					} else if(coefficientSelectionIndex <= productEndIndex) {
 						pcd.setCoefficientType(ProcessConstraintData.COEFFICIENT_PRODUCT);
@@ -265,8 +269,12 @@ public class ProcessConstraintGrid extends Composite {
 				}
 			});
 			int start = 0;
-			int end = this.expressionEndIndex;
-			if(pcd.getCoefficientType() == ProcessConstraintData.COEFFICIENT_PRODUCT) {
+			//int end = this.expressionEndIndex;
+			int end = this.noSelectionEndIndex;
+			if(pcd.getCoefficientType() == ProcessConstraintData.COEFFICIENT_EXPRESSION){
+				start = this.noSelectionEndIndex +1 ;
+				end = this.expressionEndIndex;
+			}else if(pcd.getCoefficientType() == ProcessConstraintData.COEFFICIENT_PRODUCT) {
 				start = this.expressionEndIndex +1 ;
 				end = this.productEndIndex;
 			} else if (pcd.getCoefficientType() == ProcessConstraintData.COEFFICIENT_PRODUCT_JOIN) {
@@ -452,13 +460,15 @@ public class ProcessConstraintGrid extends Composite {
 				String coefficientName = comboExpression.getText();
 				System.out.println("Coefficient selected is: " + coefficientName);
 				int coefficientSelectionIndex = comboExpression.getSelectionIndex();
-				if(coefficientSelectionIndex <= expressionEndIndex) {
+				if(coefficientSelectionIndex <= noSelectionEndIndex){
+					processConstraintData.setCoefficientType(ProcessConstraintData.COEFFICIENT_NONE);
+				}else if(coefficientSelectionIndex <= expressionEndIndex) {
 					processConstraintData.setCoefficientType(ProcessConstraintData.COEFFICIENT_EXPRESSION);
 				} else if(coefficientSelectionIndex <= productEndIndex) {
 					processConstraintData.setCoefficientType(ProcessConstraintData.COEFFICIENT_PRODUCT);
 				} else {
 					processConstraintData.setCoefficientType(ProcessConstraintData.COEFFICIENT_PRODUCT_JOIN);
-				}		
+				}	
 				processConstraintData.setCoefficient_name(coefficientName);
 			}
 		});
