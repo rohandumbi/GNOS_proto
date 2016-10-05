@@ -219,8 +219,13 @@ DROP TABLE IF EXISTS stockpile_pit_mapping;
 CREATE TABLE stockpile_pit_mapping(
    id INT NOT NULL AUTO_INCREMENT,
    project_id INT NOT NULL,
+   stockpileType INT NOT NULL,
    name  VARCHAR(100) NOT NULL,
+   expression VARCHAR(100),
    pitgroup_name VARCHAR(100) NOT NULL,
+   has_capacity TINYINT,
+   capacity INT,
+   is_reclaim TINYINT,
    primary key (id),
    unique key(project_id, name, pitgroup_name)
 );

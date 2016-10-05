@@ -71,40 +71,6 @@ public class DumpCreationDialog extends Dialog {
 		this.initializeGridContainer();
 		this.refreshGrid();
 		
-		/*Label lblStockpileName = new Label(container, SWT.NONE);
-		lblStockpileName.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
-		FormData fd_lblStockpileName = new FormData();
-		fd_lblStockpileName.top = new FormAttachment(0, 10);
-		fd_lblStockpileName.left = new FormAttachment(0, 10);
-		lblStockpileName.setLayoutData(fd_lblStockpileName);
-		lblStockpileName.setText("Dump Name:");
-		
-		this.textDumpName = new Text(container, SWT.BORDER);
-		this.textDumpName.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
-		FormData fd_textStockpileName = new FormData();
-		fd_textStockpileName.top = new FormAttachment(0, 10);
-		fd_textStockpileName.left = new FormAttachment(lblStockpileName, 6);
-		fd_textStockpileName.right = new FormAttachment(100, -10);
-		this.textDumpName.setLayoutData(fd_textStockpileName);
-		
-		Label lblPitGroupName = new Label(container, SWT.NONE);
-		lblPitGroupName.setText("Pit Group:");
-		lblPitGroupName.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
-		FormData fd_lblPitGroupName = new FormData();
-		fd_lblPitGroupName.top = new FormAttachment(lblStockpileName, 12);
-		fd_lblPitGroupName.left = new FormAttachment(lblStockpileName, 0, SWT.LEFT);
-		lblPitGroupName.setLayoutData(fd_lblPitGroupName);
-		
-		this.comboPitGroup = new Combo(container, SWT.NONE);
-		FormData fd_comboPitGroup = new FormData();
-		fd_comboPitGroup.left = new FormAttachment(textDumpName, 0, SWT.LEFT);
-		fd_comboPitGroup.top = new FormAttachment(textDumpName, 12);
-		fd_comboPitGroup.right = new FormAttachment(100, -10);
-		this.comboPitGroup.setLayoutData(fd_comboPitGroup);
-		this.comboPitGroup.setItems(pitGroupNames);*/
-		
-		
-		
 		this.container.getShell().setText("Dump Details");
 		return this.container;
 	}
@@ -172,23 +138,9 @@ public class DumpCreationDialog extends Dialog {
 
 	@Override
 	protected void okPressed() {
-		/*System.out.println("OK Pressed");
-		//this.definedProcessRoute = this.processDefinitionFormScreen.getDefinedProcess();
-		this.createdDumpName = textDumpName.getText();
-		this.associatedPitGroupName = comboPitGroup.getText();*/
 		super.okPressed();
 	}
 
-	/*private void setDialogLocation(){
-		Rectangle monitorArea = getShell().getDisplay().getPrimaryMonitor().getBounds();
-		//Rectangle shellArea = getShell().getBounds();
-		int x = monitorArea.x + (monitorArea.width - 980)/2;
-		int y = monitorArea.y + (monitorArea.height - 650)/2;
-		System.out.println("Process dialog X: "+ x);
-		System.out.println("Process dialog Y: "+ y);
-		getShell().setLocation(x,y);
-	}*/
-	
 	public ProcessRoute getDefinedProcessRoute(){
 		return this.definedProcessRoute;
 	}

@@ -530,24 +530,37 @@ public class ProjectConfigutration {
 	}
 	
 	public void loadStockpiles() {
-		String sql = "select id, name, pitgroup_name from stockpile_pit_mapping where project_id = "+ this.projectId +" order by id asc ";
+		String sql = "select id, project_id, stockpileType, name, expression, pitgroup_name, has_capacity, capacity, is_reclaim from stockpile_pit_mapping where project_id = "+ this.projectId +" order by id asc ";
 
 		try (
 				Connection conn = DBManager.getConnection();
 				Statement stmt = conn.createStatement();
 				ResultSet rs = stmt.executeQuery(sql);
 				
-			){	
+			){
 			int count = 1;
 			while(rs.next()){
-				String name = rs.getString(2);
-				String pitGroupName = rs.getString(3);
+				int id = rs.getInt(1);
+				int stockpileType = rs.getInt(3);
+				String name = rs.getString(4);
+				String expression = rs.getString(5);
+				String pitGroupName = rs.getString(6);
+				boolean hasCapacity = rs.getBoolean(7);
+				int capacity = rs.getInt(8);
+				boolean isReclaim = rs.getBoolean(9);
 				PitGroup pitGroup = this.getPitGroupfromName(pitGroupName);
-				Stockpile stockPile = new Stockpile(name, pitGroup);
-				stockPile.setStockpileNumber(count);
-				
-				count++;
-				this.stockPileList.add(stockPile);
+				Stockpile stockpile = new Stockpile();
+				stockpile.setId(id);
+				stockpile.setStockpileType(stockpileType);
+				stockpile.setName(name);
+				stockpile.setExpression(expression);
+				stockpile.setAssociatedPitGroup(pitGroup);
+				stockpile.setHasCapacity(hasCapacity);
+				stockpile.setCapacity(capacity);
+				stockpile.setStockpileNumber(count);
+				stockpile.setReclaim(isReclaim);
+				count ++;
+				this.stockPileList.add(stockpile);
 			}
 			
 		} catch (SQLException e) {
@@ -1086,25 +1099,42 @@ public class ProjectConfigutration {
 	}
 	
 	public void saveStockpiles() {
-		String insert_sql = "insert into stockpile_pit_mapping ( project_id , name, pitgroup_name) values ( ? , ?, ?)";
-
+		String insert_sql = "insert into stockpile_pit_mapping ( project_id , stockpileType, name, expression, pitgroup_name, has_capacity, capacity, is_reclaim) values ( ? , ?, ?, ?, ?, ?, ?, ?)";
+		String update_sql = "update stockpile_pit_mapping set stockpileType= ? , name = ?, expression = ?, pitgroup_name = ?, has_capacity = ?, capacity = ?, is_reclaim = ? where id = ?";
 		try (
 				Connection conn = DBManager.getConnection();
-				PreparedStatement pstmt = conn.prepareStatement(insert_sql);
-				
+				PreparedStatement pstmt1 = conn.prepareStatement(insert_sql);
+				PreparedStatement pstmt2 = conn.prepareStatement(update_sql);
 			){
 			int count = 1;
 			for(Stockpile stockpile : stockPileList) {
-				pstmt.setInt(1, projectId);
-				pstmt.setString(2, stockpile.getName());
-				pstmt.setString(3, stockpile.getAssociatedPitGroup().getName());
-				pstmt.executeUpdate();
+				if(stockpile.getId() == -1){
+					pstmt1.setInt(1, projectId);
+					pstmt1.setInt(2, stockpile.getStockpileType());
+					pstmt1.setString(3, stockpile.getName());
+					pstmt1.setString(4, stockpile.getExpression());
+					pstmt1.setString(5, stockpile.getAssociatedPitGroup().getName());
+					pstmt1.setBoolean(6, stockpile.isHasCapacity());
+					pstmt1.setInt(7, stockpile.getCapacity());
+					pstmt1.setBoolean(8, stockpile.isReclaim());
+					pstmt1.executeUpdate();
+				}else{
+					pstmt2.setInt(1, stockpile.getStockpileType());
+					pstmt2.setString(2, stockpile.getName());
+					pstmt2.setString(3, stockpile.getExpression());
+					pstmt2.setString(4, stockpile.getAssociatedPitGroup().getName());
+					pstmt2.setBoolean(5, stockpile.isHasCapacity());
+					pstmt2.setInt(6, stockpile.getCapacity());
+					pstmt2.setBoolean(7, stockpile.isReclaim());
+					pstmt2.setInt(8, stockpile.getId());
+					pstmt2.executeUpdate();
+				}
 				stockpile.setStockpileNumber(count);				
 				count++;
 			}
 			
 		} catch (SQLException e) {
-			System.err.println("Failed saving stockpile data. "+e.getMessage());
+			System.err.println("Failed saving dump data. "+e.getMessage());
 		}
 	}
 	

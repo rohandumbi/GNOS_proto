@@ -85,7 +85,7 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 		Label labelSecondSeparator = new Label(this, SWT.SEPARATOR | SWT.VERTICAL);
 		FormData fd_labelSecondSeparator = new FormData();
 		fd_labelSecondSeparator.top = new FormAttachment(labelScreenDescription, 10, SWT.BOTTOM);
-		fd_labelSecondSeparator.left = new FormAttachment(88);
+		fd_labelSecondSeparator.left = new FormAttachment(85);
 		fd_labelSecondSeparator.bottom = new FormAttachment(100);
 		labelSecondSeparator.setLayoutData(fd_labelSecondSeparator);
 
@@ -115,6 +115,7 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 		//fd_lblProcessDiagram.bottom = new FormAttachment(lblAllModels, 0, SWT.BOTTOM);
 		fd_lblProcessDiagram.top = new FormAttachment(labelFirstSeparator, 0, SWT.TOP);
 		fd_lblProcessDiagram.left = new FormAttachment(labelFirstSeparator, 10);
+		fd_lblProcessDiagram.right = new FormAttachment(labelSecondSeparator);
 		lblProcessDiagram.setLayoutData(fd_lblProcessDiagram);
 		lblProcessDiagram.setText("Generated Grouping Diagram");
 		
@@ -280,7 +281,7 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 		fd_btnAddDumpToGroup.bottom = new FormAttachment(lblAllDumps, 5, SWT.BOTTOM);
 		fd_btnAddDumpToGroup.left = new FormAttachment(lblAllDumps, 2);
 		btnAddDumpToGroup.setLayoutData(fd_btnAddDumpToGroup);
-		btnAddDumpToGroup.setText("Add Dump");
+		btnAddDumpToGroup.setText("Add/Update");
 		
 		/*
 		 * Add stockpile to group button
@@ -292,12 +293,12 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 				//TODO add stockpile to group handler
 				StockpileCreationDialog dialog = new StockpileCreationDialog(getShell(), getSourcePitGroupItems());
 				if (Window.OK == dialog.open()) {
-					String stockpileName = dialog.getCreatedStockpilepName();
-					String associatedPitGroupName = dialog.getAssociatedPitGroupName();
-					Stockpile stockPile = new Stockpile(stockpileName, getPitGroupByNameFromPitGroupList(associatedPitGroupName));
-					listOfStockpiles.add(stockPile);
-					stockpileList.add(stockpileName);
-					compositeGroupDiagram.addStockpileToGroup(stockPile);
+					for(Stockpile stockpile : listOfStockpiles){
+						if(stockpile.getId() == -1){//unsaved dumps have value -1
+							compositeGroupDiagram.addStockpileToGroup(stockpile);
+							stockpileList.add(stockpile.getName());
+						}
+					}
 				}
 			}
 		});
@@ -306,7 +307,7 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 		fd_btnAddStockpileToGroup.bottom = new FormAttachment(lblAllStockpiles, 5, SWT.BOTTOM);
 		fd_btnAddStockpileToGroup.left = new FormAttachment(lblAllStockpiles, 2);
 		btnAddStockpileToGroup.setLayoutData(fd_btnAddStockpileToGroup);
-		btnAddStockpileToGroup.setText("Add");
+		btnAddStockpileToGroup.setText("Add/Update");
 		
 		//Add existing pit groups to diagram and list
 		for(PitGroup pitGroup: this.listOfPitGroups){
