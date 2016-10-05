@@ -469,12 +469,14 @@ public class ProjectConfigutration {
 			){
 			
 			while(rs.next()){
+				int id = rs.getInt(1);
 				String name = rs.getString(2);
 				PitGroup pitGroup = this.getPitGroupfromName(name);
 				if(pitGroup == null){
 					pitGroup = new PitGroup(name);
 					pitGroupList.add(pitGroup);
-				}			
+				}	
+				pitGroup.setId(id);
 				String child_pit_name = rs.getString(3);
 				String child_pitgroup_name = rs.getString(4);
 				if(child_pit_name != null){
@@ -1040,19 +1042,22 @@ public class ProjectConfigutration {
 				
 			){
 			for(PitGroup pitGroup: pitGroupList) {
-				for(Pit pit: pitGroup.getListChildPits()){
-					pstmt.setInt(1, projectId);
-					pstmt.setString(2, pitGroup.getName());
-					pstmt.setString(3, pit.getPitName());
-					pstmt.setNull(4, java.sql.Types.VARCHAR);
-					pstmt.executeUpdate();
-				}
-				for(PitGroup childGroup: pitGroup.getListChildPitGroups()){
-					pstmt.setInt(1, projectId);
-					pstmt.setString(2, pitGroup.getName());
-					pstmt.setNull(3, java.sql.Types.VARCHAR);
-					pstmt.setString(4, childGroup.getName());
-					pstmt.executeUpdate();
+				
+				if(pitGroup.getId() == -1){//unsaved pit group
+					for(Pit pit: pitGroup.getListChildPits()){
+						pstmt.setInt(1, projectId);
+						pstmt.setString(2, pitGroup.getName());
+						pstmt.setString(3, pit.getPitName());
+						pstmt.setNull(4, java.sql.Types.VARCHAR);
+						pstmt.executeUpdate();
+					}
+					for(PitGroup childGroup: pitGroup.getListChildPitGroups()){
+						pstmt.setInt(1, projectId);
+						pstmt.setString(2, pitGroup.getName());
+						pstmt.setNull(3, java.sql.Types.VARCHAR);
+						pstmt.setString(4, childGroup.getName());
+						pstmt.executeUpdate();
+					}
 				}
 			}
 			

@@ -3,11 +3,13 @@ package com.org.gnos.db.model;
 import java.util.ArrayList;
 
 public class PitGroup {
+	private int id;
 	private String name;
 	private ArrayList<Pit> listChildPits;
 	private ArrayList<PitGroup> listChildPitGroups;
 	
 	public PitGroup(String name){
+		this.id = -1;
 		this.name = name;
 		this.listChildPits = new ArrayList<Pit>();
 		this.listChildPitGroups = new ArrayList<PitGroup>();
@@ -23,6 +25,14 @@ public class PitGroup {
 		this.listChildPitGroups.add(newPitGroup);
 	}
 	
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
 	public String getName() {
 		return name;
 	}
