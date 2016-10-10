@@ -243,7 +243,7 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 		/*
 		 * Add group to group button
 		 */
-		Button btnAddGroupToGroup = new Button(this, SWT.NONE);
+		/*Button btnAddGroupToGroup = new Button(this, SWT.NONE);
 		btnAddGroupToGroup.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -255,7 +255,7 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 		fd_btnAddGroupToGroup.bottom = new FormAttachment(lblAllGroups, 5, SWT.BOTTOM);
 		fd_btnAddGroupToGroup.left = new FormAttachment(lblAllGroups, 2);
 		btnAddGroupToGroup.setLayoutData(fd_btnAddGroupToGroup);
-		btnAddGroupToGroup.setText("Add");
+		btnAddGroupToGroup.setText("Add");*/
 		
 		/*
 		 * Add dump to group button
