@@ -19,7 +19,9 @@ public final class DAOUtil {
     {
 		PreparedStatement statement = connection.prepareStatement(sql,
 	            returnGeneratedKeys ? Statement.RETURN_GENERATED_KEYS : Statement.NO_GENERATED_KEYS);
-	        setValues(statement, values);
+			if(values != null){
+				setValues(statement, values);
+			}        
 	        return statement;
 	}
 	

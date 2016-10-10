@@ -30,7 +30,6 @@ public class ExpressionDAO {
 		
 		try (
 	            Connection connection = DBManager.getConnection();
-	            //PreparedStatement statement = connection.prepareStatement(SQL_LIST_ORDER_BY_ID);
 				PreparedStatement statement = prepareStatement(connection, SQL_LIST_ORDER_BY_ID, false, values);
 	            ResultSet resultSet = statement.executeQuery();
 	        ){

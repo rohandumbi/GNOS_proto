@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.Set;
 
 import com.org.gnos.db.DBManager;
+import com.org.gnos.db.dao.BenchConstraintDAO;
+import com.org.gnos.db.dao.GradeConstraintDAO;
+import com.org.gnos.db.dao.ProcessConstraintDAO;
 import com.org.gnos.db.dao.ScenarioDAO;
 import com.org.gnos.db.model.CapexData;
 import com.org.gnos.db.model.CapexInstance;
@@ -172,139 +175,15 @@ public class ScenarioConfigutration {
 	}
 
 	public void loadProcessConstraintData() {
-		this.processConstraintDataList = new ArrayList<ProcessConstraintData>();
-		String sql = "select id, selector_name, selector_type, coefficient_name, coefficient_type, in_use, is_max, year, value from process_constraint_defn, process_constraint_year_mapping where id = process_constraint_id and scenario_id = "
-				+ this.scenarioId + " order by id, year";
-		Statement stmt = null;
-		ResultSet rs = null;
-		Connection conn = DBManager.getConnection();
-		try {
-			stmt = conn.createStatement();
-			stmt.execute(sql);
-			rs = stmt.getResultSet();
-			ProcessConstraintData pcd;
-			while (rs.next()) {
-				int id = rs.getInt(1);
-				String processJoinName = rs.getString(2);
-				int expressionId = rs.getInt(3);
-				//Model model = this.getModelById(modelId);
-				ProcessJoin processJoin = this.projectConfiguration.getProcessJoinByName(processJoinName);
-
-				pcd = getProcessConstraintDataById(id);
-				if (pcd == null) {
-					pcd = new ProcessConstraintData();					
-					pcd.setId(id);
-					pcd.setSelector_name(rs.getString(2));
-					pcd.setSelectionType(rs.getInt(3));
-					pcd.setCoefficient_name(rs.getString(4));
-					pcd.setCoefficientType(rs.getInt(5));
-					pcd.setInUse(rs.getBoolean(6));
-					pcd.setMax(rs.getBoolean(7));
-
-					this.processConstraintDataList.add(pcd);
-				}
-				pcd.addYear(rs.getInt("year"), rs.getFloat("value"));
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (stmt != null)
-					stmt.close();
-				if (rs != null)
-					rs.close();
-				if (conn != null)
-					DBManager.releaseConnection(conn);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
+		this.processConstraintDataList = new ProcessConstraintDAO().getAll();
 	}
 
 	public void loadGradeConstraintData() {
-		this.gradeConstraintDataList = new ArrayList<GradeConstraintData>();
-		String sql = "select id, selector_name, selector_type, grade, product_join_name, in_use, is_max, year, value from grade_constraint_defn, grade_constraint_year_mapping where id = grade_constraint_id and scenario_id = "
-				+ this.scenarioId + " order by id, year";
-		Statement stmt = null;
-		ResultSet rs = null;
-		Connection conn = DBManager.getConnection();
-		try {
-			stmt = conn.createStatement();
-			stmt.execute(sql);
-			rs = stmt.getResultSet();
-			GradeConstraintData gcd;
-			while (rs.next()) {
-				int id = rs.getInt(1);
-
-				gcd = getGradeConstraintDataById(id);
-				if (gcd == null) {
-					gcd = new GradeConstraintData();					
-					gcd.setId(id);
-					gcd.setSelectorName(rs.getString(2));
-					gcd.setSelectionType(rs.getInt(3));
-					gcd.setSelectedGradeName(rs.getString(4));
-					gcd.setProductJoinName(rs.getString(5));
-					gcd.setInUse(rs.getBoolean(6));
-					gcd.setMax(rs.getBoolean(7));
-
-					this.gradeConstraintDataList.add(gcd);
-				}
-				gcd.addYear(rs.getInt("year"), rs.getFloat("value"));
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (stmt != null)
-					stmt.close();
-				if (rs != null)
-					rs.close();
-				if (conn != null)
-					DBManager.releaseConnection(conn);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
+		this.gradeConstraintDataList = new GradeConstraintDAO().getAll();
 	}
 
 	public void loadBenchConstraintData() {
-		this.pitBenchConstraintDataList = new ArrayList<PitBenchConstraintData>();
-		String sql = "select id, pit_name, in_use, year, value from bench_constraint_defn, bench_constraint_year_mapping where id = bench_constraint_id and scenario_id =" + this.scenarioId + " order by id, year";
-		Statement stmt = null;
-		ResultSet rs = null;
-		Connection conn = DBManager.getConnection();
-		try {
-			stmt = conn.createStatement();
-			stmt.execute(sql);
-			rs = stmt.getResultSet();
-			PitBenchConstraintData pcd;
-			while (rs.next()) {
-				int id = rs.getInt(1);
-
-				pcd = getBenchConstraintDataById(id);
-				if (pcd == null) {
-					pcd = new PitBenchConstraintData();					
-					pcd.setId(id);
-					pcd.setPitName(rs.getString(2));
-					pcd.setInUse(rs.getBoolean(3));
-					this.pitBenchConstraintDataList.add(pcd);
-				}
-				pcd.addYear(rs.getInt("year"), rs.getInt("value"));
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (stmt != null)
-					stmt.close();
-				if (rs != null)
-					rs.close();
-				if (conn != null)
-					DBManager.releaseConnection(conn);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
+		this.pitBenchConstraintDataList = new BenchConstraintDAO().getAll();
 	}
 	
 	public void loadPitDependencyData() {
@@ -443,186 +322,36 @@ public class ScenarioConfigutration {
 
 
 	public void saveProcessConstraintData() {
-		Connection conn = DBManager.getConnection();
-		String insert_sql = "insert into process_constraint_defn (scenario_id, selector_name, selector_type, coefficient_name, coefficient_type,  in_use, is_max) values (?, ?, ?, ?, ?, ?, ?)";
-		String mapping_sql = "insert into process_constraint_year_mapping (process_constraint_id, year, value) values (?, ?, ?)";
-		PreparedStatement pstmt = null;
-		PreparedStatement pstmt1 = null;
-		ResultSet rs = null;
-		boolean autoCommit = true;
 
-		try {
-			autoCommit = conn.getAutoCommit();
-			conn.setAutoCommit(false);
-			pstmt = conn.prepareStatement(insert_sql,
-					Statement.RETURN_GENERATED_KEYS);
-			pstmt1 = conn.prepareStatement(mapping_sql);
-
-			for(ProcessConstraintData pcd : this.processConstraintDataList) {
-				if (pcd.getId() > 0)
-					continue;
-				//pstmt.setInt(1, this.projectConfiguration.getProjectId());
-				pstmt.setInt(1, this.scenarioId);
-				pstmt.setString(2, pcd.getSelector_name());
-				pstmt.setInt(3, pcd.getSelectionType());
-				pstmt.setString(4, pcd.getCoefficient_name());
-				pstmt.setInt(5, pcd.getCoefficientType());
-				pstmt.setBoolean(6, pcd.isInUse());
-				pstmt.setBoolean(7, pcd.isMax());
-				pstmt.executeUpdate();
-				rs = pstmt.getGeneratedKeys();
-
-				if (rs.next()){
-					int id = rs.getInt(1);
-					pcd.setId(id);
-
-					Set keys = pcd.getConstraintData().keySet();
-					Iterator<Integer> it = keys.iterator();
-					while (it.hasNext()) {
-						int key = it.next();
-						pstmt1.setInt(1, pcd.getId());
-						pstmt1.setInt(2, key);
-						pstmt1.setFloat(3, pcd.getConstraintData().get(key));
-						pstmt1.executeUpdate();
-					}
-				}
-			}
-
-			conn.commit();
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				conn.setAutoCommit(autoCommit);
-				if (pstmt != null)
-					pstmt.close();
-				if (conn != null)
-					DBManager.releaseConnection(conn);
-			} catch (SQLException e) {
-				e.printStackTrace();
+		ProcessConstraintDAO processConstraintdao = new ProcessConstraintDAO();
+		for(ProcessConstraintData pcd : this.processConstraintDataList) {			
+			if (pcd.getId() > 0) {
+				processConstraintdao.update(pcd);
+			} else {
+				processConstraintdao.create(pcd);
 			}
 		}
 	}
 
 	public void saveGradeConstraintData() {
-		Connection conn = DBManager.getConnection();
-		String insert_sql = "insert into grade_constraint_defn (scenario_id, grade, product_join_name, selector_name, selector_type, in_use, is_max) values (?, ?, ?, ?, ?, ?, ?)";
-		String mapping_sql = "insert into grade_constraint_year_mapping (grade_constraint_id, year, value) values (?, ?, ?)";
-		PreparedStatement pstmt = null;
-		PreparedStatement pstmt1 = null;
-		ResultSet rs = null;
-		boolean autoCommit = true;
-
-		try {
-			autoCommit = conn.getAutoCommit();
-			conn.setAutoCommit(false);
-			pstmt = conn.prepareStatement(insert_sql,
-					Statement.RETURN_GENERATED_KEYS);
-			pstmt1 = conn.prepareStatement(mapping_sql);
-
-			for(GradeConstraintData gcd : this.gradeConstraintDataList) {
-				if (gcd.getId() > 0)
-					continue;
-				//pstmt.setInt(1, this.projectConfiguration.getProjectId());
-				pstmt.setInt(1, this.scenarioId);
-				pstmt.setString(2, gcd.getSelectedGradeName());
-				pstmt.setString(3, gcd.getProductJoinName());
-				pstmt.setString(4, gcd.getSelectorName());
-				pstmt.setInt(5, gcd.getSelectionType());
-				pstmt.setBoolean(6, gcd.isInUse());
-				pstmt.setBoolean(7, gcd.isMax());
-				pstmt.executeUpdate();
-				rs = pstmt.getGeneratedKeys();
-
-				if (rs.next()){
-					int id = rs.getInt(1);
-					gcd.setId(id);
-
-					Set keys = gcd.getConstraintData().keySet();
-					Iterator<Integer> it = keys.iterator();
-					while (it.hasNext()) {
-						int key = it.next();
-						pstmt1.setInt(1, gcd.getId());
-						pstmt1.setInt(2, key);
-						pstmt1.setFloat(3, gcd.getConstraintData().get(key));
-						pstmt1.executeUpdate();
-					}
-				}
-			}
-
-			conn.commit();
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				conn.setAutoCommit(autoCommit);
-				if (pstmt != null)
-					pstmt.close();
-				if (conn != null)
-					DBManager.releaseConnection(conn);
-			} catch (SQLException e) {
-				e.printStackTrace();
+		GradeConstraintDAO gradeConstraintdao = new GradeConstraintDAO();
+		for(GradeConstraintData gcd : this.gradeConstraintDataList) {			
+			if (gcd.getId() > 0) {
+				gradeConstraintdao.update(gcd);
+			} else {
+				gradeConstraintdao.create(gcd);
 			}
 		}
 	}
 
 	public void saveBenchConstraintData() {
-		Connection conn = DBManager.getConnection();
-		String insert_sql = "insert into bench_constraint_defn (scenario_id, pit_name, in_use) values (?, ?, ?)";
-		String mapping_sql = "insert into bench_constraint_year_mapping (bench_constraint_id, year, value) values (?, ?, ?)";
-		PreparedStatement pstmt = null;
-		PreparedStatement pstmt1 = null;
-		ResultSet rs = null;
-		boolean autoCommit = true;
-
-		try {
-			autoCommit = conn.getAutoCommit();
-			conn.setAutoCommit(false);
-			pstmt = conn.prepareStatement(insert_sql,
-					Statement.RETURN_GENERATED_KEYS);
-			pstmt1 = conn.prepareStatement(mapping_sql);
-
-			for(PitBenchConstraintData pcd : this.pitBenchConstraintDataList) {
-				if (pcd.getId() > 0)
-					continue;
-				//pstmt.setInt(1, this.projectConfiguration.getProjectId());
-				pstmt.setInt(1, this.scenarioId);
-				pstmt.setString(2, pcd.getPitName());
-				pstmt.setBoolean(3, pcd.isInUse());
-				pstmt.executeUpdate();
-				rs = pstmt.getGeneratedKeys();
-
-				if (rs.next()){
-					int id = rs.getInt(1);
-					pcd.setId(id);
-
-					Set keys = pcd.getConstraintData().keySet();
-					Iterator<Integer> it = keys.iterator();
-					while (it.hasNext()) {
-						int key = it.next();
-						pstmt1.setInt(1, pcd.getId());
-						pstmt1.setInt(2, key);
-						pstmt1.setFloat(3, pcd.getConstraintData().get(key));
-						pstmt1.executeUpdate();
-					}
-				}
-			}
-
-			conn.commit();
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				conn.setAutoCommit(autoCommit);
-				if (pstmt != null)
-					pstmt.close();
-				if (conn != null)
-					DBManager.releaseConnection(conn);
-			} catch (SQLException e) {
-				e.printStackTrace();
+		
+		BenchConstraintDAO benchConstraintdao = new BenchConstraintDAO();
+		for(PitBenchConstraintData pcd : this.pitBenchConstraintDataList) {
+			if (pcd.getId() > 0) {
+				benchConstraintdao.update(pcd);
+			} else {
+				benchConstraintdao.create(pcd);
 			}
 		}
 	}
@@ -928,6 +657,10 @@ public class ScenarioConfigutration {
 			}
 		}
 		return null;
+	}
+
+	public int getScenarioId() {
+		return scenarioId;
 	}
 
 	public List<OpexData> getOpexDataList() {

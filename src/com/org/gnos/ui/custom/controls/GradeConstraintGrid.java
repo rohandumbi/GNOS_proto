@@ -25,13 +25,11 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.core.ScenarioConfigutration;
-import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.GradeConstraintData;
 import com.org.gnos.db.model.Pit;
 import com.org.gnos.db.model.PitGroup;
 import com.org.gnos.db.model.Process;
 import com.org.gnos.db.model.ProcessJoin;
-import com.org.gnos.db.model.Product;
 import com.org.gnos.db.model.ProductJoin;
 
 public class GradeConstraintGrid extends Composite {
@@ -48,14 +46,10 @@ public class GradeConstraintGrid extends Composite {
 	private Label secondSeparator;
 	private Label thirdSeparator;
 	private Label fourthSeparator;
-	private Label lblClassification;
 	private List<GradeConstraintData> gradeConstraintDataList;
 	private int startYear;
 	private int timePeriod;
 
-	private int expressionEndIndex = 0;
-	private int productEndIndex = 0;
-	private int productJoinEndIndex = 0;
 
 	private int processEndIndex = 0;
 	private int processJoinEndIndex = 0;
@@ -79,28 +73,6 @@ public class GradeConstraintGrid extends Composite {
 			this.addRow(gradeConstraintData);
 		}
 	}
-
-
-	/*private String[] getCoefficientComboItems(){
-		ProjectConfigutration projectConfigutration = ProjectConfigutration.getInstance();
-		List<Expression> expressions = projectConfigutration.getNonGradeExpressions();
-		List<Product> products = projectConfigutration.getProductList();
-		List<ProductJoin> productJoins = projectConfigutration.getProductJoinList();
-		this.expressionEndIndex = expressions.size() -1;
-		this.productEndIndex = this.expressionEndIndex + products.size();
-		this.productJoinEndIndex = this.productEndIndex + productJoins.size();
-		String[] comboItems = new String[this.productJoinEndIndex+1];
-		for(int i=0; i< expressions.size() ; i++){
-			comboItems[i] = expressions.get(i).getName();
-		}
-		for(int i=0; i < products.size(); i++){
-			comboItems[this.expressionEndIndex +i+1] = products.get(i).getName();
-		}
-		for(int i=0; i < productJoins.size(); i++){
-			comboItems[this.productEndIndex+ i +1] = productJoins.get(i).getName();
-		}
-		return comboItems;
-	}*/
 
 	private String[] getSelectors(){
 
@@ -432,10 +404,19 @@ public class GradeConstraintGrid extends Composite {
 				public void modifyText(ModifyEvent event) {
 					// Get the widget whose text was modified
 					Text text = (Text) event.widget;
-					System.out.println("Input value for the " + targetYear + " year is " + text.getText());
-					//GradeConstraintData gradeConstraintData = (GradeConstraintData)parent.getData();
+					Float yearlyValue = 0f;
+					if(text.getText().trim().length() > 0){
+						try{
+							yearlyValue = Float.valueOf(text.getText());
+						} catch(NumberFormatException nfe) {
+							System.err.println("Not a valid value =>"+ yearlyValue);
+							text.setText("0");
+						}
+						
+					}
+					System.out.println("Input value for the " + targetYear + " year is " + yearlyValue);
 					LinkedHashMap<Integer, Float> constraintData = gradeConstraintData.getConstraintData();
-					constraintData.put(targetYear, Float.valueOf(text.getText()));
+					constraintData.put(targetYear, yearlyValue);
 				}
 			});
 			FormData fd_yearlyValue = new FormData();

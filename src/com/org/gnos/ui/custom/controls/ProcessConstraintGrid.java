@@ -1,11 +1,9 @@
 package com.org.gnos.ui.custom.controls;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -398,10 +396,20 @@ public class ProcessConstraintGrid extends Composite {
 					public void modifyText(ModifyEvent event) {
 						// Get the widget whose text was modified
 						Text text = (Text) event.widget;
-						String yearlyValue = text.getText();
+						String yearlyValueText = text.getText();
+						Float yearlyValue = 0f;
+						if(yearlyValueText.trim().length() > 0){
+							try{
+								yearlyValue = Float.valueOf(yearlyValueText);
+							} catch(NumberFormatException nfe) {
+								System.err.println("Not a valid value =>"+ yearlyValue);
+								text.setText("0");
+							}
+							
+						}
 						System.out.println("Input value for the " + targetYear + " year is " + yearlyValue);
 						LinkedHashMap<Integer, Float> constraintData = pcd.getConstraintData();
-						constraintData.put(targetYear, Float.valueOf(yearlyValue));
+						constraintData.put(targetYear, yearlyValue);
 					}
 				});
 				

@@ -49,6 +49,12 @@ public class PitBenchConstraintGrid extends Composite {
 		this.timePeriod = ScenarioConfigutration.getInstance().getTimePeriod();
 		this.startYear = ScenarioConfigutration.getInstance().getStartYear();
 		this.pitBenchConstraintDataList = ScenarioConfigutration.getInstance().getPitBenchConstraintDataList();
+		if(this.pitBenchConstraintDataList.size() == 0){
+			PitBenchConstraintData pitBenchConstraintData = new PitBenchConstraintData();
+			pitBenchConstraintData.setPitName("Default");
+			pitBenchConstraintData.setInUse(true);
+			this.pitBenchConstraintDataList.add(pitBenchConstraintData);
+		}
 		this.createContent(parent);
 	}
 
@@ -169,32 +175,29 @@ public class PitBenchConstraintGrid extends Composite {
 		String associatedPitName  = pitBenchConstraintData.getPitName();
 		if(associatedPitName != null){
 			comboPits.setText(associatedPitName);
+			if(associatedPitName.equals("Default")){
+				comboPits.setEnabled(false);
+			}
 		}else{
 			comboPits.setText("Select Pit");
 		}
-		if(this.allRows.size() == 0){//if first row add default data
-			comboPits.setText("Default");
-			comboPits.setEnabled(false);
-			pitBenchConstraintData.setPitName("Default");
-		}else{
-			comboPits.addListener(SWT.MouseDown, new Listener(){
-				@Override
-				public void handleEvent(Event event) {
-					// TODO Auto-generated method stub
-					comboPits.removeAll();
-					comboPits.setItems(getPits());
-					comboPits.getParent().layout();
-					comboPits.setListVisible(true);
-				}
-			});
+		comboPits.addListener(SWT.MouseDown, new Listener(){
+			@Override
+			public void handleEvent(Event event) {
+				// TODO Auto-generated method stub
+				comboPits.removeAll();
+				comboPits.setItems(getPits());
+				comboPits.getParent().layout();
+				comboPits.setListVisible(true);
+			}
+		});
 
-			comboPits.addSelectionListener(new SelectionAdapter() {
-				public void widgetSelected(SelectionEvent e) {
-					String selectedPitName = comboPits.getText();
-					pitBenchConstraintData.setPitName(selectedPitName);
-				}
-			});
-		}
+		comboPits.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				String selectedPitName = comboPits.getText();
+				pitBenchConstraintData.setPitName(selectedPitName);
+			}
+		});
 
 		FormData fd_comboPits = new FormData();
 		fd_comboPits.left = new FormAttachment(btnUse, 18);
@@ -230,10 +233,19 @@ public class PitBenchConstraintGrid extends Composite {
 				public void modifyText(ModifyEvent event) {
 					// Get the widget whose text was modified
 					Text text = (Text) event.widget;
-					System.out.println("Input value for the " + targetYear + " year is " + text.getText());
-					//GradeConstraintData gradeConstraintData = (GradeConstraintData)parent.getData();
+					Integer yearlyValue = 0;
+					if(text.getText().trim().length() > 0){
+						try{
+							yearlyValue = Integer.valueOf(text.getText());
+						} catch(NumberFormatException nfe) {
+							System.err.println("Not a valid value =>"+ yearlyValue);
+							text.setText("0");
+						}
+						
+					}
+					System.out.println("Input value for the " + targetYear + " year is " + yearlyValue);
 					LinkedHashMap<Integer, Integer> constraintData = pitBenchConstraintData.getConstraintData();
-					constraintData.put(targetYear, Integer.valueOf(text.getText()));
+					constraintData.put(targetYear, yearlyValue);
 				}
 			});
 			FormData fd_yearlyValue = new FormData();
