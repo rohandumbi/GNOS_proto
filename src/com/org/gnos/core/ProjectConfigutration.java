@@ -16,6 +16,7 @@ import java.util.Set;
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.dao.ExpressionDAO;
 import com.org.gnos.db.dao.FieldDAO;
+import com.org.gnos.db.model.CycleTimeData;
 import com.org.gnos.db.model.Dump;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Field;
@@ -47,6 +48,7 @@ public class ProjectConfigutration {
 	private List<Dump> dumpList = new ArrayList<Dump>();
 	private List<Stockpile> stockPileList = new ArrayList<Stockpile>();
 	private List<Pit> pitList = new ArrayList<Pit>();
+	private CycleTimeData cycleTimeData = new CycleTimeData();
 
 	private boolean newProject = true;
 	private Map<String, String> savedRequiredFieldMapping;
@@ -1403,4 +1405,12 @@ public class ProjectConfigutration {
 		return stockPileList;
 	}
 
+	public CycleTimeData getCycleTimeData() {
+		return cycleTimeData;
+	}
+
+	public void setCycleTimeData(CycleTimeData cycleTimeData) {
+		this.cycleTimeData = cycleTimeData;
+	}
+	
 }

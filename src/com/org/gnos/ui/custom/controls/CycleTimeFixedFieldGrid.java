@@ -7,6 +7,8 @@ import java.util.Map;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -19,6 +21,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.db.model.Field;
+import com.org.gnos.db.model.PitGroup;
 
 public class CycleTimeFixedFieldGrid extends Composite {
 
@@ -34,28 +37,45 @@ public class CycleTimeFixedFieldGrid extends Composite {
 	private List<Composite> allRows;
 	private String[] sourceFieldsComboItems;
 	private Composite parent;
+	private Map<String, String> fixedFieldMap;
+	private Composite presentRow;
 	
 	public CycleTimeFixedFieldGrid(Composite parent, int style) {
 		super(parent, style);
 		this.parent = parent;
+		ProjectConfigutration projectInstance = ProjectConfigutration.getInstance();
+		this.fixedFieldMap = projectInstance.getCycleTimeData().getFixedFieldMap();
 		//this.requiredFieldNames = requiredFieldNames;
-		//this.allSourceFields = allSourceFields;
+		this.allSourceFields = projectInstance.getFields();
+		this.allRows = new ArrayList<>();
 		this.createContent(parent);
 	}
 	
-	private void createSourceFieldsComboItems(){
+	private String[] getFixedFields(){
+		return new String[]{"Pit", "Bench"};
+	}
+	
+	/*private void createSourceFieldsComboItems(){
 		int i = 0;
 		int sourceFieldSize = this.allSourceFields.size();
 		this.sourceFieldsComboItems = new String[sourceFieldSize];
 		for(i=0; i<sourceFieldSize; i++){
 			this.sourceFieldsComboItems[i] = this.allSourceFields.get(i).getName();
 		}
+	}*/
+	private String[] getSourceFieldComboItems(){
+		int i = 0;
+		int sourceFieldSize = this.allSourceFields.size();
+		String[] comboItems = new String[sourceFieldSize];
+		for(i=0; i<sourceFieldSize; i++){
+			comboItems[i] = this.allSourceFields.get(i).getName();
+		}
+		return comboItems;
 	}
 
 
 	private void createHeader(){
 		compositeGridHeader = new Composite(this, SWT.BORDER);
-		//compositeGridHeader.setBounds(0, 0, 749, 37);
 		compositeGridHeader.setBackground(SWTResourceManager.getColor(230, 230, 230));
 		compositeGridHeader.setLayout(new FormLayout());
 		FormData fd_compositeGridHeader = new FormData();
@@ -69,11 +89,6 @@ public class CycleTimeFixedFieldGrid extends Composite {
 		FormData fd_label = new FormData();
 		fd_label.left = new FormAttachment(50);
 		label.setLayoutData(fd_label);
-
-		/*Label label_1 = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
-		FormData fd_label_1 = new FormData();
-		fd_label_1.left = new FormAttachment(70);
-		label_1.setLayoutData(fd_label_1);*/
 
 		Label lblRqrdFieldHeader = new Label(compositeGridHeader, SWT.NONE);
 		lblRqrdFieldHeader.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
@@ -92,15 +107,9 @@ public class CycleTimeFixedFieldGrid extends Composite {
 		fd_lblSourceFieldHeader.left = new FormAttachment(label, 10);
 		lblSourceFieldHeader.setLayoutData(fd_lblSourceFieldHeader);
 		lblSourceFieldHeader.setText("SOURCE FIELD");
+		
+		this.presentRow = compositeGridHeader;
 
-		/*Label lblDatatypeHeader = new Label(compositeGridHeader, SWT.NONE);
-		lblDatatypeHeader.setBackground(SWTResourceManager.getColor(230, 230, 230));
-		lblDatatypeHeader.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
-		FormData fd_lblDatatypeHeader = new FormData();
-		fd_lblDatatypeHeader.top = new FormAttachment(0,2);
-		fd_lblDatatypeHeader.left = new FormAttachment(label_1, 10);
-		lblDatatypeHeader.setLayoutData(fd_lblDatatypeHeader);
-		lblDatatypeHeader.setText("DATATYPE");*/
 	}
 	private void createRows(){
 		Composite presentRow = this.compositeGridHeader;//referring to the header as the 1st row when there are no rows inserted yet
@@ -157,11 +166,62 @@ public class CycleTimeFixedFieldGrid extends Composite {
 			i++;
 		}
 	}
+	
+	private void addRow(final String key){
+		Composite compositeRow = new Composite(this, SWT.BORDER);
+		compositeRow.setLayout(new FormLayout());
+		Color backgroundColor = SWTResourceManager.getColor(SWT.COLOR_WHITE);
+		if((allRows.size())%2 != 0){
+			backgroundColor =  SWTResourceManager.getColor(245, 245, 245);
+		}
+		compositeRow.setBackground(backgroundColor);
+		FormData fd_compositeRow = new FormData();
+		fd_compositeRow.bottom = new FormAttachment(presentRow, 25, SWT.BOTTOM);
+		fd_compositeRow.top = new FormAttachment(presentRow);
+		fd_compositeRow.right = new FormAttachment(presentRow, 0, SWT.RIGHT);
+		fd_compositeRow.left = new FormAttachment(presentRow, 0, SWT.LEFT);
+		compositeRow.setLayoutData(fd_compositeRow);
+
+		Label lblRqrdFieldName = new Label(compositeRow, SWT.NONE);
+		lblRqrdFieldName.setBackground(backgroundColor);
+		lblRqrdFieldName.setFont(SWTResourceManager.getFont("Arial", 9, SWT.NORMAL));
+		FormData fd_lblRqrdFieldName = new FormData();
+		fd_lblRqrdFieldName.top = new FormAttachment(0);
+		fd_lblRqrdFieldName.left = new FormAttachment(0, 10);
+		lblRqrdFieldName.setLayoutData(fd_lblRqrdFieldName);
+		lblRqrdFieldName.setText(key);
+		
+		final Combo comboSourceField = new Combo(compositeRow, SWT.NONE);
+		comboSourceField.setItems(this.getSourceFieldComboItems());
+		FormData fd_comboSourceField = new FormData();
+		fd_comboSourceField.left = new FormAttachment(50, 12);
+		fd_comboSourceField.right = new FormAttachment(80);
+		fd_comboSourceField.bottom = new FormAttachment(presentRow, 20, SWT.BOTTOM);
+		comboSourceField.setLayoutData(fd_comboSourceField);
+		comboSourceField.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				String mappedFieldName = comboSourceField.getText();
+				fixedFieldMap.put(key, mappedFieldName);
+			}
+		});
+		String existingMapping = fixedFieldMap.get(key);
+		if(existingMapping != null){
+			comboSourceField.setText(existingMapping);
+		}else{
+			comboSourceField.setText("Mapping Not Done");
+		}
+		
+		allRows.add(compositeRow);
+		this.presentRow = compositeRow;
+	}
 
 	private void createContent(Composite parent){
 		this.setLayout(new FormLayout());
 		//this.createSourceFieldsComboItems();
 		this.createHeader();
+		for(String field: this.getFixedFields()){
+			this.addRow(field);
+		}
 		//this.createRows();
 		//this.setSourceFieldMapping(); //updating the default standard mappings initially
 	}

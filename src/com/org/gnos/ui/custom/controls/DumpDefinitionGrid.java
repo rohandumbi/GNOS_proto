@@ -184,20 +184,6 @@ public class DumpDefinitionGrid extends Composite {
 		fd_sixthSeparator.left = new FormAttachment(SIXTH_SEPARATOR_POSITION);
 		sixthSeparator.setLayoutData(fd_sixthSeparator);
 		
-		/*Label lblReclaim = new Label(compositeGridHeader, SWT.NONE);
-		lblReclaim.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
-		FormData fd_lblReclaim = new FormData();
-		fd_lblReclaim.top = new FormAttachment(0,2);
-		fd_lblReclaim.left = new FormAttachment(sixthSeparator, 5);
-		lblReclaim.setLayoutData(fd_lblReclaim);
-		lblReclaim.setText("reclaim");
-		lblReclaim.setBackground(SWTResourceManager.getColor(230, 230, 230));
-		
-		seventhSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
-		FormData fd_seventhSeparator = new FormData();
-		fd_seventhSeparator.left = new FormAttachment(lblReclaim, 5);
-		seventhSeparator.setLayoutData(fd_seventhSeparator);*/
-		
 		this.presentRow = this.compositeGridHeader;//referring to the header as the 1st row when there are no rows inserted yet
 	}
 	

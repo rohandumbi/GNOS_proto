@@ -1,5 +1,7 @@
 package com.org.gnos.ui.custom.controls;
 
+import java.util.Map;
+
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
@@ -39,9 +41,9 @@ public class ImportCycleTimeDialog extends Dialog {
 	private CycleTimeDumpFieldGrid cycleTimeDumpFieldGrid;
 	private CycleTimeStockpileFieldGrid cycleTimeStockpileFieldGrid;
 	private CycleTimeChildProcessFieldGrid cycleTimeChildProcessFieldGrid;
-	//private Button btnAddDump;
 	private Composite container;
 	private Label labelScreenName;
+	private Map<String, String> fixedFieldMap;
 	
 	public ImportCycleTimeDialog(Shell parentShell, String[] pitGroupNames) {
 		super(parentShell);
