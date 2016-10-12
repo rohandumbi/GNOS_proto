@@ -25,6 +25,7 @@ import com.org.gnos.events.GnosEvent;
 import com.org.gnos.ui.custom.controls.DumpCreationDialog;
 import com.org.gnos.ui.custom.controls.GnosScreen;
 import com.org.gnos.ui.custom.controls.GroupCreationDialog;
+import com.org.gnos.ui.custom.controls.ImportCycleTimeDialog;
 import com.org.gnos.ui.custom.controls.StockpileCreationDialog;
 import com.org.gnos.ui.graph.PitGroupDefinitionGraph;
 
@@ -108,16 +109,41 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 		lblAllGroups.setLayoutData(fd_lblAllGroups);
 		lblAllGroups.setText("All Pit Groups:");
 		
-		Label lblProcessDiagram = new Label(this, SWT.NONE);
-		lblProcessDiagram.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		lblProcessDiagram.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
-		FormData fd_lblProcessDiagram = new FormData();
+		Label lblDiagram = new Label(this, SWT.NONE);
+		lblDiagram.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		lblDiagram.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
+		FormData fd_lblDiagram = new FormData();
 		//fd_lblProcessDiagram.bottom = new FormAttachment(lblAllModels, 0, SWT.BOTTOM);
-		fd_lblProcessDiagram.top = new FormAttachment(labelFirstSeparator, 0, SWT.TOP);
-		fd_lblProcessDiagram.left = new FormAttachment(labelFirstSeparator, 10);
-		fd_lblProcessDiagram.right = new FormAttachment(labelSecondSeparator);
-		lblProcessDiagram.setLayoutData(fd_lblProcessDiagram);
-		lblProcessDiagram.setText("Generated Grouping Diagram");
+		fd_lblDiagram.top = new FormAttachment(labelFirstSeparator, 0, SWT.TOP);
+		fd_lblDiagram.left = new FormAttachment(labelFirstSeparator, 10);
+		//fd_lblDiagram.right = new FormAttachment(labelSecondSeparator);
+		lblDiagram.setLayoutData(fd_lblDiagram);
+		lblDiagram.setText("Generated Grouping Diagram");
+		
+		/*
+		 * Import cycle time button button
+		 */
+		Button btnImportCycleTime = new Button(this, SWT.NONE);
+		btnImportCycleTime.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				ImportCycleTimeDialog dialog = new ImportCycleTimeDialog(getShell(), getSourcePitGroupItems());
+				if (Window.OK == dialog.open()) {
+					/*for(Dump dump : listOfDumps){
+						if(dump.getId() == -1){//unsaved dumps have value -1
+							compositeGroupDiagram.addDumpToGroup(dump);
+							dumpList.add(dump.getName());
+						}
+					}*/
+				}
+			}
+		});
+		btnImportCycleTime.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
+		FormData fd_btnImportCycleTime = new FormData();
+		fd_btnImportCycleTime.top = new FormAttachment(lblDiagram, 0, SWT.TOP);
+		fd_btnImportCycleTime.left = new FormAttachment(lblDiagram, 5);
+		btnImportCycleTime.setLayoutData(fd_btnImportCycleTime);
+		btnImportCycleTime.setText("Import Cycle Time");
 		
 		Label lblAllDumps = new Label(this, SWT.NONE);
 		lblAllDumps.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
@@ -201,7 +227,7 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 		 */
 		this.compositeGroupDiagram = new PitGroupDefinitionGraph(this, SWT.BORDER);
 		FormData fd_compositeGroupDiagram = new FormData();
-		fd_compositeGroupDiagram.top = new FormAttachment(lblProcessDiagram, 10);
+		fd_compositeGroupDiagram.top = new FormAttachment(lblDiagram, 10);
 		fd_compositeGroupDiagram.left = new FormAttachment(labelFirstSeparator, 10);
 		fd_compositeGroupDiagram.bottom = new FormAttachment(100, -10);
 		fd_compositeGroupDiagram.right = new FormAttachment(labelSecondSeparator, -10);
