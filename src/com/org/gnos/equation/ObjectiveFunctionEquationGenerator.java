@@ -3,12 +3,12 @@ package com.org.gnos.equation;
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -22,14 +22,10 @@ import com.org.gnos.core.Tree;
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.model.CapexData;
 import com.org.gnos.db.model.CapexInstance;
-import com.org.gnos.db.model.Dump;
 import com.org.gnos.db.model.FixedOpexCost;
 import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.OpexData;
-import com.org.gnos.db.model.Pit;
-import com.org.gnos.db.model.PitGroup;
 import com.org.gnos.db.model.Process;
-import com.org.gnos.db.model.Stockpile;
 
 public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 	
@@ -256,24 +252,24 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		return blocks;
 	}
 	
-	private float getProcessValue(Block b, Model model, int year) {
-		float value = 0;
+	private BigDecimal getProcessValue(Block b, Model model, int year) {
+		BigDecimal value = new BigDecimal(0);
 		if(model == null) return value;
-		float revenue = 0;
-		float pcost = 0;
+		BigDecimal revenue = new BigDecimal(0);
+		BigDecimal pcost = new BigDecimal(0);
 		List<OpexData> opexDataList = scenarioConfigutration.getOpexDataList();
 		for(OpexData opexData: opexDataList) {
 			if(opexData.getModel().getId() == model.getId()){
 				if(opexData.isRevenue()){
 					String expressionName = opexData.getExpression().getName().replaceAll("\\s+","_");
-					float expr_value = b.getComputedField(expressionName);
-					revenue = revenue + expr_value * opexData.getCostData().get(year);
+					BigDecimal expr_value = b.getComputedField(expressionName);
+					revenue = revenue.add(expr_value.multiply(new BigDecimal(opexData.getCostData().get(year))));
 				} else {
-					pcost = pcost + opexData.getCostData().get(year);
+					pcost = pcost.add(new BigDecimal(opexData.getCostData().get(year)));
 				}
 			}
 		}
-		value = revenue - pcost;
+		value = revenue.subtract(pcost);
 		return value;
 	}
 	

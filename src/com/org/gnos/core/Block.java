@@ -1,5 +1,6 @@
 package com.org.gnos.core;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,10 +41,10 @@ public class Block {
 		return Integer.parseInt(this.computedFields.get("bench_no"));
 	}
 	
-	public Float getComputedField(String fieldName) {
+	public BigDecimal getComputedField(String fieldName) {
 		String val = this.computedFields.get(fieldName);
-		if(val == null ) return new Float(0);
-		else return Float.parseFloat(val);
+		if(val == null ) return new BigDecimal(0);
+		else return new BigDecimal(val);
 	}
 	
 	public String getField(String fieldName) {
