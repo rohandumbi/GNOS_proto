@@ -153,37 +153,6 @@ public class CycleTimeFixedFieldGrid extends Composite {
 		}
 	}
 
-	/*public boolean setSourceFieldMapping(){
-		
-		Map<String, String> requiredFieldMapping = new LinkedHashMap<String, String>();
-		Control[] rowChildren = null;
-		for(int i = 0; i < allRows.size(); i++){
-			rowChildren = allRows.get(i).getChildren();
-			
-			String requiredFieldName = null;
-			String sourceFieldName = null;
-			
-			Control compositeRequiredFieldName = rowChildren[0];
-			Control compositeSourceFieldName = rowChildren[1];
-			
-			if(compositeRequiredFieldName instanceof Label){
-				Label labelRequiredFieldName = (Label)compositeRequiredFieldName;
-				requiredFieldName = labelRequiredFieldName.getText();
-			}
-			if(compositeSourceFieldName instanceof Combo){
-				Combo comboSourceFieldName = (Combo)compositeSourceFieldName;
-				sourceFieldName = comboSourceFieldName.getText();
-			}
-			if(sourceFieldName == null || sourceFieldName == ""){
-				MessageDialog.openError(this.parent.getShell(), "GNOS Error", "Please map a source field for the Required Field: " + requiredFieldName);
-				return false;
-			}
-			requiredFieldMapping.put(requiredFieldName, sourceFieldName);
-		}
-		ProjectConfigutration.getInstance().setRequiredFieldMapping(requiredFieldMapping);
-		return true;
-	}*/
-
 	@Override
 	protected void checkSubclass() {
 		// Disable the check that prevents subclassing of SWT components
