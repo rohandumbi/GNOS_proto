@@ -65,16 +65,6 @@ public class ImportCycleTimeDialog extends Dialog {
 		labelScreenName.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.BOLD));
 		labelScreenName.setText("Cycle Time Data Mapping Dialog");
 		
-		/*Label labelScreenDescription = new Label(this.container, SWT.NONE);
-		labelScreenDescription.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
-		labelScreenDescription.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		FormData fd_labelScreenDescription = new FormData();
-		fd_labelScreenDescription.top = new FormAttachment(labelScreenName, 10, SWT.BOTTOM);
-		fd_labelScreenDescription.left = new FormAttachment(labelScreenName, 0, SWT.LEFT);
-		//fd_labelScreenDescription.right = new FormAttachment(0, 866);
-		labelScreenDescription.setLayoutData(fd_labelScreenDescription);
-		labelScreenDescription.setText("Add/Modify Dumps");*/
-		
 		this.initializeGridContainers();
 		this.refreshGrids();
 		
@@ -150,29 +140,6 @@ public class ImportCycleTimeDialog extends Dialog {
 		
 		Rectangle r4 = this.scGridContainer4.getClientArea();
 		this.scGridContainer4.setMinSize(this.scGridContainer4.computeSize(SWT.DEFAULT, r4.height, true));
-		
-		
-		/*this.btnAddDump = new Button(this.container, SWT.NONE);
-		this.btnAddDump.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				//TO DO implement row add
-				dumpDefinitionGrid.addRow();
-				Rectangle r = dumpDefinitionGrid.getClientArea();
-				int gridWidth = r.width;
-				
-				int scrollableHeight = scGridContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).y;
-				Point point = new Point(gridWidth, scrollableHeight);
-				scGridContainer.setMinSize(point);
-			}
-		});
-		this.btnAddDump.setFont(SWTResourceManager.getFont("Segoe UI", 16, SWT.BOLD));
-		FormData fd_btnAddRow = new FormData();
-		fd_btnAddRow.top = new FormAttachment(scGridContainer, 0, SWT.TOP);
-		fd_btnAddRow.right = new FormAttachment(100, -5);
-		this.btnAddDump.setLayoutData(fd_btnAddRow);
-		this.btnAddDump.setText("+");*/
-		
 	}
 	
 	public void refreshGrids(){
@@ -203,8 +170,8 @@ public class ImportCycleTimeDialog extends Dialog {
 
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
-		createButton(parent, IDialogConstants.OK_ID, "Add", true);
-		createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
+		createButton(parent, IDialogConstants.OK_ID, "OK", true);
+		//createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
 	}
 
 	@Override

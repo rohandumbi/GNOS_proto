@@ -364,3 +364,12 @@ CREATE TABLE cycletime_stockpile_field_mapping(
    mapped_field_name VARCHAR(100) NOT NULL,
    UNIQUE KEY ( project_id, field_name )
 );
+
+DROP TABLE IF EXISTS cycletime_process_field_mapping;
+
+CREATE TABLE cycletime_process_field_mapping(
+   project_id INT NOT NULL,
+   field_name VARCHAR(100) NOT NULL,
+   mapped_field_name VARCHAR(100) NOT NULL,
+   UNIQUE KEY ( project_id, field_name )
+);

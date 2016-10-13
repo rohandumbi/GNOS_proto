@@ -56,6 +56,7 @@ public class ProjectConfigutration {
 	private ArrayList<String> existingCycleTimeFixedFields = new ArrayList<String>();
 	private ArrayList<String> existingCycleTimeDumpFields = new ArrayList<String>();
 	private ArrayList<String> existingCycleTimeStockpileFields = new ArrayList<String>();
+	private ArrayList<String> existingCycleTimeProcessFields = new ArrayList<String>();
 	
 	//private
 
@@ -583,6 +584,7 @@ public class ProjectConfigutration {
 		loadCycleTimeFixedFieldMappingData();
 		loadCycleTimeDumpFieldMappingData();
 		loadCycleTimeStockpileFieldMappingData();
+		loadCycleTimeProcessFieldMappingData();
 	}
 	
 	private void loadCycleTimeFixedFieldMappingData() {
@@ -664,6 +666,38 @@ public class ProjectConfigutration {
 			while (rs.next()) {
 				existingCycleTimeStockpileFields.add(rs.getString(1));
 				stockpileFieldMap.put(rs.getString(1), rs.getString(2));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (stmt != null)
+					stmt.close();
+				if (rs != null)
+					rs.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	private void loadCycleTimeProcessFieldMappingData() {
+		String sql = "select field_name, mapped_field_name from cycletime_process_field_mapping where project_id = "
+				+ this.projectId;
+		Statement stmt = null;
+		ResultSet rs = null;
+		Connection conn = DBManager.getConnection();
+		Map<String, String> processFieldMap = this.cycleTimeData.getChildProcessFieldMap();
+
+		try {
+			stmt = conn.createStatement();
+			stmt.execute(sql);
+			rs = stmt.getResultSet();
+			while (rs.next()) {
+				existingCycleTimeProcessFields.add(rs.getString(1));
+				processFieldMap.put(rs.getString(1), rs.getString(2));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -1259,6 +1293,7 @@ public class ProjectConfigutration {
 		saveCycleTimeFixedFieldData();
 		saveCycleTimeDumpFieldData();
 		saveCycleTimeStockpileFieldData();
+		saveCycleTimeProcessFieldData();
 	}
 	
 	public void saveCycleTimeFixedFieldData() {
@@ -1414,7 +1449,55 @@ public class ProjectConfigutration {
 
 	}
 	
-	
+	public void saveCycleTimeProcessFieldData() {
+
+		Connection conn = DBManager.getConnection();
+		String insert_sql = " insert into cycletime_process_field_mapping (project_id, field_name, mapped_field_name) values (?, ?, ?)";
+		String update_sql = " update cycletime_process_field_mapping set mapped_field_name = ? where project_id = ? AND field_name = ? ";
+		PreparedStatement insertPstmt = null;
+		PreparedStatement updatePstmt = null;
+		boolean autoCommit = true;
+
+		try {
+			autoCommit = conn.getAutoCommit();
+			conn.setAutoCommit(false);
+			insertPstmt = conn.prepareStatement(insert_sql);
+			updatePstmt = conn.prepareStatement(update_sql);
+			Map<String, String> processFieldMap = this.cycleTimeData.getChildProcessFieldMap();
+			Set keys = processFieldMap.keySet();
+			Iterator<String> it = keys.iterator();
+			while (it.hasNext()) {
+				String key = it.next();
+				if(existingCycleTimeProcessFields.contains(key)){
+					updatePstmt.setString(1, processFieldMap.get(key));
+					updatePstmt.setInt(2, projectId);
+					updatePstmt.setString(3, key);
+					updatePstmt.executeUpdate();
+				}else{
+					insertPstmt.setInt(1, projectId);
+					insertPstmt.setString(2, key);
+					insertPstmt.setString(3, processFieldMap.get(key));
+					insertPstmt.executeUpdate();
+				}
+			}
+			conn.commit();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				conn.setAutoCommit(autoCommit);
+				if (insertPstmt != null)
+					insertPstmt.close();
+				if (updatePstmt != null)
+					updatePstmt.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+
+	}
 	
 	public Expression getExpressionById(int expressionId) {
 		for (Expression expression : expressions) {

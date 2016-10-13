@@ -51,11 +51,11 @@ public class CycleTimeStockpileFieldGrid extends Composite {
 	private String[] getStockpileFields(){
 		int i = 0;
 		int sourceFieldSize = this.stockpileList.size();
-		String[] dumps = new String[sourceFieldSize];
+		String[] stockpiles = new String[sourceFieldSize];
 		for(i=0; i<sourceFieldSize; i++){
-			dumps[i] = this.stockpileList.get(i).getName();
+			stockpiles[i] = this.stockpileList.get(i).getName();
 		}
-		return dumps;
+		return stockpiles;
 	}
 	
 	private String[] getSourceFieldComboItems(){
@@ -91,7 +91,7 @@ public class CycleTimeStockpileFieldGrid extends Composite {
 		fd_lblRqrdFieldHeader.top = new FormAttachment(0,2);
 		fd_lblRqrdFieldHeader.left = new FormAttachment(0, 10);
 		lblRqrdFieldHeader.setLayoutData(fd_lblRqrdFieldHeader);
-		lblRqrdFieldHeader.setText("DUMP NAME");
+		lblRqrdFieldHeader.setText("STOCKPILE NAME");
 		lblRqrdFieldHeader.setBackground(SWTResourceManager.getColor(230, 230, 230));
 
 		Label lblSourceFieldHeader = new Label(compositeGridHeader, SWT.NONE);
