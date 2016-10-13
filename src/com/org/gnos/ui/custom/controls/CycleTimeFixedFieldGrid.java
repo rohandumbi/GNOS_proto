@@ -21,7 +21,6 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.db.model.Field;
-import com.org.gnos.db.model.PitGroup;
 
 public class CycleTimeFixedFieldGrid extends Composite {
 
@@ -30,12 +29,9 @@ public class CycleTimeFixedFieldGrid extends Composite {
 	 * @param parent
 	 * @param style
 	 */
-	private String[] requiredFieldNames;
 	private List<Field> allSourceFields;
-	//private String[] dataTypes;
 	private Composite compositeGridHeader;
 	private List<Composite> allRows;
-	private String[] sourceFieldsComboItems;
 	private Composite parent;
 	private Map<String, String> fixedFieldMap;
 	private Composite presentRow;
@@ -55,14 +51,6 @@ public class CycleTimeFixedFieldGrid extends Composite {
 		return new String[]{"Pit", "Bench"};
 	}
 	
-	/*private void createSourceFieldsComboItems(){
-		int i = 0;
-		int sourceFieldSize = this.allSourceFields.size();
-		this.sourceFieldsComboItems = new String[sourceFieldSize];
-		for(i=0; i<sourceFieldSize; i++){
-			this.sourceFieldsComboItems[i] = this.allSourceFields.get(i).getName();
-		}
-	}*/
 	private String[] getSourceFieldComboItems(){
 		int i = 0;
 		int sourceFieldSize = this.allSourceFields.size();
@@ -110,61 +98,6 @@ public class CycleTimeFixedFieldGrid extends Composite {
 		
 		this.presentRow = compositeGridHeader;
 
-	}
-	private void createRows(){
-		Composite presentRow = this.compositeGridHeader;//referring to the header as the 1st row when there are no rows inserted yet
-		allRows = new ArrayList<Composite>();
-		Map<String, String> existingMapping = ProjectConfigutration.getInstance().getRequiredFieldMapping();
-		int i=0;
-		for(String requiredFieldName : this.requiredFieldNames){
-			
-			Composite compositeRow = new Composite(this, SWT.BORDER);
-			Color backgroundColor = SWTResourceManager.getColor(SWT.COLOR_WHITE);
-			if(i%2 != 0){
-				backgroundColor =  SWTResourceManager.getColor(245, 245, 245);
-			}
-			compositeRow.setLayout(new FormLayout());
-			compositeRow.setBackground(backgroundColor);
-			FormData fd_compositeRow = new FormData();
-			fd_compositeRow.bottom = new FormAttachment(presentRow, 25, SWT.BOTTOM);
-			fd_compositeRow.top = new FormAttachment(presentRow);
-			fd_compositeRow.right = new FormAttachment(presentRow, 0, SWT.RIGHT);
-			fd_compositeRow.left = new FormAttachment(presentRow, 0, SWT.LEFT);
-
-			Label lblRqrdFieldName = new Label(compositeRow, SWT.NONE);
-			lblRqrdFieldName.setForeground(SWTResourceManager.getColor(0,191,255));
-			lblRqrdFieldName.setBackground(backgroundColor);
-			lblRqrdFieldName.setFont(SWTResourceManager.getFont("Arial", 9, SWT.BOLD));
-			FormData fd_lblRqrdFieldName = new FormData();
-			fd_lblRqrdFieldName.top = new FormAttachment(0);
-			fd_lblRqrdFieldName.left = new FormAttachment(0, 10);
-			lblRqrdFieldName.setLayoutData(fd_lblRqrdFieldName);
-			lblRqrdFieldName.setText(requiredFieldName);
-
-			Combo comboSourceField = new Combo(compositeRow, SWT.NONE);
-			comboSourceField.setItems(this.sourceFieldsComboItems);
-			if(existingMapping != null && existingMapping.size()> 0){
-				String mappedField = existingMapping.get(requiredFieldName);
-				for(int j=0; j< this.allSourceFields.size(); j++) {
-					if(mappedField.equalsIgnoreCase(this.allSourceFields.get(j).getName())){
-						comboSourceField.select(j);
-						break;
-					}
-				}
-			} else {
-				comboSourceField.select(i);
-			}
-			
-			FormData fd_comboSourceField = new FormData();
-			fd_comboSourceField.left = new FormAttachment(50, 12);
-			fd_comboSourceField.right = new FormAttachment(80);
-			comboSourceField.setLayoutData(fd_comboSourceField);
-			
-			compositeRow.setLayoutData(fd_compositeRow);
-			allRows.add(compositeRow);
-			presentRow = compositeRow;
-			i++;
-		}
 	}
 	
 	private void addRow(final String key){
@@ -217,16 +150,13 @@ public class CycleTimeFixedFieldGrid extends Composite {
 
 	private void createContent(Composite parent){
 		this.setLayout(new FormLayout());
-		//this.createSourceFieldsComboItems();
 		this.createHeader();
 		for(String field: this.getFixedFields()){
 			this.addRow(field);
 		}
-		//this.createRows();
-		//this.setSourceFieldMapping(); //updating the default standard mappings initially
 	}
 
-	public boolean setSourceFieldMapping(){
+	/*public boolean setSourceFieldMapping(){
 		
 		Map<String, String> requiredFieldMapping = new LinkedHashMap<String, String>();
 		Control[] rowChildren = null;
@@ -235,11 +165,9 @@ public class CycleTimeFixedFieldGrid extends Composite {
 			
 			String requiredFieldName = null;
 			String sourceFieldName = null;
-			//String datatypeName = null;
 			
 			Control compositeRequiredFieldName = rowChildren[0];
 			Control compositeSourceFieldName = rowChildren[1];
-			//Control compositeDatatype = rowChildren[2];
 			
 			if(compositeRequiredFieldName instanceof Label){
 				Label labelRequiredFieldName = (Label)compositeRequiredFieldName;
@@ -257,7 +185,7 @@ public class CycleTimeFixedFieldGrid extends Composite {
 		}
 		ProjectConfigutration.getInstance().setRequiredFieldMapping(requiredFieldMapping);
 		return true;
-	}
+	}*/
 
 	@Override
 	protected void checkSubclass() {

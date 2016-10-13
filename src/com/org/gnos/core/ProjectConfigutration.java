@@ -52,6 +52,10 @@ public class ProjectConfigutration {
 
 	private boolean newProject = true;
 	private Map<String, String> savedRequiredFieldMapping;
+	
+	private ArrayList<String> existingCycleTimeFixedField = new ArrayList<String>();
+	
+	//private
 
 	private int projectId = -1;
 
@@ -88,6 +92,7 @@ public class ProjectConfigutration {
 		loadPitGroups();
 		loadDumps();
 		loadStockpiles();
+		loadCycleTimeData();
 	}
 
 	private void loadFieldData() {
@@ -572,6 +577,42 @@ public class ProjectConfigutration {
 		}
 	}
 	
+	private void loadCycleTimeData(){
+		loadCycleTimeFixedFieldMappingData();
+	}
+	
+	private void loadCycleTimeFixedFieldMappingData() {
+		String sql = "select field_name, mapped_field_name from cycletime_fixed_field_mapping where project_id = "
+				+ this.projectId;
+		Statement stmt = null;
+		ResultSet rs = null;
+		Connection conn = DBManager.getConnection();
+		Map<String, String> fixedFieldMap = this.cycleTimeData.getFixedFieldMap();
+
+		try {
+			stmt = conn.createStatement();
+			stmt.execute(sql);
+			rs = stmt.getResultSet();
+			while (rs.next()) {
+				existingCycleTimeFixedField.add(rs.getString(1));
+				fixedFieldMap.put(rs.getString(1), rs.getString(2));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (stmt != null)
+					stmt.close();
+				if (rs != null)
+					rs.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	public void save() {
 		saveFieldData();
 		saveRequiredFieldMappingData();
@@ -584,6 +625,7 @@ public class ProjectConfigutration {
 		savePitGroups();
 		saveDumps();
 		saveStockpiles();
+		saveCycleTimeData();
 	}
 
 	public void saveFieldData() {
@@ -1144,6 +1186,65 @@ public class ProjectConfigutration {
 			System.err.println("Failed saving dump data. "+e.getMessage());
 		}
 	}
+	
+	public void saveCycleTimeData(){
+		saveCycleTimeFixedFieldData();
+	}
+	
+	public void saveCycleTimeFixedFieldData() {
+
+		/*if (this.newProject) {
+			new PitBenchProcessor().updatePitBenchData(projectId);
+		}*/
+		Connection conn = DBManager.getConnection();
+		String insert_sql = " insert into cycletime_fixed_field_mapping (project_id, field_name, mapped_field_name) values (?, ?, ?)";
+		String update_sql = " update cycletime_fixed_field_mapping set mapped_field_name = ? where project_id = ? AND field_name = ? ";
+		PreparedStatement insertPstmt = null;
+		PreparedStatement updatePstmt = null;
+		boolean autoCommit = true;
+
+		try {
+			autoCommit = conn.getAutoCommit();
+			conn.setAutoCommit(false);
+			insertPstmt = conn.prepareStatement(insert_sql);
+			updatePstmt = conn.prepareStatement(update_sql);
+			Map<String, String> fixedFieldMap = this.cycleTimeData.getFixedFieldMap();
+			Set keys = fixedFieldMap.keySet();
+			Iterator<String> it = keys.iterator();
+			while (it.hasNext()) {
+				String key = it.next();
+				if(existingCycleTimeFixedField.contains(key)){
+					updatePstmt.setString(1, fixedFieldMap.get(key));
+					updatePstmt.setInt(2, projectId);
+					updatePstmt.setString(3, key);
+					updatePstmt.executeUpdate();
+				}else{
+					insertPstmt.setInt(1, projectId);
+					insertPstmt.setString(2, key);
+					insertPstmt.setString(3, fixedFieldMap.get(key));
+					insertPstmt.executeUpdate();
+				}
+			}
+			conn.commit();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				conn.setAutoCommit(autoCommit);
+				if (insertPstmt != null)
+					insertPstmt.close();
+				if (updatePstmt != null)
+					updatePstmt.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+
+	}
+	
+	
 	
 	public Expression getExpressionById(int expressionId) {
 		for (Expression expression : expressions) {
