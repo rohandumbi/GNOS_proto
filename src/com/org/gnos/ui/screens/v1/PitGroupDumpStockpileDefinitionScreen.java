@@ -27,6 +27,7 @@ import com.org.gnos.ui.custom.controls.GnosScreen;
 import com.org.gnos.ui.custom.controls.GroupCreationDialog;
 import com.org.gnos.ui.custom.controls.ImportCycleTimeDialog;
 import com.org.gnos.ui.custom.controls.StockpileCreationDialog;
+import com.org.gnos.ui.custom.controls.TruckParameterDialog;
 import com.org.gnos.ui.graph.PitGroupDefinitionGraph;
 
 public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
@@ -121,13 +122,13 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 		lblDiagram.setText("Generated Grouping Diagram");
 		
 		/*
-		 * Import cycle time button button
+		 * Import cycle time button
 		 */
 		Button btnImportCycleTime = new Button(this, SWT.NONE);
 		btnImportCycleTime.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				ImportCycleTimeDialog dialog = new ImportCycleTimeDialog(getShell(), getSourcePitGroupItems());
+				ImportCycleTimeDialog dialog = new ImportCycleTimeDialog(getShell());
 				if (Window.OK == dialog.open()) {
 					/*for(Dump dump : listOfDumps){
 						if(dump.getId() == -1){//unsaved dumps have value -1
@@ -144,6 +145,26 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 		fd_btnImportCycleTime.left = new FormAttachment(lblDiagram, 5);
 		btnImportCycleTime.setLayoutData(fd_btnImportCycleTime);
 		btnImportCycleTime.setText("Import Cycle Time");
+		
+		/*
+		 * Define track params button
+		 */
+		Button btnDefineTruckParams = new Button(this, SWT.NONE);
+		btnDefineTruckParams.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				TruckParameterDialog dialog = new TruckParameterDialog(getShell());
+				if (Window.OK == dialog.open()) {
+					//TODO implementation
+				}
+			}
+		});
+		btnImportCycleTime.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
+		FormData fd_btnDefineTruckParams = new FormData();
+		fd_btnDefineTruckParams.top = new FormAttachment(lblDiagram, 0, SWT.TOP);
+		fd_btnDefineTruckParams.left = new FormAttachment(btnImportCycleTime, 5);
+		btnDefineTruckParams.setLayoutData(fd_btnDefineTruckParams);
+		btnDefineTruckParams.setText("Define Truck Params");
 		
 		Label lblAllDumps = new Label(this, SWT.NONE);
 		lblAllDumps.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));

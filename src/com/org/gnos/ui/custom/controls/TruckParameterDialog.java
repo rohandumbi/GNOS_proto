@@ -6,6 +6,8 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
@@ -23,9 +25,10 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.core.ProjectConfigutration;
+import com.org.gnos.db.model.TruckPrameterData;
 import com.org.gnos.services.ProcessRoute;
 
-public class ImportCycleTimeDialog extends Dialog {
+public class TruckParameterDialog extends Dialog {
 
 	//private ProcessDefinitionFormScreen processDefinitionFormScreen;
 	private ProcessRoute definedProcessRoute;
@@ -45,8 +48,13 @@ public class ImportCycleTimeDialog extends Dialog {
 	private Label labelScreenName;
 	private Map<String, String> fixedFieldMap;
 	
-	public ImportCycleTimeDialog(Shell parentShell) {
+	private TruckPrameterData truckParameterData;
+	private ProjectConfigutration projectInstance;
+	
+	public TruckParameterDialog(Shell parentShell) {
 		super(parentShell);
+		this.projectInstance = ProjectConfigutration.getInstance();
+		this.truckParameterData = this.projectInstance.getTruckParameterData();
 	}
 	@Override
 	protected Control createDialogArea(Composite parent) {
@@ -56,19 +64,54 @@ public class ImportCycleTimeDialog extends Dialog {
 		
 		labelScreenName = new Label(this.container, SWT.NONE);
 		labelScreenName.setForeground(SWTResourceManager.getColor(0, 191, 255));
-		labelScreenName.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		//labelScreenName.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		FormData fd_labelScreenName = new FormData();
 		fd_labelScreenName.top = new FormAttachment(0, 10);
 		fd_labelScreenName.left = new FormAttachment(0, 10);
 		labelScreenName.setLayoutData(fd_labelScreenName);
 		labelScreenName.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.BOLD));
-		labelScreenName.setText("Cycle Time Data Mapping Dialog");
+		labelScreenName.setText("Truck Parameter Definition Dialog");
 		
+		this.initializeFixedCostForm();
 		this.initializeGridContainers();
 		this.refreshGrids();
 		
-		this.container.getShell().setText("Cycle Time Details");
+		this.container.getShell().setText("Truck Parameter Details");
 		return this.container;
+	}
+	
+	private void initializeFixedCostForm(){
+		Label labelFixedTime = new Label(this.container, SWT.NONE);
+		FormData fd_labelFixedTime = new FormData();
+		fd_labelFixedTime.top = new FormAttachment(8);
+		fd_labelFixedTime.left = new FormAttachment(labelScreenName, 0, SWT.LEFT);
+		labelFixedTime.setLayoutData(fd_labelFixedTime);
+		labelFixedTime.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.BOLD));
+		labelFixedTime.setText("Fixed Time: ");
+		
+		final Text textFixedTime = new Text(this.container, SWT.BORDER);
+		FormData fd_textFixedTime = new FormData();
+		fd_textFixedTime.top = new FormAttachment(8);
+		fd_textFixedTime.left = new FormAttachment(labelFixedTime, 0, SWT.RIGHT);
+		fd_textFixedTime.right = new FormAttachment(labelFixedTime, 50, SWT.RIGHT);
+		textFixedTime.setLayoutData(fd_textFixedTime);
+		textFixedTime.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.BOLD));
+		
+		int fixedTime = this.truckParameterData.getFixedTime();
+		if(fixedTime > 0){
+			textFixedTime.setText(String.valueOf(fixedTime));
+		}
+		textFixedTime.addModifyListener(new ModifyListener(){
+			public void modifyText(ModifyEvent event) {
+				//TODO implement handler
+				String text = textFixedTime.getText();
+				if(!text.isEmpty()){
+					truckParameterData.setFixedTime(Integer.valueOf(text));
+				}else{
+					truckParameterData.setFixedTime(0);
+				}
+			}
+		});
 	}
 	
 	private void initializeGridContainers(){
@@ -77,9 +120,9 @@ public class ImportCycleTimeDialog extends Dialog {
 		 */
 		this.scGridContainer1 = new ScrolledComposite(this.container, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 		FormData fd_scGridContainer1 = new FormData(500,500);// temp hack else size of scrolled composite keeps on increasing
-		fd_scGridContainer1.top = new FormAttachment(5);
+		fd_scGridContainer1.top = new FormAttachment(15);
 		fd_scGridContainer1.left = new FormAttachment(labelScreenName, 0, SWT.LEFT);
-		fd_scGridContainer1.bottom = new FormAttachment(25, -10);
+		fd_scGridContainer1.bottom = new FormAttachment(50, -10);
 		fd_scGridContainer1.right = new FormAttachment(100, -35);
 		
 		this.scGridContainer1.setExpandHorizontal(true);
@@ -92,7 +135,7 @@ public class ImportCycleTimeDialog extends Dialog {
 		/*
 		 * 2
 		 */
-		this.scGridContainer2 = new ScrolledComposite(this.container, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		/*this.scGridContainer2 = new ScrolledComposite(this.container, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 		FormData fd_scGridContainer2 = new FormData(500,500);// temp hack else size of scrolled composite keeps on increasing
 		fd_scGridContainer2.top = new FormAttachment(scGridContainer1, 5, SWT.BOTTOM);
 		fd_scGridContainer2.left = new FormAttachment(labelScreenName, 0, SWT.LEFT);
@@ -104,12 +147,12 @@ public class ImportCycleTimeDialog extends Dialog {
 		this.scGridContainer2.setLayoutData(fd_scGridContainer2);
 		
 		Rectangle r2 = this.scGridContainer1.getClientArea();
-		this.scGridContainer1.setMinSize(this.scGridContainer1.computeSize(SWT.DEFAULT, r2.height, true));
+		this.scGridContainer1.setMinSize(this.scGridContainer1.computeSize(SWT.DEFAULT, r2.height, true));*/
 		
 		/*
 		 * 3 
 		 */
-		this.scGridContainer3 = new ScrolledComposite(this.container, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		/*this.scGridContainer3 = new ScrolledComposite(this.container, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 		FormData fd_scGridContainer3 = new FormData(500,500);// temp hack else size of scrolled composite keeps on increasing
 		fd_scGridContainer3.top = new FormAttachment(scGridContainer2, 5, SWT.BOTTOM);
 		fd_scGridContainer3.left = new FormAttachment(labelScreenName, 0, SWT.LEFT);
@@ -121,12 +164,12 @@ public class ImportCycleTimeDialog extends Dialog {
 		this.scGridContainer3.setLayoutData(fd_scGridContainer3);
 		
 		Rectangle r3 = this.scGridContainer3.getClientArea();
-		this.scGridContainer3.setMinSize(this.scGridContainer3.computeSize(SWT.DEFAULT, r3.height, true));
+		this.scGridContainer3.setMinSize(this.scGridContainer3.computeSize(SWT.DEFAULT, r3.height, true));*/
 		
 		/*
 		 * 4
 		 */
-		this.scGridContainer4 = new ScrolledComposite(this.container, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		/*this.scGridContainer4 = new ScrolledComposite(this.container, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 		FormData fd_scGridContainer4 = new FormData(500,500);// temp hack else size of scrolled composite keeps on increasing
 		fd_scGridContainer4.top = new FormAttachment(scGridContainer3, 5, SWT.BOTTOM);
 		fd_scGridContainer4.left = new FormAttachment(labelScreenName, 0, SWT.LEFT);
@@ -138,7 +181,7 @@ public class ImportCycleTimeDialog extends Dialog {
 		this.scGridContainer4.setLayoutData(fd_scGridContainer4);
 		
 		Rectangle r4 = this.scGridContainer4.getClientArea();
-		this.scGridContainer4.setMinSize(this.scGridContainer4.computeSize(SWT.DEFAULT, r4.height, true));
+		this.scGridContainer4.setMinSize(this.scGridContainer4.computeSize(SWT.DEFAULT, r4.height, true));*/
 	}
 	
 	public void refreshGrids(){
@@ -148,7 +191,7 @@ public class ImportCycleTimeDialog extends Dialog {
 		this.cycleTimeFixedFieldGrid = new CycleTimeFixedFieldGrid(scGridContainer1, SWT.None);
 		this.scGridContainer1.setContent(this.cycleTimeFixedFieldGrid);
 		
-		if(this.cycleTimeDumpFieldGrid != null){
+		/*if(this.cycleTimeDumpFieldGrid != null){
 			this.cycleTimeDumpFieldGrid.dispose();
 		}
 		this.cycleTimeDumpFieldGrid = new CycleTimeDumpFieldGrid(scGridContainer2, SWT.None);
@@ -164,7 +207,7 @@ public class ImportCycleTimeDialog extends Dialog {
 			this.cycleTimeChildProcessFieldGrid.dispose();
 		}
 		this.cycleTimeChildProcessFieldGrid = new CycleTimeChildProcessFieldGrid(scGridContainer4, SWT.None);
-		this.scGridContainer4.setContent(this.cycleTimeChildProcessFieldGrid);
+		this.scGridContainer4.setContent(this.cycleTimeChildProcessFieldGrid);*/
 	}
 
 	@Override

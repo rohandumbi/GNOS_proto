@@ -54,16 +54,16 @@ public class ProjectConfigutration {
 
 	private boolean newProject = true;
 	private Map<String, String> savedRequiredFieldMapping;
-	
+
 	/* Tracking existing cycle time data for the project instance */
 	private ArrayList<String> existingCycleTimeFixedFields = new ArrayList<String>();
 	private ArrayList<String> existingCycleTimeDumpFields = new ArrayList<String>();
 	private ArrayList<String> existingCycleTimeStockpileFields = new ArrayList<String>();
 	private ArrayList<String> existingCycleTimeProcessFields = new ArrayList<String>();
-	
+
 	/* Tracking existing truck param data for project instance */
 	private ArrayList<String> existingTruckParamMaterials = new ArrayList<String>(); 
-	
+
 	private int projectId = -1;
 
 	public static ProjectConfigutration getInstance() {
@@ -90,7 +90,7 @@ public class ProjectConfigutration {
 		pitGroupList = new ArrayList<PitGroup>();
 		dumpList = new ArrayList<Dump>();
 		stockPileList = new ArrayList<Stockpile>();
-		
+
 		loadFieldData();
 		loadFieldMappingData();
 		loadExpressions();
@@ -191,7 +191,7 @@ public class ProjectConfigutration {
 		loadProducts();
 		loadProductJoins();
 	}
-	
+
 	public List<Pit> getPitList() {
 		if(pitList != null && this.pitList.size() > 0) return this.pitList;
 		this.pitList = new ArrayList<Pit>();
@@ -205,7 +205,7 @@ public class ProjectConfigutration {
 				Connection conn = DBManager.getConnection();
 				Statement stmt = conn.createStatement();
 				ResultSet rs = stmt.executeQuery(sql);
-			) {
+				) {
 
 			while (rs.next()) {
 				String pit_name = rs.getString(1);
@@ -220,7 +220,7 @@ public class ProjectConfigutration {
 
 		return this.pitList;
 	}
-	
+
 	public List<String> getBenchNamesAssociatedWithPit(String pitName) {
 		List<String> associatedBenchNames = new ArrayList<String>();
 		String bench_rl_name = this.getRequiredFieldMapping().get("bench_rl");
@@ -232,7 +232,7 @@ public class ProjectConfigutration {
 				Connection conn = DBManager.getConnection();
 				Statement stmt = conn.createStatement();
 				ResultSet rs = stmt.executeQuery(sql);
-			) {
+				) {
 
 			while (rs.next()) {
 				String bench_name = rs.getString(1);
@@ -251,13 +251,13 @@ public class ProjectConfigutration {
 	public void loadProcessTree() {
 		String sql = "select model_id, parent_model_id from process_route_defn where project_id = "
 				+ this.projectId + " order by model_id ";
-		
+
 		Map<String, Node> nodes = new HashMap<String, Node>();
 		try (
 				Connection conn = DBManager.getConnection();
 				Statement stmt = conn.createStatement();
 				ResultSet rs =stmt.executeQuery(sql);
-			){
+				){
 
 			while (rs.next()) {
 				int modelId = rs.getInt(1);
@@ -302,7 +302,7 @@ public class ProjectConfigutration {
 				Connection conn = DBManager.getConnection();
 				Statement stmt = conn.createStatement();
 				ResultSet rs =stmt.executeQuery(sql);
-			){
+				){
 
 			while (rs.next()) {
 				int modelId = rs.getInt(1);
@@ -316,7 +316,7 @@ public class ProjectConfigutration {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 	public void loadProcessJoins() {
 		String sql = "select name, child_model_id from process_join_defn where project_id = " + this.projectId + " order by name ";
@@ -357,7 +357,7 @@ public class ProjectConfigutration {
 			}
 		}
 	}
-	
+
 	public void loadProducts() {
 		String sql = "select distinct a.name, associated_model_id, child_expression_id, b.id, b.name, b.value from product_defn a, grade b where a.project_id = "
 				+ this.projectId +" and b.product_name = a.name" + " and b.project_id="+ this.projectId + " order by a.name, b.id asc";
@@ -411,11 +411,11 @@ public class ProjectConfigutration {
 			}
 		}
 	}
-	
+
 	public void loadProductJoins() {
 		String sql = "select distinct name, child_product_name, child_product_join_name from product_join_defn where project_id = "+ this.projectId  +
 				" and ( child_product_name is not null  or child_product_join_name is not null ) order by child_product_name desc";
-		
+
 		String grade_sql = "select distinct id, name from product_join_grade_name_mapping where project_id = "+ this.projectId  +
 				" and product_join_name = ?  order by id asc";
 
@@ -424,17 +424,17 @@ public class ProjectConfigutration {
 				Statement stmt = conn.createStatement();
 				ResultSet rs = stmt.executeQuery(sql);
 				PreparedStatement pstmt = conn.prepareStatement(grade_sql);
-			){
-			
+				){
+
 			while(rs.next()){
 				String productJoinName = rs.getString(1);
 				ProductJoin productJoin = this.getProductJoinByName(productJoinName);
 				if(productJoin == null){
 					productJoin = new ProductJoin(productJoinName);
 					this.productJoinList.add(productJoin);
-					
+
 					// Add grade to product join .. but there must be a better place to do this
-					
+
 					ResultSet rs1 = null;
 					try {
 						pstmt.setString(1, productJoinName);
@@ -453,21 +453,21 @@ public class ProjectConfigutration {
 							System.err.println("Failed to close resultset. "+sqle.getMessage());
 						}
 					}
-					
+
 				}
 				String childProductName = rs.getString(2);
 				if(childProductName != null) {
 					Product product = this.getProductByName(childProductName);
 					productJoin.addProduct(product);
 				}
-				
+
 				String childProductJoinName = rs.getString(3);
 				if(childProductJoinName != null) {
 					ProductJoin childProductJoin = this.getProductJoinByName(childProductJoinName);
 					productJoin.addProductJoin(childProductJoin);
 				}
 			}
-			
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -480,9 +480,9 @@ public class ProjectConfigutration {
 				Connection conn = DBManager.getConnection();
 				Statement stmt = conn.createStatement();
 				ResultSet rs = stmt.executeQuery(sql);
-				
-			){
-			
+
+				){
+
 			while(rs.next()){
 				int id = rs.getInt(1);
 				String name = rs.getString(2);
@@ -501,14 +501,14 @@ public class ProjectConfigutration {
 					pitGroup.addPitGroup(this.getPitGroupfromName(child_pitgroup_name));
 				}
 				//pitGroupList.add(pitGroup);
-		
+
 			}
-			
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void loadDumps() {
 		String sql = "select id, project_id, dumpType, name, expression, pitgroup_name, has_capacity, capacity from dump_pit_mapping where project_id = "+ this.projectId +" order by id asc ";
 
@@ -516,8 +516,8 @@ public class ProjectConfigutration {
 				Connection conn = DBManager.getConnection();
 				Statement stmt = conn.createStatement();
 				ResultSet rs = stmt.executeQuery(sql);
-				
-			){
+
+				){
 			int count = 1;
 			while(rs.next()){
 				int id = rs.getInt(1);
@@ -540,12 +540,12 @@ public class ProjectConfigutration {
 				count ++;
 				this.dumpList.add(dump);
 			}
-			
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void loadStockpiles() {
 		String sql = "select id, project_id, stockpileType, name, expression, pitgroup_name, has_capacity, capacity, is_reclaim from stockpile_pit_mapping where project_id = "+ this.projectId +" order by id asc ";
 
@@ -553,8 +553,8 @@ public class ProjectConfigutration {
 				Connection conn = DBManager.getConnection();
 				Statement stmt = conn.createStatement();
 				ResultSet rs = stmt.executeQuery(sql);
-				
-			){
+
+				){
 			int count = 1;
 			while(rs.next()){
 				int id = rs.getInt(1);
@@ -579,19 +579,19 @@ public class ProjectConfigutration {
 				count ++;
 				this.stockPileList.add(stockpile);
 			}
-			
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void loadCycleTimeData(){
 		loadCycleTimeFixedFieldMappingData();
 		loadCycleTimeDumpFieldMappingData();
 		loadCycleTimeStockpileFieldMappingData();
 		loadCycleTimeProcessFieldMappingData();
 	}
-	
+
 	private void loadCycleTimeFixedFieldMappingData() {
 		String sql = "select field_name, mapped_field_name from cycletime_fixed_field_mapping where project_id = "
 				+ this.projectId;
@@ -623,7 +623,7 @@ public class ProjectConfigutration {
 			}
 		}
 	}
-	
+
 	private void loadCycleTimeDumpFieldMappingData() {
 		String sql = "select field_name, mapped_field_name from cycletime_dump_field_mapping where project_id = "
 				+ this.projectId;
@@ -655,7 +655,7 @@ public class ProjectConfigutration {
 			}
 		}
 	}
-	
+
 	private void loadCycleTimeStockpileFieldMappingData() {
 		String sql = "select field_name, mapped_field_name from cycletime_stockpile_field_mapping where project_id = "
 				+ this.projectId;
@@ -687,7 +687,7 @@ public class ProjectConfigutration {
 			}
 		}
 	}
-	
+
 	private void loadCycleTimeProcessFieldMappingData() {
 		String sql = "select field_name, mapped_field_name from cycletime_process_field_mapping where project_id = "
 				+ this.projectId;
@@ -719,12 +719,12 @@ public class ProjectConfigutration {
 			}
 		}
 	}
-	
+
 	private void loadTruckParameters(){
 		loadTruckParamMaterialPayloadMapping();
 		loadTruckParamterFixedTime();
 	}
-	
+
 	private void loadTruckParamMaterialPayloadMapping(){
 		String sql = "select material_name, payload from truckparam_material_payload_mapping where project_id = "
 				+ this.projectId;
@@ -756,7 +756,7 @@ public class ProjectConfigutration {
 			}
 		}
 	}
-	
+
 	private void loadTruckParamterFixedTime(){
 		String sql = "select fixed_time from truckparam_fixed_time where project_id = "
 				+ this.projectId;
@@ -786,7 +786,7 @@ public class ProjectConfigutration {
 			}
 		}
 	}
-	
+
 	public void save() {
 		saveFieldData();
 		saveRequiredFieldMappingData();
@@ -917,10 +917,10 @@ public class ProjectConfigutration {
 
 	public void saveExpressionData() {
 		ExpressionDAO expressiondao = new ExpressionDAO();
-			for (Expression expression : expressions) {
-				if (expression.getId() == -1) {
+		for (Expression expression : expressions) {
+			if (expression.getId() == -1) {
 				expressiondao.create(expression);
-				} else {
+			} else {
 				expressiondao.update(expression);
 			}
 
@@ -1039,11 +1039,11 @@ public class ProjectConfigutration {
 
 	public void saveProcesses() {
 		List<Process> processes = this.getProcessList();
-		
+
 		if(processes.size() < 1){ 
 			return;
 		}
-		
+
 		Connection conn = DBManager.getConnection();
 		String delete_sql = " delete from process where project_id = "+ this.projectId;
 		String insert_sql = " insert into process (project_id, model_id, process_no) values (?, ?, ?)";
@@ -1053,7 +1053,7 @@ public class ProjectConfigutration {
 
 		try{
 			autoCommit = conn.getAutoCommit();
-			
+
 			stmt = conn.createStatement();
 			stmt.executeUpdate(delete_sql);
 			conn.setAutoCommit(false);	
@@ -1081,7 +1081,7 @@ public class ProjectConfigutration {
 			}
 		}
 	}
-	
+
 	public void saveProcessJoins() {
 		Connection conn = DBManager.getConnection();
 		String insert_sql = " insert into process_join_defn (project_id, name, child_model_id) values (?, ?, ?)";
@@ -1122,7 +1122,7 @@ public class ProjectConfigutration {
 			}
 		}
 	}
-	
+
 	public void saveProductJoins() {
 		Connection conn = DBManager.getConnection();
 		String insert_sql = " insert into product_join_defn (project_id, name, child_product_name, child_product_join_name) values (?, ?, ?, ?)";
@@ -1140,7 +1140,7 @@ public class ProjectConfigutration {
 			conn.setAutoCommit(false);
 			pstmt = conn.prepareStatement(insert_sql);
 			pstmt1 = conn.prepareStatement(insert_grade_sql);
-			
+
 			for(ProductJoin productJoin : this.productJoinList) {
 				String productJoinName = productJoin.getName();
 				List<Product> childProducts = productJoin.getlistChildProducts();
@@ -1174,7 +1174,7 @@ public class ProjectConfigutration {
 					}
 				}
 			}
-			
+
 			conn.commit();
 		}catch (SQLException e) {
 			e.printStackTrace();
@@ -1190,7 +1190,7 @@ public class ProjectConfigutration {
 			}
 		}
 	}
-	
+
 	public void saveProducts() {
 		Connection conn = DBManager.getConnection();
 		String insert_sql = " insert into product_defn (project_id, name, associated_model_id, child_expression_id) values (?, ?, ?, ?)";
@@ -1208,11 +1208,11 @@ public class ProjectConfigutration {
 			conn.setAutoCommit(false);
 			pstmt = conn.prepareStatement(insert_sql);
 			pstmt1 = conn.prepareStatement(insert_grade_sql);
-			
+
 			for(Product product : this.productList){
 				String productName = product.getName();
 				int modelId = product.getAssociatedProcess().getId();
-				
+
 				for(Expression expression : product.getListOfExpressions()){
 					int expId = expression.getId();
 					pstmt.setInt(1, this.projectId);
@@ -1250,7 +1250,7 @@ public class ProjectConfigutration {
 			}
 		}
 	}
-	
+
 
 	public void savePitGroups() {
 		String insert_sql = "insert into pitgroup_pit_mapping ( project_id , name, child_pit_name, child_pitgroup_name) values ( ? , ?, ?, ?) ";
@@ -1258,10 +1258,10 @@ public class ProjectConfigutration {
 		try (
 				Connection conn = DBManager.getConnection();
 				PreparedStatement pstmt = conn.prepareStatement(insert_sql);
-				
-			){
+
+				){
 			for(PitGroup pitGroup: pitGroupList) {
-				
+
 				if(pitGroup.getId() == -1){//unsaved pit group
 					for(Pit pit: pitGroup.getListChildPits()){
 						pstmt.setInt(1, projectId);
@@ -1279,7 +1279,7 @@ public class ProjectConfigutration {
 					}
 				}
 			}
-			
+
 		} catch (SQLException e) {
 			System.err.println("Failed saving pit groups. "+e.getMessage());
 		}
@@ -1291,7 +1291,7 @@ public class ProjectConfigutration {
 				Connection conn = DBManager.getConnection();
 				PreparedStatement pstmt1 = conn.prepareStatement(insert_sql);
 				PreparedStatement pstmt2 = conn.prepareStatement(update_sql);
-			){
+				){
 			int count = 1;
 			for(Dump dump : dumpList) {
 				if(dump.getId() == -1){
@@ -1316,12 +1316,12 @@ public class ProjectConfigutration {
 				dump.setDumpNumber(count);				
 				count++;
 			}
-			
+
 		} catch (SQLException e) {
 			System.err.println("Failed saving dump data. "+e.getMessage());
 		}
 	}
-	
+
 	public void saveStockpiles() {
 		String insert_sql = "insert into stockpile_pit_mapping ( project_id , stockpileType, name, expression, pitgroup_name, has_capacity, capacity, is_reclaim) values ( ? , ?, ?, ?, ?, ?, ?, ?)";
 		String update_sql = "update stockpile_pit_mapping set stockpileType= ? , name = ?, expression = ?, pitgroup_name = ?, has_capacity = ?, capacity = ?, is_reclaim = ? where id = ?";
@@ -1329,7 +1329,7 @@ public class ProjectConfigutration {
 				Connection conn = DBManager.getConnection();
 				PreparedStatement pstmt1 = conn.prepareStatement(insert_sql);
 				PreparedStatement pstmt2 = conn.prepareStatement(update_sql);
-			){
+				){
 			int count = 1;
 			for(Stockpile stockpile : stockPileList) {
 				if(stockpile.getId() == -1){
@@ -1356,19 +1356,19 @@ public class ProjectConfigutration {
 				stockpile.setStockpileNumber(count);				
 				count++;
 			}
-			
+
 		} catch (SQLException e) {
 			System.err.println("Failed saving dump data. "+e.getMessage());
 		}
 	}
-	
+
 	public void saveCycleTimeData(){
 		saveCycleTimeFixedFieldData();
 		saveCycleTimeDumpFieldData();
 		saveCycleTimeStockpileFieldData();
 		saveCycleTimeProcessFieldData();
 	}
-	
+
 	public void saveCycleTimeFixedFieldData() {
 
 		/*if (this.newProject) {
@@ -1421,7 +1421,7 @@ public class ProjectConfigutration {
 		}
 
 	}
-	
+
 	public void saveCycleTimeDumpFieldData() {
 
 		Connection conn = DBManager.getConnection();
@@ -1471,7 +1471,7 @@ public class ProjectConfigutration {
 		}
 
 	}
-	
+
 	public void saveCycleTimeStockpileFieldData() {
 
 		Connection conn = DBManager.getConnection();
@@ -1521,7 +1521,7 @@ public class ProjectConfigutration {
 		}
 
 	}
-	
+
 	public void saveCycleTimeProcessFieldData() {
 
 		Connection conn = DBManager.getConnection();
@@ -1571,11 +1571,64 @@ public class ProjectConfigutration {
 		}
 
 	}
-	
+
 	public void saveTruckParameterData(){
+		saveTruckParameterFixedTime();
 		saveTruckParamMaterialPayloadData();
 	}
-	
+
+	public void saveTruckParameterFixedTime(){
+		String sql = "select count(*) from truckparam_fixed_time where project_id = "
+				+ this.projectId;
+		String insert_sql = " insert into truckparam_fixed_time (project_id, fixed_time) values (?, ?)";
+		String update_sql = " update truckparam_fixed_time set fixed_time = ? where project_id = ? ";
+		PreparedStatement insertPstmt = null;
+		PreparedStatement updatePstmt = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		Connection conn = DBManager.getConnection();
+		boolean isFixedTimeSavedInDB = false;
+
+		try {
+			stmt = conn.createStatement();
+			stmt.execute(sql);
+			rs = stmt.getResultSet();
+			insertPstmt = conn.prepareStatement(insert_sql);
+			updatePstmt = conn.prepareStatement(update_sql);
+			while (rs.next()) {
+				if(rs.getInt(1) > 0){
+					isFixedTimeSavedInDB = true;
+				}
+			}
+			if(isFixedTimeSavedInDB == true){
+				updatePstmt.setInt(1, this.truckParameterData.getFixedTime());
+				updatePstmt.setInt(2, projectId);
+				updatePstmt.executeUpdate();
+			}else{
+				insertPstmt.setInt(1, projectId);
+				insertPstmt.setInt(2, this.truckParameterData.getFixedTime());
+				insertPstmt.executeUpdate();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (stmt != null)
+					stmt.close();
+				if (insertPstmt != null)
+					insertPstmt.close();
+				if (updatePstmt != null)
+					updatePstmt.close();
+				if (rs != null)
+					rs.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
 	private void saveTruckParamMaterialPayloadData(){
 		Connection conn = DBManager.getConnection();
 		String insert_sql = " insert into truckparam_material_payload_mapping (project_id, material_name, payload) values (?, ?, ?)";
@@ -1623,7 +1676,7 @@ public class ProjectConfigutration {
 			}
 		}
 	}
-	
+
 	public Expression getExpressionById(int expressionId) {
 		for (Expression expression : expressions) {
 			if (expression.getId() == expressionId) {
@@ -1685,7 +1738,7 @@ public class ProjectConfigutration {
 		}
 		return null;
 	}
-	
+
 	public ProductJoin getProductJoinByName(String name) {
 		if (name == null)
 			return null;
@@ -1754,7 +1807,7 @@ public class ProjectConfigutration {
 		}
 		return null;
 	}
-	
+
 	public PitGroup getPitGroupfromName(String name) {
 
 		for(PitGroup pg : this.pitGroupList){
@@ -1785,7 +1838,7 @@ public class ProjectConfigutration {
 	}
 
 	public List<Process> getProcessList() {
-		
+
 		Map<String, Process> existingProcess = new HashMap<String, Process>();
 		for(Process process: this.processList){
 			existingProcess.put(process.getModel().getName(), process);
@@ -1809,7 +1862,7 @@ public class ProjectConfigutration {
 		return processList;
 	}
 
-	
+
 	public List<ProcessJoin> getProcessJoins() {
 		return processJoins;
 	}
@@ -1817,11 +1870,11 @@ public class ProjectConfigutration {
 	public void setProcessJoins(List<ProcessJoin> processJoins) {
 		this.processJoins = processJoins;
 	}
-	
+
 	public void addProcessJoin(ProcessJoin processJoin) {
 		this.processJoins.add(processJoin);
 	}
-	
+
 	public List<Product> getProductList() {
 		return productList;
 	}
@@ -1837,7 +1890,7 @@ public class ProjectConfigutration {
 	public List<ProductJoin> getProductJoinList() {
 		return productJoinList;
 	}
-	
+
 	public List<ProductJoin> getProductJoinWithGrades() {
 		List<ProductJoin> productJoinWithGrades = new ArrayList<ProductJoin>();
 		for(ProductJoin pj: productJoinList){
@@ -1847,7 +1900,7 @@ public class ProjectConfigutration {
 		}
 		return productJoinWithGrades;
 	}
-	
+
 	public List<ProductJoin> getProductJoinOfProductsList() {
 		List<ProductJoin> productJoinOfProducts = new ArrayList<ProductJoin>();
 		for(ProductJoin pj: productJoinList){
@@ -1857,7 +1910,7 @@ public class ProjectConfigutration {
 		}
 		return productJoinOfProducts;
 	}
-	
+
 	public List<ProductJoin> getProductJoinOfProductsJoinsList() {
 		List<ProductJoin> productJoinOfProductJoins = new ArrayList<ProductJoin>();
 		for(ProductJoin pj: productJoinList){
@@ -1899,5 +1952,5 @@ public class ProjectConfigutration {
 	public void setTruckParameterData(TruckPrameterData truckParameterData) {
 		this.truckParameterData = truckParameterData;
 	}
-	
+
 }
