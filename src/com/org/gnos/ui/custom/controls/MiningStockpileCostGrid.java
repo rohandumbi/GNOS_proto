@@ -26,6 +26,7 @@ import com.org.gnos.db.model.ProcessConstraintData;
 import com.org.gnos.db.model.Scenario;
 import com.org.gnos.db.model.StockpileReclaimingCost;
 import com.org.gnos.db.model.StockpilingCost;
+import com.org.gnos.db.model.TruckHourCost;
 import com.org.gnos.db.model.WasteMiningCost;
 import com.org.gnos.services.TimePeriod;
 
@@ -42,7 +43,7 @@ public class MiningStockpileCostGrid extends Composite {
 	private Scenario scenario;
 	private Label firstSeparator;
 	private Label lblClassification;
-	private String[] costCategories = new String[]{"Ore mining cost", "Waste mining cost", "Stockpile cost", "Stockpile reclaiming cost"};
+	private String[] costCategories = new String[]{"Ore mining cost", "Waste mining cost", "Stockpile cost", "Stockpile reclaiming cost", "Truck hour cost"};
 	private FixedOpexCost[] existingFixedOpexCost;
 
 	public MiningStockpileCostGrid(Composite parent, int style, Scenario scenario) {
@@ -126,7 +127,7 @@ public class MiningStockpileCostGrid extends Composite {
 	
 	private void addRows(){
 		FixedOpexCost fixedOpexCost = null;
-		for(int i=0; i<4; i++){
+		for(int i=0; i<5; i++){
 			Color backgroundColor = SWTResourceManager.getColor(SWT.COLOR_WHITE);
 			if((i%2 != 0)){
 				backgroundColor =  SWTResourceManager.getColor(245, 245, 245);
@@ -142,6 +143,8 @@ public class MiningStockpileCostGrid extends Composite {
 					fixedOpexCost = new StockpilingCost();
 				}else if(i==3){
 					fixedOpexCost = new StockpileReclaimingCost();
+				}else if(i==4){
+					fixedOpexCost = new TruckHourCost();
 				}
 				fixedOpexCost.setScenarioId(scenario.getId());
 				this.existingFixedOpexCost[i] = fixedOpexCost;

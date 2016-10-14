@@ -27,6 +27,7 @@ import com.org.gnos.db.model.ProcessJoin;
 import com.org.gnos.db.model.Scenario;
 import com.org.gnos.db.model.StockpileReclaimingCost;
 import com.org.gnos.db.model.StockpilingCost;
+import com.org.gnos.db.model.TruckHourCost;
 import com.org.gnos.db.model.WasteMiningCost;
 
 public class ScenarioConfigutration {
@@ -34,7 +35,7 @@ public class ScenarioConfigutration {
 	final static ScenarioConfigutration instance = new ScenarioConfigutration();
 
 	private List<OpexData> opexDataList = new ArrayList<OpexData>();
-	private FixedOpexCost[] fixedCost = new FixedOpexCost[4];// fixed opex cost has 4 fixed categories
+	private FixedOpexCost[] fixedCost = new FixedOpexCost[5];// fixed opex cost has 5 fixed categories
 	private List<ProcessJoin> processJoins = new ArrayList<ProcessJoin>();
 	private List<ProcessConstraintData> processConstraintDataList = new ArrayList<ProcessConstraintData>();
 	private List<GradeConstraintData> gradeConstraintDataList = new ArrayList<GradeConstraintData>();
@@ -127,7 +128,7 @@ public class ScenarioConfigutration {
 	public void loadFixedCost() {
 		String sql = "select cost_head, year, value, value from fixedcost_year_mapping where scenario_id = "
 				+ this.scenarioId + " order by cost_head";
-		fixedCost = new FixedOpexCost[4];
+		fixedCost = new FixedOpexCost[5];
 		Statement stmt = null;
 		ResultSet rs = null;
 		Connection conn = DBManager.getConnection();
@@ -149,6 +150,8 @@ public class ScenarioConfigutration {
 						fixedOpexCost = new StockpilingCost();
 					} else if (costHead == 3) {
 						fixedOpexCost = new StockpileReclaimingCost();
+					} else if (costHead == 4) {
+						fixedOpexCost = new TruckHourCost();
 					}
 					fixedCost[costHead] = fixedOpexCost;
 				}

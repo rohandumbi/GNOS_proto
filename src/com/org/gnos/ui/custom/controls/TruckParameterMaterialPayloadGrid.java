@@ -34,16 +34,13 @@ public class TruckParameterMaterialPayloadGrid extends Composite {
 	private List<Expression> allSourceFields;
 	private Composite compositeGridHeader;
 	private List<Composite> allRows;
-	private Composite parent;
 	private Map<String, Integer> materialPayloadMap;
 	private Composite presentRow;
 	
 	public TruckParameterMaterialPayloadGrid(Composite parent, int style) {
 		super(parent, style);
-		this.parent = parent;
 		ProjectConfigutration projectInstance = ProjectConfigutration.getInstance();
 		this.materialPayloadMap = projectInstance.getTruckParameterData().getMaterialPayloadMap();
-		//this.requiredFieldNames = requiredFieldNames;
 		this.allSourceFields = projectInstance.getExpressions();
 		this.allRows = new ArrayList<>();
 		this.createContent(parent);
@@ -117,15 +114,6 @@ public class TruckParameterMaterialPayloadGrid extends Composite {
 		fd_compositeRow.left = new FormAttachment(presentRow, 0, SWT.LEFT);
 		compositeRow.setLayoutData(fd_compositeRow);
 
-		/*Label lblRqrdFieldName = new Label(compositeRow, SWT.NONE);
-		lblRqrdFieldName.setBackground(backgroundColor);
-		
-		FormData fd_lblRqrdFieldName = new FormData();
-		fd_lblRqrdFieldName.top = new FormAttachment(0);
-		fd_lblRqrdFieldName.left = new FormAttachment(0, 10);
-		lblRqrdFieldName.setLayoutData(fd_lblRqrdFieldName);
-		lblRqrdFieldName.setText(key);*/
-		
 		final Combo comboSourceField = new Combo(compositeRow, SWT.NONE);
 		comboSourceField.setItems(this.getSourceFieldComboItems());
 		FormData fd_comboSourceField = new FormData();
