@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ModifyEvent;
@@ -36,17 +37,17 @@ public class TruckParameterDialog extends Dialog {
 	private String associatedPitGroupName;
 	
 	private ScrolledComposite scGridContainer1;
-	private ScrolledComposite scGridContainer2;
-	private ScrolledComposite scGridContainer3;
-	private ScrolledComposite scGridContainer4;
+	//private ScrolledComposite scGridContainer2;
+	//private ScrolledComposite scGridContainer3;
+	//private ScrolledComposite scGridContainer4;
 	
-	private CycleTimeFixedFieldGrid cycleTimeFixedFieldGrid;
-	private CycleTimeDumpFieldGrid cycleTimeDumpFieldGrid;
-	private CycleTimeStockpileFieldGrid cycleTimeStockpileFieldGrid;
-	private CycleTimeChildProcessFieldGrid cycleTimeChildProcessFieldGrid;
+	private TruckParameterMaterialPayloadGrid truckParameterMaterialPayloadGrid;
+	//private CycleTimeDumpFieldGrid cycleTimeDumpFieldGrid;
+	//private CycleTimeStockpileFieldGrid cycleTimeStockpileFieldGrid;
+	//private CycleTimeChildProcessFieldGrid cycleTimeChildProcessFieldGrid;
 	private Composite container;
 	private Label labelScreenName;
-	private Map<String, String> fixedFieldMap;
+	//private Map<String, String> fixedFieldMap;
 	
 	private TruckPrameterData truckParameterData;
 	private ProjectConfigutration projectInstance;
@@ -132,6 +133,25 @@ public class TruckParameterDialog extends Dialog {
 		Rectangle r1 = this.scGridContainer1.getClientArea();
 		this.scGridContainer1.setMinSize(this.scGridContainer1.computeSize(SWT.DEFAULT, r1.height, true));
 		
+		Button btnAddRowToMaterial = new Button(this.container, SWT.NONE);
+		FormData fd_btnAddRowToMaterial = new FormData();
+		fd_btnAddRowToMaterial.top = new FormAttachment(this.scGridContainer1, 0, SWT.TOP);
+		fd_btnAddRowToMaterial.left = new FormAttachment(this.scGridContainer1, 5, SWT.RIGHT);
+		btnAddRowToMaterial.setLayoutData(fd_btnAddRowToMaterial);
+		btnAddRowToMaterial.setText("+");
+		btnAddRowToMaterial.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				truckParameterMaterialPayloadGrid.addRow();
+				Rectangle r = truckParameterMaterialPayloadGrid.getClientArea();
+				int gridWidth = r.width;
+				
+				int scrollableHeight = scGridContainer1.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).y;
+				Point point = new Point(gridWidth, scrollableHeight);
+				scGridContainer1.setMinSize(point);
+			}
+		});
+		
 		/*
 		 * 2
 		 */
@@ -185,11 +205,11 @@ public class TruckParameterDialog extends Dialog {
 	}
 	
 	public void refreshGrids(){
-		if(this.cycleTimeFixedFieldGrid != null){
-			this.cycleTimeFixedFieldGrid.dispose();
+		if(this.truckParameterMaterialPayloadGrid != null){
+			this.truckParameterMaterialPayloadGrid.dispose();
 		}
-		this.cycleTimeFixedFieldGrid = new CycleTimeFixedFieldGrid(scGridContainer1, SWT.None);
-		this.scGridContainer1.setContent(this.cycleTimeFixedFieldGrid);
+		this.truckParameterMaterialPayloadGrid = new TruckParameterMaterialPayloadGrid(scGridContainer1, SWT.None);
+		this.scGridContainer1.setContent(this.truckParameterMaterialPayloadGrid);
 		
 		/*if(this.cycleTimeDumpFieldGrid != null){
 			this.cycleTimeDumpFieldGrid.dispose();
