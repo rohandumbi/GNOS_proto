@@ -29,6 +29,7 @@ import com.org.gnos.db.model.ProcessJoin;
 import com.org.gnos.db.model.Product;
 import com.org.gnos.db.model.ProductJoin;
 import com.org.gnos.db.model.Stockpile;
+import com.org.gnos.db.model.TruckPrameterData;
 import com.org.gnos.services.PitBenchProcessor;
 
 public class ProjectConfigutration {
@@ -49,17 +50,20 @@ public class ProjectConfigutration {
 	private List<Stockpile> stockPileList = new ArrayList<Stockpile>();
 	private List<Pit> pitList = new ArrayList<Pit>();
 	private CycleTimeData cycleTimeData = new CycleTimeData();
+	private TruckPrameterData truckParameterData = new TruckPrameterData();
 
 	private boolean newProject = true;
 	private Map<String, String> savedRequiredFieldMapping;
 	
+	/* Tracking existing cycle time data for the project instance */
 	private ArrayList<String> existingCycleTimeFixedFields = new ArrayList<String>();
 	private ArrayList<String> existingCycleTimeDumpFields = new ArrayList<String>();
 	private ArrayList<String> existingCycleTimeStockpileFields = new ArrayList<String>();
 	private ArrayList<String> existingCycleTimeProcessFields = new ArrayList<String>();
 	
-	//private
-
+	/* Tracking existing truck param data for project instance */
+	private ArrayList<String> existingTruckParamMaterials = new ArrayList<String>(); 
+	
 	private int projectId = -1;
 
 	public static ProjectConfigutration getInstance() {
@@ -96,6 +100,7 @@ public class ProjectConfigutration {
 		loadDumps();
 		loadStockpiles();
 		loadCycleTimeData();
+		loadTruckParameters();
 	}
 
 	private void loadFieldData() {
@@ -715,6 +720,73 @@ public class ProjectConfigutration {
 		}
 	}
 	
+	private void loadTruckParameters(){
+		loadTruckParamMaterialPayloadMapping();
+		loadTruckParamterFixedTime();
+	}
+	
+	private void loadTruckParamMaterialPayloadMapping(){
+		String sql = "select material_name, payload from truckparam_material_payload_mapping where project_id = "
+				+ this.projectId;
+		Statement stmt = null;
+		ResultSet rs = null;
+		Connection conn = DBManager.getConnection();
+		Map<String, Integer> materialPayloadMap = this.truckParameterData.getMaterialPayloadMap();
+
+		try {
+			stmt = conn.createStatement();
+			stmt.execute(sql);
+			rs = stmt.getResultSet();
+			while (rs.next()) {
+				existingTruckParamMaterials.add(rs.getString(1));
+				materialPayloadMap.put(rs.getString(1), rs.getInt(2));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (stmt != null)
+					stmt.close();
+				if (rs != null)
+					rs.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	private void loadTruckParamterFixedTime(){
+		String sql = "select fixed_time from truckparam_fixed_time where project_id = "
+				+ this.projectId;
+		Statement stmt = null;
+		ResultSet rs = null;
+		Connection conn = DBManager.getConnection();
+
+		try {
+			stmt = conn.createStatement();
+			stmt.execute(sql);
+			rs = stmt.getResultSet();
+			while (rs.next()) {
+				truckParameterData.setFixedTime(rs.getInt(1));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (stmt != null)
+					stmt.close();
+				if (rs != null)
+					rs.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	public void save() {
 		saveFieldData();
 		saveRequiredFieldMappingData();
@@ -728,6 +800,7 @@ public class ProjectConfigutration {
 		saveDumps();
 		saveStockpiles();
 		saveCycleTimeData();
+		saveTruckParameterData();
 	}
 
 	public void saveFieldData() {
@@ -1499,6 +1572,58 @@ public class ProjectConfigutration {
 
 	}
 	
+	public void saveTruckParameterData(){
+		saveTruckParamMaterialPayloadData();
+	}
+	
+	private void saveTruckParamMaterialPayloadData(){
+		Connection conn = DBManager.getConnection();
+		String insert_sql = " insert into truckparam_material_payload_mapping (project_id, material_name, payload) values (?, ?, ?)";
+		String update_sql = " update truckparam_material_payload_mapping set payload = ? where project_id = ? AND material_name = ? ";
+		PreparedStatement insertPstmt = null;
+		PreparedStatement updatePstmt = null;
+		boolean autoCommit = true;
+
+		try {
+			autoCommit = conn.getAutoCommit();
+			conn.setAutoCommit(false);
+			insertPstmt = conn.prepareStatement(insert_sql);
+			updatePstmt = conn.prepareStatement(update_sql);
+			Map<String, Integer> materialPayloadMap = this.truckParameterData.getMaterialPayloadMap();
+			Set keys = materialPayloadMap.keySet();
+			Iterator<String> it = keys.iterator();
+			while (it.hasNext()) {
+				String key = it.next();
+				if(existingTruckParamMaterials.contains(key)){
+					updatePstmt.setInt(1, materialPayloadMap.get(key));
+					updatePstmt.setInt(2, projectId);
+					updatePstmt.setString(3, key);
+					updatePstmt.executeUpdate();
+				}else{
+					insertPstmt.setInt(1, projectId);
+					insertPstmt.setString(2, key);
+					insertPstmt.setInt(3, materialPayloadMap.get(key));
+					insertPstmt.executeUpdate();
+				}
+			}
+			conn.commit();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				conn.setAutoCommit(autoCommit);
+				if (insertPstmt != null)
+					insertPstmt.close();
+				if (updatePstmt != null)
+					updatePstmt.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	public Expression getExpressionById(int expressionId) {
 		for (Expression expression : expressions) {
 			if (expression.getId() == expressionId) {
@@ -1765,6 +1890,14 @@ public class ProjectConfigutration {
 
 	public void setCycleTimeData(CycleTimeData cycleTimeData) {
 		this.cycleTimeData = cycleTimeData;
+	}
+
+	public TruckPrameterData getTruckParameterData() {
+		return truckParameterData;
+	}
+
+	public void setTruckParameterData(TruckPrameterData truckParameterData) {
+		this.truckParameterData = truckParameterData;
 	}
 	
 }

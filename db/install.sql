@@ -373,3 +373,20 @@ CREATE TABLE cycletime_process_field_mapping(
    mapped_field_name VARCHAR(100) NOT NULL,
    UNIQUE KEY ( project_id, field_name )
 );
+
+DROP TABLE IF EXISTS truckparam_material_payload_mapping;
+
+CREATE TABLE truckparam_material_payload_mapping(
+   project_id INT NOT NULL,
+   material_name VARCHAR(100) NOT NULL,
+   payload INT NOT NULL,
+   UNIQUE KEY ( project_id, material_name )
+);
+
+DROP TABLE IF EXISTS truckparam_fixed_time;
+
+CREATE TABLE truckparam_fixed_time(
+   project_id INT NOT NULL,
+   fixed_time INT NOT NULL,
+   UNIQUE KEY ( project_id )
+);
