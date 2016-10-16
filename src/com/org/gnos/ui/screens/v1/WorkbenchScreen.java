@@ -224,7 +224,7 @@ public class WorkbenchScreen extends GnosScreen {
 		gnosStepBenchConstraintsDefinitionLabel.setLayoutData(fd_gnosStepBenchConstraintsDefinitionLabel);
 		gnosStepBenchConstraintsDefinitionLabel.registerEventListener(this);
 		
-		gnosPitDependencyLabel = new GnosConfigurationStepLabel(this, SWT.NONE, "Pit Dependency");
+		gnosPitDependencyLabel = new GnosConfigurationStepLabel(this, SWT.NONE, "Pit and Dump Dependency");
 		FormData fd_gnosPitDependencyLabel = new FormData();
 		fd_gnosPitDependencyLabel.bottom = new FormAttachment(gnosStepBenchConstraintsDefinitionLabel, 40, SWT.BOTTOM);
 		fd_gnosPitDependencyLabel.right = new FormAttachment(label, -6);
@@ -360,7 +360,7 @@ public class WorkbenchScreen extends GnosScreen {
 		}else if(e.eventName == "Bench Constraint Definition"){
 			selectStepLabel(gnosStepBenchConstraintsDefinitionLabel);
 			mainConfigurationViewPort.loadBenchConstraintDefinitionScreen();
-		}else if(e.eventName == "Pit Dependency"){
+		}else if(e.eventName == "Pit and Dump Dependency"){
 			selectStepLabel(gnosPitDependencyLabel);
 			mainConfigurationViewPort.loadPitDependencyScreen();
 		}else if(e.eventName == "Capex Definition"){

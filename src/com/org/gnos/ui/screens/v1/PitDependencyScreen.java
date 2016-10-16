@@ -1,35 +1,37 @@
 package com.org.gnos.ui.screens.v1;
 
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Text;
-
-import com.org.gnos.core.ScenarioConfigutration;
-import com.org.gnos.events.GnosEvent;
-import com.org.gnos.ui.custom.controls.GnosScreen;
-import com.org.gnos.ui.custom.controls.PitBenchConstraintGrid;
-import com.org.gnos.ui.custom.controls.PitDependencyGrid;
-
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.FormLayout;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
+
+import com.org.gnos.core.ScenarioConfigutration;
+import com.org.gnos.events.GnosEvent;
+import com.org.gnos.ui.custom.controls.DumpDependencyGrid;
+import com.org.gnos.ui.custom.controls.GnosScreen;
+import com.org.gnos.ui.custom.controls.PitDependencyGrid;
 
 public class PitDependencyScreen extends GnosScreen {
 
 	private Text textScenarioName;
-	private ScrolledComposite scGridContainer;
+	private ScrolledComposite scGridContainer1;
+	private ScrolledComposite scGridContainer2;
 	private PitDependencyGrid pitDependencyGrid;
+	private DumpDependencyGrid dumpDependencyGrid;
 	private Label labelScreenName;
 	private String scenarioName;
 	private Button btnAddConstraintRow;
+	private Button btnAddDumpRow;
 	/**
 	 * Create the composite.
 	 * @param parent
@@ -57,7 +59,7 @@ public class PitDependencyScreen extends GnosScreen {
 		fd_labelScreenName.left = new FormAttachment(0, 10);
 		labelScreenName.setLayoutData(fd_labelScreenName);
 		labelScreenName.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.BOLD));
-		labelScreenName.setText("Pit Dependency Definition");
+		labelScreenName.setText("Pit and Dump Dependency Definition");
 		
 		Label labelScreenDescription = new Label(this, SWT.NONE);
 		labelScreenDescription.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
@@ -67,7 +69,7 @@ public class PitDependencyScreen extends GnosScreen {
 		fd_labelScreenDescription.left = new FormAttachment(0, 10);
 		//fd_labelScreenDescription.right = new FormAttachment(0, 866);
 		labelScreenDescription.setLayoutData(fd_labelScreenDescription);
-		labelScreenDescription.setText("Define your pit dependencies");
+		labelScreenDescription.setText("Define your pit and dump dependencies");
 		
 		Label lblScenarioName = new Label(this, SWT.NONE);
 		lblScenarioName.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
@@ -89,25 +91,28 @@ public class PitDependencyScreen extends GnosScreen {
 			textScenarioName.setText(this.scenarioName);
 		}
 		
-		this.initializeGridContainer();
-		this.refreshGrid();
+		this.initializeGridContainers();
+		this.refreshGrids();
 		
 	}
 	
-	private void initializeGridContainer(){
-		this.scGridContainer = new ScrolledComposite(this, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		FormData fd_scGridContainer = new FormData(500,500);// temp hack else size of scrolled composite keeps on increasing
-		fd_scGridContainer.top = new FormAttachment(textScenarioName, 10, SWT.BOTTOM);
-		fd_scGridContainer.left = new FormAttachment(labelScreenName, 0, SWT.LEFT);
-		fd_scGridContainer.bottom = new FormAttachment(100, -10);
-		fd_scGridContainer.right = new FormAttachment(100, -35);
+	private void initializeGridContainers(){
+		/*
+		 * 1 
+		 */
+		this.scGridContainer1 = new ScrolledComposite(this, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		FormData fd_scGridContainer1 = new FormData(500,500);// temp hack else size of scrolled composite keeps on increasing
+		fd_scGridContainer1.top = new FormAttachment(textScenarioName, 10, SWT.BOTTOM);
+		fd_scGridContainer1.left = new FormAttachment(labelScreenName, 0, SWT.LEFT);
+		fd_scGridContainer1.bottom = new FormAttachment(40, -10);
+		fd_scGridContainer1.right = new FormAttachment(100, -35);
 		
-		this.scGridContainer.setExpandHorizontal(true);
-		this.scGridContainer.setExpandVertical(true);
-		this.scGridContainer.setLayoutData(fd_scGridContainer);
+		this.scGridContainer1.setExpandHorizontal(true);
+		this.scGridContainer1.setExpandVertical(true);
+		this.scGridContainer1.setLayoutData(fd_scGridContainer1);
 		
-		Rectangle r = this.scGridContainer.getClientArea();
-		this.scGridContainer.setMinSize(this.scGridContainer.computeSize(SWT.DEFAULT, r.height, true));
+		Rectangle r = this.scGridContainer1.getClientArea();
+		this.scGridContainer1.setMinSize(this.scGridContainer1.computeSize(SWT.DEFAULT, r.height, true));
 		
 		
 		this.btnAddConstraintRow = new Button(this, SWT.NONE);
@@ -119,9 +124,9 @@ public class PitDependencyScreen extends GnosScreen {
 				Rectangle r = pitDependencyGrid.getClientArea();
 				int gridWidth = r.width;
 				
-				int scrollableHeight = scGridContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).y;
+				int scrollableHeight = scGridContainer1.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).y;
 				Point point = new Point(gridWidth, scrollableHeight);
-				scGridContainer.setMinSize(point);
+				scGridContainer1.setMinSize(point);
 			}
 		});
 		this.btnAddConstraintRow.setFont(SWTResourceManager.getFont("Segoe UI", 16, SWT.BOLD));
@@ -131,9 +136,48 @@ public class PitDependencyScreen extends GnosScreen {
 		this.btnAddConstraintRow.setLayoutData(fd_btnAddRow);
 		this.btnAddConstraintRow.setText("+");
 		
+		/*
+		 * 2
+		 */
+		this.scGridContainer2 = new ScrolledComposite(this, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		FormData fd_scGridContainer2 = new FormData(500,500);// temp hack else size of scrolled composite keeps on increasing
+		fd_scGridContainer2.top = new FormAttachment(scGridContainer1, 10, SWT.BOTTOM);
+		fd_scGridContainer2.left = new FormAttachment(scGridContainer1, 0, SWT.LEFT);
+		fd_scGridContainer2.bottom = new FormAttachment(80, -10);
+		fd_scGridContainer2.right = new FormAttachment(100, -35);
+		
+		this.scGridContainer2.setExpandHorizontal(true);
+		this.scGridContainer2.setExpandVertical(true);
+		this.scGridContainer2.setLayoutData(fd_scGridContainer2);
+		
+		Rectangle r1 = this.scGridContainer2.getClientArea();
+		this.scGridContainer2.setMinSize(this.scGridContainer1.computeSize(SWT.DEFAULT, r1.height, true));
+		
+		
+		this.btnAddDumpRow = new Button(this, SWT.NONE);
+		this.btnAddDumpRow.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				//TO DO implement row add
+				dumpDependencyGrid.addRow();
+				Rectangle r = dumpDependencyGrid.getClientArea();
+				int gridWidth = r.width;
+				
+				int scrollableHeight = scGridContainer2.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).y;
+				Point point = new Point(gridWidth, scrollableHeight);
+				scGridContainer2.setMinSize(point);
+			}
+		});
+		this.btnAddDumpRow.setFont(SWTResourceManager.getFont("Segoe UI", 16, SWT.BOLD));
+		FormData fd_btnAddDumpRow = new FormData();
+		fd_btnAddDumpRow.top = new FormAttachment(scGridContainer2, 0, SWT.TOP);
+		fd_btnAddDumpRow.right = new FormAttachment(100, -5);
+		this.btnAddDumpRow.setLayoutData(fd_btnAddDumpRow);
+		this.btnAddDumpRow.setText("+");
+		
 	}
 	
-	public void refreshGrid(){
+	public void refreshGrids(){
 		this.scenarioName = ScenarioConfigutration.getInstance().getName();
 		if(this.scenarioName != null){
 			this.textScenarioName.setText(this.scenarioName);
@@ -142,8 +186,14 @@ public class PitDependencyScreen extends GnosScreen {
 		if(this.pitDependencyGrid != null){
 			this.pitDependencyGrid.dispose();
 		}
-		this.pitDependencyGrid = new PitDependencyGrid(scGridContainer, SWT.None);
-		this.scGridContainer.setContent(this.pitDependencyGrid);
+		this.pitDependencyGrid = new PitDependencyGrid(scGridContainer1, SWT.None);
+		this.scGridContainer1.setContent(this.pitDependencyGrid);
+		
+		if(this.dumpDependencyGrid != null){
+			this.dumpDependencyGrid.dispose();
+		}
+		this.dumpDependencyGrid = new DumpDependencyGrid(scGridContainer2, SWT.None);
+		this.scGridContainer2.setContent(this.dumpDependencyGrid);
 	}
 	
 	@Override
