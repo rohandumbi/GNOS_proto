@@ -85,42 +85,32 @@ public class DumpDependencyGrid extends Composite {
 		return comboItems;
 	}
 	
-	private String getDescription(String firstPit, String firstPitAssociatedBench, String dependentPit, String dependentPitPitAssociatedBench, String minLead, String maxLead){
+	private String getDescription(String firstPit, String firstDump, String dependentDump){
 		String description = null;
-		if(firstPitAssociatedBench == null){
-			firstPitAssociatedBench = "";
-		}
-		if(dependentPitPitAssociatedBench == null){
-			dependentPitPitAssociatedBench = "";
-		}
-		if((firstPit==null)||(dependentPit==null)||(firstPit.equals(""))||(dependentPit.equals(""))){
+		boolean firstPitEmpty = ((firstPit == null) || firstPit.isEmpty());
+		boolean firstDumpEmpty = ((firstDump == null) || firstDump.isEmpty());
+		
+		if((firstPitEmpty && firstDumpEmpty) || (dependentDump.equals(""))){
 			return "";
-		}else if((minLead.equals("-1")) && (maxLead.equals("-1"))){
-			description = firstPit + "/" + firstPitAssociatedBench + " will be totally mined before " + dependentPit + "/" + dependentPitPitAssociatedBench + " is started.";
-		}else if(maxLead.equals("-1")){
-			description = firstPit + "/" + firstPitAssociatedBench + " will be mined atleast " + minLead + " benches ahead of " + dependentPit + "/" + dependentPitPitAssociatedBench;
-		}else if(minLead.equals("-1")){
-			description = firstPit + "/" + firstPitAssociatedBench + " will be mined atmost " + maxLead + " benches ahead of " + dependentPit + "/" + dependentPitPitAssociatedBench;
-		}else if(!(minLead.equals("-1")) && !(maxLead.equals("-1"))){
-			description = firstPit + "/" + firstPitAssociatedBench + " will be mined atleast " + minLead + " benches ahead of " + dependentPit + "/" + dependentPitPitAssociatedBench + " AND " + firstPit + "/" + firstPitAssociatedBench + " will be mined atmost " + maxLead + " benches ahead of " + dependentPit + "/" + dependentPitPitAssociatedBench;
+		}else if(firstPitEmpty){
+			description = firstDump + " will be completely filled before " + dependentDump + " will be started";
+		}else if(firstDumpEmpty){
+			description = firstPit + " will be completely mined before " + dependentDump + " will be started";
 		}
 		return description;
 	}
 	
 	private void updateRowDescription(Composite rowComposite){
-		/*PitDependencyData pitDependencyData = (PitDependencyData)rowComposite.getData();
-		String firstPit = pitDependencyData.getFirstPitName();
-		String firstPitAssociatedBench = pitDependencyData.getFirstPitAssociatedBench();
-		String dependentPit = pitDependencyData.getDependentPitName();
-		String dependentPitAssociatedBench = pitDependencyData.getDependentPitAssociatedBench();
-		String minLead = String.valueOf(pitDependencyData.getMinLead());
-		String maxLead = String.valueOf(pitDependencyData.getMaxLead());
+		DumpDependencyData dumpDependencyData = (DumpDependencyData)rowComposite.getData();
+		String firstPit = dumpDependencyData.getFirstPitName();
+		String firstDump = dumpDependencyData.getFirstDumpName();
+		String dependentDump = dumpDependencyData.getDependentDumpName();
 		
-		String description = getDescription(firstPit, firstPitAssociatedBench, dependentPit, dependentPitAssociatedBench, minLead, maxLead);
-		Text textDescription = (Text)rowComposite.getChildren()[7];
+		String description = getDescription(firstPit, firstDump, dependentDump);
+		Text textDescription = (Text)rowComposite.getChildren()[4];
 		if(description != null){
 			textDescription.setText(description);
-		}*/
+		}
 	}
 
 	private void createHeader(){
@@ -204,50 +194,6 @@ public class DumpDependencyGrid extends Composite {
 		fd_fifthSeparator.left = new FormAttachment(FIFTH_SEPARATOR_POSITION);
 		fifthSeparator.setLayoutData(fd_fifthSeparator);
 		
-		/*Label lblMinLead = new Label(compositeGridHeader, SWT.NONE);
-		lblMinLead.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
-		FormData fd_lblMinLead = new FormData();
-		fd_lblMinLead.top = new FormAttachment(0,2);
-		fd_lblMinLead.left = new FormAttachment(fifthSeparator, 20);
-		lblMinLead.setLayoutData(fd_lblMinLead);
-		lblMinLead.setText("Min Lead");
-		lblMinLead.setBackground(SWTResourceManager.getColor(230, 230, 230));
-		
-		sixthSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
-		FormData fd_sixthSeparator = new FormData();
-		fd_sixthSeparator.left = new FormAttachment(lblMinLead, 20);
-		sixthSeparator.setLayoutData(fd_sixthSeparator);
-		
-		Label lblMaxLead = new Label(compositeGridHeader, SWT.NONE);
-		lblMaxLead.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
-		FormData fd_lblMaxLead = new FormData();
-		fd_lblMaxLead.top = new FormAttachment(0,2);
-		fd_lblMaxLead.left = new FormAttachment(sixthSeparator, 20);
-		lblMaxLead.setLayoutData(fd_lblMaxLead);
-		lblMaxLead.setText("Max Lead");
-		lblMaxLead.setBackground(SWTResourceManager.getColor(230, 230, 230));
-		
-		seventhSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
-		FormData fd_seventhSeparator = new FormData();
-		fd_seventhSeparator.left = new FormAttachment(lblMaxLead, 20);
-		seventhSeparator.setLayoutData(fd_seventhSeparator);
-		
-		Label lblDescription = new Label(compositeGridHeader, SWT.NONE);
-		lblDescription.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
-		FormData fd_lblDescription = new FormData();
-		fd_lblDescription.top = new FormAttachment(0,2);
-		fd_lblDescription.left = new FormAttachment(seventhSeparator, 200);
-		lblDescription.setLayoutData(fd_lblDescription);
-		lblDescription.setText("Description");
-		lblDescription.setBackground(SWTResourceManager.getColor(230, 230, 230));
-		
-		eigthSeparator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
-		FormData fd_eigthSeparator = new FormData();
-		fd_eigthSeparator.left = new FormAttachment(lblDescription, 200);
-		eigthSeparator.setLayoutData(fd_eigthSeparator);*/
-		
-		
-		
 		this.presentRow = this.compositeGridHeader;//referring to the header as the 1st row when there are no rows inserted yet
 
 	}
@@ -290,7 +236,7 @@ public class DumpDependencyGrid extends Composite {
 		comboFirstPits.setLayoutData(fd_comboFirstPits);
 		
 		final Combo comboFirstDumps = new Combo(compositeRow, SWT.NONE);
-		comboFirstPits.setItems(this.getDumps());
+		comboFirstDumps.setItems(this.getDumps());
 		String firstDumpNameName = dumpDependencyData.getFirstDumpName();
 		FormData fd_comboFirstDumps = new FormData();
 		fd_comboFirstDumps.left = new FormAttachment(SECOND_SEPARATOR_POSITION, 2);
@@ -320,9 +266,6 @@ public class DumpDependencyGrid extends Composite {
 				comboFirstPits.setItems(getPits());
 				comboFirstPits.getParent().layout();
 				comboFirstPits.setListVisible(true);
-				//dumpDependencyData.setFirstPitName("");
-				//dumpDependencyData.setFirstDumpName(null);
-				//updateRowDescription(compositeRow);
 			}
 		});
 
@@ -332,7 +275,6 @@ public class DumpDependencyGrid extends Composite {
 				dumpDependencyData.setFirstPitName(selectedPitName);
 				dumpDependencyData.setFirstDumpName(null);
 				comboFirstDumps.setText("");
-				//comboAssociatedFirstPitBenches.setItems(getBenchesForPitName(selectedPitName));
 				updateRowDescription(compositeRow);
 			}
 		});
@@ -345,15 +287,11 @@ public class DumpDependencyGrid extends Composite {
 				comboFirstDumps.setItems(getDumps());
 				comboFirstDumps.getParent().layout();
 				comboFirstDumps.setListVisible(true);
-				//dumpDependencyData.setFirstPitName("");
-				//dumpDependencyData.setFirstDumpName(null);
-				//updateRowDescription(compositeRow);
 			}
 		});
 		
-		comboFirstDumps.addListener(SWT.MouseDown, new Listener(){
-			@Override
-			public void handleEvent(Event event) {
+		comboFirstDumps.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
 				String selectedDumpName = comboFirstDumps.getText();
 				dumpDependencyData.setFirstPitName(null);
 				dumpDependencyData.setFirstDumpName(selectedDumpName);
@@ -363,16 +301,8 @@ public class DumpDependencyGrid extends Composite {
 			}
 		});
 		
-		/*comboAssociatedFirstPitBenches.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				String selectedBenchName = comboAssociatedFirstPitBenches.getText();
-				pitDependencyData.setFirstPitAssociatedBench(selectedBenchName);
-				updateRowDescription(compositeRow);
-			}
-		});*/
-		
 		final Combo comboDependentDumps = new Combo(compositeRow, SWT.NONE);
-		comboDependentDumps.setItems(this.getPits());
+		comboDependentDumps.setItems(this.getDumps());
 		String dependentDumpName  = dumpDependencyData.getDependentDumpName();
 		FormData fd_comboDependentDumps = new FormData();
 		fd_comboDependentDumps.left = new FormAttachment(THIRD_SEPARATOR_POSITION, 2);
@@ -384,6 +314,33 @@ public class DumpDependencyGrid extends Composite {
 		}else{
 			comboDependentDumps.setText("Select Dependent Dump");
 		}
+		comboDependentDumps.addListener(SWT.MouseDown, new Listener(){
+			@Override
+			public void handleEvent(Event event) {
+				// TODO Auto-generated method stub
+				comboDependentDumps.removeAll();
+				comboDependentDumps.setItems(getDumps());
+				comboDependentDumps.getParent().layout();
+				comboDependentDumps.setListVisible(true);
+			}
+		});
+		
+		/*comboDependentDumps.addListener(SWT.MouseDown, new Listener(){
+			@Override
+			public void handleEvent(Event event) {
+				String selectedDumpName = comboDependentDumps.getText();
+				dumpDependencyData.setDependentDumpName(selectedDumpName);
+				updateRowDescription(compositeRow);
+			}
+		});*/
+		
+		comboDependentDumps.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				String selectedDumpName = comboDependentDumps.getText();
+				dumpDependencyData.setDependentDumpName(selectedDumpName);
+				updateRowDescription(compositeRow);
+			}
+		});
 		
 		final Text textDescription = new Text(compositeRow, SWT.BORDER);
 		FormData fd_textDescription = new FormData();

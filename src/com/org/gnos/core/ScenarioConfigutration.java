@@ -485,6 +485,7 @@ public class ScenarioConfigutration {
 		saveGradeConstraintData();
 		saveBenchConstraintData();
 		savePitDependencyList();
+		saveDumpDependencyList();
 		saveCapexData();
 	}
 
@@ -767,6 +768,68 @@ public class ScenarioConfigutration {
 					int id = rs.getInt(1);
 					pdd.setId(id);
 				}
+			}
+
+			conn.commit();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				conn.setAutoCommit(autoCommit);
+				if (pstmt != null)
+					pstmt.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public void saveDumpDependencyList() {
+		Connection conn = DBManager.getConnection();
+		String insert_sql = "insert into dump_dependency_defn (scenario_id, in_use, first_pit_name, first_dump_name, dependent_dump_name) values (?, ?, ?, ?, ?)";
+		String update_sql = " update dump_dependency_defn set in_use = ? , first_pit_name = ?, first_dump_name = ?, dependent_dump_name = ?  where id = ? and scenario_id = ?" ;
+		PreparedStatement pstmt = null;
+		PreparedStatement pstmt1 = null;
+		ResultSet rs = null;
+		boolean autoCommit = true;
+
+		try {
+			autoCommit = conn.getAutoCommit();
+			conn.setAutoCommit(false);
+			pstmt = conn.prepareStatement(insert_sql,
+					Statement.RETURN_GENERATED_KEYS);
+			pstmt1 = conn.prepareStatement(update_sql,
+					Statement.RETURN_GENERATED_KEYS);
+
+			for(DumpDependencyData ddd : this.dumpDependencyDataList) {
+				if (ddd.getId() > 0){
+					//update to come
+					//pstmt1.setInt(1, this.scenarioId);
+					pstmt1.setBoolean(1, ddd.isInUse());
+					pstmt1.setString(2, ddd.getFirstPitName());
+					pstmt1.setString(3, ddd.getFirstDumpName());
+					pstmt1.setString(4, ddd.getDependentDumpName());
+					pstmt1.setInt(5, ddd.getId());
+					pstmt1.setInt(6, this.scenarioId);
+					pstmt1.executeUpdate();
+				}else{
+					pstmt.setInt(1, this.scenarioId);
+					pstmt.setBoolean(2, ddd.isInUse());
+					pstmt.setString(3, ddd.getFirstPitName());
+					pstmt.setString(4, ddd.getFirstDumpName());
+					pstmt.setString(5, ddd.getDependentDumpName());
+					pstmt.executeUpdate();
+					rs = pstmt.getGeneratedKeys();
+
+					if (rs.next()){
+						int id = rs.getInt(1);
+						ddd.setId(id);
+					}
+				}
+				//pstmt.setInt(1, this.projectConfiguration.getProjectId());
 			}
 
 			conn.commit();
