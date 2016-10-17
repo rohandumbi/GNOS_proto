@@ -2,6 +2,7 @@ package com.org.gnos.equation;
 
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -53,7 +54,7 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 			Bench lastBench = null;
 			for(Bench bench: benches){
 				List<String> variables = getAllVariablesForBench(bench);
-				float tonnesWt = getBenchTonnesWt(bench);
+				BigDecimal tonnesWt = getBenchTonnesWt(bench);
 				
 				for(int i=1; i<= timePeriod; i++){
 					StringBuffer sb1= new StringBuffer();
@@ -70,8 +71,7 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 					          if(lastBench != null){
 					        	  sb2.append(" +"+variable);
 					          }
-					      }
-						
+					      }						
 					}
 					if(lastBench != null){
 						//float lastBenchTonnesWeight = getBenchTonnesWt(lastBench);
@@ -83,10 +83,7 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 					if(lastBench != null){
 						write(sb2.toString().substring(2));
 					}
-				}
-				
-
-				
+				}		
 				lastBench = bench;				
 			}
 		}
@@ -163,11 +160,11 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 		return variables;
 	}
 	
-	private float getBenchTonnesWt(Bench bench){
-		float tonnesWt = 0;
+	private BigDecimal getBenchTonnesWt(Bench bench){
+		BigDecimal tonnesWt = new BigDecimal(0);
 		for(Block block:bench.getBlocks()){
 			try{
-				tonnesWt += Float.parseFloat(block.getField(this.tonnesWeightFieldName));
+				tonnesWt = tonnesWt.add(new BigDecimal(block.getField(this.tonnesWeightFieldName)));
 			} catch(NumberFormatException nfe){
 				System.err.println("Could not parse to float :"+nfe.getMessage());
 			}

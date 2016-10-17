@@ -1,14 +1,12 @@
 package com.org.gnos.db.dao;
 
 import static com.org.gnos.db.dao.util.DAOUtil.prepareStatement;
-import static com.org.gnos.db.dao.util.DAOUtil.toSqlTimeStamp;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import com.org.gnos.core.ProjectConfigutration;
