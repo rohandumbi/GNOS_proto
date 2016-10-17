@@ -313,6 +313,19 @@ CREATE TABLE pit_dependency_defn(
    unique key(scenario_id, first_pit_name, first_pit_bench_name, dependent_pit_name, dependent_pit_bench_name, min_lead, max_lead)
 );
 
+DROP TABLE IF EXISTS dump_dependency_defn; 
+
+CREATE TABLE dump_dependency_defn(
+   id INT NOT NULL AUTO_INCREMENT,
+   scenario_id INT NOT NULL,
+   in_use TINYINT NOT NULL default 1,
+   first_pit_name  VARCHAR(50),
+   first_dump_name  VARCHAR(50),
+   dependent_dump_name  VARCHAR(50) NOT NULL,
+   PRIMARY KEY ( id ),
+   unique key(scenario_id, id)
+);
+
 
 DROP TABLE IF EXISTS capex_data; 
 

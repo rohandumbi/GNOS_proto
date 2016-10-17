@@ -14,6 +14,7 @@ import com.org.gnos.db.DBManager;
 import com.org.gnos.db.dao.ScenarioDAO;
 import com.org.gnos.db.model.CapexData;
 import com.org.gnos.db.model.CapexInstance;
+import com.org.gnos.db.model.DumpDependencyData;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.FixedOpexCost;
 import com.org.gnos.db.model.GradeConstraintData;
@@ -41,6 +42,7 @@ public class ScenarioConfigutration {
 	private List<GradeConstraintData> gradeConstraintDataList = new ArrayList<GradeConstraintData>();
 	private List<PitBenchConstraintData> pitBenchConstraintDataList = new ArrayList<PitBenchConstraintData>();
 	private List<PitDependencyData> pitDependencyDataList = new ArrayList<PitDependencyData>();
+	private List<DumpDependencyData> dumpDependencyDataList = new ArrayList<DumpDependencyData>();
 	private ArrayList<CapexData> capexDataList = new ArrayList<CapexData>();
 	private Scenario scenarioData ;
 
@@ -69,6 +71,7 @@ public class ScenarioConfigutration {
 		loadGradeConstraintData();
 		loadBenchConstraintData();
 		loadPitDependencyData();
+		loadDumpDependencyData();
 		loadCapexData();
 	}
 
@@ -336,6 +339,47 @@ public class ScenarioConfigutration {
 					pdd.setMinLead(rs.getInt(7));
 					pdd.setMaxLead(rs.getInt(8));
 					this.pitDependencyDataList.add(pdd);
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (stmt != null)
+					stmt.close();
+				if (rs != null)
+					rs.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public void loadDumpDependencyData() {
+		this.dumpDependencyDataList = new ArrayList<DumpDependencyData>();
+		String sql = "select id, in_use, first_pit_name, first_dump_name, dependent_dump_name from dump_dependency_defn where scenario_id =" + this.scenarioId + " order by id";
+		Statement stmt = null;
+		ResultSet rs = null;
+		Connection conn = DBManager.getConnection();
+		try {
+			stmt = conn.createStatement();
+			stmt.execute(sql);
+			rs = stmt.getResultSet();
+			DumpDependencyData ddd;
+			while (rs.next()) {
+				int id = rs.getInt(1);
+
+				ddd = getDumpDependencyDataById(id);
+				if (ddd == null) {
+					ddd = new DumpDependencyData();					
+					ddd.setId(id);
+					ddd.setInUse(rs.getBoolean(2));
+					ddd.setFirstPitName(rs.getString(3));
+					ddd.setFirstDumpName(rs.getString(4));
+					ddd.setDependentDumpName(rs.getString(5));
+					this.dumpDependencyDataList.add(ddd);
 				}
 			}
 		} catch (SQLException e) {
@@ -932,6 +976,17 @@ public class ScenarioConfigutration {
 		}
 		return null;
 	}
+	
+	public DumpDependencyData getDumpDependencyDataById(int id) {
+		if (this.dumpDependencyDataList == null)
+			return null;
+		for (DumpDependencyData ddd : this.dumpDependencyDataList) {
+			if (ddd.getId() == id) {
+				return ddd;
+			}
+		}
+		return null;
+	}
 
 	public List<OpexData> getOpexDataList() {
 		return opexDataList;
@@ -1035,4 +1090,14 @@ public class ScenarioConfigutration {
 			return this.scenarioData.getName();
 		}
 	}
+
+	public List<DumpDependencyData> getDumpDependencyDataList() {
+		return dumpDependencyDataList;
+	}
+
+	public void setDumpDependencyDataList(List<DumpDependencyData> dumpDependencyDataList) {
+		this.dumpDependencyDataList = dumpDependencyDataList;
+	}
+	
+	
 }
