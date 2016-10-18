@@ -2,17 +2,14 @@ package com.org.gnos.equation;
 
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.org.gnos.core.Block;
-import com.org.gnos.core.ProjectConfigutration;
-import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Grade;
 import com.org.gnos.db.model.GradeConstraintData;
@@ -96,7 +93,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 			
 			for(int i=1; i<= timePeriod; i++){
 				String eq = "";
-				float targetGrade = gradeConstraintData.getConstraintData().get(startYear+i -1);
+				BigDecimal targetGrade = new BigDecimal(gradeConstraintData.getConstraintData().get(startYear+i -1));
 				if(selectorType == GradeConstraintData.SELECTION_PROCESS_JOIN) {
 					ProcessJoin processJoin = projectConfiguration.getProcessJoinByName(gradeConstraintData.getSelectorName());
 					if(processJoin != null) {
@@ -193,23 +190,24 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 	}
 
 	
-	public String buildGradeConstraintVariables(int processNumber, List<String> coefficients, Grade grade, List<Block> blocks, int period, float targetGrade) {
+	public String buildGradeConstraintVariables(int processNumber, List<String> coefficients, Grade grade, List<Block> blocks, int period, BigDecimal targetGrade) {
 		
 		String eq = "";
 		for(Block block: blocks){		
-			float processRatio = 0;
+			BigDecimal processRatio = new BigDecimal(0);
 			for(String coefficient: coefficients){
 				String expressionName = coefficient.replaceAll("\\s+","_");
-				processRatio += block.getComputedField(expressionName);					
+				processRatio =  processRatio.add(block.getComputedField(expressionName));					
 			}
 
-			if(processRatio == 0) continue;
+			if(processRatio.compareTo(new BigDecimal(0)) == 0) continue;
 			String gradeExpr = grade.getExpression().getName().replaceAll("\\s+","_");
-			float bloackGrade = block.getComputedField(gradeExpr);
-			if(targetGrade > bloackGrade) {
+			BigDecimal blockGrade = block.getComputedField(gradeExpr);
+			if(targetGrade.compareTo(blockGrade) == 1) {
 				eq +=  "+ ";
-			} 
-			eq +=   processRatio*(targetGrade-bloackGrade)+"p"+block.getPitNo()+"x"+block.getBlockNo()+"p"+processNumber+"t"+period;
+			}
+			BigDecimal coeff = processRatio.multiply(targetGrade.subtract(blockGrade));
+			eq +=   coeff+"p"+block.getPitNo()+"x"+block.getBlockNo()+"p"+processNumber+"t"+period;
 		}			
 		return eq;
 	}
