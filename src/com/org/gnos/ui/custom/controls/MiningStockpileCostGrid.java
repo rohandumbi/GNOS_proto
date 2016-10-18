@@ -1,8 +1,7 @@
 package com.org.gnos.ui.custom.controls;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,12 +21,10 @@ import org.eclipse.wb.swt.SWTResourceManager;
 import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.db.model.FixedOpexCost;
 import com.org.gnos.db.model.OreMiningCost;
-import com.org.gnos.db.model.ProcessConstraintData;
 import com.org.gnos.db.model.Scenario;
 import com.org.gnos.db.model.StockpileReclaimingCost;
 import com.org.gnos.db.model.StockpilingCost;
 import com.org.gnos.db.model.WasteMiningCost;
-import com.org.gnos.services.TimePeriod;
 
 public class MiningStockpileCostGrid extends Composite {
 
@@ -178,20 +175,20 @@ public class MiningStockpileCostGrid extends Composite {
 	private void addTimePeriodRowMembers(Composite parent, Control reference){
 		Control previousMember = reference;
 		FixedOpexCost associatedFixedCost = (FixedOpexCost)parent.getData();
-		final Map<Integer, Float> associatedFixedCostData = associatedFixedCost.getCostData();
+		final Map<Integer, BigDecimal> associatedFixedCostData = associatedFixedCost.getCostData();
 		for(int i=0; i<this.scenario.getTimePeriod(); i++){
 			Text yearlyValue = new Text(parent, SWT.BORDER);
 			final int targetYear = this.scenario.getStartYear() + i;
-			Float value = associatedFixedCostData.get(targetYear);
+			BigDecimal value = associatedFixedCostData.get(targetYear);
 			if(value != null){
-				yearlyValue.setText(Float.toString(value));
+				yearlyValue.setText(value.toString());
 			}
 			yearlyValue.addModifyListener(new ModifyListener(){
 				public void modifyText(ModifyEvent event) {
 					// Get the widget whose text was modified
 					Text text = (Text) event.widget;
 					System.out.println("Input value for the " + targetYear + " year is " + text.getText());
-					associatedFixedCostData.put(targetYear, Float.valueOf(text.getText()));
+					associatedFixedCostData.put(targetYear, new BigDecimal(text.getText()));
 				}
 			});
 			FormData fd_yearlyValue = new FormData();

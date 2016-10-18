@@ -1,5 +1,6 @@
 package com.org.gnos.db.model;
 
+import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -11,19 +12,19 @@ public class OpexData {
 	private Expression expression;
 	private boolean inUse;
 	private boolean isRevenue;
-	private LinkedHashMap<Integer, Float> costData;
+	private LinkedHashMap<Integer, BigDecimal> costData;
 	
 	public OpexData(Model model) {
 		super();
 		this.id = -1;
 		this.model = model;
-		this.costData = new LinkedHashMap<Integer, Float>();
+		this.costData = new LinkedHashMap<Integer, BigDecimal>();
 	}
 	
 	public OpexData(){
 		super();
 		this.id = -1;
-		this.costData = new LinkedHashMap<Integer, Float>();
+		this.costData = new LinkedHashMap<Integer, BigDecimal>();
 	}
 	
 	public int getId() {
@@ -57,14 +58,11 @@ public class OpexData {
 	public void setRevenue(boolean isRevenue) {
 		this.isRevenue = isRevenue;
 	}
-	public Map<Integer, Float> getCostData() {
+	public Map<Integer, BigDecimal> getCostData() {
 		return costData;
 	}
-	public void setCostData(LinkedHashMap<Integer, Float> costData) {
-		this.costData = costData;
-	}
 	
-	public void addYear(int year, float value) {
+	public void addYear(int year, BigDecimal value) {
 		this.costData.put(year, value);
 	}
 

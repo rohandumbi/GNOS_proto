@@ -80,19 +80,19 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 	
 	private void buildProcessVariables(Process process, List<Block> blocks, int processNumber) {
 		FixedOpexCost[] fixedOpexCost = scenarioConfigutration.getFixedCost();
-		Map<Integer, Float> oreMiningCostMap = fixedOpexCost[0].getCostData();
+		Map<Integer, BigDecimal> oreMiningCostMap = fixedOpexCost[0].getCostData();
 		Set<Integer> keys = oreMiningCostMap.keySet();
 		int count = 1;
 		for(int year: keys){
-			float miningcost = oreMiningCostMap.get(year);
+			BigDecimal miningcost = oreMiningCostMap.get(year);
 			
 			for(Block block: blocks) {
-				float processValue = getProcessValue(block, process.getModel(), year);
-				float value = processValue - miningcost;
-				value = (float) (value * (1 / Math.pow ((1 + discount_rate), count)));
+				BigDecimal processValue = getProcessValue(block, process.getModel(), year);
+				BigDecimal value = processValue.subtract(miningcost);
+				value = (value.multiply(new BigDecimal(1 / Math.pow ((1 + discount_rate), count))));
 				String variable = "p"+block.getPitNo()+"x"+block.getBlockNo()+"p"+processNumber+"t"+count;
-				String eq = " "+value+variable;
-				if(value > 0){
+				String eq = " "+formatDecimalValue(value)+variable;
+				if(value.doubleValue() > 0){
 					eq = " +"+eq;
 				} 
 				write(eq);
@@ -106,17 +106,17 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 	private void buildStockpileVariables(Set<Block> blocks) {
 		FixedOpexCost[] fixedOpexCost = scenarioConfigutration.getFixedCost();
 		if(fixedOpexCost == null || fixedOpexCost.length < 3) return;
-		Map<Integer, Float> oreMiningCostMap = fixedOpexCost[0].getCostData();
-		Map<Integer, Float> stockPilingCostMap = fixedOpexCost[2].getCostData();
+		Map<Integer, BigDecimal> oreMiningCostMap = fixedOpexCost[0].getCostData();
+		Map<Integer, BigDecimal> stockPilingCostMap = fixedOpexCost[2].getCostData();
 		Set<Integer> keys = stockPilingCostMap.keySet();
 		int count = 1;
 		for(int year: keys){
-			float cost = stockPilingCostMap.get(year)+oreMiningCostMap.get(year);			
+			BigDecimal cost = stockPilingCostMap.get(year).add(oreMiningCostMap.get(year));			
 			for(Block block: blocks) {
 				Integer stockpileNumber = this.serviceInstanceData.getPitStockpileMapping().get(block.getPitNo());
 				if(stockpileNumber == null) continue;
 				String variable = "p"+block.getPitNo()+"x"+block.getBlockNo()+"s"+stockpileNumber+"t"+count;
-				String eq = " -"+cost+ variable;
+				String eq = " -"+formatDecimalValue(cost)+ variable;
 				write(eq);
 				
 				serviceInstanceData.addVariable(block, variable);
@@ -130,18 +130,18 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		serviceInstanceData.setWasteBlocks(wasteblocks);
 		FixedOpexCost[] fixedOpexCost = scenarioConfigutration.getFixedCost();
 		if(fixedOpexCost == null || fixedOpexCost.length < 2) return;
-		Map<Integer, Float> wasteMiningCostMap = fixedOpexCost[1].getCostData();
+		Map<Integer, BigDecimal> wasteMiningCostMap = fixedOpexCost[1].getCostData();
 		Set<Integer> keys = wasteMiningCostMap.keySet();
 
 		int count = 1;	
 		for(int year: keys){
-			float cost = wasteMiningCostMap.get(year);		
+			BigDecimal cost = wasteMiningCostMap.get(year);		
 			for(Block block: wasteblocks) {
 				List<Integer> dumps = this.serviceInstanceData.getPitDumpMapping().get(block.getPitNo());
 				if(dumps == null) continue;
 				for(Integer dumpNo: dumps){
 					String variable = "p"+block.getPitNo()+"x"+block.getBlockNo()+"w"+dumpNo+"t"+count;
-					String eq = " -"+cost+variable;
+					String eq = " -"+formatDecimalValue(cost)+variable;
 					write(eq);
 					
 					serviceInstanceData.addVariable(block, variable);
@@ -164,8 +164,8 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 				capexInstanceCount++;
 				for(int i= 1; i <= timeperiod ; i++){
 					String cv = "c"+capexCount+"i"+capexInstanceCount+"t"+i;
-					float value = (float) (ci.getCapexAmount() * (1 / Math.pow ((1 + discount_rate), i)));
-					write(" -"+value+cv);
+					BigDecimal value = new BigDecimal(ci.getCapexAmount() * (1 / Math.pow ((1 + discount_rate), i)));
+					write(" -"+formatDecimalValue(value)+cv);
 				}
 			}
 		}
@@ -263,9 +263,9 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 				if(opexData.isRevenue()){
 					String expressionName = opexData.getExpression().getName().replaceAll("\\s+","_");
 					BigDecimal expr_value = b.getComputedField(expressionName);
-					revenue = revenue.add(expr_value.multiply(new BigDecimal(opexData.getCostData().get(year))));
+					revenue = revenue.add(expr_value.multiply(opexData.getCostData().get(year)));
 				} else {
-					pcost = pcost.add(new BigDecimal(opexData.getCostData().get(year)));
+					pcost = pcost.add(opexData.getCostData().get(year));
 				}
 			}
 		}

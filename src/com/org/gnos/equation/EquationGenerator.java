@@ -2,25 +2,24 @@ package com.org.gnos.equation;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
+import com.org.gnos.core.GNOSConfig;
 import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.core.ScenarioConfigutration;
-import com.org.gnos.db.model.Dump;
 import com.org.gnos.db.model.Pit;
 import com.org.gnos.db.model.PitGroup;
 import com.org.gnos.db.model.Product;
 import com.org.gnos.db.model.ProductJoin;
-import com.org.gnos.db.model.Stockpile;
 
 public abstract class EquationGenerator {
 	
 	static final int BYTES_PER_LINE = 256;
+	private static int DECIMAL_POINT = 6;
 	
 	protected BufferedOutputStream output;
 	protected ProjectConfigutration projectConfiguration;
@@ -30,10 +29,18 @@ public abstract class EquationGenerator {
 	
 	protected int bytesWritten = 0;
 	
+	static {
+		String dp_format = GNOSConfig.get("format.dp");
+		if(dp_format!= null && dp_format.trim().length()>0){
+			DECIMAL_POINT = Integer.parseInt(dp_format);
+		}
+		System.out.println("DP value is "+DECIMAL_POINT);
+	}
+	
 	public EquationGenerator(InstanceData data) {
 		this.serviceInstanceData = data;
 		this.projectConfiguration = ProjectConfigutration.getInstance();
-		this.scenarioConfigutration = ScenarioConfigutration.getInstance();
+		this.scenarioConfigutration = ScenarioConfigutration.getInstance();		
 	}
 
 
@@ -70,6 +77,11 @@ public abstract class EquationGenerator {
 			 processes.addAll(getProcessListFromProductJoin(childJoin));
 		 }
 		 return processes;
+	}
+	
+	protected String formatDecimalValue(BigDecimal bd) {
+		BigDecimal a =  bd.setScale(DECIMAL_POINT , BigDecimal.ROUND_HALF_EVEN);
+		return a.stripTrailingZeros().toString();
 	}
 	
 	protected void write(String s) {

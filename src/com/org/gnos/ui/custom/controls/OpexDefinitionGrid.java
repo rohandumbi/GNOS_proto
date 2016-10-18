@@ -1,5 +1,6 @@
 package com.org.gnos.ui.custom.controls;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -346,7 +347,7 @@ public class OpexDefinitionGrid extends Composite {
 	private void addTimePeriodRowMembers(final Composite parent, Control reference){
 		Control previousMember = reference;
 		final OpexData associatedOpexData = (OpexData)parent.getData();
-		final Map<Integer, Float> constraintData = associatedOpexData.getCostData();
+		final Map<Integer, BigDecimal> constraintData = associatedOpexData.getCostData();
 		boolean isNewOpexData = (associatedOpexData.getId() == -1);
 		for(int i=0; i<this.scenario.getTimePeriod(); i++){
 			Text yearlyValue = new Text(parent, SWT.BORDER);
@@ -360,7 +361,7 @@ public class OpexDefinitionGrid extends Composite {
 				public void modifyText(ModifyEvent event) {
 					// Get the widget whose text was modified
 					Text text = (Text) event.widget;
-					constraintData.put(targetYear, Float.valueOf(text.getText()));
+					constraintData.put(targetYear, new BigDecimal(text.getText()));
 				}
 			});
 			/*

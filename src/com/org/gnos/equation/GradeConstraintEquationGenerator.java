@@ -207,7 +207,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 				eq +=  "+ ";
 			}
 			BigDecimal coeff = processRatio.multiply(targetGrade.subtract(blockGrade));
-			eq +=   coeff+"p"+block.getPitNo()+"x"+block.getBlockNo()+"p"+processNumber+"t"+period;
+			eq +=   formatDecimalValue(coeff)+"p"+block.getPitNo()+"x"+block.getBlockNo()+"p"+processNumber+"t"+period;
 		}			
 		return eq;
 	}
