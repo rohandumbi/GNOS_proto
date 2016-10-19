@@ -37,11 +37,12 @@ public class TruckParameterDialog extends Dialog {
 	private String associatedPitGroupName;
 	
 	private ScrolledComposite scGridContainer1;
-	//private ScrolledComposite scGridContainer2;
+	private ScrolledComposite scGridContainer2;
 	//private ScrolledComposite scGridContainer3;
 	//private ScrolledComposite scGridContainer4;
 	
 	private TruckParameterMaterialPayloadGrid truckParameterMaterialPayloadGrid;
+	private TruckParameterCycleTimeGrid truckParameterCycleTimeGrid;
 	//private CycleTimeDumpFieldGrid cycleTimeDumpFieldGrid;
 	//private CycleTimeStockpileFieldGrid cycleTimeStockpileFieldGrid;
 	//private CycleTimeChildProcessFieldGrid cycleTimeChildProcessFieldGrid;
@@ -155,19 +156,19 @@ public class TruckParameterDialog extends Dialog {
 		/*
 		 * 2
 		 */
-		/*this.scGridContainer2 = new ScrolledComposite(this.container, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		this.scGridContainer2 = new ScrolledComposite(this.container, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 		FormData fd_scGridContainer2 = new FormData(500,500);// temp hack else size of scrolled composite keeps on increasing
 		fd_scGridContainer2.top = new FormAttachment(scGridContainer1, 5, SWT.BOTTOM);
 		fd_scGridContainer2.left = new FormAttachment(labelScreenName, 0, SWT.LEFT);
-		fd_scGridContainer2.bottom = new FormAttachment(50, -10);
+		fd_scGridContainer2.bottom = new FormAttachment(100, -10);
 		fd_scGridContainer2.right = new FormAttachment(100, -35);
 		
 		this.scGridContainer2.setExpandHorizontal(true);
 		this.scGridContainer2.setExpandVertical(true);
 		this.scGridContainer2.setLayoutData(fd_scGridContainer2);
 		
-		Rectangle r2 = this.scGridContainer1.getClientArea();
-		this.scGridContainer1.setMinSize(this.scGridContainer1.computeSize(SWT.DEFAULT, r2.height, true));*/
+		Rectangle r2 = this.scGridContainer2.getClientArea();
+		this.scGridContainer2.setMinSize(this.scGridContainer2.computeSize(SWT.DEFAULT, r2.height, true));
 		
 		/*
 		 * 3 
@@ -210,6 +211,12 @@ public class TruckParameterDialog extends Dialog {
 		}
 		this.truckParameterMaterialPayloadGrid = new TruckParameterMaterialPayloadGrid(scGridContainer1, SWT.None);
 		this.scGridContainer1.setContent(this.truckParameterMaterialPayloadGrid);
+		
+		if(this.truckParameterCycleTimeGrid != null){
+			this.truckParameterCycleTimeGrid.dispose();
+		}
+		this.truckParameterCycleTimeGrid = new TruckParameterCycleTimeGrid(scGridContainer2, SWT.None);
+		this.scGridContainer2.setContent(this.truckParameterCycleTimeGrid);
 		
 		/*if(this.cycleTimeDumpFieldGrid != null){
 			this.cycleTimeDumpFieldGrid.dispose();
