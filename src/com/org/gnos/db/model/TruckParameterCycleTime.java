@@ -3,9 +3,14 @@ package com.org.gnos.db.model;
 import java.util.HashMap;
 
 public class TruckParameterCycleTime {
-	protected int id;
-	protected HashMap<Integer, Float> costData;
-	protected int scenarioId;
+	private int id;
+	private HashMap<String, Integer> processData;
+	private int projectId;
+	private String stockPileName;
+	
+	public TruckParameterCycleTime(){
+		this.processData = new HashMap<String, Integer>();
+	}
 	
 	public int getId() {
 		return id;
@@ -14,20 +19,26 @@ public class TruckParameterCycleTime {
 		this.id = id;
 	}
 	
-	public HashMap<Integer, Float> getCostData() {
-		return costData;
+	public HashMap<String, Integer> getProcessData() {
+		return processData;
 	}
 
-	public void setCostData(HashMap<Integer, Float> costData) {
-		this.costData = costData;
+	public void setProcessData(HashMap<String, Integer> processData) {
+		this.processData = processData;
+	}
+	public int getProjectId() {
+		return projectId;
+	}
+	public void setProjectId(int projectId) {
+		this.projectId = projectId;
+	}
+	public String getStockPileName() {
+		return stockPileName;
+	}
+	public void setStockPileName(String stockPileName) {
+		this.stockPileName = stockPileName;
 	}
 	
-	public int getScenarioId() {
-		return scenarioId;
-	}
 	
-	public void setScenarioId(int scenarioId) {
-		this.scenarioId = scenarioId;
-	}
 	
 }

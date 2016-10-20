@@ -29,6 +29,7 @@ import com.org.gnos.db.model.Stockpile;
 import com.org.gnos.db.model.StockpileReclaimingCost;
 import com.org.gnos.db.model.StockpilingCost;
 import com.org.gnos.db.model.TruckHourCost;
+import com.org.gnos.db.model.TruckParameterCycleTime;
 import com.org.gnos.db.model.WasteMiningCost;
 import com.org.gnos.services.TimePeriod;
 
@@ -42,21 +43,23 @@ public class TruckParameterCycleTimeGrid extends Composite {
 	private Composite compositeGridHeader;
 	private List<Composite> allRows;
 	private Composite presentRow;
-	private Scenario scenario;
+	//private Scenario scenario;
 	private Label firstSeparator;
 	private Label lblClassification;
-	private String[] costCategories = new String[]{"Ore mining cost", "Waste mining cost", "Stockpile cost", "Stockpile reclaiming cost", "Truck hour cost"};
+	//private String[] costCategories = new String[]{"Ore mining cost", "Waste mining cost", "Stockpile cost", "Stockpile reclaiming cost", "Truck hour cost"};
 	private FixedOpexCost[] existingFixedOpexCost;
 	private String[] processNames;
 	
 	private ProjectConfigutration projectInstance;
 	private static final int FIRST_SEPARATOR_POSITION = 10;
+	private ArrayList<TruckParameterCycleTime> truckParameterCycleTimeList;
 
 	public TruckParameterCycleTimeGrid(Composite parent, int style) {
 		super(parent, style);
 		this.projectInstance = ProjectConfigutration.getInstance();
 		this.allRows = new ArrayList<Composite>();
 		this.processNames = getProcesses();
+		this.truckParameterCycleTimeList = projectInstance.getTruckParameterCycleTimeList();
 		this.createContent(parent);
 	}
 	
@@ -164,7 +167,13 @@ public class TruckParameterCycleTimeGrid extends Composite {
 	
 	private void addRows(){
 		String[] reclaimStockpileNames = getReclaimStockpiles();
+		TruckParameterCycleTime truckParameterCycleTime;
 		for(int i=0; i<reclaimStockpileNames.length; i++){
+			if((i <= truckParameterCycleTimeList.size()) || (truckParameterCycleTimeList.get(i) == null)){
+				truckParameterCycleTime = new TruckParameterCycleTime();
+				truckParameterCycleTime.setStockPileName(reclaimStockpileNames[i]);
+				truckParameterCycleTimeList.add(i, truckParameterCycleTime);
+			}
 			Color backgroundColor = SWTResourceManager.getColor(SWT.COLOR_WHITE);
 			if((i%2 != 0)){
 				backgroundColor =  SWTResourceManager.getColor(245, 245, 245);
@@ -187,6 +196,8 @@ public class TruckParameterCycleTimeGrid extends Composite {
 			fd_labelCategory.top = new FormAttachment(0);
 			//fd_labelCategory.right = new FormAttachment(0, 168);
 			labelCategory.setLayoutData(fd_labelCategory);
+			
+			compositeRow.setData(truckParameterCycleTimeList.get(i));
 			
 			this.addProcessRowMembers(compositeRow, labelCategory);
 			
@@ -250,6 +261,9 @@ public class TruckParameterCycleTimeGrid extends Composite {
 		Control previousMember = reference;
 		//FixedOpexCost associatedFixedCost = (FixedOpexCost)parent.getData();
 		//final Map<Integer, Float> associatedFixedCostData = associatedFixedCost.getCostData();
+		
+		TruckParameterCycleTime truckParameterCycleTime = (TruckParameterCycleTime)parent.getData();
+		final Map<String, Integer> associatedProcessData = truckParameterCycleTime.getProcessData();
 		for(int i=0; i<this.processNames.length; i++){
 			Text yearlyValue = new Text(parent, SWT.BORDER);
 			FormData fd_yearlyValue = new FormData();
@@ -262,7 +276,14 @@ public class TruckParameterCycleTimeGrid extends Composite {
 				fd_yearlyValue.right = new FormAttachment(previousMember, 110, SWT.RIGHT);
 			}
 			yearlyValue.setLayoutData(fd_yearlyValue);
-			
+			final String processName = this.processNames[i];
+			if(associatedProcessData != null){
+				Integer value = associatedProcessData.get(processName);
+				//yearlyValue.setText(Integer.toString(value));
+			}
+			/*if(value != null){
+				yearlyValue.setText(Float.toString(value));
+			}*/
 			
 			//Text yearlyValue = new Text(parent, SWT.BORDER);
 			//final int targetYear = this.scenario.getStartYear() + i;
@@ -275,7 +296,7 @@ public class TruckParameterCycleTimeGrid extends Composite {
 					// Get the widget whose text was modified
 					Text text = (Text) event.widget;
 					//System.out.println("Input value for the " + targetYear + " year is " + text.getText());
-					//associatedFixedCostData.put(targetYear, Float.valueOf(text.getText()));
+					associatedProcessData.put(processName, Integer.valueOf(text.getText()));
 				}
 			});
 			/*

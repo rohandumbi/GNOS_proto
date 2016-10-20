@@ -403,3 +403,13 @@ CREATE TABLE truckparam_fixed_time(
    fixed_time INT NOT NULL,
    UNIQUE KEY ( project_id )
 );
+
+DROP TABLE IF EXISTS truckparam_cycle_time; 
+
+CREATE TABLE truckparam_cycle_time(
+   project_id INT NOT NULL,
+   stockpile_name VARCHAR(100) NOT NULL,
+   process_name VARCHAR(100) NOT NULL,
+   value INT NOT NULL,
+   unique key(project_id, stockpile_name, process_name)
+);

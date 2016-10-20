@@ -20,6 +20,7 @@ import com.org.gnos.db.model.CycleTimeData;
 import com.org.gnos.db.model.Dump;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Field;
+import com.org.gnos.db.model.FixedOpexCost;
 import com.org.gnos.db.model.Grade;
 import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.Pit;
@@ -29,6 +30,7 @@ import com.org.gnos.db.model.ProcessJoin;
 import com.org.gnos.db.model.Product;
 import com.org.gnos.db.model.ProductJoin;
 import com.org.gnos.db.model.Stockpile;
+import com.org.gnos.db.model.TruckParameterCycleTime;
 import com.org.gnos.db.model.TruckPrameterData;
 import com.org.gnos.services.PitBenchProcessor;
 
@@ -62,7 +64,8 @@ public class ProjectConfigutration {
 	private ArrayList<String> existingCycleTimeProcessFields = new ArrayList<String>();
 
 	/* Tracking existing truck param data for project instance */
-	private ArrayList<String> existingTruckParamMaterials = new ArrayList<String>(); 
+	private ArrayList<String> existingTruckParamMaterials = new ArrayList<String>();
+	private ArrayList<TruckParameterCycleTime> truckParameterCycleTimeList = new ArrayList<TruckParameterCycleTime>();
 
 	private int projectId = -1;
 
@@ -1575,6 +1578,7 @@ public class ProjectConfigutration {
 	public void saveTruckParameterData(){
 		saveTruckParameterFixedTime();
 		saveTruckParamMaterialPayloadData();
+		saveTruckParameterCycleTimeData();
 	}
 
 	public void saveTruckParameterFixedTime(){
@@ -1669,6 +1673,51 @@ public class ProjectConfigutration {
 					insertPstmt.close();
 				if (updatePstmt != null)
 					updatePstmt.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public void saveTruckParameterCycleTimeData() {
+		Connection conn = DBManager.getConnection();
+		String insert_sql = "insert into truckparam_cycle_time (project_id, stockpile_name, process_name, value) values (?, ?, ?, ?)";
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		boolean autoCommit = true;
+
+		try {
+			autoCommit = conn.getAutoCommit();
+			conn.setAutoCommit(false);
+			pstmt = conn.prepareStatement(insert_sql,
+					Statement.RETURN_GENERATED_KEYS);
+
+			for (TruckParameterCycleTime tpmCycleTime: truckParameterCycleTimeList) {
+				//FixedOpexCost fixedOpexCost = fixedCost[i];
+				if(tpmCycleTime == null || tpmCycleTime.getProcessData() == null) continue;
+				Set keys = tpmCycleTime.getProcessData().keySet();
+				Iterator<String> it = keys.iterator();
+				while (it.hasNext()) {
+					String key = it.next();
+					//pstmt.setInt(1, this.projectConfiguration.getProjectId());
+					pstmt.setInt(1, projectId);
+					pstmt.setString(2, tpmCycleTime.getStockPileName());
+					pstmt.setString(3, key);
+					pstmt.setInt(4, tpmCycleTime.getProcessData().get(key));
+					pstmt.executeUpdate();
+				}
+			}
+			conn.commit();
+
+		} catch (SQLException e) {
+			System.err.println("Failed saving Fixed cost."+e.getMessage());
+		} finally {
+			try {
+				conn.setAutoCommit(autoCommit);
+				if (pstmt != null)
+					pstmt.close();
 				if (conn != null)
 					DBManager.releaseConnection(conn);
 			} catch (SQLException e) {
@@ -1951,6 +2000,14 @@ public class ProjectConfigutration {
 
 	public void setTruckParameterData(TruckPrameterData truckParameterData) {
 		this.truckParameterData = truckParameterData;
+	}
+
+	public ArrayList<TruckParameterCycleTime> getTruckParameterCycleTimeList() {
+		return truckParameterCycleTimeList;
+	}
+
+	public void setTruckParameterCycleTimeList(ArrayList<TruckParameterCycleTime> truckParameterCycleTimeList) {
+		this.truckParameterCycleTimeList = truckParameterCycleTimeList;
 	}
 
 }
