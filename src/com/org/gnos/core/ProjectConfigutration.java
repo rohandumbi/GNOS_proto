@@ -23,6 +23,7 @@ import com.org.gnos.db.model.Field;
 import com.org.gnos.db.model.FixedOpexCost;
 import com.org.gnos.db.model.Grade;
 import com.org.gnos.db.model.Model;
+import com.org.gnos.db.model.OreMiningCost;
 import com.org.gnos.db.model.Pit;
 import com.org.gnos.db.model.PitGroup;
 import com.org.gnos.db.model.Process;
@@ -30,8 +31,12 @@ import com.org.gnos.db.model.ProcessJoin;
 import com.org.gnos.db.model.Product;
 import com.org.gnos.db.model.ProductJoin;
 import com.org.gnos.db.model.Stockpile;
+import com.org.gnos.db.model.StockpileReclaimingCost;
+import com.org.gnos.db.model.StockpilingCost;
+import com.org.gnos.db.model.TruckHourCost;
 import com.org.gnos.db.model.TruckParameterCycleTime;
 import com.org.gnos.db.model.TruckPrameterData;
+import com.org.gnos.db.model.WasteMiningCost;
 import com.org.gnos.services.PitBenchProcessor;
 
 public class ProjectConfigutration {
@@ -53,6 +58,7 @@ public class ProjectConfigutration {
 	private List<Pit> pitList = new ArrayList<Pit>();
 	private CycleTimeData cycleTimeData = new CycleTimeData();
 	private TruckPrameterData truckParameterData = new TruckPrameterData();
+	private ArrayList<TruckParameterCycleTime> truckParameterCycleTimeList = new ArrayList<TruckParameterCycleTime>();
 
 	private boolean newProject = true;
 	private Map<String, String> savedRequiredFieldMapping;
@@ -65,7 +71,8 @@ public class ProjectConfigutration {
 
 	/* Tracking existing truck param data for project instance */
 	private ArrayList<String> existingTruckParamMaterials = new ArrayList<String>();
-	private ArrayList<TruckParameterCycleTime> truckParameterCycleTimeList = new ArrayList<TruckParameterCycleTime>();
+	private ArrayList<String> existingTruckParamCycleTimeStockpiles = new ArrayList<String>();
+	
 
 	private int projectId = -1;
 
@@ -726,6 +733,7 @@ public class ProjectConfigutration {
 	private void loadTruckParameters(){
 		loadTruckParamMaterialPayloadMapping();
 		loadTruckParamterFixedTime();
+		loadTruckParamCycleTime();
 	}
 
 	private void loadTruckParamMaterialPayloadMapping(){
@@ -743,6 +751,50 @@ public class ProjectConfigutration {
 			while (rs.next()) {
 				existingTruckParamMaterials.add(rs.getString(1));
 				materialPayloadMap.put(rs.getString(1), rs.getInt(2));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (stmt != null)
+					stmt.close();
+				if (rs != null)
+					rs.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	private void loadTruckParamCycleTime(){
+		String sql = "select stockpile_name, process_name, value from truckparam_cycle_time where project_id = "
+				+ this.projectId + " order by stockpile_name";
+		//fixedCost = new FixedOpexCost[5];
+		Statement stmt = null;
+		ResultSet rs = null;
+		Connection conn = DBManager.getConnection();
+		try {
+			stmt = conn.createStatement();
+			stmt.execute(sql);
+			rs = stmt.getResultSet();
+			while (rs.next()) {
+				String stockpileName = rs.getString(1);
+				String processName = rs.getString(2);
+				int value = rs.getInt(3);
+				//float value = rs.getFloat(3);
+				//FixedOpexCost fixedOpexCost = fixedCost[costHead];
+				
+				TruckParameterCycleTime truckParamCycleTime = this.getTruckParamCycleTimeByStockpileName(stockpileName);
+				if(truckParamCycleTime == null){
+					truckParamCycleTime = new TruckParameterCycleTime();
+					truckParamCycleTime.setProjectId(projectId);
+					truckParamCycleTime.setStockPileName(stockpileName);
+					this.truckParameterCycleTimeList.add(truckParamCycleTime);
+				}
+
+				truckParamCycleTime.getProcessData().put(processName, value);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -1866,6 +1918,17 @@ public class ProjectConfigutration {
 		}
 		return null;
 	}
+	
+	public TruckParameterCycleTime getTruckParamCycleTimeByStockpileName(String stockpileName) {
+
+		for(TruckParameterCycleTime tpmCycleTime : this.truckParameterCycleTimeList){
+			if(tpmCycleTime.getStockPileName().equals(stockpileName)){
+				return tpmCycleTime;
+			}
+		}
+		return null;
+	}
+	
 	public void setExpressions(List<Expression> expressions) {
 		this.expressions = expressions;
 	}

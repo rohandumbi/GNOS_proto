@@ -169,7 +169,8 @@ public class TruckParameterCycleTimeGrid extends Composite {
 		String[] reclaimStockpileNames = getReclaimStockpiles();
 		TruckParameterCycleTime truckParameterCycleTime;
 		for(int i=0; i<reclaimStockpileNames.length; i++){
-			if((i <= truckParameterCycleTimeList.size()) || (truckParameterCycleTimeList.get(i) == null)){
+			truckParameterCycleTime = projectInstance.getTruckParamCycleTimeByStockpileName(reclaimStockpileNames[i]);
+			if(truckParameterCycleTime == null){
 				truckParameterCycleTime = new TruckParameterCycleTime();
 				truckParameterCycleTime.setStockPileName(reclaimStockpileNames[i]);
 				truckParameterCycleTimeList.add(i, truckParameterCycleTime);
@@ -279,7 +280,9 @@ public class TruckParameterCycleTimeGrid extends Composite {
 			final String processName = this.processNames[i];
 			if(associatedProcessData != null){
 				Integer value = associatedProcessData.get(processName);
-				//yearlyValue.setText(Integer.toString(value));
+				if(value != null){
+					yearlyValue.setText(Integer.toString(value));
+				}
 			}
 			/*if(value != null){
 				yearlyValue.setText(Float.toString(value));
