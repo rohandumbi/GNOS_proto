@@ -20,10 +20,8 @@ import com.org.gnos.db.model.CycleTimeData;
 import com.org.gnos.db.model.Dump;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Field;
-import com.org.gnos.db.model.FixedOpexCost;
 import com.org.gnos.db.model.Grade;
 import com.org.gnos.db.model.Model;
-import com.org.gnos.db.model.OreMiningCost;
 import com.org.gnos.db.model.Pit;
 import com.org.gnos.db.model.PitGroup;
 import com.org.gnos.db.model.Process;
@@ -31,12 +29,8 @@ import com.org.gnos.db.model.ProcessJoin;
 import com.org.gnos.db.model.Product;
 import com.org.gnos.db.model.ProductJoin;
 import com.org.gnos.db.model.Stockpile;
-import com.org.gnos.db.model.StockpileReclaimingCost;
-import com.org.gnos.db.model.StockpilingCost;
-import com.org.gnos.db.model.TruckHourCost;
 import com.org.gnos.db.model.TruckParameterCycleTime;
 import com.org.gnos.db.model.TruckPrameterData;
-import com.org.gnos.db.model.WasteMiningCost;
 import com.org.gnos.services.PitBenchProcessor;
 
 public class ProjectConfigutration {
@@ -792,6 +786,7 @@ public class ProjectConfigutration {
 					truckParamCycleTime.setProjectId(projectId);
 					truckParamCycleTime.setStockPileName(stockpileName);
 					this.truckParameterCycleTimeList.add(truckParamCycleTime);
+					this.existingTruckParamCycleTimeStockpiles.add(stockpileName);
 				}
 
 				truckParamCycleTime.getProcessData().put(processName, value);
@@ -1733,17 +1728,54 @@ public class ProjectConfigutration {
 		}
 	}
 	
+	private boolean isTruckParameterCycleTimeInDB(String stockpileName, String processName){
+		String sql = "select count(*) from truckparam_cycle_time where project_id = "
+				+ this.projectId + " AND stockpile_name = '" + stockpileName + "'" +" AND process_name = '" +  processName + "'";
+		Statement stmt = null;
+		ResultSet rs = null;
+		Connection conn = DBManager.getConnection();
+		boolean isFixedTimeSavedInDB = false;
+		try {
+			stmt = conn.createStatement();
+			stmt.execute(sql);
+			rs = stmt.getResultSet();
+			while (rs.next()) {
+				if(rs.getInt(1) > 0){
+					isFixedTimeSavedInDB = true;
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (stmt != null)
+					stmt.close();
+				if (rs != null)
+					rs.close();
+				if (conn != null)
+					DBManager.releaseConnection(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return isFixedTimeSavedInDB;
+	}
+	
 	public void saveTruckParameterCycleTimeData() {
 		Connection conn = DBManager.getConnection();
 		String insert_sql = "insert into truckparam_cycle_time (project_id, stockpile_name, process_name, value) values (?, ?, ?, ?)";
-		PreparedStatement pstmt = null;
+		String update_sql = "update truckparam_cycle_time set value = ? where project_id = ? AND (stockpile_name = ? AND process_name = ?)";
+		PreparedStatement insertStmt = null;
+		PreparedStatement updateStmt = null;
 		ResultSet rs = null;
 		boolean autoCommit = true;
 
 		try {
 			autoCommit = conn.getAutoCommit();
 			conn.setAutoCommit(false);
-			pstmt = conn.prepareStatement(insert_sql,
+			insertStmt = conn.prepareStatement(insert_sql,
+					Statement.RETURN_GENERATED_KEYS);
+			updateStmt = conn.prepareStatement(update_sql,
 					Statement.RETURN_GENERATED_KEYS);
 
 			for (TruckParameterCycleTime tpmCycleTime: truckParameterCycleTimeList) {
@@ -1753,12 +1785,20 @@ public class ProjectConfigutration {
 				Iterator<String> it = keys.iterator();
 				while (it.hasNext()) {
 					String key = it.next();
-					//pstmt.setInt(1, this.projectConfiguration.getProjectId());
-					pstmt.setInt(1, projectId);
-					pstmt.setString(2, tpmCycleTime.getStockPileName());
-					pstmt.setString(3, key);
-					pstmt.setInt(4, tpmCycleTime.getProcessData().get(key));
-					pstmt.executeUpdate();
+					if(this.isTruckParameterCycleTimeInDB(tpmCycleTime.getStockPileName(), key)){
+						System.out.println("Should update track cycle time");
+						updateStmt.setInt(1, tpmCycleTime.getProcessData().get(key));
+						updateStmt.setInt(2, projectId);
+						updateStmt.setString(3, tpmCycleTime.getStockPileName());
+						updateStmt.setString(4, key);
+						updateStmt.executeUpdate();
+					}else{
+						insertStmt.setInt(1, projectId);
+						insertStmt.setString(2, tpmCycleTime.getStockPileName());
+						insertStmt.setString(3, key);
+						insertStmt.setInt(4, tpmCycleTime.getProcessData().get(key));
+						insertStmt.executeUpdate();
+					}
 				}
 			}
 			conn.commit();
@@ -1768,8 +1808,8 @@ public class ProjectConfigutration {
 		} finally {
 			try {
 				conn.setAutoCommit(autoCommit);
-				if (pstmt != null)
-					pstmt.close();
+				if (insertStmt != null)
+					insertStmt.close();
 				if (conn != null)
 					DBManager.releaseConnection(conn);
 			} catch (SQLException e) {

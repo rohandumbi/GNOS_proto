@@ -9,6 +9,7 @@ public class TruckParameterCycleTime {
 	private String stockPileName;
 	
 	public TruckParameterCycleTime(){
+		this.id = -1;
 		this.processData = new HashMap<String, Integer>();
 	}
 	
