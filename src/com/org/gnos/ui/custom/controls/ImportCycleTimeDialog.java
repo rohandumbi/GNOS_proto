@@ -17,6 +17,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -43,7 +44,9 @@ public class ImportCycleTimeDialog extends Dialog {
 	private CycleTimeChildProcessFieldGrid cycleTimeChildProcessFieldGrid;
 	private Composite container;
 	private Label labelScreenName;
-	private Map<String, String> fixedFieldMap;
+	private Label labelImportFile;
+	
+	private FileDialog fileDialog;
 	
 	public ImportCycleTimeDialog(Shell parentShell) {
 		super(parentShell);
@@ -64,6 +67,44 @@ public class ImportCycleTimeDialog extends Dialog {
 		labelScreenName.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.BOLD));
 		labelScreenName.setText("Cycle Time Data Mapping Dialog");
 		
+		labelImportFile = new Label(this.container, SWT.NONE);
+		//labelImportFile.setForeground(SWTResourceManager.getColor(0, 191, 255));
+		labelImportFile.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		FormData fd_labelImportFile = new FormData();
+		fd_labelImportFile.top = new FormAttachment(labelScreenName, 10, SWT.BOTTOM);
+		fd_labelImportFile.left = new FormAttachment(labelScreenName, 0, SWT.LEFT);
+		labelImportFile.setLayoutData(fd_labelImportFile);
+		labelImportFile.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.BOLD));
+		labelImportFile.setText("Import File: ");
+		
+		this.fileDialog = new FileDialog(parent.getShell(), SWT.OPEN);
+		this.fileDialog.setFilterExtensions(new String [] {"*.csv"});
+		this.fileDialog.setFilterPath("c:\\");
+		
+		final Text textFileLocation = new Text(this.container, SWT.BORDER);
+		FormData fd_textFileLocation = new FormData();
+		fd_textFileLocation.top = new FormAttachment(labelImportFile, 0, SWT.TOP);
+		fd_textFileLocation.left = new FormAttachment(labelImportFile, 5, SWT.RIGHT);
+		fd_textFileLocation.right = new FormAttachment(50 );
+		textFileLocation.setLayoutData(fd_textFileLocation);
+		
+		Button btnBrowseFile = new Button(this.container, SWT.NONE);
+		FormData fd_btnBrowseFile = new FormData();
+		fd_btnBrowseFile.top = new FormAttachment(textFileLocation, 0, SWT.TOP);
+		fd_btnBrowseFile.left = new FormAttachment(textFileLocation, 5, SWT.RIGHT);
+		btnBrowseFile.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				//TODO open system directory
+				String csvFileName = fileDialog.open();
+				System.out.println("Selected file" + csvFileName);
+				if(csvFileName != null){
+					textFileLocation.setText(csvFileName);
+				}
+			}
+		});
+		btnBrowseFile.setText("....");
+		btnBrowseFile.setLayoutData(fd_btnBrowseFile);
+		
 		this.initializeGridContainers();
 		this.refreshGrids();
 		
@@ -77,7 +118,7 @@ public class ImportCycleTimeDialog extends Dialog {
 		 */
 		this.scGridContainer1 = new ScrolledComposite(this.container, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 		FormData fd_scGridContainer1 = new FormData(500,500);// temp hack else size of scrolled composite keeps on increasing
-		fd_scGridContainer1.top = new FormAttachment(5);
+		fd_scGridContainer1.top = new FormAttachment(10);
 		fd_scGridContainer1.left = new FormAttachment(labelScreenName, 0, SWT.LEFT);
 		fd_scGridContainer1.bottom = new FormAttachment(25, -10);
 		fd_scGridContainer1.right = new FormAttachment(100, -35);
