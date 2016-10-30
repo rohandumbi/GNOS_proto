@@ -3,12 +3,12 @@ package com.org.gnos.equation;
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -22,14 +22,10 @@ import com.org.gnos.core.Tree;
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.model.CapexData;
 import com.org.gnos.db.model.CapexInstance;
-import com.org.gnos.db.model.Dump;
 import com.org.gnos.db.model.FixedOpexCost;
 import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.OpexData;
-import com.org.gnos.db.model.Pit;
-import com.org.gnos.db.model.PitGroup;
 import com.org.gnos.db.model.Process;
-import com.org.gnos.db.model.Stockpile;
 
 public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 	
@@ -84,19 +80,19 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 	
 	private void buildProcessVariables(Process process, List<Block> blocks, int processNumber) {
 		FixedOpexCost[] fixedOpexCost = scenarioConfigutration.getFixedCost();
-		Map<Integer, Float> oreMiningCostMap = fixedOpexCost[0].getCostData();
+		Map<Integer, BigDecimal> oreMiningCostMap = fixedOpexCost[0].getCostData();
 		Set<Integer> keys = oreMiningCostMap.keySet();
 		int count = 1;
 		for(int year: keys){
-			float miningcost = oreMiningCostMap.get(year);
+			BigDecimal miningcost = oreMiningCostMap.get(year);
 			
 			for(Block block: blocks) {
-				float processValue = getProcessValue(block, process.getModel(), year);
-				float value = processValue - miningcost;
-				value = (float) (value * (1 / Math.pow ((1 + discount_rate), count)));
+				BigDecimal processValue = getProcessValue(block, process.getModel(), year);
+				BigDecimal value = processValue.subtract(miningcost);
+				value = (value.multiply(new BigDecimal(1 / Math.pow ((1 + discount_rate), count))));
 				String variable = "p"+block.getPitNo()+"x"+block.getBlockNo()+"p"+processNumber+"t"+count;
-				String eq = " "+value+variable;
-				if(value > 0){
+				String eq = " "+formatDecimalValue(value)+variable;
+				if(value.doubleValue() > 0){
 					eq = " +"+eq;
 				} 
 				write(eq);
@@ -110,17 +106,17 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 	private void buildStockpileVariables(Set<Block> blocks) {
 		FixedOpexCost[] fixedOpexCost = scenarioConfigutration.getFixedCost();
 		if(fixedOpexCost == null || fixedOpexCost.length < 3) return;
-		Map<Integer, Float> oreMiningCostMap = fixedOpexCost[0].getCostData();
-		Map<Integer, Float> stockPilingCostMap = fixedOpexCost[2].getCostData();
+		Map<Integer, BigDecimal> oreMiningCostMap = fixedOpexCost[0].getCostData();
+		Map<Integer, BigDecimal> stockPilingCostMap = fixedOpexCost[2].getCostData();
 		Set<Integer> keys = stockPilingCostMap.keySet();
 		int count = 1;
 		for(int year: keys){
-			float cost = stockPilingCostMap.get(year)+oreMiningCostMap.get(year);			
+			BigDecimal cost = stockPilingCostMap.get(year).add(oreMiningCostMap.get(year));			
 			for(Block block: blocks) {
 				Integer stockpileNumber = this.serviceInstanceData.getPitStockpileMapping().get(block.getPitNo());
 				if(stockpileNumber == null) continue;
 				String variable = "p"+block.getPitNo()+"x"+block.getBlockNo()+"s"+stockpileNumber+"t"+count;
-				String eq = " -"+cost+ variable;
+				String eq = " -"+formatDecimalValue(cost)+ variable;
 				write(eq);
 				
 				serviceInstanceData.addVariable(block, variable);
@@ -134,18 +130,18 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		serviceInstanceData.setWasteBlocks(wasteblocks);
 		FixedOpexCost[] fixedOpexCost = scenarioConfigutration.getFixedCost();
 		if(fixedOpexCost == null || fixedOpexCost.length < 2) return;
-		Map<Integer, Float> wasteMiningCostMap = fixedOpexCost[1].getCostData();
+		Map<Integer, BigDecimal> wasteMiningCostMap = fixedOpexCost[1].getCostData();
 		Set<Integer> keys = wasteMiningCostMap.keySet();
 
 		int count = 1;	
 		for(int year: keys){
-			float cost = wasteMiningCostMap.get(year);		
+			BigDecimal cost = wasteMiningCostMap.get(year);		
 			for(Block block: wasteblocks) {
 				List<Integer> dumps = this.serviceInstanceData.getPitDumpMapping().get(block.getPitNo());
 				if(dumps == null) continue;
 				for(Integer dumpNo: dumps){
 					String variable = "p"+block.getPitNo()+"x"+block.getBlockNo()+"w"+dumpNo+"t"+count;
-					String eq = " -"+cost+variable;
+					String eq = " -"+formatDecimalValue(cost)+variable;
 					write(eq);
 					
 					serviceInstanceData.addVariable(block, variable);
@@ -168,8 +164,8 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 				capexInstanceCount++;
 				for(int i= 1; i <= timeperiod ; i++){
 					String cv = "c"+capexCount+"i"+capexInstanceCount+"t"+i;
-					float value = (float) (ci.getCapexAmount() * (1 / Math.pow ((1 + discount_rate), i)));
-					write(" -"+value+cv);
+					BigDecimal value = new BigDecimal(ci.getCapexAmount() * (1 / Math.pow ((1 + discount_rate), i)));
+					write(" -"+formatDecimalValue(value)+cv);
 				}
 			}
 		}
@@ -256,24 +252,24 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		return blocks;
 	}
 	
-	private float getProcessValue(Block b, Model model, int year) {
-		float value = 0;
+	private BigDecimal getProcessValue(Block b, Model model, int year) {
+		BigDecimal value = new BigDecimal(0);
 		if(model == null) return value;
-		float revenue = 0;
-		float pcost = 0;
+		BigDecimal revenue = new BigDecimal(0);
+		BigDecimal pcost = new BigDecimal(0);
 		List<OpexData> opexDataList = scenarioConfigutration.getOpexDataList();
 		for(OpexData opexData: opexDataList) {
 			if(opexData.getModel().getId() == model.getId()){
 				if(opexData.isRevenue()){
 					String expressionName = opexData.getExpression().getName().replaceAll("\\s+","_");
-					float expr_value = b.getComputedField(expressionName);
-					revenue = revenue + expr_value * opexData.getCostData().get(year);
+					BigDecimal expr_value = b.getComputedField(expressionName);
+					revenue = revenue.add(expr_value.multiply(opexData.getCostData().get(year)));
 				} else {
-					pcost = pcost + opexData.getCostData().get(year);
+					pcost = pcost.add(opexData.getCostData().get(year));
 				}
 			}
 		}
-		value = revenue - pcost;
+		value = revenue.subtract(pcost);
 		return value;
 	}
 	

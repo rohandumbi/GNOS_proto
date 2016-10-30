@@ -1,5 +1,6 @@
 package com.org.gnos.core;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -113,7 +114,7 @@ public class ScenarioConfigutration {
 
 					this.opexDataList.add(od);
 				}
-				od.addYear(rs.getInt(6), rs.getFloat(7));
+				od.addYear(rs.getInt(6), rs.getBigDecimal(7));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -145,7 +146,7 @@ public class ScenarioConfigutration {
 			while (rs.next()) {
 				int costHead = rs.getInt(1);
 				int year = rs.getInt(2);
-				float value = rs.getFloat(3);
+				BigDecimal value = rs.getBigDecimal(3);
 				FixedOpexCost fixedOpexCost = fixedCost[costHead];
 				if (fixedOpexCost == null) {
 					if (costHead == 0) {
@@ -620,7 +621,7 @@ public class ScenarioConfigutration {
 						int key = it.next();
 						pstmt1.setInt(1, od.getId());
 						pstmt1.setInt(2, key);
-						pstmt1.setFloat(3, od.getCostData().get(key));
+						pstmt1.setBigDecimal(3, od.getCostData().get(key));
 						pstmt1.executeUpdate();
 					}
 				}
@@ -669,7 +670,7 @@ public class ScenarioConfigutration {
 					pstmt.setInt(1, fixedOpexCost.getScenarioId());
 					pstmt.setInt(2, i);
 					pstmt.setInt(3, key);
-					pstmt.setFloat(4, fixedOpexCost.getCostData().get(key));
+					pstmt.setBigDecimal(4, fixedOpexCost.getCostData().get(key));
 					pstmt.executeUpdate();
 				}
 			}

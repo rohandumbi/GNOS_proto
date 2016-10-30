@@ -3,6 +3,7 @@ package com.org.gnos.equation;
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -259,14 +260,14 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 		
 		String eq = "";
 		for(Block block: blocks){
-			float processRatio = 0;
+			BigDecimal processRatio = new BigDecimal(0);
 			for(String coefficient: coefficients){
 				String expressionName = coefficient.replaceAll("\\s+","_");
-				processRatio += block.getComputedField(expressionName);					
+				processRatio = processRatio.add(block.getComputedField(expressionName));					
 			}
-			if(processRatio == 0) continue;
+			if(processRatio.doubleValue() == 0) continue;
 			
-			eq +=  "+ "+ processRatio+"p"+block.getPitNo()+"x"+block.getBlockNo()+"p"+processNumber+"t"+period;
+			eq +=  "+ "+ formatDecimalValue(processRatio)+"p"+block.getPitNo()+"x"+block.getBlockNo()+"p"+processNumber+"t"+period;
 		}			
 		return eq;
 	}
@@ -275,14 +276,14 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 		
 		String eq = "";
 		for(Block block: blocks){
-			float processRatio = 0;
+			BigDecimal processRatio = new BigDecimal(0);
 			for(String coefficient: coefficients){
 				String expressionName = coefficient.replaceAll("\\s+","_");
-				processRatio += block.getComputedField(expressionName);					
+				processRatio = processRatio.add(block.getComputedField(expressionName));					
 			}
-			if(processRatio == 0) continue;
+			if(processRatio.doubleValue() == 0) continue;
 			
-			eq +=  "+ "+processRatio+"p"+block.getPitNo()+"x"+block.getBlockNo()+"s"+this.serviceInstanceData.getPitStockpileMapping().get(block.getPitNo())+"t"+period;
+			eq +=  "+ "+formatDecimalValue(processRatio)+"p"+block.getPitNo()+"x"+block.getBlockNo()+"s"+this.serviceInstanceData.getPitStockpileMapping().get(block.getPitNo())+"t"+period;
 		}			
 		return eq;
 	}
@@ -291,17 +292,17 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 	
 		String eq = "";
 		for(Block block: blocks){
-			float processRatio = 0;
+			BigDecimal processRatio = new BigDecimal(0);
 			for(String coefficient: coefficients){
 				String expressionName = coefficient.replaceAll("\\s+","_");
-				processRatio += block.getComputedField(expressionName);					
+				processRatio = processRatio.add(block.getComputedField(expressionName));					
 			}
-			if(processRatio == 0) continue;
+			if(processRatio.doubleValue() == 0) continue;
 			
 			List<Integer> dumps = this.serviceInstanceData.getPitDumpMapping().get(block.getPitNo());
 			if(dumps == null) continue;
 			for(Integer dumpNo: dumps){
-				eq += "+ "+processRatio+"p"+block.getPitNo()+"x"+block.getBlockNo()+"w"+dumpNo+"t"+period;
+				eq += "+ "+formatDecimalValue(processRatio)+"p"+block.getPitNo()+"x"+block.getBlockNo()+"w"+dumpNo+"t"+period;
 			}
 		}			
 		return eq;

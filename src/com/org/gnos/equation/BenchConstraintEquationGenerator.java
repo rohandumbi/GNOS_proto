@@ -60,7 +60,7 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 					StringBuffer sb1= new StringBuffer();
 					StringBuffer sb2= new StringBuffer();
 					String benchVariable = "p"+pitNo+"b"+bench.getBenchNo()+"t"+i;
-					sb1.append(tonnesWt+benchVariable);
+					sb1.append(formatDecimalValue(tonnesWt)+benchVariable);
 					for(String variable: variables){
 						Matcher matcher = lastIntPattern.matcher(variable);
 					      if (matcher.find()) {
@@ -76,7 +76,7 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 					if(lastBench != null){
 						//float lastBenchTonnesWeight = getBenchTonnesWt(lastBench);
 						String lastBenchVariable = "p"+pitNo+"b"+lastBench.getBenchNo()+"t"+i;
-						sb2.append("-"+ tonnesWt+lastBenchVariable +" <= 0 ");
+						sb2.append("-"+ formatDecimalValue(tonnesWt)+lastBenchVariable +" <= 0 ");
 					}
 					sb1.append(" <= 0 ");
 					write(sb1.toString());

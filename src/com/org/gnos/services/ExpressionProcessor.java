@@ -75,9 +75,9 @@ public class ExpressionProcessor {
 			for(Expression expr: this.expressions){
 				String columnName = expr.getName().replaceAll("\\s+","_").toLowerCase();
 				if(expr.isGrade()) {
-					sql = "update gnos_data_"+projectId+" a, gnos_computed_data_"+projectId+" b set b."+columnName +" = "+ expr.getExprvalue();
+					sql = "update gnos_data_"+projectId+" a, gnos_computed_data_"+projectId+" b set b."+columnName +" = IFNULL("+ expr.getExprvalue()+" , 0)";
 				} else {
-					sql = "update gnos_data_"+projectId+" a, gnos_computed_data_"+projectId+" b set b."+columnName +" = ("+ expr.getExprvalue() +") / "+tonnes_wt_alias;
+					sql = "update gnos_data_"+projectId+" a, gnos_computed_data_"+projectId+" b set b."+columnName +" = IFNULL( ("+ expr.getExprvalue() +") / "+tonnes_wt_alias +" , 0)";
 				}
 				sql = sql+ " where a.id = b.row_id ";
 				if(expr.getFilter() != null && expr.getFilter().trim().length() > 0) {
