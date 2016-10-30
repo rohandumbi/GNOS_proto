@@ -1033,15 +1033,16 @@ public class ProjectConfigutration {
 	}
 
 	public void saveProcessTree() {
-		Connection conn = DBManager.getConnection();
-		String insert_sql = " insert into process_route_defn (project_id, model_id, parent_model_id) values (?, ?, ?)";
-		PreparedStatement pstmt = null;
-		Map<String, Node> nodes = processTree.getNodes();
-		boolean autoCommit = true;
 
+		Map<String, Node> nodes = processTree.getNodes();
 		if (nodes == null)
 			return;
 
+		Connection conn = DBManager.getConnection();
+		String insert_sql = " insert into process_route_defn (project_id, model_id, parent_model_id) values (?, ?, ?)";
+		PreparedStatement pstmt = null;
+		boolean autoCommit = true;
+		
 		try {
 			autoCommit = conn.getAutoCommit();
 			conn.setAutoCommit(false);
@@ -1133,15 +1134,14 @@ public class ProjectConfigutration {
 	}
 
 	public void saveProcessJoins() {
-		Connection conn = DBManager.getConnection();
-		String insert_sql = " insert into process_join_defn (project_id, name, child_model_id) values (?, ?, ?)";
-		PreparedStatement pstmt = null;
-		boolean autoCommit = true;
 
 		if(this.processJoins.size() < 1){ // no process joins defined
 			return;
 		}
-
+		Connection conn = DBManager.getConnection();
+		String insert_sql = " insert into process_join_defn (project_id, name, child_model_id) values (?, ?, ?)";
+		PreparedStatement pstmt = null;
+		boolean autoCommit = true;
 		try{
 			autoCommit = conn.getAutoCommit();
 			conn.setAutoCommit(false);
@@ -1174,17 +1174,17 @@ public class ProjectConfigutration {
 	}
 
 	public void saveProductJoins() {
+
+		if(this.productJoinList.size() < 1){ // no process joins defined
+			return;
+		}
 		Connection conn = DBManager.getConnection();
 		String insert_sql = " insert into product_join_defn (project_id, name, child_product_name, child_product_join_name) values (?, ?, ?, ?)";
 		String insert_grade_sql = " insert into product_join_grade_name_mapping (project_id, name, product_join_name) values (?, ?, ?)";
 		PreparedStatement pstmt = null;
 		PreparedStatement pstmt1 = null;
 		boolean autoCommit = true;
-
-		if(this.productJoinList.size() < 1){ // no process joins defined
-			return;
-		}
-
+		
 		try{
 			autoCommit = conn.getAutoCommit();
 			conn.setAutoCommit(false);
@@ -1242,17 +1242,18 @@ public class ProjectConfigutration {
 	}
 
 	public void saveProducts() {
+
+		if(this.productList.size() < 1){ // no products defined
+			return;
+		}
+
 		Connection conn = DBManager.getConnection();
 		String insert_sql = " insert into product_defn (project_id, name, associated_model_id, child_expression_id) values (?, ?, ?, ?)";
 		String insert_grade_sql = " insert into grade (project_id, name, product_name, value) values (?, ?, ?, ?)";
 		PreparedStatement pstmt = null;
 		PreparedStatement pstmt1 = null;
 		boolean autoCommit = true;
-
-		if(this.productList.size() < 1){ // no products defined
-			return;
-		}
-
+		
 		try{
 			autoCommit = conn.getAutoCommit();
 			conn.setAutoCommit(false);
