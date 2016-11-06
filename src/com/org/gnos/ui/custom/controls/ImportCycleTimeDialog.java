@@ -25,14 +25,10 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.services.ProcessRoute;
+import com.org.gnos.services.csv.CycletTimeDataProcessor;
 
 public class ImportCycleTimeDialog extends Dialog {
 
-	//private ProcessDefinitionFormScreen processDefinitionFormScreen;
-	private ProcessRoute definedProcessRoute;
-	private String createdDumpName;
-	private String associatedPitGroupName;
-	
 	private ScrolledComposite scGridContainer1;
 	private ScrolledComposite scGridContainer2;
 	private ScrolledComposite scGridContainer3;
@@ -96,9 +92,10 @@ public class ImportCycleTimeDialog extends Dialog {
 			public void widgetSelected(SelectionEvent e) {
 				//TODO open system directory
 				String csvFileName = fileDialog.open();
-				System.out.println("Selected file" + csvFileName);
+				System.out.println("Selected Cycle time file: " + csvFileName);
 				if(csvFileName != null){
 					textFileLocation.setText(csvFileName);
+					loadCycleTimeData(csvFileName);
 				}
 			}
 		});
@@ -221,20 +218,14 @@ public class ImportCycleTimeDialog extends Dialog {
 		int y = monitorArea.height -100;
 		return new Point(x, y);
 	}
-
 	@Override
 	protected void okPressed() {
 		super.okPressed();
 	}
-
-	public ProcessRoute getDefinedProcessRoute(){
-		return this.definedProcessRoute;
+	
+	private void loadCycleTimeData(String fileName){
+		CycletTimeDataProcessor processor = CycletTimeDataProcessor.getInstance();
+		processor.processCsv(fileName);
 	}
 	
-	public String getCreatedDumpName(){
-		return this.createdDumpName;
-	}
-	public String getAssociatedPitGroupName(){
-		return this.associatedPitGroupName;
-	}
 }

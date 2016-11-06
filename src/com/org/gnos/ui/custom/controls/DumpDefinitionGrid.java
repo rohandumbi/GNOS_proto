@@ -42,21 +42,26 @@ public class DumpDefinitionGrid extends Composite {
 	private Label fourthSeparator;
 	private Label fifthSeparator;
 	private Label sixthSeparator;
-	/*private Label seventhSeparator;
-	private Label eigthSeparator;*/
+
 	private List<Dump> dumpList;
+	
+	private int pitEndIndex = 0;
+	private int pitGroupEndIndex = 0;
+	
 	private final int FIRST_SEPARATOR_POSITION = 10;
 	private final int SECOND_SEPARATOR_POSITION = 20;
 	private final int THIRD_SEPARATOR_POSITION = 35;
 	private final int FOURTH_SEPARATOR_POSITION = 55;
 	private final int FIFTH_SEPARATOR_POSITION = 60;
 	private final int SIXTH_SEPARATOR_POSITION = 70;
+	
+	private ProjectConfigutration projectConfiguration ;
 
 	public DumpDefinitionGrid(Composite parent, int style) {
 		super(parent, style);
 		this.allRows = new ArrayList<Composite>();
-		//this.pitDependencyDataList = ScenarioConfigutration.getInstance().getPitDependencyDataList();
-		this.dumpList = ProjectConfigutration.getInstance().getDumpList();
+		projectConfiguration = ProjectConfigutration.getInstance();
+		this.dumpList = projectConfiguration.getDumpList();
 		this.createContent(parent);
 	}
 
@@ -242,7 +247,7 @@ public class DumpDefinitionGrid extends Composite {
 		fd_comboDumpType.right = new FormAttachment(FIRST_SEPARATOR_POSITION);
 		comboDumpType.setLayoutData(fd_comboDumpType);
 		comboDumpType.setItems(accociatedTypes);
-		comboDumpType.select(dump.getDumpType());
+		comboDumpType.select(dump.getType());
 		
 		final Composite dumpNameComposite = new Composite(compositeRow, SWT.BORDER);
 		FormData fd_dumpNameComposite = new FormData();
@@ -258,7 +263,7 @@ public class DumpDefinitionGrid extends Composite {
 		comboDumpType.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				createDumpNameWidget(compositeRow, dumpNameComposite, comboDumpType.getSelectionIndex());
-				dump.setDumpType(comboDumpType.getSelectionIndex());
+				dump.setType(comboDumpType.getSelectionIndex());
 			}
 		});
 		
@@ -268,18 +273,37 @@ public class DumpDefinitionGrid extends Composite {
 		fd_comboPitGroup.top = new FormAttachment(0);
 		fd_comboPitGroup.right = new FormAttachment(THIRD_SEPARATOR_POSITION);
 		comboPitGroup.setLayoutData(fd_comboPitGroup);
-		comboPitGroup.setItems(getPitGroups());
+		String[] pits = getPits();
+		String[] pitGroups = getPitGroups();
+		this.pitEndIndex = pits.length -1;
+		this.pitGroupEndIndex = this.pitEndIndex + pitGroups.length;
+		String[] comboItems = new String[pits.length + pitGroups.length];
+		System.arraycopy(pits, 0, comboItems, 0, pits.length);
+		System.arraycopy(pitGroups, 0, comboItems, pits.length, pitGroups.length);
+		
+		comboPitGroup.setItems(comboItems);
+		
 		comboPitGroup.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				//TODO implement handler
-				PitGroup selectedPitGroup = ProjectConfigutration.getInstance().getPitGroupfromName(comboPitGroup.getText());
-				dump.setAssociatedPitGroup(selectedPitGroup);
+				String text = comboPitGroup.getText();
+				int index = comboPitGroup.getSelectionIndex();
+				if(index <= pitEndIndex) {
+					dump.setMappingType(0);
+					dump.setAssociatedPit(projectConfiguration.getPitfromPitName(text));
+				} else {
+					dump.setMappingType(1);
+					dump.setAssociatedPitGroup(projectConfiguration.getPitGroupfromName(text));
+				}
+
 			}
 		});
-		if(dump.getAssociatedPitGroup() != null){
-			String pitGroupName = dump.getAssociatedPitGroup().getName();
-			if(pitGroupName != null){
-				comboPitGroup.setText(pitGroupName);
+		if(dump.getMappingType() == 0){
+			if(dump.getAssociatedPit() != null) {
+				comboPitGroup.setText(dump.getAssociatedPit().getPitName());
+			}
+		} else {
+			if(dump.getAssociatedPitGroup() != null){
+				comboPitGroup.setText(dump.getAssociatedPitGroup().getName());
 			}
 		}
 		
@@ -292,12 +316,12 @@ public class DumpDefinitionGrid extends Composite {
 		textExpression.addModifyListener(new ModifyListener(){
 			public void modifyText(ModifyEvent event) {
 				//TODO implement handler
-				dump.setExpression(textExpression.getText());
+				dump.setCondition(textExpression.getText());
 			}
 		});
-		String expression = dump.getExpression();
-		if(expression != null){
-			textExpression.setText(expression);
+		String condition = dump.getCondition();
+		if(condition != null){
+			textExpression.setText(condition);
 		}
 		
 		final Button btnHasCapacity = new Button(compositeRow, SWT.CHECK);

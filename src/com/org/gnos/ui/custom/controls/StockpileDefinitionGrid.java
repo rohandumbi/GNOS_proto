@@ -22,7 +22,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.core.ProjectConfigutration;
-import com.org.gnos.db.model.Dump;
 import com.org.gnos.db.model.Pit;
 import com.org.gnos.db.model.PitGroup;
 import com.org.gnos.db.model.Stockpile;
@@ -44,7 +43,10 @@ public class StockpileDefinitionGrid extends Composite {
 	private Label fifthSeparator;
 	private Label sixthSeparator;
 	private Label seventhSeparator;
-	//private Label eigthSeparator;
+
+	private int pitEndIndex = 0;
+	private int pitGroupEndIndex = 0;
+	
 	private List<Stockpile> stockpileList;
 	private final int FIRST_SEPARATOR_POSITION = 10;
 	private final int SECOND_SEPARATOR_POSITION = 20;
@@ -53,12 +55,14 @@ public class StockpileDefinitionGrid extends Composite {
 	private final int FIFTH_SEPARATOR_POSITION = 60;
 	private final int SIXTH_SEPARATOR_POSITION = 70;
 	private final int SEVENTH_SEPARATOR_POSITION = 75;
+	
+	private ProjectConfigutration projectConfiguration ;
 
 	public StockpileDefinitionGrid(Composite parent, int style) {
 		super(parent, style);
 		this.allRows = new ArrayList<Composite>();
-		//this.pitDependencyDataList = ScenarioConfigutration.getInstance().getPitDependencyDataList();
-		this.stockpileList = ProjectConfigutration.getInstance().getStockPileList();
+		this.projectConfiguration = ProjectConfigutration.getInstance();
+		this.stockpileList = projectConfiguration.getStockPileList();
 		this.createContent(parent);
 	}
 
@@ -258,7 +262,7 @@ public class StockpileDefinitionGrid extends Composite {
 		fd_comboDumpType.right = new FormAttachment(FIRST_SEPARATOR_POSITION);
 		comboDumpType.setLayoutData(fd_comboDumpType);
 		comboDumpType.setItems(accociatedTypes);
-		comboDumpType.select(stockpile.getStockpileType());
+		comboDumpType.select(stockpile.getType());
 		
 		final Composite stockpileNameComposite = new Composite(compositeRow, SWT.BORDER);
 		FormData fd_stockpileNameComposite = new FormData();
@@ -274,7 +278,7 @@ public class StockpileDefinitionGrid extends Composite {
 		comboDumpType.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				createStockpileNameWidget(compositeRow, stockpileNameComposite, comboDumpType.getSelectionIndex());
-				stockpile.setStockpileType(comboDumpType.getSelectionIndex());
+				stockpile.setType(comboDumpType.getSelectionIndex());
 			}
 		});
 		
@@ -284,18 +288,36 @@ public class StockpileDefinitionGrid extends Composite {
 		fd_comboPitGroup.top = new FormAttachment(0);
 		fd_comboPitGroup.right = new FormAttachment(THIRD_SEPARATOR_POSITION);
 		comboPitGroup.setLayoutData(fd_comboPitGroup);
-		comboPitGroup.setItems(getPitGroups());
+		String[] pits = getPits();
+		String[] pitGroups = getPitGroups();
+		this.pitEndIndex = pits.length -1;
+		this.pitGroupEndIndex = this.pitEndIndex + pitGroups.length;
+		String[] comboItems = new String[pits.length + pitGroups.length];
+		System.arraycopy(pits, 0, comboItems, 0, pits.length);
+		System.arraycopy(pitGroups, 0, comboItems, pits.length, pitGroups.length);
+		
+		comboPitGroup.setItems(comboItems);
+
 		comboPitGroup.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				//TODO implement handler
-				PitGroup selectedPitGroup = ProjectConfigutration.getInstance().getPitGroupfromName(comboPitGroup.getText());
-				stockpile.setAssociatedPitGroup(selectedPitGroup);
+				String text = comboPitGroup.getText();
+				int index = comboPitGroup.getSelectionIndex();
+				if(index <= pitEndIndex) {
+					stockpile.setMappingType(0);
+					stockpile.setAssociatedPit(projectConfiguration.getPitfromPitName(text));
+				} else {
+					stockpile.setMappingType(1);
+					stockpile.setAssociatedPitGroup(projectConfiguration.getPitGroupfromName(text));
+				}
 			}
 		});
-		if(stockpile.getAssociatedPitGroup() != null){
-			String pitGroupName = stockpile.getAssociatedPitGroup().getName();
-			if(pitGroupName != null){
-				comboPitGroup.setText(pitGroupName);
+		if(stockpile.getMappingType() == 0){
+			if(stockpile.getAssociatedPit() != null) {
+				comboPitGroup.setText(stockpile.getAssociatedPit().getPitName());
+			}
+		} else {
+			if(stockpile.getAssociatedPitGroup() != null){
+				comboPitGroup.setText(stockpile.getAssociatedPitGroup().getName());
 			}
 		}
 		
@@ -308,12 +330,12 @@ public class StockpileDefinitionGrid extends Composite {
 		textExpression.addModifyListener(new ModifyListener(){
 			public void modifyText(ModifyEvent event) {
 				//TODO implement handler
-				stockpile.setExpression(textExpression.getText());
+				stockpile.setCondition(textExpression.getText());
 			}
 		});
-		String expression = stockpile.getExpression();
-		if(expression != null){
-			textExpression.setText(expression);
+		String condition = stockpile.getCondition();
+		if(condition != null){
+			textExpression.setText(condition);
 		}
 		
 		final Button btnHasCapacity = new Button(compositeRow, SWT.CHECK);

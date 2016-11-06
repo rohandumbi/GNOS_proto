@@ -514,7 +514,7 @@ public class ProjectConfigutration {
 	}
 
 	public void loadDumps() {
-		String sql = "select id, project_id, dumpType, name, expression, pitgroup_name, has_capacity, capacity from dump_pit_mapping where project_id = "+ this.projectId +" order by id asc ";
+		String sql = "select id, type, name, condition_str, mapped_to, mapping_type, has_capacity, capacity from dump where project_id = "+ this.projectId +" order by id asc ";
 
 		try (
 				Connection conn = DBManager.getConnection();
@@ -525,22 +525,27 @@ public class ProjectConfigutration {
 			int count = 1;
 			while(rs.next()){
 				int id = rs.getInt(1);
-				int dumpType = rs.getInt(3);
-				String name = rs.getString(4);
-				String expression = rs.getString(5);
-				String pitGroupName = rs.getString(6);
+				int type = rs.getInt(2);
+				String name = rs.getString(3);
+				String condition = rs.getString(4);
+				String mappedTo = rs.getString(5);
+				int mappingType = rs.getInt(6);
 				boolean hasCapacity = rs.getBoolean(7);
 				int capacity = rs.getInt(8);
-				PitGroup pitGroup = this.getPitGroupfromName(pitGroupName);
 				Dump dump = new Dump();
 				dump.setId(id);
-				dump.setDumpType(dumpType);
+				dump.setType(type);
 				dump.setName(name);
-				dump.setExpression(expression);
-				dump.setAssociatedPitGroup(pitGroup);
+				dump.setCondition(condition);
+				dump.setMappingType(mappingType);
 				dump.setHasCapacity(hasCapacity);
 				dump.setCapacity(capacity);
 				dump.setDumpNumber(count);
+				if(mappingType == 0){
+					dump.setAssociatedPit(this.getPitfromPitName(mappedTo));
+				} else {
+					dump.setAssociatedPitGroup(this.getPitGroupfromName(mappedTo));
+				}
 				count ++;
 				this.dumpList.add(dump);
 			}
@@ -551,7 +556,7 @@ public class ProjectConfigutration {
 	}
 
 	public void loadStockpiles() {
-		String sql = "select id, project_id, stockpileType, name, expression, pitgroup_name, has_capacity, capacity, is_reclaim from stockpile_pit_mapping where project_id = "+ this.projectId +" order by id asc ";
+		String sql = "select id, type, name, condition_str, mapped_to, mapping_type, has_capacity, capacity, is_reclaim from stockpile where project_id = "+ this.projectId +" order by id asc ";
 
 		try (
 				Connection conn = DBManager.getConnection();
@@ -562,24 +567,29 @@ public class ProjectConfigutration {
 			int count = 1;
 			while(rs.next()){
 				int id = rs.getInt(1);
-				int stockpileType = rs.getInt(3);
-				String name = rs.getString(4);
-				String expression = rs.getString(5);
-				String pitGroupName = rs.getString(6);
+				int type = rs.getInt(2);
+				String name = rs.getString(3);
+				String condition = rs.getString(4);
+				String mappedTo = rs.getString(5);
+				int mappingType = rs.getInt(6);
 				boolean hasCapacity = rs.getBoolean(7);
 				int capacity = rs.getInt(8);
 				boolean isReclaim = rs.getBoolean(9);
-				PitGroup pitGroup = this.getPitGroupfromName(pitGroupName);
 				Stockpile stockpile = new Stockpile();
 				stockpile.setId(id);
-				stockpile.setStockpileType(stockpileType);
+				stockpile.setType(type);
 				stockpile.setName(name);
-				stockpile.setExpression(expression);
-				stockpile.setAssociatedPitGroup(pitGroup);
+				stockpile.setCondition(condition);
+				stockpile.setMappingType(mappingType);
 				stockpile.setHasCapacity(hasCapacity);
 				stockpile.setCapacity(capacity);
 				stockpile.setStockpileNumber(count);
 				stockpile.setReclaim(isReclaim);
+				if(mappingType == 0){
+					stockpile.setAssociatedPit(this.getPitfromPitName(mappedTo));
+				} else {
+					stockpile.setAssociatedPitGroup(this.getPitGroupfromName(mappedTo));
+				}
 				count ++;
 				this.stockPileList.add(stockpile);
 			}
@@ -1336,8 +1346,8 @@ public class ProjectConfigutration {
 		}
 	}
 	public void saveDumps() {
-		String insert_sql = "insert into dump_pit_mapping ( project_id , dumpType, name, expression, pitgroup_name, has_capacity, capacity) values ( ? , ?, ?, ?, ?, ?, ?)";
-		String update_sql = "update dump_pit_mapping set dumpType= ? , name = ?, expression = ?, pitgroup_name = ?, has_capacity = ?, capacity = ? where id = ?";
+		String insert_sql = "insert into dump ( project_id , type, name, condition_str, mapped_to, mapping_type, has_capacity, capacity) values ( ? , ?, ?, ?, ?, ?, ?, ?)";
+		String update_sql = "update dump set type = ? , name = ?, condition_str = ?, mapped_to = ?, mapping_type= ?, has_capacity = ?, capacity = ? where id = ?";
 		try (
 				Connection conn = DBManager.getConnection();
 				PreparedStatement pstmt1 = conn.prepareStatement(insert_sql);
@@ -1347,21 +1357,31 @@ public class ProjectConfigutration {
 			for(Dump dump : dumpList) {
 				if(dump.getId() == -1){
 					pstmt1.setInt(1, projectId);
-					pstmt1.setInt(2, dump.getDumpType());
+					pstmt1.setInt(2, dump.getType());
 					pstmt1.setString(3, dump.getName());
-					pstmt1.setString(4, dump.getExpression());
-					pstmt1.setString(5, dump.getAssociatedPitGroup().getName());
-					pstmt1.setBoolean(6, dump.isHasCapacity());
-					pstmt1.setInt(7, dump.getCapacity());
+					pstmt1.setString(4, dump.getCondition());
+					if(dump.getMappingType() == 0){
+						pstmt1.setString(5, dump.getAssociatedPit().getPitName());
+					} else {
+						pstmt1.setString(5, dump.getAssociatedPitGroup().getName());
+					}	
+					pstmt1.setInt(6, dump.getMappingType());
+					pstmt1.setBoolean(7, dump.isHasCapacity());
+					pstmt1.setInt(8, dump.getCapacity());
 					pstmt1.executeUpdate();
 				}else{
-					pstmt2.setInt(1, dump.getDumpType());
+					pstmt2.setInt(1, dump.getType());
 					pstmt2.setString(2, dump.getName());
-					pstmt2.setString(3, dump.getExpression());
-					pstmt2.setString(4, dump.getAssociatedPitGroup().getName());
-					pstmt2.setBoolean(5, dump.isHasCapacity());
-					pstmt2.setInt(6, dump.getCapacity());
-					pstmt2.setInt(7, dump.getId());
+					pstmt2.setString(3, dump.getCondition());
+					if(dump.getMappingType() == 0){
+						pstmt2.setString(4, dump.getAssociatedPit().getPitName());
+					} else {
+						pstmt2.setString(4, dump.getAssociatedPitGroup().getName());
+					}
+					pstmt2.setInt(5, dump.getMappingType());
+					pstmt2.setBoolean(6, dump.isHasCapacity());
+					pstmt2.setInt(7, dump.getCapacity());
+					pstmt2.setInt(8, dump.getId());
 					pstmt2.executeUpdate();
 				}
 				dump.setDumpNumber(count);				
@@ -1374,8 +1394,8 @@ public class ProjectConfigutration {
 	}
 
 	public void saveStockpiles() {
-		String insert_sql = "insert into stockpile_pit_mapping ( project_id , stockpileType, name, expression, pitgroup_name, has_capacity, capacity, is_reclaim) values ( ? , ?, ?, ?, ?, ?, ?, ?)";
-		String update_sql = "update stockpile_pit_mapping set stockpileType= ? , name = ?, expression = ?, pitgroup_name = ?, has_capacity = ?, capacity = ?, is_reclaim = ? where id = ?";
+		String insert_sql = "insert into stockpile ( project_id , type, name, condition_str, mapped_to, mapping_type, has_capacity, capacity, is_reclaim) values ( ? , ?, ?, ?, ?, ?, ?, ?, ?)";
+		String update_sql = "update stockpile set type = ? , name = ?, condition_str = ?, mapped_to = ?, mapping_type= ?, has_capacity = ?, capacity = ?, is_reclaim = ? where id = ?";
 		try (
 				Connection conn = DBManager.getConnection();
 				PreparedStatement pstmt1 = conn.prepareStatement(insert_sql);
@@ -1385,23 +1405,34 @@ public class ProjectConfigutration {
 			for(Stockpile stockpile : stockPileList) {
 				if(stockpile.getId() == -1){
 					pstmt1.setInt(1, projectId);
-					pstmt1.setInt(2, stockpile.getStockpileType());
+					pstmt1.setInt(2, stockpile.getType());
 					pstmt1.setString(3, stockpile.getName());
-					pstmt1.setString(4, stockpile.getExpression());
-					pstmt1.setString(5, stockpile.getAssociatedPitGroup().getName());
-					pstmt1.setBoolean(6, stockpile.isHasCapacity());
-					pstmt1.setInt(7, stockpile.getCapacity());
-					pstmt1.setBoolean(8, stockpile.isReclaim());
+					pstmt1.setString(4, stockpile.getCondition());
+					if(stockpile.getMappingType() == 0) {
+						pstmt1.setString(5, stockpile.getAssociatedPit().getPitName());
+					} else {
+						pstmt1.setString(5, stockpile.getAssociatedPitGroup().getName());
+					}
+					
+					pstmt1.setInt(6, stockpile.getMappingType());
+					pstmt1.setBoolean(7, stockpile.isHasCapacity());
+					pstmt1.setInt(8, stockpile.getCapacity());
+					pstmt1.setBoolean(9, stockpile.isReclaim());
 					pstmt1.executeUpdate();
 				}else{
-					pstmt2.setInt(1, stockpile.getStockpileType());
+					pstmt2.setInt(1, stockpile.getType());
 					pstmt2.setString(2, stockpile.getName());
-					pstmt2.setString(3, stockpile.getExpression());
-					pstmt2.setString(4, stockpile.getAssociatedPitGroup().getName());
-					pstmt2.setBoolean(5, stockpile.isHasCapacity());
-					pstmt2.setInt(6, stockpile.getCapacity());
-					pstmt2.setBoolean(7, stockpile.isReclaim());
-					pstmt2.setInt(8, stockpile.getId());
+					pstmt2.setString(3, stockpile.getCondition());
+					if(stockpile.getMappingType() == 0) {
+						pstmt2.setString(4, stockpile.getAssociatedPit().getPitName());
+					} else {
+						pstmt2.setString(4, stockpile.getAssociatedPitGroup().getName());
+					}
+					pstmt2.setInt(5, stockpile.getMappingType());
+					pstmt2.setBoolean(6, stockpile.isHasCapacity());
+					pstmt2.setInt(7, stockpile.getCapacity());
+					pstmt2.setBoolean(8, stockpile.isReclaim());
+					pstmt2.setInt(9, stockpile.getId());
 					pstmt2.executeUpdate();
 				}
 				stockpile.setStockpileNumber(count);				
@@ -1950,6 +1981,15 @@ public class ProjectConfigutration {
 		return null;
 	}
 
+	public Pit getPitfromPitNumber(int number) {
+		List<Pit> pitList = this.getPitList();
+		for(Pit p : pitList){
+			if(p.getPitNumber()== number){
+				return p;
+			}
+		}
+		return null;
+	}
 	public PitGroup getPitGroupfromName(String name) {
 
 		for(PitGroup pg : this.pitGroupList){

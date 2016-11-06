@@ -22,10 +22,13 @@ import com.org.gnos.core.Tree;
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.model.CapexData;
 import com.org.gnos.db.model.CapexInstance;
+import com.org.gnos.db.model.Dump;
 import com.org.gnos.db.model.FixedOpexCost;
 import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.OpexData;
+import com.org.gnos.db.model.Pit;
 import com.org.gnos.db.model.Process;
+import com.org.gnos.db.model.Stockpile;
 
 public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 	
@@ -52,6 +55,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 			output = new BufferedOutputStream(new FileOutputStream("output.txt"), bufferSize);
 			bytesWritten = 0;
 			buildProcessBlockVariables();
+			buildStockpileVariables();
 			buildWasteBlockVariables();
 			buildCapexVariables();
 			output.flush();
@@ -75,7 +79,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 			buildProcessVariables(process, blocks, process.getProcessNo());		
 		}
 		serviceInstanceData.setProcessBlocks(processBlocks);
-		buildStockpileVariables(processBlocks);
+
 	}
 	
 	private void buildProcessVariables(Process process, List<Block> blocks, int processNumber) {
@@ -87,6 +91,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 			BigDecimal miningcost = oreMiningCostMap.get(year);
 			
 			for(Block block: blocks) {
+				processedBlocks.add(block.getId());
 				BigDecimal processValue = getProcessValue(block, process.getModel(), year);
 				BigDecimal value = processValue.subtract(miningcost);
 				value = (value.multiply(new BigDecimal(1 / Math.pow ((1 + discount_rate), count))));
@@ -103,53 +108,104 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		}
 	}
 	
-	private void buildStockpileVariables(Set<Block> blocks) {
+	private void buildStockpileVariables() {
+		
 		FixedOpexCost[] fixedOpexCost = scenarioConfigutration.getFixedCost();
 		if(fixedOpexCost == null || fixedOpexCost.length < 3) return;
 		Map<Integer, BigDecimal> oreMiningCostMap = fixedOpexCost[0].getCostData();
 		Map<Integer, BigDecimal> stockPilingCostMap = fixedOpexCost[2].getCostData();
 		Set<Integer> keys = stockPilingCostMap.keySet();
-		int count = 1;
-		for(int year: keys){
-			BigDecimal cost = stockPilingCostMap.get(year).add(oreMiningCostMap.get(year));			
-			for(Block block: blocks) {
-				Integer stockpileNumber = this.serviceInstanceData.getPitStockpileMapping().get(block.getPitNo());
-				if(stockpileNumber == null) continue;
-				String variable = "p"+block.getPitNo()+"x"+block.getBlockNo()+"s"+stockpileNumber+"t"+count;
-				String eq = " -"+formatDecimalValue(cost)+ variable;
-				write(eq);
-				
-				serviceInstanceData.addVariable(block, variable);
+		String pitNameField = projectConfiguration.getRequiredFieldMapping().get("pit_name");
+		List<Stockpile> stockpileList = projectConfiguration.getStockPileList();
+		for(Stockpile sp: stockpileList){
+			String condition = (sp.getCondition() == null) ? "" : sp.getCondition();
+			if(hasValue(sp.getCondition())){
+				condition += " AND ";
 			}
-			count++;
-		}
-	}
-	
-	private void buildWasteBlockVariables() throws IOException {
-		Set<Block> wasteblocks = findWasteBlocks();
-		serviceInstanceData.setWasteBlocks(wasteblocks);
-		FixedOpexCost[] fixedOpexCost = scenarioConfigutration.getFixedCost();
-		if(fixedOpexCost == null || fixedOpexCost.length < 2) return;
-		Map<Integer, BigDecimal> wasteMiningCostMap = fixedOpexCost[1].getCostData();
-		Set<Integer> keys = wasteMiningCostMap.keySet();
-
-		int count = 1;	
-		for(int year: keys){
-			BigDecimal cost = wasteMiningCostMap.get(year);		
-			for(Block block: wasteblocks) {
-				List<Integer> dumps = this.serviceInstanceData.getPitDumpMapping().get(block.getPitNo());
-				if(dumps == null) continue;
-				for(Integer dumpNo: dumps){
-					String variable = "p"+block.getPitNo()+"x"+block.getBlockNo()+"w"+dumpNo+"t"+count;
-					String eq = " -"+formatDecimalValue(cost)+variable;
+			condition +=  pitNameField + " in ( ";
+			if(sp.getMappingType() == 0) {
+				condition +=  "'"+sp.getAssociatedPit().getPitName() +"'";
+			} else {
+				Set<Integer> pits = serviceInstanceData.flattenPitGroup(sp.getAssociatedPitGroup());
+				for(int pitNo: pits){
+					Pit pit = projectConfiguration.getPitfromPitNumber(pitNo);
+					condition +=  "'"+pit.getPitName() +"',";
+				}
+				condition = condition.substring(0, condition.length() -1);
+			}
+			condition += ")";
+			System.out.println(" Stockpile Condition :"+condition);
+			List<Block> blocks = findBlocks(condition);
+			int count = 1;
+			for(int year: keys){
+				BigDecimal cost = stockPilingCostMap.get(year).add(oreMiningCostMap.get(year));			
+				for(Block block: blocks) {
+					if(!processedBlocks.contains(block.getId())) continue;
+					Integer stockpileNumber = this.serviceInstanceData.getPitStockpileMapping().get(block.getPitNo());
+					if(stockpileNumber == null) continue;
+					String variable = "p"+block.getPitNo()+"x"+block.getBlockNo()+"s"+stockpileNumber+"t"+count;
+					String eq = " -"+formatDecimalValue(cost)+ variable;
 					write(eq);
 					
 					serviceInstanceData.addVariable(block, variable);
 				}
-				
+				count++;
 			}
-			count++;
 		}
+		
+	}
+	
+	private void buildWasteBlockVariables() throws IOException {
+		Set<Block> wasteBlocks = new HashSet<Block>();
+		FixedOpexCost[] fixedOpexCost = scenarioConfigutration.getFixedCost();
+		if(fixedOpexCost == null || fixedOpexCost.length < 2) return;
+		Map<Integer, BigDecimal> wasteMiningCostMap = fixedOpexCost[1].getCostData();
+		Set<Integer> keys = wasteMiningCostMap.keySet();
+		String pitNameField = projectConfiguration.getRequiredFieldMapping().get("pit_name");
+		List<Dump> dumpList = projectConfiguration.getDumpList();
+		
+		for(Dump dump: dumpList) {			
+			String condition = (dump.getCondition() == null) ? "": dump.getCondition();
+			if(hasValue(dump.getCondition())){
+				condition += " AND " ;
+			}
+			condition +=  pitNameField + " in ( ";
+			if(dump.getMappingType() == 0) {
+				condition += "'"+dump.getAssociatedPit().getPitName()+ "'";
+			} else {
+				Set<Integer> pits = serviceInstanceData.flattenPitGroup(dump.getAssociatedPitGroup());
+				for(int pitNo: pits){
+					Pit pit = projectConfiguration.getPitfromPitNumber(pitNo);
+					condition +=  "'"+ pit.getPitName() +"',";
+				}
+				condition = condition.substring(0, condition.length() -1);
+			}
+			condition += ")";
+			System.out.println(" Dump Condition :"+condition);
+			List<Block> blocks = findBlocks(condition);
+			
+			int count = 1;	
+			for(int year: keys){
+				BigDecimal cost = wasteMiningCostMap.get(year);		
+				for(Block block: blocks) {
+					if(processedBlocks.contains(block.getId())) continue;
+					wasteBlocks.add(block);
+					List<Integer> dumps = this.serviceInstanceData.getPitDumpMapping().get(block.getPitNo());
+					if(dumps == null) continue;
+					for(Integer dumpNo: dumps){
+						String variable = "p"+block.getPitNo()+"x"+block.getBlockNo()+"w"+dumpNo+"t"+count;
+						String eq = " -"+formatDecimalValue(cost)+variable;
+						write(eq);
+						
+						serviceInstanceData.addVariable(block, variable);
+					}
+					
+				}
+				count++;
+			}
+		}
+		serviceInstanceData.setWasteBlocks(wasteBlocks);
+		
 	}
 	
 	private void buildCapexVariables(){
@@ -228,7 +284,6 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 				int id = rs.getInt("id");
 				Block block = serviceInstanceData.getBlocks().get(id);
 				blocks.add(block);
-				processedBlocks.add(block.getId());
 			}
 			
 		} catch (SQLException e) {

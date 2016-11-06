@@ -2,12 +2,14 @@ package com.org.gnos.db.model;
 
 public class Dump {
 	private int id;
-	private int dumpType; // 0=External; 1=Internal
+	private int type; // 0=External; 1=Internal
 	private String name;
 	private PitGroup associatedPitGroup;
+	private Pit associatedPit;
+	private int mappingType; // 0 - Pit, 1 - PitGroup
 	private int dumpNumber;
 	private boolean hasCapacity;
-	private String expression;
+	private String condition;
 	private int capacity;
 	
 	public Dump(String name, PitGroup pitGroup){
@@ -19,7 +21,7 @@ public class Dump {
 	public Dump(){
 		this.id = -1;
 	}
-	
+
 	public int getId() {
 		return id;
 	}
@@ -28,12 +30,44 @@ public class Dump {
 		this.id = id;
 	}
 
+	public int getType() {
+		return type;
+	}
+
+	public void setType(int type) {
+		this.type = type;
+	}
+
 	public String getName() {
 		return name;
 	}
 
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	public PitGroup getAssociatedPitGroup() {
 		return associatedPitGroup;
+	}
+
+	public void setAssociatedPitGroup(PitGroup associatedPitGroup) {
+		this.associatedPitGroup = associatedPitGroup;
+	}
+
+	public Pit getAssociatedPit() {
+		return associatedPit;
+	}
+
+	public void setAssociatedPit(Pit associatedPit) {
+		this.associatedPit = associatedPit;
+	}
+
+	public int getMappingType() {
+		return mappingType;
+	}
+
+	public void setMappingType(int mappingType) {
+		this.mappingType = mappingType;
 	}
 
 	public int getDumpNumber() {
@@ -44,14 +78,6 @@ public class Dump {
 		this.dumpNumber = dumpNumber;
 	}
 
-	public int getDumpType() {
-		return dumpType;
-	}
-
-	public void setDumpType(int dumpType) {
-		this.dumpType = dumpType;
-	}
-
 	public boolean isHasCapacity() {
 		return hasCapacity;
 	}
@@ -60,12 +86,12 @@ public class Dump {
 		this.hasCapacity = hasCapacity;
 	}
 
-	public String getExpression() {
-		return expression;
+	public String getCondition() {
+		return condition;
 	}
 
-	public void setExpression(String expression) {
-		this.expression = expression;
+	public void setCondition(String condition) {
+		this.condition = condition;
 	}
 
 	public int getCapacity() {
@@ -74,14 +100,6 @@ public class Dump {
 
 	public void setCapacity(int capacity) {
 		this.capacity = capacity;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public void setAssociatedPitGroup(PitGroup associatedPitGroup) {
-		this.associatedPitGroup = associatedPitGroup;
 	}
 	
 }

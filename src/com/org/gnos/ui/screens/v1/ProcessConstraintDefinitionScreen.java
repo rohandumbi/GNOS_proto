@@ -1,9 +1,6 @@
 package com.org.gnos.ui.screens.v1;
 
 
-import java.util.List;
-import java.util.Map;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -20,11 +17,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.core.ScenarioConfigutration;
-import com.org.gnos.db.model.OpexData;
-import com.org.gnos.db.model.ProcessConstraintData;
-import com.org.gnos.db.model.Scenario;
 import com.org.gnos.events.GnosEvent;
-import com.org.gnos.services.TimePeriod;
 import com.org.gnos.ui.custom.controls.GnosScreen;
 import com.org.gnos.ui.custom.controls.ProcessConstraintGrid;
 
@@ -34,8 +27,6 @@ public class ProcessConstraintDefinitionScreen extends GnosScreen {
 	private ScrolledComposite scGridContainer;
 	private ProcessConstraintGrid processConstraintGrid;
 	private Label labelScreenName;
-	private int timePeriod;
-	private int startYear;
 	private String scenarioName;
 	private Button btnAddConstraintRow;
 	/**
@@ -48,8 +39,6 @@ public class ProcessConstraintDefinitionScreen extends GnosScreen {
 		setForeground(SWTResourceManager.getColor(30, 144, 255));
 		setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		this.timePeriod = ScenarioConfigutration.getInstance().getTimePeriod();
-		this.startYear = ScenarioConfigutration.getInstance().getStartYear();
 		this.scenarioName = ScenarioConfigutration.getInstance().getName();
 		this.createContent();
 

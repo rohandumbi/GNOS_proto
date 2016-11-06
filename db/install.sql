@@ -199,35 +199,35 @@ CREATE TABLE pitgroup_pit_mapping(
    unique (project_id, name, child_pitgroup_name)
 );
 
-DROP TABLE IF EXISTS dump_pit_mapping; 
+DROP TABLE IF EXISTS dump; 
 
-CREATE TABLE dump_pit_mapping(
+CREATE TABLE dump(
    id INT NOT NULL AUTO_INCREMENT,
    project_id INT NOT NULL,
-   dumpType INT NOT NULL,
+   type INT NOT NULL,
    name VARCHAR(100) NOT NULL,
-   expression VARCHAR(100),
-   pitgroup_name VARCHAR(100) NOT NULL,
+   condition_str VARCHAR(200),
+   mapped_to VARCHAR(50) NOT NULL,
+   mapping_type TINYINT,
    has_capacity TINYINT,
    capacity INT,
-   primary key (id),
-   unique (project_id, name, pitgroup_name)
+   primary key (id)
 );
 
-DROP TABLE IF EXISTS stockpile_pit_mapping; 
+DROP TABLE IF EXISTS stockpile; 
 
-CREATE TABLE stockpile_pit_mapping(
+CREATE TABLE stockpile(
    id INT NOT NULL AUTO_INCREMENT,
    project_id INT NOT NULL,
-   stockpileType INT NOT NULL,
+   type INT NOT NULL,
    name  VARCHAR(100) NOT NULL,
-   expression VARCHAR(100),
-   pitgroup_name VARCHAR(100) NOT NULL,
+   condition_str VARCHAR(200),
+   mapped_to VARCHAR(50) NOT NULL,
+   mapping_type TINYINT,
    has_capacity TINYINT,
    capacity INT,
    is_reclaim TINYINT,
-   primary key (id),
-   unique key(project_id, name, pitgroup_name)
+   primary key (id)
 );
 
 DROP TABLE IF EXISTS grade; 

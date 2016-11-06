@@ -99,31 +99,45 @@ public class InstanceData {
 		this.pitStockpileMapping = new HashMap<Integer, Integer>();
 		List<Stockpile> stockpileListData = projectConfiguration.getStockPileList();
 		for(Stockpile sp: stockpileListData){
-			Set<Integer> pits = flattenPitGroup(sp.getAssociatedPitGroup());
-			for(Integer pitNo: pits) {
-				this.pitStockpileMapping.put(pitNo, sp.getStockpileNumber());
+			if(sp.getMappingType() == 0) {
+				this.pitStockpileMapping.put(sp.getAssociatedPit().getPitNumber(), sp.getStockpileNumber());
+			} else {
+				Set<Integer> pits = flattenPitGroup(sp.getAssociatedPitGroup());
+				for(Integer pitNo: pits) {
+					this.pitStockpileMapping.put(pitNo, sp.getStockpileNumber());
+				}
 			}
+			
 		}
 		
 	}
 
+	
 	private void parseDumpData() {
 		this.pitDumpMapping = new HashMap<Integer, List<Integer>>();
 		List<Dump> dumpData = projectConfiguration.getDumpList();
 		for(Dump dump: dumpData){
-			Set<Integer> pits = flattenPitGroup(dump.getAssociatedPitGroup());
-			for(Integer pitNo: pits) {
-				List<Integer> dumps = this.pitDumpMapping.get(pitNo);
-				if(dumps == null){
-					dumps = new ArrayList<Integer>();
-					this.pitDumpMapping.put(pitNo, dumps);
+			if(dump.getMappingType() == 0){
+				int pitNo = dump.getAssociatedPit().getPitNumber();
+				addDumpToPit(pitNo, dump.getDumpNumber());
+			} else {
+				Set<Integer> pits = flattenPitGroup(dump.getAssociatedPitGroup());
+				for(Integer pitNo: pits) {
+					addDumpToPit(pitNo, dump.getDumpNumber());
 				}
-				dumps.add(dump.getDumpNumber());
 			}
+			
 		}
 	}
-	
-	private Set<Integer> flattenPitGroup(PitGroup pg) {
+	private void addDumpToPit(int pitNo, int dumpNumber) {
+		List<Integer> dumps = this.pitDumpMapping.get(pitNo);
+		if(dumps == null){
+			dumps = new ArrayList<Integer>();
+			this.pitDumpMapping.put(pitNo, dumps);
+		}
+		dumps.add(dumpNumber);
+	}
+	public Set<Integer> flattenPitGroup(PitGroup pg) {
 		 Set<Integer> pits = new HashSet<Integer>();
 		 for(com.org.gnos.db.model.Pit childPit: pg.getListChildPits()){
 			 pits.add(childPit.getPitNumber());

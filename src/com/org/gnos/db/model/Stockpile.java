@@ -2,12 +2,14 @@ package com.org.gnos.db.model;
 
 public class Stockpile {
 	private int id;
-	private int stockpileType; // 0=External; 1=Internal
+	private int type; // 0=External; 1=Internal
 	private String name;
 	private PitGroup associatedPitGroup;
+	private Pit associatedPit;
+	private int mappingType;
 	private int stockpileNumber;
 	private boolean hasCapacity;
-	private String expression;
+	private String condition;
 	private int capacity;
 	private boolean isReclaim;
 	
@@ -21,12 +23,52 @@ public class Stockpile {
 		this.id = -1;
 	}
 
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public int getType() {
+		return type;
+	}
+
+	public void setType(int type) {
+		this.type = type;
+	}
+
 	public String getName() {
 		return name;
 	}
 
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	public PitGroup getAssociatedPitGroup() {
-		return this.associatedPitGroup;
+		return associatedPitGroup;
+	}
+
+	public void setAssociatedPitGroup(PitGroup associatedPitGroup) {
+		this.associatedPitGroup = associatedPitGroup;
+	}
+
+	public Pit getAssociatedPit() {
+		return associatedPit;
+	}
+
+	public void setAssociatedPit(Pit associatedPit) {
+		this.associatedPit = associatedPit;
+	}
+
+	public int getMappingType() {
+		return mappingType;
+	}
+
+	public void setMappingType(int mappingType) {
+		this.mappingType = mappingType;
 	}
 
 	public int getStockpileNumber() {
@@ -37,22 +79,6 @@ public class Stockpile {
 		this.stockpileNumber = stockpileNumber;
 	}
 
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public int getStockpileType() {
-		return stockpileType;
-	}
-
-	public void setStockpileType(int stockpileType) {
-		this.stockpileType = stockpileType;
-	}
-
 	public boolean isHasCapacity() {
 		return hasCapacity;
 	}
@@ -61,12 +87,12 @@ public class Stockpile {
 		this.hasCapacity = hasCapacity;
 	}
 
-	public String getExpression() {
-		return expression;
+	public String getCondition() {
+		return condition;
 	}
 
-	public void setExpression(String expression) {
-		this.expression = expression;
+	public void setCondition(String condition) {
+		this.condition = condition;
 	}
 
 	public int getCapacity() {
@@ -85,13 +111,4 @@ public class Stockpile {
 		this.isReclaim = isReclaim;
 	}
 
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public void setAssociatedPitGroup(PitGroup associatedPitGroup) {
-		this.associatedPitGroup = associatedPitGroup;
-	}
-	
-	
 }

@@ -45,19 +45,19 @@ public class PitGroupDefinitionGraph extends Composite {
 	}
 	
 	public void addDumpToGroup(Dump dump){
-		GraphNode dumpNode = new GraphNode(this.graph, SWT.NONE, "Dump: " + dump.getName());
+		/*GraphNode dumpNode = new GraphNode(this.graph, SWT.NONE, "Dump: " + dump.getName());
 		dumpNode.setBackgroundColor(SWTResourceManager.getColor(SWT.COLOR_RED));
 		GraphNode associatedPitGroupNode = this.existingGroupNodeGraph.get(dump.getAssociatedPitGroup().getName());
 		new GraphConnection(this.graph, ZestStyles.CONNECTIONS_DOT, dumpNode, associatedPitGroupNode);
-		this.graph.setLayoutAlgorithm(new HorizontalTreeLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);
+		this.graph.setLayoutAlgorithm(new HorizontalTreeLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);*/
 	}
 	
 	public void addStockpileToGroup(Stockpile stockpile){
-		GraphNode stockPileNode = new GraphNode(this.graph, SWT.NONE, "Stockpile: " + stockpile.getName());
+		/*GraphNode stockPileNode = new GraphNode(this.graph, SWT.NONE, "Stockpile: " + stockpile.getName());
 		stockPileNode.setBackgroundColor(SWTResourceManager.getColor(SWT.COLOR_GREEN));
 		GraphNode associatedPitGroupNode = this.existingGroupNodeGraph.get(stockpile.getAssociatedPitGroup().getName());
 		new GraphConnection(this.graph, ZestStyles.CONNECTIONS_DOT, stockPileNode, associatedPitGroupNode);
-		this.graph.setLayoutAlgorithm(new HorizontalTreeLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);
+		this.graph.setLayoutAlgorithm(new HorizontalTreeLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);*/
 	}
 
 	
