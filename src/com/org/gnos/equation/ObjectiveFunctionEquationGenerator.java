@@ -190,6 +190,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 				for(Block block: blocks) {
 					if(processedBlocks.contains(block.getId())) continue;
 					wasteBlocks.add(block);
+					dump.addBlock(block);
 					List<Integer> dumps = this.serviceInstanceData.getPitDumpMapping().get(block.getPitNo());
 					if(dumps == null) continue;
 					for(Integer dumpNo: dumps){

@@ -2000,6 +2000,27 @@ public class ProjectConfigutration {
 		return null;
 	}
 	
+	public Dump getDumpfromDumpName(String name) {
+		List<Dump> dumpList = this.getDumpList();
+		for(Dump dump : dumpList){
+			if(dump.getName().equals(name)){
+				return dump;
+			}
+		}
+		return null;
+	}
+	
+	public Dump getDumpfromPitName(String name) {
+		List<Dump> dumpList = this.getDumpList();
+		for(Dump dump : dumpList){
+			if(dump.getType() == 0) continue;
+			if(dump.getName().equals(name)){
+				return dump;
+			}
+		}
+		return null;
+	}
+	
 	public TruckParameterCycleTime getTruckParamCycleTimeByStockpileName(String stockpileName) {
 
 		for(TruckParameterCycleTime tpmCycleTime : this.truckParameterCycleTimeList){

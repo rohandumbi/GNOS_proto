@@ -1,5 +1,11 @@
 package com.org.gnos.db.model;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import com.org.gnos.core.Block;
+
 public class Dump {
 	private int id;
 	private int type; // 0=External; 1=Internal
@@ -11,6 +17,7 @@ public class Dump {
 	private boolean hasCapacity;
 	private String condition;
 	private int capacity;
+	private Set<Block> blocks = new HashSet<Block>();
 	
 	public Dump(String name, PitGroup pitGroup){
 		this.id = -1;
@@ -102,4 +109,14 @@ public class Dump {
 		this.capacity = capacity;
 	}
 	
+	public Set<Block> getBlocks() {
+		return blocks;
+	}
+	public void setBlocks(Set<Block> blocks) {
+		this.blocks = blocks;
+	}
+	
+	public void addBlock(Block block) {
+		this.blocks.add(block);
+	}
 }

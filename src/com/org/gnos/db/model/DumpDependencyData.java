@@ -7,15 +7,11 @@ public class DumpDependencyData {
 	private String firstPitName;
 	private String firstDumpName;
 	private String dependentDumpName;
-	/*private String dependentPitAssociatedBench;
-	private int minLead;
-	private int maxLead;*/
+
 	
 	public DumpDependencyData() {
 		super();
 		this.id = -1;
-		//this.minLead = -1;
-		//this.maxLead = -1;
 	}
 	
 	public int getId() {

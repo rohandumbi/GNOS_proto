@@ -4,6 +4,8 @@ import com.org.gnos.equation.BenchConstraintEquationGenerator;
 import com.org.gnos.equation.BinaryVariableGenerator;
 import com.org.gnos.equation.BoundaryVariableGenerator;
 import com.org.gnos.equation.CapexEquationGenerator;
+import com.org.gnos.equation.DumpCapacityEquationGenerator;
+import com.org.gnos.equation.DumpDependencyEquationGenerator;
 import com.org.gnos.equation.GradeConstraintEquationGenerator;
 import com.org.gnos.equation.InstanceData;
 import com.org.gnos.equation.ObjectiveFunctionEquationGenerator;
@@ -30,6 +32,8 @@ public class EquationGeneratorService {
 		new BoundaryVariableGenerator(data).generate();
 		new PitDependencyEquationGenerator(data).generate();
 		new CapexEquationGenerator(data).generate();
+		new DumpDependencyEquationGenerator(data).generate();
+		new DumpCapacityEquationGenerator(data).generate();
 		
 	}	
 }
