@@ -42,4 +42,12 @@ public class Pit {
 		}
 		return null;
 	}
+	public Bench getBench(String name){
+		for(Bench b:benches){
+			if(b.getBenchName().equals(name)){
+				return b;
+			}
+		}
+		return null;
+	}
 }

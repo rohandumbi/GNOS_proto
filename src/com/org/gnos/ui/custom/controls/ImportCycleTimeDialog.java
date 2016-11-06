@@ -1,6 +1,7 @@
 package com.org.gnos.ui.custom.controls;
 
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -14,7 +15,6 @@ import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.FileDialog;
@@ -24,7 +24,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.core.ProjectConfigutration;
-import com.org.gnos.services.ProcessRoute;
+import com.org.gnos.db.model.Field;
 import com.org.gnos.services.csv.CycletTimeDataProcessor;
 
 public class ImportCycleTimeDialog extends Dialog {
@@ -225,7 +225,17 @@ public class ImportCycleTimeDialog extends Dialog {
 	
 	private void loadCycleTimeData(String fileName){
 		CycletTimeDataProcessor processor = CycletTimeDataProcessor.getInstance();
+		ProjectConfigutration projectConfigutration = ProjectConfigutration.getInstance();
 		processor.processCsv(fileName);
+		processor.dumpToDB(projectConfigutration.getProjectId());
+		List<Field> cycletimefields = new ArrayList<Field>();
+		for(String column: processor.getHeaderColumns()){
+			Field field = new Field(column);
+			cycletimefields.add(field);
+		}
+		projectConfigutration.setCycletimefields(cycletimefields);
+		projectConfigutration.saveCycleTimeFields();
+		refreshGrids();
 	}
 	
 }

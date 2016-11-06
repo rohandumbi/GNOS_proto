@@ -26,7 +26,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.core.ProjectConfigutration;
-import com.org.gnos.db.model.TruckPrameterData;
+import com.org.gnos.db.model.TruckParameterData;
 import com.org.gnos.services.ProcessRoute;
 
 public class TruckParameterDialog extends Dialog {
@@ -50,7 +50,7 @@ public class TruckParameterDialog extends Dialog {
 	private Label labelScreenName;
 	//private Map<String, String> fixedFieldMap;
 	
-	private TruckPrameterData truckParameterData;
+	private TruckParameterData truckParameterData;
 	private ProjectConfigutration projectInstance;
 	
 	public TruckParameterDialog(Shell parentShell) {

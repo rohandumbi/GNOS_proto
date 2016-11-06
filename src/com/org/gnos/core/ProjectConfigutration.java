@@ -16,7 +16,7 @@ import java.util.Set;
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.dao.ExpressionDAO;
 import com.org.gnos.db.dao.FieldDAO;
-import com.org.gnos.db.model.CycleTimeData;
+import com.org.gnos.db.model.CycleTimeMappingData;
 import com.org.gnos.db.model.Dump;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Field;
@@ -30,7 +30,7 @@ import com.org.gnos.db.model.Product;
 import com.org.gnos.db.model.ProductJoin;
 import com.org.gnos.db.model.Stockpile;
 import com.org.gnos.db.model.TruckParameterCycleTime;
-import com.org.gnos.db.model.TruckPrameterData;
+import com.org.gnos.db.model.TruckParameterData;
 import com.org.gnos.services.PitBenchProcessor;
 
 public class ProjectConfigutration {
@@ -38,6 +38,7 @@ public class ProjectConfigutration {
 	final static ProjectConfigutration instance = new ProjectConfigutration();
 
 	private List<Field> fields = new ArrayList<Field>();
+	private List<Field> cycletimefields = new ArrayList<Field>();
 	private Map<String, String> requiredFieldMapping = new LinkedHashMap<String, String>();
 	private List<Expression> expressions = new ArrayList<Expression>();
 	private List<Model> models = new ArrayList<Model>();
@@ -50,8 +51,8 @@ public class ProjectConfigutration {
 	private List<Dump> dumpList = new ArrayList<Dump>();
 	private List<Stockpile> stockPileList = new ArrayList<Stockpile>();
 	private List<Pit> pitList = new ArrayList<Pit>();
-	private CycleTimeData cycleTimeData = new CycleTimeData();
-	private TruckPrameterData truckParameterData = new TruckPrameterData();
+	private CycleTimeMappingData cycleTimeMappingData = new CycleTimeMappingData();
+	private TruckParameterData truckParameterData = new TruckParameterData();
 	private ArrayList<TruckParameterCycleTime> truckParameterCycleTimeList = new ArrayList<TruckParameterCycleTime>();
 
 	private boolean newProject = true;
@@ -86,6 +87,7 @@ public class ProjectConfigutration {
 
 		// Reinitializing the structures
 		fields = new ArrayList<Field>();
+		cycletimefields = new ArrayList<Field>();
 		requiredFieldMapping = new HashMap<String, String>();
 		expressions = new ArrayList<Expression>();
 		models = new ArrayList<Model>();
@@ -96,6 +98,7 @@ public class ProjectConfigutration {
 		stockPileList = new ArrayList<Stockpile>();
 
 		loadFieldData();
+		loadCycleTimeFieldData();
 		loadFieldMappingData();
 		loadExpressions();
 		loadModels();
@@ -103,7 +106,7 @@ public class ProjectConfigutration {
 		loadPitGroups();
 		loadDumps();
 		loadStockpiles();
-		loadCycleTimeData();
+		loadCycleTimeMappingData();
 		loadTruckParameters();
 	}
 
@@ -111,6 +114,25 @@ public class ProjectConfigutration {
 		fields = (new FieldDAO()).get();
 	}
 
+	private void loadCycleTimeFieldData(){
+		String sql = "select id, name from cycle_time_fields where project_id = "+ ProjectConfigutration.getInstance().getProjectId();
+		try (
+				Connection conn = DBManager.getConnection();
+				Statement stmt = conn.createStatement();
+				ResultSet rs = stmt.executeQuery(sql);
+				) {
+			
+			Field field = null;
+			while(rs.next()){
+				field = new Field(rs.getString(2));
+				field.setId(rs.getInt(1));
+				cycletimefields.add(field);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	private void loadFieldMappingData() {
 		String sql = "select field_name, mapped_field_name from required_field_mapping where project_id = "
 				+ this.projectId;
@@ -599,7 +621,7 @@ public class ProjectConfigutration {
 		}
 	}
 
-	private void loadCycleTimeData(){
+	private void loadCycleTimeMappingData(){
 		loadCycleTimeFixedFieldMappingData();
 		loadCycleTimeDumpFieldMappingData();
 		loadCycleTimeStockpileFieldMappingData();
@@ -612,7 +634,7 @@ public class ProjectConfigutration {
 		Statement stmt = null;
 		ResultSet rs = null;
 		Connection conn = DBManager.getConnection();
-		Map<String, String> fixedFieldMap = this.cycleTimeData.getFixedFieldMap();
+		Map<String, String> fixedFieldMap = this.cycleTimeMappingData.getFixedFieldMap();
 
 		try {
 			stmt = conn.createStatement();
@@ -644,7 +666,7 @@ public class ProjectConfigutration {
 		Statement stmt = null;
 		ResultSet rs = null;
 		Connection conn = DBManager.getConnection();
-		Map<String, String> dumpFieldMap = this.cycleTimeData.getDumpFieldMap();
+		Map<String, String> dumpFieldMap = this.cycleTimeMappingData.getDumpFieldMap();
 
 		try {
 			stmt = conn.createStatement();
@@ -676,7 +698,7 @@ public class ProjectConfigutration {
 		Statement stmt = null;
 		ResultSet rs = null;
 		Connection conn = DBManager.getConnection();
-		Map<String, String> stockpileFieldMap = this.cycleTimeData.getStockpileFieldMap();
+		Map<String, String> stockpileFieldMap = this.cycleTimeMappingData.getStockpileFieldMap();
 
 		try {
 			stmt = conn.createStatement();
@@ -708,7 +730,7 @@ public class ProjectConfigutration {
 		Statement stmt = null;
 		ResultSet rs = null;
 		Connection conn = DBManager.getConnection();
-		Map<String, String> processFieldMap = this.cycleTimeData.getChildProcessFieldMap();
+		Map<String, String> processFieldMap = this.cycleTimeMappingData.getChildProcessFieldMap();
 
 		try {
 			stmt = conn.createStatement();
@@ -917,6 +939,27 @@ public class ProjectConfigutration {
 
 	}
 
+	public void saveCycleTimeFields() {
+		String inset_sql = " insert into cycle_time_fields (project_id, name) values (?, ?) ";
+		String delete_sql = " delete from cycle_time_fields where project_id = ? ";
+		try (
+				Connection connection = DBManager.getConnection();
+	            PreparedStatement ps1 = connection.prepareStatement(inset_sql);
+				PreparedStatement ps2 = connection.prepareStatement(delete_sql);
+			){
+			
+			ps2.setInt(1, projectId);
+			ps2.executeUpdate();
+			for (Field field : cycletimefields) {
+				ps1.setInt(1, projectId);
+				ps1.setString(2, field.getName());
+				ps1.executeUpdate();
+			}
+			
+		} catch(SQLException e){
+			e.printStackTrace();
+		}
+	}
 	public void saveRequiredFieldMappingData() {
 
 		if (this.newProject) {
@@ -1468,7 +1511,7 @@ public class ProjectConfigutration {
 			conn.setAutoCommit(false);
 			insertPstmt = conn.prepareStatement(insert_sql);
 			updatePstmt = conn.prepareStatement(update_sql);
-			Map<String, String> fixedFieldMap = this.cycleTimeData.getFixedFieldMap();
+			Map<String, String> fixedFieldMap = this.cycleTimeMappingData.getFixedFieldMap();
 			Set keys = fixedFieldMap.keySet();
 			Iterator<String> it = keys.iterator();
 			while (it.hasNext()) {
@@ -1518,7 +1561,7 @@ public class ProjectConfigutration {
 			conn.setAutoCommit(false);
 			insertPstmt = conn.prepareStatement(insert_sql);
 			updatePstmt = conn.prepareStatement(update_sql);
-			Map<String, String> dumpFieldMap = this.cycleTimeData.getDumpFieldMap();
+			Map<String, String> dumpFieldMap = this.cycleTimeMappingData.getDumpFieldMap();
 			Set keys = dumpFieldMap.keySet();
 			Iterator<String> it = keys.iterator();
 			while (it.hasNext()) {
@@ -1568,7 +1611,7 @@ public class ProjectConfigutration {
 			conn.setAutoCommit(false);
 			insertPstmt = conn.prepareStatement(insert_sql);
 			updatePstmt = conn.prepareStatement(update_sql);
-			Map<String, String> stockpileFieldMap = this.cycleTimeData.getStockpileFieldMap();
+			Map<String, String> stockpileFieldMap = this.cycleTimeMappingData.getStockpileFieldMap();
 			Set keys = stockpileFieldMap.keySet();
 			Iterator<String> it = keys.iterator();
 			while (it.hasNext()) {
@@ -1618,7 +1661,7 @@ public class ProjectConfigutration {
 			conn.setAutoCommit(false);
 			insertPstmt = conn.prepareStatement(insert_sql);
 			updatePstmt = conn.prepareStatement(update_sql);
-			Map<String, String> processFieldMap = this.cycleTimeData.getChildProcessFieldMap();
+			Map<String, String> processFieldMap = this.cycleTimeMappingData.getChildProcessFieldMap();
 			Set keys = processFieldMap.keySet();
 			Iterator<String> it = keys.iterator();
 			while (it.hasNext()) {
@@ -2151,19 +2194,19 @@ public class ProjectConfigutration {
 		return stockPileList;
 	}
 
-	public CycleTimeData getCycleTimeData() {
-		return cycleTimeData;
+	public CycleTimeMappingData getCycleTimeData() {
+		return cycleTimeMappingData;
 	}
 
-	public void setCycleTimeData(CycleTimeData cycleTimeData) {
-		this.cycleTimeData = cycleTimeData;
+	public void setCycleTimeData(CycleTimeMappingData cycleTimeData) {
+		this.cycleTimeMappingData = cycleTimeData;
 	}
 
-	public TruckPrameterData getTruckParameterData() {
+	public TruckParameterData getTruckParameterData() {
 		return truckParameterData;
 	}
 
-	public void setTruckParameterData(TruckPrameterData truckParameterData) {
+	public void setTruckParameterData(TruckParameterData truckParameterData) {
 		this.truckParameterData = truckParameterData;
 	}
 
@@ -2175,4 +2218,11 @@ public class ProjectConfigutration {
 		this.truckParameterCycleTimeList = truckParameterCycleTimeList;
 	}
 
+	public List<Field> getCycletimefields() {
+		return cycletimefields;
+	}
+
+	public void setCycletimefields(List<Field> cycletimefields) {
+		this.cycletimefields = cycletimefields;
+	}
 }

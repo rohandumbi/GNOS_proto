@@ -38,7 +38,7 @@ public class CycleTimeDumpFieldGrid extends Composite {
 		super(parent, style);
 		ProjectConfigutration projectInstance = ProjectConfigutration.getInstance();
 		this.dumpFieldMap = projectInstance.getCycleTimeData().getDumpFieldMap();
-		this.allSourceFields = projectInstance.getFields();
+		this.allSourceFields = projectInstance.getCycletimefields();
 		this.dumpList = projectInstance.getDumpList();
 		this.allRows = new ArrayList<>();
 		this.createContent(parent);

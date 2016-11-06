@@ -42,7 +42,7 @@ public class CycleTimeChildProcessFieldGrid extends Composite {
 		super(parent, style);
 		ProjectConfigutration projectInstance = ProjectConfigutration.getInstance();
 		this.processFieldMap = projectInstance.getCycleTimeData().getChildProcessFieldMap();
-		this.allSourceFields = projectInstance.getFields();
+		this.allSourceFields = projectInstance.getCycletimefields();
 		this.processList = projectInstance.getProcessList();
 		this.allRows = new ArrayList<>();
 		this.createContent(parent);

@@ -351,6 +351,15 @@ CREATE TABLE capex_instance(
    unique key(name, capex_id)
 );
 
+DROP TABLE IF EXISTS cycle_time_fields;
+
+CREATE TABLE cycle_time_fields(
+   id INT NOT NULL AUTO_INCREMENT,
+   project_id INT NOT NULL,
+   name VARCHAR(100) NOT NULL,
+   PRIMARY KEY ( id )
+);
+
 DROP TABLE IF EXISTS cycletime_fixed_field_mapping;
 
 CREATE TABLE cycletime_fixed_field_mapping(

@@ -39,7 +39,7 @@ public class CycleTimeFixedFieldGrid extends Composite {
 		ProjectConfigutration projectInstance = ProjectConfigutration.getInstance();
 		this.fixedFieldMap = projectInstance.getCycleTimeData().getFixedFieldMap();
 		//this.requiredFieldNames = requiredFieldNames;
-		this.allSourceFields = projectInstance.getFields();
+		this.allSourceFields = projectInstance.getCycletimefields();
 		this.allRows = new ArrayList<>();
 		this.createContent(parent);
 	}

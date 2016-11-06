@@ -42,7 +42,7 @@ public class CycleTimeStockpileFieldGrid extends Composite {
 		super(parent, style);
 		ProjectConfigutration projectInstance = ProjectConfigutration.getInstance();
 		this.stockpileFieldMap = projectInstance.getCycleTimeData().getStockpileFieldMap();
-		this.allSourceFields = projectInstance.getFields();
+		this.allSourceFields = projectInstance.getCycletimefields();
 		this.stockpileList = projectInstance.getStockPileList();
 		this.allRows = new ArrayList<>();
 		this.createContent(parent);

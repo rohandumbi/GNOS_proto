@@ -126,6 +126,12 @@ public class CycletTimeDataProcessor {
 			data_sql += ", ";
 		}
 		data_sql += " PRIMARY KEY ( id ) );";
+		try (
+				Statement stmt = conn.createStatement();
+			)
+		{
+			stmt.executeUpdate(data_sql);
+		} 
 		
 	}
 	
