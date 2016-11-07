@@ -48,6 +48,7 @@ public class DumpDependencyEquationGenerator extends EquationGenerator{
 			if(dumpDependencyData.getFirstPitName() != null){
 				Pit pit = getPitFromPitName(dumpDependencyData.getFirstPitName());
 				Dump d1 = projectConfiguration.getDumpfromPitName(dumpDependencyData.getFirstPitName());
+				if(d1 == null) continue;
 				Dump d2 = projectConfiguration.getDumpfromDumpName(dumpDependencyData.getDependentDumpName());
 				buildPitDumpDependencyEquation1(pit, d1, d2);
 				buildDumpDependencyEquation2(d1, d2);
