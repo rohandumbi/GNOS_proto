@@ -135,10 +135,11 @@ public class TruckParameterCycleTimeGrid extends Composite {
 		
 		for(int i=0; i<this.processNames.length; i++){
 			Label lblYear;
+			Label separator;
 			if(i != 0){
-				Label separator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
+				separator = new Label(compositeGridHeader, SWT.SEPARATOR | SWT.VERTICAL);
 				FormData fd_separator = new FormData();
-				fd_separator.left = new FormAttachment(previousColumn, 25);
+				fd_separator.left = new FormAttachment(previousColumn, 118);
 				separator.setLayoutData(fd_separator);
 				
 				lblYear = new Label(compositeGridHeader, SWT.NONE);
@@ -150,7 +151,6 @@ public class TruckParameterCycleTimeGrid extends Composite {
 				lblYear.setBackground(SWTResourceManager.getColor(230, 230, 230));
 				lblYear.setLayoutData(fd_lblYear);
 			}else{
-				
 				lblYear = new Label(compositeGridHeader, SWT.NONE);
 				lblYear.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 				FormData fd_lblYear = new FormData();
@@ -159,9 +159,10 @@ public class TruckParameterCycleTimeGrid extends Composite {
 				lblYear.setText(processNames[i]);
 				lblYear.setBackground(SWTResourceManager.getColor(230, 230, 230));
 				lblYear.setLayoutData(fd_lblYear);
+				separator = (Label)reference;
 			}
 			
-			previousColumn = lblYear;
+			previousColumn = separator;
 		}
 	}
 	
@@ -271,10 +272,10 @@ public class TruckParameterCycleTimeGrid extends Composite {
 			//fd_yearlyValue.right = new FormAttachment(previousMember, 76, SWT.RIGHT);
 			if(i==0){
 				fd_yearlyValue.left = new FormAttachment(FIRST_SEPARATOR_POSITION);
-				fd_yearlyValue.right = new FormAttachment(FIRST_SEPARATOR_POSITION, 110);
+				fd_yearlyValue.right = new FormAttachment(FIRST_SEPARATOR_POSITION, 120);
 			}else{
 				fd_yearlyValue.left = new FormAttachment(previousMember, 0);
-				fd_yearlyValue.right = new FormAttachment(previousMember, 110, SWT.RIGHT);
+				fd_yearlyValue.right = new FormAttachment(previousMember, 120, SWT.RIGHT);
 			}
 			yearlyValue.setLayoutData(fd_yearlyValue);
 			final String processName = this.processNames[i];
