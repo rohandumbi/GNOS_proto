@@ -1,6 +1,7 @@
 package com.org.gnos.ui.screens.v1;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
@@ -315,7 +316,7 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 				DumpCreationDialog dialog = new DumpCreationDialog(getShell(), getSourcePitGroupItems());
 				if (Window.OK == dialog.open()) {
 					for(Dump dump : listOfDumps){
-						if(dump.getId() == -1){//unsaved dumps have value -1
+						if((dump.getId() == -1) && !isDumpAlreadyPresent(dump.getName())){//unsaved dumps have value -1
 							compositeGroupDiagram.addDumpToGroup(dump);
 							dumpList.add(dump.getName());
 						}
@@ -341,7 +342,7 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 				StockpileCreationDialog dialog = new StockpileCreationDialog(getShell(), getSourcePitGroupItems());
 				if (Window.OK == dialog.open()) {
 					for(Stockpile stockpile : listOfStockpiles){
-						if(stockpile.getId() == -1){//unsaved dumps have value -1
+						if((stockpile.getId() == -1) && !isStockpileAlreadyPresent(stockpile.getName())){//unsaved dumps have value -1
 							compositeGroupDiagram.addStockpileToGroup(stockpile);
 							stockpileList.add(stockpile.getName());
 						}
@@ -373,6 +374,20 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 			this.compositeGroupDiagram.addStockpileToGroup(stockPile);
 			this.stockpileList.add(stockPile.getName());
 		}
+	}
+	
+	private boolean isDumpAlreadyPresent(String dumpName){
+		boolean isPresent = false;
+		String[] exisitingDumpNames = dumpList.getItems();
+		isPresent = Arrays.asList(exisitingDumpNames).contains(dumpName);
+		return isPresent;
+	}
+	
+	private boolean isStockpileAlreadyPresent(String stockpileName){
+		boolean isPresent = false;
+		String[] exisitingStockpileNames = stockpileList.getItems();
+		isPresent = Arrays.asList(exisitingStockpileNames).contains(stockpileName);
+		return isPresent;
 	}
 	
 	private String[] getSourcePitItems(){
