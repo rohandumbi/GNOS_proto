@@ -110,7 +110,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 				if(payload > 0) {
 					Integer ct = cycleTimeDataMapping.get(block.getPitNo()+":"+block.getBenchNo()+":"+process.getModel().getName());
 					if(ct != null) {
-						double th_ratio = ct / payload* 60;
+						double th_ratio =  (double)ct /( payload* 60);
 						miningcost = miningcost.add(truckHourCost.multiply(new BigDecimal(th_ratio)));
 					}
 				}
@@ -169,7 +169,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 					if(payload > 0) {
 						Integer ct = cycleTimeDataMapping.get(block.getPitNo()+":"+block.getBenchNo()+":"+sp.getName());
 						if(ct != null) {
-							double th_ratio = ct / payload* 60;
+							double th_ratio =  (double)ct /( payload* 60);
 							cost = cost.add(truckHourCost.multiply(new BigDecimal(th_ratio)));
 						}
 					}
