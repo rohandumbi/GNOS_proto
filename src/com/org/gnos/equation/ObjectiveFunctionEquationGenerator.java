@@ -227,7 +227,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 					if(payload > 0) {
 						Integer ct = cycleTimeDataMapping.get(block.getPitNo()+":"+block.getBenchNo()+":"+dump.getName());
 						if(ct != null) {
-							double th_ratio = ct / payload* 60;
+							double th_ratio = (double)ct /( payload* 60);
 							cost = cost.add(truckHourCost.multiply(new BigDecimal(th_ratio)));
 						}
 					}
