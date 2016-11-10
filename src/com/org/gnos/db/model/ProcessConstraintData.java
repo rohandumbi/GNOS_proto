@@ -9,6 +9,7 @@ public class ProcessConstraintData {
 	public static final int COEFFICIENT_EXPRESSION =1;
 	public static final int COEFFICIENT_PRODUCT =2;
 	public static final int COEFFICIENT_PRODUCT_JOIN =3;
+	public static final int COEFFICIENT_TRUCK_HOUR = 4;
 	
 	public static final int SELECTION_NONE = 0;
 	public static final int SELECTION_PROCESS_JOIN = 1;

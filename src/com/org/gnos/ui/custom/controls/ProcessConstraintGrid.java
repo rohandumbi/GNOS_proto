@@ -57,6 +57,7 @@ public class ProcessConstraintGrid extends Composite {
 	private int expressionEndIndex = 0;
 	private int productEndIndex = 0;
 	private int productJoinEndIndex = 0;
+	private int truckHourIndex = 0;
 
 	private int processEndIndex = 0;
 	private int processJoinEndIndex = 0;
@@ -87,7 +88,8 @@ public class ProcessConstraintGrid extends Composite {
 		this.expressionEndIndex = this.noSelectionEndIndex + expressions.size();
 		this.productEndIndex = this.expressionEndIndex + products.size();
 		this.productJoinEndIndex = this.productEndIndex + productJoins.size();
-		String[] comboItems = new String[this.productJoinEndIndex+1];
+		this.truckHourIndex = this.productJoinEndIndex + 1;
+		String[] comboItems = new String[this.truckHourIndex+1];
 		comboItems[this.noSelectionEndIndex] = "--NONE--";
 		for(int i=0; i< expressions.size() ; i++){
 			comboItems[this.noSelectionEndIndex + i + 1] = expressions.get(i).getName();
@@ -98,6 +100,7 @@ public class ProcessConstraintGrid extends Composite {
 		for(int i=0; i < productJoins.size(); i++){
 			comboItems[this.productEndIndex+ i +1] = productJoins.get(i).getName();
 		}
+		comboItems[this.truckHourIndex] = "Total_Th";
 		return comboItems;
 	}
 
@@ -258,10 +261,12 @@ public class ProcessConstraintGrid extends Composite {
 						pcd.setCoefficientType(ProcessConstraintData.COEFFICIENT_NONE);
 					}else if(coefficientSelectionIndex <= expressionEndIndex) {
 						pcd.setCoefficientType(ProcessConstraintData.COEFFICIENT_EXPRESSION);
-					} else if(coefficientSelectionIndex <= productEndIndex) {
+					}else if(coefficientSelectionIndex <= productEndIndex) {
 						pcd.setCoefficientType(ProcessConstraintData.COEFFICIENT_PRODUCT);
-					} else {
+					}else if(coefficientSelectionIndex <= productJoinEndIndex){
 						pcd.setCoefficientType(ProcessConstraintData.COEFFICIENT_PRODUCT_JOIN);
+					}else if(coefficientSelectionIndex == truckHourIndex){
+						pcd.setCoefficientType(ProcessConstraintData.COEFFICIENT_TRUCK_HOUR);
 					}		
 					pcd.setCoefficient_name(coefficientName);
 				}
@@ -275,9 +280,12 @@ public class ProcessConstraintGrid extends Composite {
 			}else if(pcd.getCoefficientType() == ProcessConstraintData.COEFFICIENT_PRODUCT) {
 				start = this.expressionEndIndex +1 ;
 				end = this.productEndIndex;
-			} else if (pcd.getCoefficientType() == ProcessConstraintData.COEFFICIENT_PRODUCT_JOIN) {
+			}else if (pcd.getCoefficientType() == ProcessConstraintData.COEFFICIENT_PRODUCT_JOIN) {
 				start = this.productEndIndex +1 ;
 				end = this.productJoinEndIndex;
+			}else if (pcd.getCoefficientType() == ProcessConstraintData.COEFFICIENT_TRUCK_HOUR) {
+				start = this.productJoinEndIndex +1 ;
+				end = this.truckHourIndex;
 			}
 			for(; start <= end; start++){
 				if(itemsComboExpression[start].equals(pcd.getCoefficient_name())) {
@@ -472,10 +480,12 @@ public class ProcessConstraintGrid extends Composite {
 					processConstraintData.setCoefficientType(ProcessConstraintData.COEFFICIENT_NONE);
 				}else if(coefficientSelectionIndex <= expressionEndIndex) {
 					processConstraintData.setCoefficientType(ProcessConstraintData.COEFFICIENT_EXPRESSION);
-				} else if(coefficientSelectionIndex <= productEndIndex) {
+				}else if(coefficientSelectionIndex <= productEndIndex) {
 					processConstraintData.setCoefficientType(ProcessConstraintData.COEFFICIENT_PRODUCT);
-				} else {
+				}else if(coefficientSelectionIndex <= productJoinEndIndex){
 					processConstraintData.setCoefficientType(ProcessConstraintData.COEFFICIENT_PRODUCT_JOIN);
+				}else if(coefficientSelectionIndex == truckHourIndex){
+					processConstraintData.setCoefficientType(ProcessConstraintData.COEFFICIENT_TRUCK_HOUR);
 				}	
 				processConstraintData.setCoefficient_name(coefficientName);
 			}
