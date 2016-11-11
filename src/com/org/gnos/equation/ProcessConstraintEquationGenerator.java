@@ -2,11 +2,9 @@ package com.org.gnos.equation;
 
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -14,6 +12,7 @@ import java.util.Set;
 import com.org.gnos.core.Block;
 import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.core.ScenarioConfigutration;
+import com.org.gnos.db.model.Dump;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.Pit;
@@ -23,12 +22,11 @@ import com.org.gnos.db.model.ProcessConstraintData;
 import com.org.gnos.db.model.ProcessJoin;
 import com.org.gnos.db.model.Product;
 import com.org.gnos.db.model.ProductJoin;
+import com.org.gnos.db.model.Stockpile;
 
 public class ProcessConstraintEquationGenerator extends EquationGenerator{
 
 	private List<ProcessConstraintData> processConstraintDataList;
-	private int bytesWritten = 0;
-
 
 	public ProcessConstraintEquationGenerator(InstanceData data) {
 		super(data);
@@ -43,7 +41,6 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 		int bufferSize = 8 * 1024;
 		try {
 			output = new BufferedOutputStream(new FileOutputStream("processConstraint.txt"), bufferSize);
-			bytesWritten = 0;
 			buildProcessConstraintVariables();
 			output.flush();
 			output.close();
@@ -64,6 +61,7 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 			int coefficientType = processConstraintData.getCoefficientType();
 			Map<String, List<String>> processExprMap = new HashMap<String, List<String>>();
 			boolean applyProcessRestrictions = false;
+			boolean usetruckHourCoeffcient = false;
 			if(coefficientType == ProcessConstraintData.COEFFICIENT_PRODUCT) {
 				Product p = projectConfiguration.getProductByName(processConstraintData.getCoefficient_name());
 				if(p != null){
@@ -89,6 +87,8 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 					}
 				}
 				applyProcessRestrictions = true;
+			} else if( coefficientType == ProcessConstraintData.COEFFICIENT_TRUCK_HOUR ) {
+				usetruckHourCoeffcient = true;
 			}
 			
 			for(int i=1; i<= timePeriod; i++){
@@ -109,7 +109,7 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 										coefficients = new ArrayList<>();
 										coefficients.add(processConstraintData.getCoefficient_name());
 									}
-									eq += buildProcessConstraintVariables(p.getProcessNo(), coefficients, p.getBlocks(), i);
+									eq += buildProcessConstraintVariables(p, coefficients, usetruckHourCoeffcient, p.getBlocks(), i);
 									break;
 								}
 							}
@@ -128,7 +128,7 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 								coefficients = new ArrayList<>();
 								coefficients.add(processConstraintData.getCoefficient_name());
 							}
-							eq += buildProcessConstraintVariables(p.getProcessNo(), coefficients, p.getBlocks(), i);
+							eq += buildProcessConstraintVariables(p, coefficients, usetruckHourCoeffcient, p.getBlocks(), i);
 							break;
 						}
 					}
@@ -153,7 +153,7 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 									blocks.add(b);
 								}
 							}
-							eq += buildProcessConstraintVariables(p.getProcessNo(), coefficients, blocks, i);
+							eq += buildProcessConstraintVariables(p, coefficients, usetruckHourCoeffcient, blocks, i);
 						}
 						if(!applyProcessRestrictions) {
 							List<String> coefficients = new ArrayList<>();
@@ -163,13 +163,13 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 								if(pit.getPitNumber() != b.getPitNo()) continue;
 								blocks.add(b);								
 							}
-							eq += buildStockpileConstraintVariables(coefficients, blocks, i);
+							eq += buildStockpileConstraintVariables(coefficients,usetruckHourCoeffcient, blocks, i);
 							blocks = new ArrayList<Block>();
 							for(Block b: serviceInstanceData.getWasteBlocks()){
 								if(pit.getPitNumber() != b.getPitNo()) continue;
 								blocks.add(b);			
 							}
-							eq += buildWasteConstraintVariables(coefficients, blocks, i);
+							eq += buildWasteConstraintVariables(coefficients, usetruckHourCoeffcient, blocks, i);
 						}
 						
 					}
@@ -196,7 +196,7 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 								blocks.add(b);
 							}
 						}
-						eq += buildProcessConstraintVariables(p.getProcessNo(), coefficients, blocks, i);
+						eq += buildProcessConstraintVariables(p, coefficients, usetruckHourCoeffcient, blocks, i);
 					}
 					if(!applyProcessRestrictions) {
 						List<String> coefficients = new ArrayList<>();
@@ -206,13 +206,13 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 							if(!pitNumbers.contains(b.getPitNo())) continue;
 							blocks.add(b);								
 						}
-						eq += buildStockpileConstraintVariables(coefficients, blocks, i);
+						eq += buildStockpileConstraintVariables(coefficients, usetruckHourCoeffcient, blocks, i);
 						blocks = new ArrayList<Block>();
 						for(Block b: serviceInstanceData.getWasteBlocks()){
 							if(!pitNumbers.contains(b.getPitNo())) continue;
 							blocks.add(b);			
 						}
-						eq += buildWasteConstraintVariables(coefficients, blocks, i);
+						eq += buildWasteConstraintVariables(coefficients, usetruckHourCoeffcient, blocks, i);
 					}
 					
 				} else {
@@ -227,17 +227,17 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 							coefficients = new ArrayList<>();
 							coefficients.add(processConstraintData.getCoefficient_name());
 						}
-						eq += buildProcessConstraintVariables(p.getProcessNo(), coefficients, p.getBlocks(), i);
+						eq += buildProcessConstraintVariables(p, coefficients, usetruckHourCoeffcient, p.getBlocks(), i);
 					}
 					if(!applyProcessRestrictions) {
 						List<String> coefficients = new ArrayList<>();
 						coefficients.add(processConstraintData.getCoefficient_name());
 						List<Block> blocks = new ArrayList<Block>();
 						blocks.addAll(serviceInstanceData.getProcessBlocks());
-						eq += buildStockpileConstraintVariables(coefficients, blocks, i);
+						eq += buildStockpileConstraintVariables(coefficients, usetruckHourCoeffcient, blocks, i);
 						blocks = new ArrayList<Block>();
 						blocks.addAll(serviceInstanceData.getWasteBlocks());
-						eq += buildWasteConstraintVariables(coefficients, blocks, i);
+						eq += buildWasteConstraintVariables(coefficients, usetruckHourCoeffcient, blocks, i);
 					}
 				}
 				
@@ -256,55 +256,90 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 		
 	}
 
-	private String buildProcessConstraintVariables(int processNumber, List<String> coefficients, List<Block> blocks, int period) {
+	private String buildProcessConstraintVariables(Process p, List<String> coefficients, boolean useTruckHour, List<Block> blocks, int period) {
 		
 		String eq = "";
-		for(Block block: blocks){
-			BigDecimal processRatio = new BigDecimal(0);
-			for(String coefficient: coefficients){
-				String expressionName = coefficient.replaceAll("\\s+","_");
-				processRatio = processRatio.add(block.getComputedField(expressionName));					
+		int processNumber = p.getProcessNo();
+		for(Block block: blocks){			
+			String variable = "p"+block.getPitNo()+"x"+block.getBlockNo()+"p"+processNumber+"t"+period;
+			BigDecimal coefficientRatio =  new BigDecimal(0);
+			if(useTruckHour) {
+				coefficientRatio = getTruckHourRatio(block, p.getModel().getName());
+			} else {
+				for(String coefficient: coefficients){
+					String expressionName = coefficient.replaceAll("\\s+","_");
+					coefficientRatio = coefficientRatio.add(block.getComputedField(expressionName));					
+				}
 			}
-			if(processRatio.doubleValue() == 0) continue;
-			
-			eq +=  "+ "+ formatDecimalValue(processRatio)+"p"+block.getPitNo()+"x"+block.getBlockNo()+"p"+processNumber+"t"+period;
+	
+			if(coefficientRatio.doubleValue() == 0) continue;
+					
+			eq +=  "+ "+ formatDecimalValue(coefficientRatio)+ variable;
 		}			
 		return eq;
 	}
 	
-	private String buildStockpileConstraintVariables(List<String> coefficients, List<Block> blocks, int period) {
+	private String buildStockpileConstraintVariables(List<String> coefficients, boolean useTruckHour, List<Block> blocks, int period) {
 		
 		String eq = "";
 		for(Block block: blocks){
-			BigDecimal processRatio = new BigDecimal(0);
-			for(String coefficient: coefficients){
-				String expressionName = coefficient.replaceAll("\\s+","_");
-				processRatio = processRatio.add(block.getComputedField(expressionName));					
+			Stockpile sp = this.serviceInstanceData.getPitStockpileMapping().get(block.getPitNo());
+			if(sp == null) continue;
+			String variable ="p"+block.getPitNo()+"x"+block.getBlockNo()+"s"+sp.getStockpileNumber()+"t"+period;
+			BigDecimal coefficientRatio = new BigDecimal(0);
+			if(useTruckHour) {
+				coefficientRatio = getTruckHourRatio(block, sp.getName());
+			} else {
+				for(String coefficient: coefficients){
+					String expressionName = coefficient.replaceAll("\\s+","_");
+					coefficientRatio = coefficientRatio.add(block.getComputedField(expressionName));					
+				}
 			}
-			if(processRatio.doubleValue() == 0) continue;
 			
-			eq +=  "+ "+formatDecimalValue(processRatio)+"p"+block.getPitNo()+"x"+block.getBlockNo()+"s"+this.serviceInstanceData.getPitStockpileMapping().get(block.getPitNo())+"t"+period;
+			if(coefficientRatio.doubleValue() == 0) continue;
+			
+			eq +=  "+ "+formatDecimalValue(coefficientRatio)+ variable;
 		}			
 		return eq;
 	}
 
-	private String buildWasteConstraintVariables(List<String> coefficients, List<Block> blocks, int period) {
+	private String buildWasteConstraintVariables(List<String> coefficients, boolean useTruckHour, List<Block> blocks, int period) {
 	
 		String eq = "";
 		for(Block block: blocks){
-			BigDecimal processRatio = new BigDecimal(0);
-			for(String coefficient: coefficients){
-				String expressionName = coefficient.replaceAll("\\s+","_");
-				processRatio = processRatio.add(block.getComputedField(expressionName));					
+			BigDecimal coefficientRatio = new BigDecimal(0);
+			if(!useTruckHour) {
+				for(String coefficient: coefficients){
+					String expressionName = coefficient.replaceAll("\\s+","_");
+					coefficientRatio = coefficientRatio.add(block.getComputedField(expressionName));					
+				}
 			}
-			if(processRatio.doubleValue() == 0) continue;
 			
-			List<Integer> dumps = this.serviceInstanceData.getPitDumpMapping().get(block.getPitNo());
+			List<Dump> dumps = this.serviceInstanceData.getPitDumpMapping().get(block.getPitNo());
 			if(dumps == null) continue;
-			for(Integer dumpNo: dumps){
-				eq += "+ "+formatDecimalValue(processRatio)+"p"+block.getPitNo()+"x"+block.getBlockNo()+"w"+dumpNo+"t"+period;
+			for(Dump dump: dumps){
+				if(useTruckHour) {
+					coefficientRatio = getTruckHourRatio(block, dump.getName());
+				}
+				if(coefficientRatio.doubleValue() == 0) continue;
+				eq += "+ "+formatDecimalValue(coefficientRatio)+"p"+block.getPitNo()+"x"+block.getBlockNo()+"w"+dump.getDumpNumber()+"t"+period;
 			}
 		}			
 		return eq;
+	}
+	
+	private BigDecimal getTruckHourRatio(Block b, String contextName){
+		BigDecimal th_ratio = new BigDecimal(0);
+		int payload = serviceInstanceData.getBlockPayloadMapping().get(b.getId());
+		if(payload > 0) {
+			Integer ct = serviceInstanceData.getCycleTimeDataMapping().get(b.getPitNo()+":"+b.getBenchNo()+":"+contextName);
+			if(ct != null) {
+				double th_ratio_val =  (double)ct /( payload* 60);
+				th_ratio = new BigDecimal(th_ratio_val);
+			}
+		}
+		
+		return th_ratio;
+		
 	}
 }

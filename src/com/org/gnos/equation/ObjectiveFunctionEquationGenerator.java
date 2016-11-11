@@ -6,17 +6,14 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.org.gnos.core.Bench;
 import com.org.gnos.core.Block;
 import com.org.gnos.core.Node;
 import com.org.gnos.core.ProjectConfigutration;
@@ -25,16 +22,13 @@ import com.org.gnos.core.Tree;
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.model.CapexData;
 import com.org.gnos.db.model.CapexInstance;
-import com.org.gnos.db.model.CycleTimeMappingData;
 import com.org.gnos.db.model.Dump;
-import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.FixedOpexCost;
 import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.OpexData;
 import com.org.gnos.db.model.Pit;
 import com.org.gnos.db.model.Process;
 import com.org.gnos.db.model.Stockpile;
-import com.org.gnos.db.model.TruckParameterData;
 
 public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 	
@@ -43,8 +37,6 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 	private float discount_rate = 0; //this has to be made an input variable later
 	
 	private Set<Integer> processedBlocks;
-	private Map<Integer, Integer> blockPayloadMapping ;
-	private Map<String, Integer> cycleTimeDataMapping ;
 	
 	public ObjectiveFunctionEquationGenerator(InstanceData data) {
 		super(data);
@@ -55,8 +47,6 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		projectConfiguration = ProjectConfigutration.getInstance();
 		scenarioConfigutration = ScenarioConfigutration.getInstance();
 		processedBlocks = new HashSet<Integer>();
-		blockPayloadMapping = new HashMap<Integer, Integer>();
-		cycleTimeDataMapping = new HashMap<String, Integer>();
 		
 		int bufferSize = 8 * 1024;
 		try {
@@ -64,8 +54,6 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 			System.out.println("Discount :"+discount_rate);
 			output = new BufferedOutputStream(new FileOutputStream("output.txt"), bufferSize);
 			bytesWritten = 0;
-			loadBlockPayloadMapping();
-			loadCycleTimeDataMapping();
 			buildProcessBlockVariables();
 			buildStockpileVariables();
 			buildWasteBlockVariables();
@@ -106,9 +94,9 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 			BigDecimal truckHourCost = truckHourCostMap.get(year);
 			for(Block block: blocks) {
 				processedBlocks.add(block.getId());
-				int payload = blockPayloadMapping.get(block.getId());
+				int payload = serviceInstanceData.getBlockPayloadMapping().get(block.getId());
 				if(payload > 0) {
-					Integer ct = cycleTimeDataMapping.get(block.getPitNo()+":"+block.getBenchNo()+":"+process.getModel().getName());
+					Integer ct = serviceInstanceData.getCycleTimeDataMapping().get(block.getPitNo()+":"+block.getBenchNo()+":"+process.getModel().getName());
 					if(ct != null) {
 						double th_ratio =  (double)ct /( payload* 60);
 						miningcost = miningcost.add(truckHourCost.multiply(new BigDecimal(th_ratio)));
@@ -165,17 +153,17 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 				BigDecimal truckHourCost = truckHourCostMap.get(year);
 				for(Block block: blocks) {
 					if(!processedBlocks.contains(block.getId())) continue;
-					int payload = blockPayloadMapping.get(block.getId());
+					int payload = serviceInstanceData.getBlockPayloadMapping().get(block.getId());
 					if(payload > 0) {
-						Integer ct = cycleTimeDataMapping.get(block.getPitNo()+":"+block.getBenchNo()+":"+sp.getName());
+						Integer ct = serviceInstanceData.getCycleTimeDataMapping().get(block.getPitNo()+":"+block.getBenchNo()+":"+sp.getName());
 						if(ct != null) {
 							double th_ratio =  (double)ct /( payload* 60);
 							cost = cost.add(truckHourCost.multiply(new BigDecimal(th_ratio)));
 						}
 					}
-					Integer stockpileNumber = this.serviceInstanceData.getPitStockpileMapping().get(block.getPitNo());
-					if(stockpileNumber == null) continue;
-					String variable = "p"+block.getPitNo()+"x"+block.getBlockNo()+"s"+stockpileNumber+"t"+count;
+					//Integer stockpileNumber = this.serviceInstanceData.getPitStockpileMapping().get(block.getPitNo()).getStockpileNumber();
+					if(sp.getStockpileNumber() == 0) continue;
+					String variable = "p"+block.getPitNo()+"x"+block.getBlockNo()+"s"+sp.getStockpileNumber()+"t"+count;
 					String eq = " -"+formatDecimalValue(cost)+ variable;
 					write(eq);
 					
@@ -223,9 +211,9 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 				BigDecimal truckHourCost = truckHourCostMap.get(year);
 				for(Block block: blocks) {
 					if(processedBlocks.contains(block.getId())) continue;
-					int payload = blockPayloadMapping.get(block.getId());
+					int payload = serviceInstanceData.getBlockPayloadMapping().get(block.getId());
 					if(payload > 0) {
-						Integer ct = cycleTimeDataMapping.get(block.getPitNo()+":"+block.getBenchNo()+":"+dump.getName());
+						Integer ct = serviceInstanceData.getCycleTimeDataMapping().get(block.getPitNo()+":"+block.getBenchNo()+":"+dump.getName());
 						if(ct != null) {
 							double th_ratio = (double)ct /( payload* 60);
 							cost = cost.add(truckHourCost.multiply(new BigDecimal(th_ratio)));
@@ -233,15 +221,15 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 					}
 					wasteBlocks.add(block);
 					dump.addBlock(block);
-					List<Integer> dumps = this.serviceInstanceData.getPitDumpMapping().get(block.getPitNo());
-					if(dumps == null) continue;
-					for(Integer dumpNo: dumps){
-						String variable = "p"+block.getPitNo()+"x"+block.getBlockNo()+"w"+dumpNo+"t"+count;
-						String eq = " -"+formatDecimalValue(cost)+variable;
-						write(eq);
-						
-						serviceInstanceData.addVariable(block, variable);
-					}
+					//List<Dump> dumps = this.serviceInstanceData.getPitDumpMapping().get(block.getPitNo());
+					//if(dumps == null) continue;
+					//for(Integer dumpNo: dumps){
+					String variable = "p"+block.getPitNo()+"x"+block.getBlockNo()+"w"+dump.getDumpNumber()+"t"+count;
+					String eq = " -"+formatDecimalValue(cost)+variable;
+					write(eq);
+					
+					serviceInstanceData.addVariable(block, variable);
+					//}
 					
 				}
 				count++;
@@ -370,75 +358,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		value = revenue.subtract(pcost);
 		return value;
 	}
-	
-	private void loadBlockPayloadMapping() {
-		TruckParameterData truckparamdata = projectConfiguration.getTruckParameterData();
-		Map<String, Integer> payloadMap = truckparamdata.getMaterialPayloadMap();
-		Set<String> exprnames = payloadMap.keySet();
-		for(String exprname: exprnames){
-			Expression expr = projectConfiguration.getExpressionByName(exprname);
-			if(expr != null){
-				String condition = expr.getFilter();
-				List<Block> blocks = findBlocks(condition);
-				for(Block b: blocks){
-					blockPayloadMapping.put(b.getId(), payloadMap.get(exprname));
-				}				
-			}
-		}
-		
-	}
-	
-	private void loadCycleTimeDataMapping(){
-		
-		CycleTimeMappingData ctd = projectConfiguration.getCycleTimeData();
-		Map<String, String> fixedFields = ctd.getFixedFieldMap();
-		String pitNameAlias = fixedFields.get("Pit");
-		String benchAlias = fixedFields.get("Bench");
-		if(pitNameAlias == null || benchAlias == null) return;
-		int fixedTime = projectConfiguration.getTruckParameterData().getFixedTime();
-		Map<String, String> dumpFields = ctd.getDumpFieldMap();
-		Map<String, String> processFields = ctd.getChildProcessFieldMap();
-		Map<String, String> stockpileFields = ctd.getStockpileFieldMap();
-		Map<String, String> otherFields = new HashMap<String, String>();
-		otherFields.putAll(dumpFields);
-		otherFields.putAll(stockpileFields);
-		otherFields.putAll(processFields);
-		
-		String sql = "select * from gnos_cycle_time_data_"+ projectConfiguration.getProjectId();		
 
-		try (
-				Connection conn = DBManager.getConnection();
-				Statement stmt = conn.createStatement();
-				ResultSet rs = stmt.executeQuery(sql);
-			)
-		
-		{
-			while (rs.next()) {
-				String pitName = rs.getString(pitNameAlias);
-				int benchName = rs.getInt(benchAlias);
-				Pit pit = projectConfiguration.getPitfromPitName(pitName);
-				if(pit == null) continue;
-				int pitNo = pit.getPitNumber();
-				com.org.gnos.core.Pit corePit = serviceInstanceData.getPits().get(pitNo);
-				Bench b = corePit.getBench(String.valueOf(benchName));
-				if(b == null) continue;
-				Set<String> keys = otherFields.keySet();
-				for(String key: keys){
-					String columnName = otherFields.get(key);
-					try{
-						int data = rs.getInt(columnName);
-						String dataKey = pit.getPitNumber()+":"+b.getBenchNo()+":"+key;
-						cycleTimeDataMapping.put(dataKey, data + fixedTime);
-					} catch(SQLException e) {
-						System.err.println(e.getMessage());
-					}
-				}
-				
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
 	
 	private boolean hasValue(String s) {
 		return (s !=null && s.trim().length() >0);

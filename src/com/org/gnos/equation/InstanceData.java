@@ -18,9 +18,12 @@ import com.org.gnos.core.Block;
 import com.org.gnos.core.Pit;
 import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.db.DBManager;
+import com.org.gnos.db.model.CycleTimeMappingData;
 import com.org.gnos.db.model.Dump;
+import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.PitGroup;
 import com.org.gnos.db.model.Stockpile;
+import com.org.gnos.db.model.TruckParameterData;
 
 public class InstanceData {
 	
@@ -29,8 +32,10 @@ public class InstanceData {
 	private Map<Integer, Block> blocks = new LinkedHashMap<Integer,Block>();
 	private Map<Integer, Pit> pits = new LinkedHashMap<Integer,Pit>();
 	private Map<Integer, List<String>> blockVariableMapping = new HashMap<Integer, List<String>>();
-	private Map<Integer, List<Integer>> pitDumpMapping;
-	private Map<Integer, Integer> pitStockpileMapping;
+	private Map<Integer, List<Dump>> pitDumpMapping;
+	private Map<Integer, Stockpile> pitStockpileMapping;
+	private Map<Integer, Integer> blockPayloadMapping = new HashMap<Integer, Integer>();
+	private Map<String, Integer> cycleTimeDataMapping  = new HashMap<String, Integer>();
 	private String pitFieldName;
 	private String benchFieldName;
 	
@@ -43,6 +48,8 @@ public class InstanceData {
 		loadBlocks();
 		parseDumpData();
 		parseStockpileData();
+		loadBlockPayloadMapping();
+		loadCycleTimeDataMapping();
 	}
 
 	private void loadBlocks() {
@@ -96,15 +103,15 @@ public class InstanceData {
 	}
 	
 	private void parseStockpileData() {
-		this.pitStockpileMapping = new HashMap<Integer, Integer>();
+		this.pitStockpileMapping = new HashMap<Integer, Stockpile>();
 		List<Stockpile> stockpileListData = projectConfiguration.getStockPileList();
 		for(Stockpile sp: stockpileListData){
 			if(sp.getMappingType() == 0) {
-				this.pitStockpileMapping.put(sp.getAssociatedPit().getPitNumber(), sp.getStockpileNumber());
+				this.pitStockpileMapping.put(sp.getAssociatedPit().getPitNumber(), sp);
 			} else {
 				Set<Integer> pits = flattenPitGroup(sp.getAssociatedPitGroup());
 				for(Integer pitNo: pits) {
-					this.pitStockpileMapping.put(pitNo, sp.getStockpileNumber());
+					this.pitStockpileMapping.put(pitNo, sp);
 				}
 			}
 			
@@ -114,28 +121,28 @@ public class InstanceData {
 
 	
 	private void parseDumpData() {
-		this.pitDumpMapping = new HashMap<Integer, List<Integer>>();
+		this.pitDumpMapping = new HashMap<Integer, List<Dump>>();
 		List<Dump> dumpData = projectConfiguration.getDumpList();
 		for(Dump dump: dumpData){
 			if(dump.getMappingType() == 0){
 				int pitNo = dump.getAssociatedPit().getPitNumber();
-				addDumpToPit(pitNo, dump.getDumpNumber());
+				addDumpToPit(pitNo, dump);
 			} else {
 				Set<Integer> pits = flattenPitGroup(dump.getAssociatedPitGroup());
 				for(Integer pitNo: pits) {
-					addDumpToPit(pitNo, dump.getDumpNumber());
+					addDumpToPit(pitNo, dump);
 				}
 			}
 			
 		}
 	}
-	private void addDumpToPit(int pitNo, int dumpNumber) {
-		List<Integer> dumps = this.pitDumpMapping.get(pitNo);
+	private void addDumpToPit(int pitNo, Dump dump) {
+		List<Dump> dumps = this.pitDumpMapping.get(pitNo);
 		if(dumps == null){
-			dumps = new ArrayList<Integer>();
+			dumps = new ArrayList<Dump>();
 			this.pitDumpMapping.put(pitNo, dumps);
 		}
-		dumps.add(dumpNumber);
+		dumps.add(dump);
 	}
 	public Set<Integer> flattenPitGroup(PitGroup pg) {
 		 Set<Integer> pits = new HashSet<Integer>();
@@ -147,6 +154,105 @@ public class InstanceData {
 		 }
 		 
 		 return pits;
+	}
+	
+	private List<Block> findBlocks(String condition) {
+		List<Block> blocks = new ArrayList<Block>();
+		String sql = "select id from gnos_data_"+projectConfiguration.getProjectId() ;
+		if(hasValue(condition)) {
+			sql += " where "+condition;
+		}
+		
+		try (
+				Connection conn = DBManager.getConnection();
+				Statement stmt  = conn.createStatement();
+				ResultSet rs = stmt.executeQuery(sql);			
+			)
+		{
+			while(rs.next()){
+				int id = rs.getInt("id");
+				Block block = getBlocks().get(id);
+				blocks.add(block);
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return blocks;
+	}
+	
+	private void loadBlockPayloadMapping() {
+		TruckParameterData truckparamdata = projectConfiguration.getTruckParameterData();
+		Map<String, Integer> payloadMap = truckparamdata.getMaterialPayloadMap();
+		Set<String> exprnames = payloadMap.keySet();
+		for(String exprname: exprnames){
+			Expression expr = projectConfiguration.getExpressionByName(exprname);
+			if(expr != null){
+				String condition = expr.getFilter();
+				List<Block> blocks = findBlocks(condition);
+				for(Block b: blocks){
+					blockPayloadMapping.put(b.getId(), payloadMap.get(exprname));
+				}				
+			}
+		}
+		
+	}
+	
+	private void loadCycleTimeDataMapping(){
+		
+		CycleTimeMappingData ctd = projectConfiguration.getCycleTimeData();
+		Map<String, String> fixedFields = ctd.getFixedFieldMap();
+		String pitNameAlias = fixedFields.get("Pit");
+		String benchAlias = fixedFields.get("Bench");
+		if(pitNameAlias == null || benchAlias == null) return;
+		int fixedTime = projectConfiguration.getTruckParameterData().getFixedTime();
+		Map<String, String> dumpFields = ctd.getDumpFieldMap();
+		Map<String, String> processFields = ctd.getChildProcessFieldMap();
+		Map<String, String> stockpileFields = ctd.getStockpileFieldMap();
+		Map<String, String> otherFields = new HashMap<String, String>();
+		otherFields.putAll(dumpFields);
+		otherFields.putAll(stockpileFields);
+		otherFields.putAll(processFields);
+		
+		String sql = "select * from gnos_cycle_time_data_"+ projectConfiguration.getProjectId();		
+
+		try (
+				Connection conn = DBManager.getConnection();
+				Statement stmt = conn.createStatement();
+				ResultSet rs = stmt.executeQuery(sql);
+			)
+		
+		{
+			while (rs.next()) {
+				String pitName = rs.getString(pitNameAlias);
+				int benchName = rs.getInt(benchAlias);
+				com.org.gnos.db.model.Pit pit = projectConfiguration.getPitfromPitName(pitName);
+				if(pit == null) continue;
+				int pitNo = pit.getPitNumber();
+				Pit corePit = pits.get(pitNo);
+				Bench b = corePit.getBench(String.valueOf(benchName));
+				if(b == null) continue;
+				Set<String> keys = otherFields.keySet();
+				for(String key: keys){
+					String columnName = otherFields.get(key);
+					try{
+						int data = rs.getInt(columnName);
+						String dataKey = pit.getPitNumber()+":"+b.getBenchNo()+":"+key;
+						cycleTimeDataMapping.put(dataKey, data + fixedTime);
+					} catch(SQLException e) {
+						System.err.println(e.getMessage());
+					}
+				}
+				
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private boolean hasValue(String s) {
+		return (s !=null && s.trim().length() >0);
 	}
 	
 	public Set<Block> getWasteBlocks() {
@@ -182,11 +288,11 @@ public class InstanceData {
 		return blockVariableMapping;
 	}
 
-	public Map<Integer, List<Integer>> getPitDumpMapping() {
+	public Map<Integer, List<Dump>> getPitDumpMapping() {
 		return pitDumpMapping;
 	}
 
-	public Map<Integer, Integer> getPitStockpileMapping() {
+	public Map<Integer, Stockpile> getPitStockpileMapping() {
 		return pitStockpileMapping;
 	}
 
@@ -205,6 +311,20 @@ public class InstanceData {
 	public void addProcessBlock(Block b){
 		processBlocks.add(b);
 	}
-	
-	
+
+	public Map<Integer, Integer> getBlockPayloadMapping() {
+		return blockPayloadMapping;
+	}
+
+	public void setBlockPayloadMapping(Map<Integer, Integer> blockPayloadMapping) {
+		this.blockPayloadMapping = blockPayloadMapping;
+	}
+
+	public Map<String, Integer> getCycleTimeDataMapping() {
+		return cycleTimeDataMapping;
+	}
+
+	public void setCycleTimeDataMapping(Map<String, Integer> cycleTimeDataMapping) {
+		this.cycleTimeDataMapping = cycleTimeDataMapping;
+	}
 }

@@ -5,15 +5,14 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import com.org.gnos.core.Bench;
 import com.org.gnos.core.Block;
-import com.org.gnos.db.model.Pit;
 import com.org.gnos.db.model.CapexData;
 import com.org.gnos.db.model.CapexInstance;
+import com.org.gnos.db.model.Dump;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Model;
+import com.org.gnos.db.model.Pit;
 import com.org.gnos.db.model.PitGroup;
 import com.org.gnos.db.model.Process;
 import com.org.gnos.db.model.ProcessConstraintData;
@@ -209,10 +208,10 @@ public class CapexEquationGenerator extends EquationGenerator{
 				if(count > 0){
 					sb.append(" + ");
 				}
-				List<Integer> dumps = this.serviceInstanceData.getPitDumpMapping().get(b.getPitNo());
+				List<Dump> dumps = this.serviceInstanceData.getPitDumpMapping().get(b.getPitNo());
 				if(dumps == null) continue;
-				for(Integer dumpNo: dumps){
-					sb.append("p"+b.getPitNo()+"x"+b.getBlockNo()+"w"+dumpNo+"t"+i);
+				for(Dump dump: dumps){
+					sb.append("p"+b.getPitNo()+"x"+b.getBlockNo()+"w"+dump.getDumpNumber()+"t"+i);
 				}			
 				count ++;
 			}
