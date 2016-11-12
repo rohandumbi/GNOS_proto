@@ -93,17 +93,19 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 			BigDecimal miningcost = oreMiningCostMap.get(year) ;
 			BigDecimal truckHourCost = truckHourCostMap.get(year);
 			for(Block block: blocks) {
+				BigDecimal cost = new BigDecimal(0);
+				cost = cost.add(miningcost);
 				processedBlocks.add(block.getId());
 				int payload = serviceInstanceData.getBlockPayloadMapping().get(block.getId());
 				if(payload > 0) {
 					Integer ct = serviceInstanceData.getCycleTimeDataMapping().get(block.getPitNo()+":"+block.getBenchNo()+":"+process.getModel().getName());
 					if(ct != null) {
 						double th_ratio =  (double)ct /( payload* 60);
-						miningcost = miningcost.add(truckHourCost.multiply(new BigDecimal(th_ratio)));
+						cost = cost.add(truckHourCost.multiply(new BigDecimal(th_ratio)));
 					}
 				}
 				BigDecimal processValue = getProcessValue(block, process.getModel(), year);
-				BigDecimal value = processValue.subtract(miningcost);
+				BigDecimal value = processValue.subtract(cost);
 				value = (value.multiply(new BigDecimal(1 / Math.pow ((1 + discount_rate), count))));
 				String variable = "p"+block.getPitNo()+"x"+block.getBlockNo()+"p"+processNumber+"t"+count;
 				String eq = " "+formatDecimalValue(value)+variable;
@@ -149,9 +151,11 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 			List<Block> blocks = findBlocks(condition);
 			int count = 1;
 			for(int year: keys){
-				BigDecimal cost = stockPilingCostMap.get(year).add(oreMiningCostMap.get(year));
+				BigDecimal miningcost = stockPilingCostMap.get(year).add(oreMiningCostMap.get(year));
 				BigDecimal truckHourCost = truckHourCostMap.get(year);
 				for(Block block: blocks) {
+					BigDecimal cost = new BigDecimal(0);
+					cost = cost.add(miningcost);
 					if(!processedBlocks.contains(block.getId())) continue;
 					int payload = serviceInstanceData.getBlockPayloadMapping().get(block.getId());
 					if(payload > 0) {
@@ -207,9 +211,11 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 			
 			int count = 1;	
 			for(int year: keys){
-				BigDecimal cost = wasteMiningCostMap.get(year);	
+				BigDecimal wasteminingcost = wasteMiningCostMap.get(year);	
 				BigDecimal truckHourCost = truckHourCostMap.get(year);
 				for(Block block: blocks) {
+					BigDecimal cost = new BigDecimal(0);
+					cost = cost.add(wasteminingcost);
 					if(processedBlocks.contains(block.getId())) continue;
 					int payload = serviceInstanceData.getBlockPayloadMapping().get(block.getId());
 					if(payload > 0) {
