@@ -62,7 +62,7 @@ public class GNOSCSVDataProcessor {
             StringBuffer  buff = new StringBuffer("insert into gnos_data_"+projectId);
             int columnCount = columns.length;
             for(int i=0; i < columnCount ; i++){
-            	names.append(columns[i]);
+            	names.append(columns[i].replaceAll("\\s+","_").toLowerCase());
             	values.append("? ");
             	if(i < columnCount -1 ){
             		names.append(",");
