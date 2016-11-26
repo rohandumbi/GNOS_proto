@@ -2,12 +2,19 @@ package com.org.gnos.core;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import com.org.gnos.db.model.Process;
 
 public class Block {
 
 	private int id;
 	private int blockNo;
+	
+	private Set<Process> processes;  // Keep track of processes block can go to. Should have a better way to do this.
 	
 	private Map<String, String> fields;
 	private Map<String, String> computedFields;
@@ -15,6 +22,7 @@ public class Block {
 	public Block() {
 		fields = new HashMap<String, String>();
 		computedFields = new HashMap<String, String>();
+		processes = new HashSet<Process>();
 	}
 	
 	public int getId() {
@@ -59,6 +67,13 @@ public class Block {
 		this.computedFields.put(key, ratio);
 	}
 	
+	public Set<Process> getProcesses() {
+		return processes;
+	}
+
+	public void addProcess(Process p){
+		processes.add(p);
+	}
 	@Override
 	public boolean equals(Object obj) {
 		return (this.blockNo == ((Block)obj).blockNo);

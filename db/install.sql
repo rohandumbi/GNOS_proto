@@ -422,3 +422,11 @@ CREATE TABLE truckparam_cycle_time(
    value INT NOT NULL,
    unique key(project_id, stockpile_name, process_name)
 );
+
+DROP TABLE IF EXISTS scenario_config; 
+
+CREATE TABLE scenario_config(
+   scenario_id INT NOT NULL,
+   reclaim TINYINT,
+   unique key(scenario_id)
+);

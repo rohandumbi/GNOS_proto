@@ -385,7 +385,7 @@ public class ProjectConfigutration {
 	}
 
 	public void loadProducts() {
-		String sql = "select distinct a.name, associated_model_id, child_expression_id, b.id, b.name, b.value from product_defn a LEFT JOIN grade b on b.product_name = a.name"
+		String sql = "select distinct a.name, associated_model_id, child_expression_id, b.id, b.name, b.value from product_defn a LEFT JOIN grade b on b.product_name = a.name and b.project_id = a.project_id "
 				+" where a.project_id = "+ this.projectId + " order by a.name, b.id asc";
 		Statement stmt = null;
 		ResultSet rs = null;
@@ -1342,7 +1342,11 @@ public class ProjectConfigutration {
 			conn.commit();
 		}catch (SQLException e) {
 			e.printStackTrace();
-		} finally {
+		} 
+		catch(Exception e) {
+			
+		}	
+		finally {
 			try {
 				conn.setAutoCommit(autoCommit);
 				if (pstmt != null)

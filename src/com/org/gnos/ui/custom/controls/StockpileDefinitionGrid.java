@@ -358,7 +358,9 @@ public class StockpileDefinitionGrid extends Composite {
 		textCapacity.setLayoutData(fd_textCapacity);
 		textCapacity.addModifyListener(new ModifyListener(){
 			public void modifyText(ModifyEvent event) {
-				stockpile.setCapacity(Integer.parseInt(textCapacity.getText()));
+				if(textCapacity.getText() != null){
+					stockpile.setCapacity(Integer.parseInt(textCapacity.getText()));
+				}			
 			}
 		});
 		String capacity = String.valueOf(stockpile.getCapacity());

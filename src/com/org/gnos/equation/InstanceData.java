@@ -17,6 +17,7 @@ import com.org.gnos.core.Bench;
 import com.org.gnos.core.Block;
 import com.org.gnos.core.Pit;
 import com.org.gnos.core.ProjectConfigutration;
+import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.model.CycleTimeMappingData;
 import com.org.gnos.db.model.Dump;
@@ -39,12 +40,15 @@ public class InstanceData {
 	private String pitFieldName;
 	private String benchFieldName;
 	
+	private boolean spReclaimEnabled = true;
+	
 	private ProjectConfigutration projectConfiguration;
 	
 	public InstanceData() {
 		projectConfiguration = ProjectConfigutration.getInstance();
 		pitFieldName = projectConfiguration.getRequiredFieldMapping().get("pit_name");
 		benchFieldName = projectConfiguration.getRequiredFieldMapping().get("bench_rl");
+		loadConfiguration();
 		loadBlocks();
 		parseDumpData();
 		parseStockpileData();
@@ -52,6 +56,25 @@ public class InstanceData {
 		loadCycleTimeDataMapping();
 	}
 
+	private void loadConfiguration() {
+		String sql = "select reclaim from scenario_config where scenario_id ="+ ScenarioConfigutration.getInstance().getScenarioId();
+		try (
+				Connection conn = DBManager.getConnection();
+				Statement stmt  = conn.createStatement();
+				ResultSet rs = stmt.executeQuery(sql);			
+			)
+		{
+			while(rs.next()){
+				int reclaim = rs.getInt("reclaim");
+				if(reclaim == 0){
+					spReclaimEnabled = false;
+				}
+			}
+			
+		} catch (SQLException e) {
+			System.err.println("Failed to load blocks "+e.getMessage());
+		}
+	}
 	private void loadBlocks() {
 		String sql = "select a.*, b.* from gnos_data_"+projectConfiguration.getProjectId()+" a, gnos_computed_data_"+projectConfiguration.getProjectId()+" b where a.id = b.row_id";
 		try (
@@ -326,5 +349,9 @@ public class InstanceData {
 
 	public void setCycleTimeDataMapping(Map<String, Integer> cycleTimeDataMapping) {
 		this.cycleTimeDataMapping = cycleTimeDataMapping;
+	}
+
+	public boolean isSpReclaimEnabled() {
+		return spReclaimEnabled;
 	}
 }

@@ -32,5 +32,15 @@ public class Process {
 	public void addBlock(Block block) {
 		this.blocks.add(block);
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		return (this.processNo == ((Process)obj).processNo);
+	}
+	
+	@Override
+	public int hashCode() {
+		return new Integer(this.processNo).hashCode();
+	}
 }
 

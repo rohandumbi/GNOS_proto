@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.org.gnos.core.Block;
 import com.org.gnos.db.model.CapexData;
@@ -17,6 +18,7 @@ import com.org.gnos.db.model.PitGroup;
 import com.org.gnos.db.model.Process;
 import com.org.gnos.db.model.ProcessConstraintData;
 import com.org.gnos.db.model.ProcessJoin;
+import com.org.gnos.db.model.Stockpile;
 
 public class CapexEquationGenerator extends EquationGenerator{
 
@@ -153,6 +155,16 @@ public class CapexEquationGenerator extends EquationGenerator{
 						sb.append(" + ");
 					}
 					sb.append(b.getComputedField(expressionName)+"p"+b.getPitNo()+"x"+b.getBlockNo()+"p"+p.getProcessNo()+"t"+i);
+					
+					if(serviceInstanceData.isSpReclaimEnabled()) {
+						int stockpileNo = getStockpileNo(b);
+						if(stockpileNo > 0) {
+							if(count > 0){
+								sb.append(" + ");
+							}
+							sb.append(b.getComputedField(expressionName)+"sp"+stockpileNo+"x"+b.getBlockNo()+"p"+p.getProcessNo()+"t"+i);
+						}					
+					}
 					count ++;
 				}
 			}
@@ -200,20 +212,21 @@ public class CapexEquationGenerator extends EquationGenerator{
 				if(count > 0){
 					sb.append(" + ");
 				}
-				sb.append("p"+b.getPitNo()+"x"+b.getBlockNo()+"s"+this.serviceInstanceData.getPitStockpileMapping().get(b.getPitNo())+"t"+i);
+				sb.append("p"+b.getPitNo()+"x"+b.getBlockNo()+"s"+getStockpileNo(b)+"t"+i);
 				count ++;
 			}
 			for(Block b: serviceInstanceData.getWasteBlocks()){
 				if(!pitnumberList.contains(b.getPitNo())) continue;
-				if(count > 0){
-					sb.append(" + ");
-				}
 				List<Dump> dumps = this.serviceInstanceData.getPitDumpMapping().get(b.getPitNo());
 				if(dumps == null) continue;
 				for(Dump dump: dumps){
+					if(count > 0){
+						sb.append(" + ");
+					}
 					sb.append("p"+b.getPitNo()+"x"+b.getBlockNo()+"w"+dump.getDumpNumber()+"t"+i);
+					count ++;
 				}			
-				count ++;
+				
 			}
 			int instanceNumber=0;
 			for(CapexInstance ci: capexInstanceList){
@@ -245,6 +258,18 @@ public class CapexEquationGenerator extends EquationGenerator{
 		return null;
 	}
 	
-
-	
+	private int getStockpileNo(Block b){
+		List<Stockpile> stockpiles = projectConfiguration.getStockPileList();
+		
+		for(Stockpile sp: stockpiles){
+			Set<Block> blocks = sp.getBlocks();
+			for(Block block: blocks){
+				if(block.getBlockNo() == b.getBlockNo()){
+					return sp.getStockpileNumber();
+				}
+			}
+		}
+		
+		return -1;
+	}
 }

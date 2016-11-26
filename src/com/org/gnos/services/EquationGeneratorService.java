@@ -11,6 +11,7 @@ import com.org.gnos.equation.InstanceData;
 import com.org.gnos.equation.ObjectiveFunctionEquationGenerator;
 import com.org.gnos.equation.PitDependencyEquationGenerator;
 import com.org.gnos.equation.ProcessConstraintEquationGenerator;
+import com.org.gnos.equation.SPReclaimEquationGenerator;
 
 
 public class EquationGeneratorService {
@@ -34,6 +35,7 @@ public class EquationGeneratorService {
 		new CapexEquationGenerator(data).generate();
 		new DumpDependencyEquationGenerator(data).generate();
 		new DumpCapacityEquationGenerator(data).generate();
+		new SPReclaimEquationGenerator(data).generate();
 		
 	}	
 }

@@ -29,6 +29,7 @@ import com.org.gnos.db.model.OpexData;
 import com.org.gnos.db.model.Pit;
 import com.org.gnos.db.model.Process;
 import com.org.gnos.db.model.Stockpile;
+import com.org.gnos.db.model.TruckParameterCycleTime;
 
 public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 	
@@ -96,6 +97,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 				BigDecimal cost = new BigDecimal(0);
 				cost = cost.add(miningcost);
 				processedBlocks.add(block.getId());
+				block.addProcess(process);
 				int payload = serviceInstanceData.getBlockPayloadMapping().get(block.getId());
 				if(payload > 0) {
 					Integer ct = serviceInstanceData.getCycleTimeDataMapping().get(block.getPitNo()+":"+block.getBenchNo()+":"+process.getModel().getName());
@@ -130,8 +132,10 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		Set<Integer> keys = stockPilingCostMap.keySet();
 		String pitNameField = projectConfiguration.getRequiredFieldMapping().get("pit_name");
 		List<Stockpile> stockpileList = projectConfiguration.getStockPileList();
+		int startYear = scenarioConfigutration.getStartYear();
 		for(Stockpile sp: stockpileList){
 			String condition = (sp.getCondition() == null) ? "" : sp.getCondition();
+			boolean reclaimEnabled = serviceInstanceData.isSpReclaimEnabled() && sp.isReclaim() && ( sp.getCapacity() > 0 );
 			if(hasValue(sp.getCondition())){
 				condition += " AND ";
 			}
@@ -157,6 +161,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 					BigDecimal cost = new BigDecimal(0);
 					cost = cost.add(miningcost);
 					if(!processedBlocks.contains(block.getId())) continue;
+					sp.addBlock(block);
 					int payload = serviceInstanceData.getBlockPayloadMapping().get(block.getId());
 					if(payload > 0) {
 						Integer ct = serviceInstanceData.getCycleTimeDataMapping().get(block.getPitNo()+":"+block.getBenchNo()+":"+sp.getName());
@@ -165,13 +170,19 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 							cost = cost.add(truckHourCost.multiply(new BigDecimal(th_ratio)));
 						}
 					}
-					//Integer stockpileNumber = this.serviceInstanceData.getPitStockpileMapping().get(block.getPitNo()).getStockpileNumber();
 					if(sp.getStockpileNumber() == 0) continue;
 					String variable = "p"+block.getPitNo()+"x"+block.getBlockNo()+"s"+sp.getStockpileNumber()+"t"+count;
 					String eq = " -"+formatDecimalValue(cost)+ variable;
 					write(eq);
 					
 					serviceInstanceData.addVariable(block, variable);
+					
+					// Build reeclaim variable
+					
+					if(reclaimEnabled && (year > startYear)) {
+						buildSPReclaimVariable(block, sp, year);
+					}
+						
 				}
 				count++;
 			}
@@ -227,15 +238,11 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 					}
 					wasteBlocks.add(block);
 					dump.addBlock(block);
-					//List<Dump> dumps = this.serviceInstanceData.getPitDumpMapping().get(block.getPitNo());
-					//if(dumps == null) continue;
-					//for(Integer dumpNo: dumps){
 					String variable = "p"+block.getPitNo()+"x"+block.getBlockNo()+"w"+dump.getDumpNumber()+"t"+count;
 					String eq = " -"+formatDecimalValue(cost)+variable;
 					write(eq);
 					
 					serviceInstanceData.addVariable(block, variable);
-					//}
 					
 				}
 				count++;
@@ -262,6 +269,45 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 				}
 			}
 		}
+	}
+	
+	private void buildSPReclaimVariable(Block b, Stockpile sp, int year) {
+		int startYear = scenarioConfigutration.getStartYear();
+		FixedOpexCost[] fixedOpexCost = scenarioConfigutration.getFixedCost();
+		if(fixedOpexCost == null || fixedOpexCost.length < 4) return;
+		Map<Integer, BigDecimal> stockPilingReclaimingCostMap = fixedOpexCost[3].getCostData();
+		Map<Integer, BigDecimal> truckHourCostMap = fixedOpexCost[4].getCostData();
+		
+		BigDecimal cost = stockPilingReclaimingCostMap.get(year);
+		BigDecimal truckHourCost = truckHourCostMap.get(year);
+		
+		int timeperiod = year - startYear + 1;
+		
+		int payload = serviceInstanceData.getBlockPayloadMapping().get(b.getId());
+		int fixedTime = projectConfiguration.getTruckParameterData().getFixedTime();
+		if(sp.getStockpileNumber() == 0) return;
+		Set<Process> processes = b.getProcesses();
+		TruckParameterCycleTime cycleTime =  projectConfiguration.getTruckParamCycleTimeByStockpileName(sp.getName());
+		
+		for(Process p: processes){
+			BigDecimal totalCost = new BigDecimal(0);
+			totalCost = totalCost.add(cost);
+			if(payload > 0) {
+				Integer ct = 0;
+				if(cycleTime.getProcessData() != null){
+					ct = cycleTime.getProcessData().get(p.getModel().getName()) + fixedTime;
+				} 
+				if(ct != null) {
+					double th_ratio =  (double)ct /( payload* 60);
+					totalCost = totalCost.add(truckHourCost.multiply(new BigDecimal(th_ratio)));
+				}
+			}
+			totalCost = (totalCost.multiply(new BigDecimal(1 / Math.pow ((1 + discount_rate), timeperiod))));
+			String variable = "sp"+sp.getStockpileNumber()+"x"+b.getBlockNo()+"p"+p.getProcessNo()+"t"+timeperiod;
+			String eq = " -"+formatDecimalValue(totalCost)+ variable;
+			write(eq);
+			serviceInstanceData.addVariable(b, variable);
+		}	
 	}
 	
 	private String buildCondition(Process process) {

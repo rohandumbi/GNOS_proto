@@ -20,6 +20,7 @@ import com.org.gnos.db.model.Process;
 import com.org.gnos.db.model.ProcessJoin;
 import com.org.gnos.db.model.Product;
 import com.org.gnos.db.model.ProductJoin;
+import com.org.gnos.db.model.Stockpile;
 
 public class GradeConstraintEquationGenerator extends EquationGenerator{
 
@@ -208,8 +209,29 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 			}
 			BigDecimal coeff = processRatio.multiply(targetGrade.subtract(blockGrade));
 			eq +=   formatDecimalValue(coeff)+"p"+block.getPitNo()+"x"+block.getBlockNo()+"p"+processNumber+"t"+period;
+			
+			if(serviceInstanceData.isSpReclaimEnabled()) {
+				int stockpileNo = getStockpileNo(block);
+				if(stockpileNo > 0) {
+					eq +=   "+ "+ formatDecimalValue(coeff)+"sp"+stockpileNo+"x"+block.getBlockNo()+"p"+processNumber+"t"+period;
+				}			
+			}
 		}			
 		return eq;
 	}
 	
+	private int getStockpileNo(Block b){
+		List<Stockpile> stockpiles = projectConfiguration.getStockPileList();
+		
+		for(Stockpile sp: stockpiles){
+			Set<Block> blocks = sp.getBlocks();
+			for(Block block: blocks){
+				if(block.getBlockNo() == b.getBlockNo()){
+					return sp.getStockpileNumber();
+				}
+			}
+		}
+		
+		return -1;
+	}
 }
