@@ -339,9 +339,9 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 		BigDecimal th_ratio = new BigDecimal(0);
 		int payload = serviceInstanceData.getBlockPayloadMapping().get(b.getId());
 		if(payload > 0) {
-			Integer ct = serviceInstanceData.getCycleTimeDataMapping().get(b.getPitNo()+":"+b.getBenchNo()+":"+contextName);
+			BigDecimal ct = serviceInstanceData.getCycleTimeDataMapping().get(b.getPitNo()+":"+b.getBenchNo()+":"+contextName);
 			if(ct != null) {
-				double th_ratio_val =  (double)ct /( payload* 60);
+				double th_ratio_val =  ct.doubleValue() /( payload* 60);
 				th_ratio = new BigDecimal(th_ratio_val);
 			}
 		}

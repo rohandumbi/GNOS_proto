@@ -1,5 +1,6 @@
 package com.org.gnos.ui.custom.controls;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -265,7 +266,7 @@ public class TruckParameterCycleTimeGrid extends Composite {
 		//final Map<Integer, Float> associatedFixedCostData = associatedFixedCost.getCostData();
 		
 		TruckParameterCycleTime truckParameterCycleTime = (TruckParameterCycleTime)parent.getData();
-		final Map<String, Integer> associatedProcessData = truckParameterCycleTime.getProcessData();
+		final Map<String, BigDecimal> associatedProcessData = truckParameterCycleTime.getProcessData();
 		for(int i=0; i<this.processNames.length; i++){
 			Text yearlyValue = new Text(parent, SWT.BORDER);
 			FormData fd_yearlyValue = new FormData();
@@ -280,9 +281,9 @@ public class TruckParameterCycleTimeGrid extends Composite {
 			yearlyValue.setLayoutData(fd_yearlyValue);
 			final String processName = this.processNames[i];
 			if(associatedProcessData != null){
-				Integer value = associatedProcessData.get(processName);
+				BigDecimal value = associatedProcessData.get(processName);
 				if(value != null){
-					yearlyValue.setText(Integer.toString(value));
+					yearlyValue.setText(value.toString());
 				}
 			}
 			/*if(value != null){
@@ -300,7 +301,7 @@ public class TruckParameterCycleTimeGrid extends Composite {
 					// Get the widget whose text was modified
 					Text text = (Text) event.widget;
 					//System.out.println("Input value for the " + targetYear + " year is " + text.getText());
-					associatedProcessData.put(processName, Integer.valueOf(text.getText()));
+					associatedProcessData.put(processName, new BigDecimal(text.getText()));
 				}
 			});
 			/*

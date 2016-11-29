@@ -1,5 +1,6 @@
 package com.org.gnos.equation;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -36,7 +37,7 @@ public class InstanceData {
 	private Map<Integer, List<Dump>> pitDumpMapping;
 	private Map<Integer, Stockpile> pitStockpileMapping;
 	private Map<Integer, Integer> blockPayloadMapping = new HashMap<Integer, Integer>();
-	private Map<String, Integer> cycleTimeDataMapping  = new HashMap<String, Integer>();
+	private Map<String, BigDecimal> cycleTimeDataMapping  = new HashMap<String, BigDecimal>();
 	private String pitFieldName;
 	private String benchFieldName;
 	
@@ -229,7 +230,7 @@ public class InstanceData {
 		String pitNameAlias = fixedFields.get("Pit");
 		String benchAlias = fixedFields.get("Bench");
 		if(pitNameAlias == null || benchAlias == null) return;
-		int fixedTime = projectConfiguration.getTruckParameterData().getFixedTime();
+		BigDecimal fixedTime = projectConfiguration.getTruckParameterData().getFixedTime();
 		Map<String, String> dumpFields = ctd.getDumpFieldMap();
 		Map<String, String> processFields = ctd.getChildProcessFieldMap();
 		Map<String, String> stockpileFields = ctd.getStockpileFieldMap();
@@ -260,9 +261,9 @@ public class InstanceData {
 				for(String key: keys){
 					String columnName = otherFields.get(key);
 					try{
-						int data = rs.getInt(columnName);
+						BigDecimal data = rs.getBigDecimal(columnName);
 						String dataKey = pit.getPitNumber()+":"+b.getBenchNo()+":"+key;
-						cycleTimeDataMapping.put(dataKey, data + fixedTime);
+						cycleTimeDataMapping.put(dataKey, data.add(fixedTime));
 					} catch(SQLException e) {
 						System.err.println(e.getMessage());
 					}
@@ -343,11 +344,11 @@ public class InstanceData {
 		this.blockPayloadMapping = blockPayloadMapping;
 	}
 
-	public Map<String, Integer> getCycleTimeDataMapping() {
+	public Map<String, BigDecimal> getCycleTimeDataMapping() {
 		return cycleTimeDataMapping;
 	}
 
-	public void setCycleTimeDataMapping(Map<String, Integer> cycleTimeDataMapping) {
+	public void setCycleTimeDataMapping(Map<String, BigDecimal> cycleTimeDataMapping) {
 		this.cycleTimeDataMapping = cycleTimeDataMapping;
 	}
 

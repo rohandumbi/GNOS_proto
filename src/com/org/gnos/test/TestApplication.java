@@ -45,8 +45,8 @@ public class TestApplication {
 		TestApplication application = new TestApplication();
 		
 		GNOSConfig.load();
-		ProjectConfigutration.getInstance().load(10);
-		ScenarioConfigutration.getInstance().load(4);
+		ProjectConfigutration.getInstance().load(16);
+		ScenarioConfigutration.getInstance().load(17);
 		EquationGeneratorService.getInstance().execute();
 
 		

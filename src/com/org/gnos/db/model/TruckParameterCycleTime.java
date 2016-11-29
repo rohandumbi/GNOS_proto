@@ -1,16 +1,17 @@
 package com.org.gnos.db.model;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 
 public class TruckParameterCycleTime {
 	private int id;
-	private HashMap<String, Integer> processData;
+	private HashMap<String, BigDecimal> processData;
 	private int projectId;
 	private String stockPileName;
 	
 	public TruckParameterCycleTime(){
 		this.id = -1;
-		this.processData = new HashMap<String, Integer>();
+		this.processData = new HashMap<String, BigDecimal>();
 	}
 	
 	public int getId() {
@@ -20,11 +21,11 @@ public class TruckParameterCycleTime {
 		this.id = id;
 	}
 	
-	public HashMap<String, Integer> getProcessData() {
+	public HashMap<String, BigDecimal> getProcessData() {
 		return processData;
 	}
 
-	public void setProcessData(HashMap<String, Integer> processData) {
+	public void setProcessData(HashMap<String, BigDecimal> processData) {
 		this.processData = processData;
 	}
 	public int getProjectId() {

@@ -100,9 +100,9 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 				block.addProcess(process);
 				int payload = serviceInstanceData.getBlockPayloadMapping().get(block.getId());
 				if(payload > 0) {
-					Integer ct = serviceInstanceData.getCycleTimeDataMapping().get(block.getPitNo()+":"+block.getBenchNo()+":"+process.getModel().getName());
+					BigDecimal ct = serviceInstanceData.getCycleTimeDataMapping().get(block.getPitNo()+":"+block.getBenchNo()+":"+process.getModel().getName());
 					if(ct != null) {
-						double th_ratio =  (double)ct /( payload* 60);
+						double th_ratio =  ct.doubleValue() /(payload* 60);
 						cost = cost.add(truckHourCost.multiply(new BigDecimal(th_ratio)));
 					}
 				}
@@ -164,13 +164,14 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 					sp.addBlock(block);
 					int payload = serviceInstanceData.getBlockPayloadMapping().get(block.getId());
 					if(payload > 0) {
-						Integer ct = serviceInstanceData.getCycleTimeDataMapping().get(block.getPitNo()+":"+block.getBenchNo()+":"+sp.getName());
+						BigDecimal ct = serviceInstanceData.getCycleTimeDataMapping().get(block.getPitNo()+":"+block.getBenchNo()+":"+sp.getName());
 						if(ct != null) {
-							double th_ratio =  (double)ct /( payload* 60);
+							double th_ratio =  ct.doubleValue() /( payload* 60);
 							cost = cost.add(truckHourCost.multiply(new BigDecimal(th_ratio)));
 						}
 					}
 					if(sp.getStockpileNumber() == 0) continue;
+					cost = (cost.multiply(new BigDecimal(1 / Math.pow ((1 + discount_rate), count))));
 					String variable = "p"+block.getPitNo()+"x"+block.getBlockNo()+"s"+sp.getStockpileNumber()+"t"+count;
 					String eq = " -"+formatDecimalValue(cost)+ variable;
 					write(eq);
@@ -230,14 +231,15 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 					if(processedBlocks.contains(block.getId())) continue;
 					int payload = serviceInstanceData.getBlockPayloadMapping().get(block.getId());
 					if(payload > 0) {
-						Integer ct = serviceInstanceData.getCycleTimeDataMapping().get(block.getPitNo()+":"+block.getBenchNo()+":"+dump.getName());
+						BigDecimal ct = serviceInstanceData.getCycleTimeDataMapping().get(block.getPitNo()+":"+block.getBenchNo()+":"+dump.getName());
 						if(ct != null) {
-							double th_ratio = (double)ct /( payload* 60);
+							double th_ratio = ct.doubleValue() /( payload* 60);
 							cost = cost.add(truckHourCost.multiply(new BigDecimal(th_ratio)));
 						}
 					}
 					wasteBlocks.add(block);
 					dump.addBlock(block);
+					cost = (cost.multiply(new BigDecimal(1 / Math.pow ((1 + discount_rate), count))));
 					String variable = "p"+block.getPitNo()+"x"+block.getBlockNo()+"w"+dump.getDumpNumber()+"t"+count;
 					String eq = " -"+formatDecimalValue(cost)+variable;
 					write(eq);
@@ -284,7 +286,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		int timeperiod = year - startYear + 1;
 		
 		int payload = serviceInstanceData.getBlockPayloadMapping().get(b.getId());
-		int fixedTime = projectConfiguration.getTruckParameterData().getFixedTime();
+		BigDecimal fixedTime = projectConfiguration.getTruckParameterData().getFixedTime();
 		if(sp.getStockpileNumber() == 0) return;
 		Set<Process> processes = b.getProcesses();
 		TruckParameterCycleTime cycleTime =  projectConfiguration.getTruckParamCycleTimeByStockpileName(sp.getName());
@@ -293,12 +295,12 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 			BigDecimal totalCost = new BigDecimal(0);
 			totalCost = totalCost.add(cost);
 			if(payload > 0) {
-				Integer ct = 0;
+				BigDecimal ct = new BigDecimal(0);
 				if(cycleTime.getProcessData() != null){
-					ct = cycleTime.getProcessData().get(p.getModel().getName()) + fixedTime;
+					ct = cycleTime.getProcessData().get(p.getModel().getName()).add(fixedTime);
 				} 
 				if(ct != null) {
-					double th_ratio =  (double)ct /( payload* 60);
+					double th_ratio =  ct.doubleValue() /( payload* 60);
 					totalCost = totalCost.add(truckHourCost.multiply(new BigDecimal(th_ratio)));
 				}
 			}

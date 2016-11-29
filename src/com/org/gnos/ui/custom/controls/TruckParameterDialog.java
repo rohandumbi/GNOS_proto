@@ -1,10 +1,9 @@
 package com.org.gnos.ui.custom.controls;
 
-import java.util.Map;
+import java.math.BigDecimal;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ModifyEvent;
@@ -17,7 +16,6 @@ import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -99,8 +97,8 @@ public class TruckParameterDialog extends Dialog {
 		textFixedTime.setLayoutData(fd_textFixedTime);
 		textFixedTime.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.BOLD));
 		
-		int fixedTime = this.truckParameterData.getFixedTime();
-		if(fixedTime > 0){
+		BigDecimal fixedTime = this.truckParameterData.getFixedTime();
+		if(fixedTime.doubleValue() > 0){
 			textFixedTime.setText(String.valueOf(fixedTime));
 		}
 		textFixedTime.addModifyListener(new ModifyListener(){
@@ -108,9 +106,9 @@ public class TruckParameterDialog extends Dialog {
 				//TODO implement handler
 				String text = textFixedTime.getText();
 				if(!text.isEmpty()){
-					truckParameterData.setFixedTime(Integer.valueOf(text));
+					truckParameterData.setFixedTime(new BigDecimal(text));
 				}else{
-					truckParameterData.setFixedTime(0);
+					truckParameterData.setFixedTime(new BigDecimal(0));
 				}
 			}
 		});

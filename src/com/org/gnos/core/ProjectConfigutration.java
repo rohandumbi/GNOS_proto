@@ -1,5 +1,6 @@
 package com.org.gnos.core;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -808,7 +809,7 @@ public class ProjectConfigutration {
 			while (rs.next()) {
 				String stockpileName = rs.getString(1);
 				String processName = rs.getString(2);
-				int value = rs.getInt(3);
+				BigDecimal value = rs.getBigDecimal(3);
 				//float value = rs.getFloat(3);
 				//FixedOpexCost fixedOpexCost = fixedCost[costHead];
 				
@@ -851,7 +852,7 @@ public class ProjectConfigutration {
 			stmt.execute(sql);
 			rs = stmt.getResultSet();
 			while (rs.next()) {
-				truckParameterData.setFixedTime(rs.getInt(1));
+				truckParameterData.setFixedTime(rs.getBigDecimal(1));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -1731,12 +1732,12 @@ public class ProjectConfigutration {
 				}
 			}
 			if(isFixedTimeSavedInDB == true){
-				updatePstmt.setInt(1, this.truckParameterData.getFixedTime());
+				updatePstmt.setBigDecimal(1, this.truckParameterData.getFixedTime());
 				updatePstmt.setInt(2, projectId);
 				updatePstmt.executeUpdate();
 			}else{
 				insertPstmt.setInt(1, projectId);
-				insertPstmt.setInt(2, this.truckParameterData.getFixedTime());
+				insertPstmt.setBigDecimal(2, this.truckParameterData.getFixedTime());
 				insertPstmt.executeUpdate();
 			}
 		} catch (SQLException e) {
@@ -1866,7 +1867,7 @@ public class ProjectConfigutration {
 					String key = it.next();
 					if(this.isTruckParameterCycleTimeInDB(tpmCycleTime.getStockPileName(), key)){
 						System.out.println("Should update track cycle time");
-						updateStmt.setInt(1, tpmCycleTime.getProcessData().get(key));
+						updateStmt.setBigDecimal(1, tpmCycleTime.getProcessData().get(key));
 						updateStmt.setInt(2, projectId);
 						updateStmt.setString(3, tpmCycleTime.getStockPileName());
 						updateStmt.setString(4, key);
@@ -1875,7 +1876,7 @@ public class ProjectConfigutration {
 						insertStmt.setInt(1, projectId);
 						insertStmt.setString(2, tpmCycleTime.getStockPileName());
 						insertStmt.setString(3, key);
-						insertStmt.setInt(4, tpmCycleTime.getProcessData().get(key));
+						insertStmt.setBigDecimal(4, tpmCycleTime.getProcessData().get(key));
 						insertStmt.executeUpdate();
 					}
 				}

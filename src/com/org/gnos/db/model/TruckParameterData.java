@@ -1,11 +1,12 @@
 package com.org.gnos.db.model;
 
+import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class TruckParameterData {
 	private Map<String, Integer> materialPayloadMap;
-	private int fixedTime;
+	private BigDecimal fixedTime;
 	
 	public TruckParameterData(){
 		this.materialPayloadMap = new LinkedHashMap<String, Integer>();
@@ -19,11 +20,11 @@ public class TruckParameterData {
 		this.materialPayloadMap = materialPayloadMap;
 	}
 
-	public int getFixedTime() {
+	public BigDecimal getFixedTime() {
 		return fixedTime;
 	}
 
-	public void setFixedTime(int fixedTime) {
+	public void setFixedTime(BigDecimal fixedTime) {
 		this.fixedTime = fixedTime;
 	}
 	
