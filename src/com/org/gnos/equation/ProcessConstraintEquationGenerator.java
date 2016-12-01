@@ -279,7 +279,7 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 			if(serviceInstanceData.isSpReclaimEnabled()) {
 				int stockpileNo = getStockpileNo(block);
 				if(stockpileNo > 0) {
-					eq +=  "+ "+ formatDecimalValue(coefficientRatio)+"sp"+getStockpileNo(block)+"x"+block.getBlockNo()+"p"+processNumber+"t"+period;
+					eq +=  "+ "+ formatDecimalValue(coefficientRatio)+"sp"+stockpileNo+"x"+block.getBlockNo()+"p"+processNumber+"t"+period;
 				}			
 			}
 		}			
@@ -354,6 +354,7 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 		List<Stockpile> stockpiles = projectConfiguration.getStockPileList();
 		
 		for(Stockpile sp: stockpiles){
+			if(!sp.isReclaim()) continue;
 			Set<Block> blocks = sp.getBlocks();
 			for(Block block: blocks){
 				if(block.getBlockNo() == b.getBlockNo()){

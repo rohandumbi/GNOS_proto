@@ -41,6 +41,7 @@ public class SPReclaimEquationGenerator extends EquationGenerator{
 		List<Stockpile> stockpiles = projectConfiguration.getStockPileList();
 		int timeperiod = scenarioConfigutration.getTimePeriod();
 		for(Stockpile sp: stockpiles) {
+			if(!sp.isReclaim()) return;
 			Set<Block> blocks = sp.getBlocks();
 			for(int i= 1; i <= timeperiod; i++) {
 				StringBuilder sbc_sp = new StringBuilder("");
@@ -50,7 +51,7 @@ public class SPReclaimEquationGenerator extends EquationGenerator{
 					StringBuilder sb_spr = new StringBuilder("");
 					sbc_sp.append(" + p"+b.getPitNo()+"x"+b.getBlockNo()+"s"+sp.getStockpileNumber()+"t1");
 					for(int j=2; j<=i; j++){
-						sb_sp.append(" + p"+b.getPitNo()+"x"+b.getBlockNo()+"s"+sp.getStockpileNumber()+"t"+j);
+						sb_sp.append(" + p"+b.getPitNo()+"x"+b.getBlockNo()+"s"+sp.getStockpileNumber()+"t"+(j-1));
 						Set<Process> processes = b.getProcesses();
 						for(Process p: processes) {
 							sb_spr.append(" - sp"+sp.getStockpileNumber()+"x"+b.getBlockNo()+"p"+p.getProcessNo()+"t"+j);

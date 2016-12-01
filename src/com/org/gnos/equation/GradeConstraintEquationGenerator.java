@@ -224,6 +224,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 		List<Stockpile> stockpiles = projectConfiguration.getStockPileList();
 		
 		for(Stockpile sp: stockpiles){
+			if(!sp.isReclaim()) continue;
 			Set<Block> blocks = sp.getBlocks();
 			for(Block block: blocks){
 				if(block.getBlockNo() == b.getBlockNo()){

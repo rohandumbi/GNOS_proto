@@ -155,17 +155,18 @@ public class CapexEquationGenerator extends EquationGenerator{
 						sb.append(" + ");
 					}
 					sb.append(b.getComputedField(expressionName)+"p"+b.getPitNo()+"x"+b.getBlockNo()+"p"+p.getProcessNo()+"t"+i);
-					
+					count ++;
 					if(serviceInstanceData.isSpReclaimEnabled()) {
-						int stockpileNo = getStockpileNo(b);
+						int stockpileNo = getStockpileNoForReclaim(b);
 						if(stockpileNo > 0) {
 							if(count > 0){
 								sb.append(" + ");
 							}
 							sb.append(b.getComputedField(expressionName)+"sp"+stockpileNo+"x"+b.getBlockNo()+"p"+p.getProcessNo()+"t"+i);
+							count ++;
 						}					
 					}
-					count ++;
+					
 				}
 			}
 			int instanceNumber=0;
@@ -262,6 +263,22 @@ public class CapexEquationGenerator extends EquationGenerator{
 		List<Stockpile> stockpiles = projectConfiguration.getStockPileList();
 		
 		for(Stockpile sp: stockpiles){
+			Set<Block> blocks = sp.getBlocks();
+			for(Block block: blocks){
+				if(block.getBlockNo() == b.getBlockNo()){
+					return sp.getStockpileNumber();
+				}
+			}
+		}
+		
+		return -1;
+	}
+	
+	private int getStockpileNoForReclaim(Block b){
+		List<Stockpile> stockpiles = projectConfiguration.getStockPileList();
+		
+		for(Stockpile sp: stockpiles){
+			if(!sp.isReclaim()) continue;
 			Set<Block> blocks = sp.getBlocks();
 			for(Block block: blocks){
 				if(block.getBlockNo() == b.getBlockNo()){
