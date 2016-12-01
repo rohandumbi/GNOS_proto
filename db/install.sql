@@ -409,7 +409,7 @@ DROP TABLE IF EXISTS truckparam_fixed_time;
 
 CREATE TABLE truckparam_fixed_time(
    project_id INT NOT NULL,
-   fixed_time NUMERIC NOT NULL,
+   fixed_time FLOAT NOT NULL,
    UNIQUE KEY ( project_id )
 );
 
@@ -419,7 +419,7 @@ CREATE TABLE truckparam_cycle_time(
    project_id INT NOT NULL,
    stockpile_name VARCHAR(100) NOT NULL,
    process_name VARCHAR(100) NOT NULL,
-   value NUMERIC NOT NULL,
+   value FLOAT NOT NULL,
    unique key(project_id, stockpile_name, process_name)
 );
 
