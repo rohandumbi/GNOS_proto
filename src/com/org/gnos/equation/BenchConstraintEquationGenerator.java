@@ -173,4 +173,9 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 		
 		return tonnesWt;
 	}
+	
+	@Override
+	protected String formatDecimalValue(BigDecimal bd) {
+		return bd.stripTrailingZeros().toString();
+	}
 }
