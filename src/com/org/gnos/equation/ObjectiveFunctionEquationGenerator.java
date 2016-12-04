@@ -308,7 +308,10 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 			BigDecimal value = processValue.subtract(totalCost);
 			value = (value.multiply(new BigDecimal(1 / Math.pow ((1 + discount_rate), timeperiod))));
 			String variable = "sp"+sp.getStockpileNumber()+"x"+b.getBlockNo()+"p"+p.getProcessNo()+"t"+timeperiod;
-			String eq = " -"+formatDecimalValue(value)+ variable;
+			String eq = formatDecimalValue(value)+ variable;
+			if(value.doubleValue() > 0) {
+				eq =  " + " + eq;
+			} 
 			write(eq);
 			serviceInstanceData.addVariable(b, variable);
 		}	
