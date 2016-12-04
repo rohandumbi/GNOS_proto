@@ -293,6 +293,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		
 		for(Process p: processes){
 			BigDecimal totalCost = new BigDecimal(0);
+			BigDecimal processValue = getProcessValue(b, p.getModel(), year);
 			totalCost = totalCost.add(cost);
 			if(payload > 0) {
 				BigDecimal ct = new BigDecimal(0);
@@ -304,9 +305,10 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 					totalCost = totalCost.add(truckHourCost.multiply(new BigDecimal(th_ratio)));
 				}
 			}
-			totalCost = (totalCost.multiply(new BigDecimal(1 / Math.pow ((1 + discount_rate), timeperiod))));
+			BigDecimal value = processValue.subtract(totalCost);
+			value = (value.multiply(new BigDecimal(1 / Math.pow ((1 + discount_rate), timeperiod))));
 			String variable = "sp"+sp.getStockpileNumber()+"x"+b.getBlockNo()+"p"+p.getProcessNo()+"t"+timeperiod;
-			String eq = " -"+formatDecimalValue(totalCost)+ variable;
+			String eq = " -"+formatDecimalValue(value)+ variable;
 			write(eq);
 			serviceInstanceData.addVariable(b, variable);
 		}	

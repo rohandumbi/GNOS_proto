@@ -58,7 +58,9 @@ public class BoundaryVariableGenerator extends EquationGenerator{
 			StringBuilder sb = new StringBuilder("");
 			for(String variable: variables){
 				write(variable + " >= 0" );
-				sb.append(variable +"+");
+				if(!variable.startsWith("sp")){
+					sb.append(variable +"+");
+				}					
 			}
 			String eq = sb.toString().substring(0,sb.length() -1) +" <= "+b.getField(tonnesWeightFieldName);
 			write(eq);

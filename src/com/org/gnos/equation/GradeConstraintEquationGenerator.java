@@ -210,7 +210,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 			BigDecimal coeff = processRatio.multiply(targetGrade.subtract(blockGrade));
 			eq +=   formatDecimalValue(coeff)+"p"+block.getPitNo()+"x"+block.getBlockNo()+"p"+processNumber+"t"+period;
 			
-			if(serviceInstanceData.isSpReclaimEnabled()) {
+			if(serviceInstanceData.isSpReclaimEnabled() && period > 1) {
 				int stockpileNo = getStockpileNo(block);
 				if(stockpileNo > 0) {
 					eq +=   "+ "+ formatDecimalValue(coeff)+"sp"+stockpileNo+"x"+block.getBlockNo()+"p"+processNumber+"t"+period;
