@@ -34,8 +34,6 @@ public class InstanceData {
 	private Map<Integer, Block> blocks = new LinkedHashMap<Integer,Block>();
 	private Map<Integer, Pit> pits = new LinkedHashMap<Integer,Pit>();
 	private Map<Integer, List<String>> blockVariableMapping = new HashMap<Integer, List<String>>();
-	private Map<Integer, List<Dump>> pitDumpMapping;
-	private Map<Integer, Stockpile> pitStockpileMapping;
 	private Map<Integer, Integer> blockPayloadMapping = new HashMap<Integer, Integer>();
 	private Map<String, BigDecimal> cycleTimeDataMapping  = new HashMap<String, BigDecimal>();
 	private String pitFieldName;
@@ -51,8 +49,6 @@ public class InstanceData {
 		benchFieldName = projectConfiguration.getRequiredFieldMapping().get("bench_rl");
 		loadConfiguration();
 		loadBlocks();
-		parseDumpData();
-		parseStockpileData();
 		loadBlockPayloadMapping();
 		loadCycleTimeDataMapping();
 	}
@@ -125,49 +121,7 @@ public class InstanceData {
 			System.err.println("Failed to load blocks "+e.getMessage());
 		}
 	}
-	
-	private void parseStockpileData() {
-		this.pitStockpileMapping = new HashMap<Integer, Stockpile>();
-		List<Stockpile> stockpileListData = projectConfiguration.getStockPileList();
-		for(Stockpile sp: stockpileListData){
-			if(sp.getMappingType() == 0) {
-				this.pitStockpileMapping.put(sp.getAssociatedPit().getPitNumber(), sp);
-			} else {
-				Set<Integer> pits = flattenPitGroup(sp.getAssociatedPitGroup());
-				for(Integer pitNo: pits) {
-					this.pitStockpileMapping.put(pitNo, sp);
-				}
-			}
-			
-		}
-		
-	}
 
-	
-	private void parseDumpData() {
-		this.pitDumpMapping = new HashMap<Integer, List<Dump>>();
-		List<Dump> dumpData = projectConfiguration.getDumpList();
-		for(Dump dump: dumpData){
-			if(dump.getMappingType() == 0){
-				int pitNo = dump.getAssociatedPit().getPitNumber();
-				addDumpToPit(pitNo, dump);
-			} else {
-				Set<Integer> pits = flattenPitGroup(dump.getAssociatedPitGroup());
-				for(Integer pitNo: pits) {
-					addDumpToPit(pitNo, dump);
-				}
-			}
-			
-		}
-	}
-	private void addDumpToPit(int pitNo, Dump dump) {
-		List<Dump> dumps = this.pitDumpMapping.get(pitNo);
-		if(dumps == null){
-			dumps = new ArrayList<Dump>();
-			this.pitDumpMapping.put(pitNo, dumps);
-		}
-		dumps.add(dump);
-	}
 	public Set<Integer> flattenPitGroup(PitGroup pg) {
 		 Set<Integer> pits = new HashSet<Integer>();
 		 for(com.org.gnos.db.model.Pit childPit: pg.getListChildPits()){
@@ -310,14 +264,6 @@ public class InstanceData {
 
 	public Map<Integer, List<String>> getBlockVariableMapping() {
 		return blockVariableMapping;
-	}
-
-	public Map<Integer, List<Dump>> getPitDumpMapping() {
-		return pitDumpMapping;
-	}
-
-	public Map<Integer, Stockpile> getPitStockpileMapping() {
-		return pitStockpileMapping;
 	}
 
 	public void addVariable(Block b, String variable){

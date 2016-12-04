@@ -218,7 +218,7 @@ public class CapexEquationGenerator extends EquationGenerator{
 			}
 			for(Block b: serviceInstanceData.getWasteBlocks()){
 				if(!pitnumberList.contains(b.getPitNo())) continue;
-				List<Dump> dumps = this.serviceInstanceData.getPitDumpMapping().get(b.getPitNo());
+				List<Dump> dumps = getDump(b);
 				if(dumps == null) continue;
 				for(Dump dump: dumps){
 					if(count > 0){
@@ -288,5 +288,21 @@ public class CapexEquationGenerator extends EquationGenerator{
 		}
 		
 		return -1;
+	}
+	
+	private List<Dump> getDump(Block b){
+		List<Dump> alldumps = projectConfiguration.getDumpList();
+		List<Dump> dumps = new ArrayList<Dump>();
+		for(Dump dump: alldumps){
+			Set<Block> blocks = dump.getBlocks();
+			for(Block block: blocks){
+				if(block.getBlockNo() == b.getBlockNo()){
+					dumps.add(dump);
+					continue;
+				}
+			}
+		}
+		
+		return dumps;
 	}
 }

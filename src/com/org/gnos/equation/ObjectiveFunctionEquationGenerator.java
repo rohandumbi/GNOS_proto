@@ -151,7 +151,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 				condition = condition.substring(0, condition.length() -1);
 			}
 			condition += ")";
-			System.out.println(" Stockpile Condition :"+condition);
+			System.out.format(" Stockpile No: %d  Condition %s : \n", sp.getStockpileNumber(), condition);
 			List<Block> blocks = findBlocks(condition);
 			int count = 1;
 			for(int year: keys){

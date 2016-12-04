@@ -152,7 +152,7 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 		for(Block block: blocks){
 			List<String> variableList = this.blockVariableMapping.get(block.getId());
 			if(variableList != null){
-				System.out.println("Block Id :"+ block.getId()+ " Variable Size:"+variableList.size());
+				//System.out.println("Block Id :"+ block.getId()+ " Variable Size:"+variableList.size());
 				variables.addAll(this.blockVariableMapping.get(block.getId()));
 			}		
 		}

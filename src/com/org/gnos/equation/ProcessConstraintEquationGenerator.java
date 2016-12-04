@@ -23,6 +23,7 @@ import com.org.gnos.db.model.ProcessJoin;
 import com.org.gnos.db.model.Product;
 import com.org.gnos.db.model.ProductJoin;
 import com.org.gnos.db.model.Stockpile;
+import com.sun.xml.internal.ws.util.pipe.DumpTube;
 
 public class ProcessConstraintEquationGenerator extends EquationGenerator{
 
@@ -290,7 +291,7 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 		
 		String eq = "";
 		for(Block block: blocks){
-			Stockpile sp = this.serviceInstanceData.getPitStockpileMapping().get(block.getPitNo());
+			Stockpile sp = getStockpile(block);
 			if(sp == null) continue;
 			String variable ="p"+block.getPitNo()+"x"+block.getBlockNo()+"s"+sp.getStockpileNumber()+"t"+period;
 			BigDecimal coefficientRatio = new BigDecimal(0);
@@ -322,7 +323,7 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 				}
 			}
 			
-			List<Dump> dumps = this.serviceInstanceData.getPitDumpMapping().get(block.getPitNo());
+			List<Dump> dumps = getDump(block);
 			if(dumps == null) continue;
 			for(Dump dump: dumps){
 				if(useTruckHour) {
@@ -364,5 +365,35 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 		}
 		
 		return -1;
+	}
+	private Stockpile getStockpile(Block b){
+		List<Stockpile> stockpiles = projectConfiguration.getStockPileList();
+		
+		for(Stockpile sp: stockpiles){
+			Set<Block> blocks = sp.getBlocks();
+			for(Block block: blocks){
+				if(block.getBlockNo() == b.getBlockNo()){
+					return sp;
+				}
+			}
+		}
+		
+		return null;
+	}
+	
+	private List<Dump> getDump(Block b){
+		List<Dump> alldumps = projectConfiguration.getDumpList();
+		List<Dump> dumps = new ArrayList<Dump>();
+		for(Dump dump: alldumps){
+			Set<Block> blocks = dump.getBlocks();
+			for(Block block: blocks){
+				if(block.getBlockNo() == b.getBlockNo()){
+					dumps.add(dump);
+					continue;
+				}
+			}
+		}
+		
+		return dumps;
 	}
 }
