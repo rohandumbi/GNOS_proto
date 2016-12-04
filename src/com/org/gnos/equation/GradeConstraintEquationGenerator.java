@@ -213,7 +213,10 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 			if(serviceInstanceData.isSpReclaimEnabled() && period > 1) {
 				int stockpileNo = getStockpileNo(block);
 				if(stockpileNo > 0) {
-					eq +=   "+ "+ formatDecimalValue(coeff)+"sp"+stockpileNo+"x"+block.getBlockNo()+"p"+processNumber+"t"+period;
+					if(coeff.doubleValue() > 0) {
+						eq +=   "+ ";
+					}
+					eq +=  formatDecimalValue(coeff)+"sp"+stockpileNo+"x"+block.getBlockNo()+"p"+processNumber+"t"+period;
 				}			
 			}
 		}			

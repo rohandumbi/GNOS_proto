@@ -280,7 +280,10 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 			if(serviceInstanceData.isSpReclaimEnabled() && period > 1) {
 				int stockpileNo = getStockpileNo(block);
 				if(stockpileNo > 0) {
-					eq +=  "+ "+ formatDecimalValue(coefficientRatio)+"sp"+stockpileNo+"x"+block.getBlockNo()+"p"+processNumber+"t"+period;
+					if(coefficientRatio.doubleValue() > 0) {
+						eq +=   " + ";
+					}
+					eq +=  formatDecimalValue(coefficientRatio)+"sp"+stockpileNo+"x"+block.getBlockNo()+"p"+processNumber+"t"+period;
 				}			
 			}
 		}			
