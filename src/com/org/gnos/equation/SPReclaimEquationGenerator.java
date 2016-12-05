@@ -3,20 +3,17 @@ package com.org.gnos.equation;
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import com.org.gnos.core.Block;
-import com.org.gnos.db.model.Stockpile;
 import com.org.gnos.db.model.Process;
+import com.org.gnos.db.model.Stockpile;
 
 public class SPReclaimEquationGenerator extends EquationGenerator{
 	
-	private Map<Integer, List<String>> blockVariableMapping;
-	
+
 	public SPReclaimEquationGenerator(InstanceData data) {
 		super(data);
-		this.blockVariableMapping = serviceInstanceData.getBlockVariableMapping();
 	}
 	
 	@Override

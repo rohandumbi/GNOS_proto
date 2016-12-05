@@ -19,7 +19,6 @@ public class DumpCapacityEquationGenerator extends EquationGenerator{
 	
 	public DumpCapacityEquationGenerator(InstanceData data) {
 		super(data);
-		this.blockVariableMapping = serviceInstanceData.getBlockVariableMapping();
 	}
 	
 	@Override

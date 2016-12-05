@@ -62,6 +62,7 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 					String benchVariable = "p"+pitNo+"b"+bench.getBenchNo()+"t"+i;
 					sb1.append(formatDecimalValue(tonnesWt)+benchVariable);
 					for(String variable: variables){
+						if(variable.startsWith("sp")) continue;
 						Matcher matcher = lastIntPattern.matcher(variable);
 					      if (matcher.find()) {
 					          String someNumberStr = matcher.group(1);

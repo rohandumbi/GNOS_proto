@@ -17,11 +17,8 @@ import com.org.gnos.db.model.DumpDependencyData;
 
 public class DumpDependencyEquationGenerator extends EquationGenerator{
 	
-	private Map<Integer, List<String>> blockVariableMapping;
-	
 	public DumpDependencyEquationGenerator(InstanceData data) {
 		super(data);
-		this.blockVariableMapping = serviceInstanceData.getBlockVariableMapping();
 	}
 	
 	@Override
@@ -132,18 +129,5 @@ public class DumpDependencyEquationGenerator extends EquationGenerator{
 			}
 		}
 		return null;
-	}
-	private List<String> getAllVariablesForBench(Bench bench){
-		List<String> variables = new ArrayList<String>();
-		List<Block> blocks= bench.getBlocks();
-		for(Block block: blocks){
-			List<String> variableList = this.blockVariableMapping.get(block.getId());
-			if(variableList != null){
-				//System.out.println("Block Id :"+ block.getId()+ " Variable Size:"+variableList.size());
-				variables.addAll(this.blockVariableMapping.get(block.getId()));
-			}		
-		}
-		
-		return variables;
 	}
 }
