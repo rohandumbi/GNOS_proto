@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.org.gnos.core.Bench;
@@ -59,15 +60,27 @@ public class BenchProportionEquationGenerator extends EquationGenerator{
 						for(int i=1; i<= timePeriod; i++){
 							StringBuilder sb = new StringBuilder("");
 							for(String variable : blockvariables1) {
-								if(variable.startsWith("sp") || !variable.endsWith(""+i)) continue;
-								if(sb.length() > 0) {
-									sb.append(" + ");
-								}
-								sb.append(tonnage2+variable);
+								if(variable.startsWith("sp")) continue;
+								Matcher matcher = lastIntPattern.matcher(variable);
+								if (matcher.find()) {
+								      String yearStr = matcher.group(1);
+								      int year = Integer.parseInt(yearStr);
+								      if(year != i ) continue;
+								      if(sb.length() > 0) {
+											sb.append(" + ");
+								      }
+									  sb.append(tonnage2+variable);
+								}								
 							}
 							for(String variable : blockvariables2) {
-								if(variable.startsWith("sp") || !variable.endsWith(""+i)) continue;
-								sb.append(" - "+tonnage1+variable);
+								if(variable.startsWith("sp")) continue;
+								Matcher matcher = lastIntPattern.matcher(variable);
+								if (matcher.find()) {
+								      String yearStr = matcher.group(1);
+								      int year = Integer.parseInt(yearStr);
+								      if(year != i ) continue;
+								      sb.append(" - "+tonnage1+variable);
+								}
 							}
 							if(sb.length() > 0){
 								sb.append(" = 0");
