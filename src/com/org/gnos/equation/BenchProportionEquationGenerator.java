@@ -93,21 +93,6 @@ public class BenchProportionEquationGenerator extends EquationGenerator{
 			}
 		}
 	}
-
-
-	private BigDecimal getBenchTonnesWt(Bench bench){
-		BigDecimal tonnesWt = new BigDecimal(0);
-		for(Block block:bench.getBlocks()){
-			try{
-				tonnesWt = tonnesWt.add(new BigDecimal(block.getField(this.tonnesWeightFieldName)));
-			} catch(NumberFormatException nfe){
-				System.err.println("Could not parse to float :"+nfe.getMessage());
-			}
-			
-		}
-		
-		return tonnesWt;
-	}
 	
 	@Override
 	protected String formatDecimalValue(BigDecimal bd) {
