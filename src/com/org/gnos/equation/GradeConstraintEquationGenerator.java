@@ -204,10 +204,11 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 			if(processRatio.compareTo(new BigDecimal(0)) == 0) continue;
 			String gradeExpr = grade.getExpression().getName().replaceAll("\\s+","_");
 			BigDecimal blockGrade = block.getComputedField(gradeExpr);
+			BigDecimal coeff = processRatio.multiply(targetGrade.subtract(blockGrade));
+			if(coeff.doubleValue() == 0) continue;
 			if(targetGrade.compareTo(blockGrade) == 1) {
 				eq +=  "+ ";
 			}
-			BigDecimal coeff = processRatio.multiply(targetGrade.subtract(blockGrade));
 			eq +=   formatDecimalValue(coeff)+"p"+block.getPitNo()+"x"+block.getBlockNo()+"p"+processNumber+"t"+period;
 			
 			if(serviceInstanceData.isSpReclaimEnabled() && period > 1) {
