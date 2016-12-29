@@ -81,7 +81,7 @@ public class ExpressionProcessor {
 				}
 				sql = sql+ " where a.id = b.row_id ";
 				if(expr.getFilter() != null && expr.getFilter().trim().length() > 0) {
-					sql = sql+ " AND "+expr.getFilter();
+					sql = sql+ " AND ( "+expr.getFilter() +" )";
 				}
 				System.out.println("sql :"+sql);
 				stmt.executeUpdate(sql);
