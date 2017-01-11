@@ -17,7 +17,7 @@ import com.org.gnos.db.model.DumpDependencyData;
 
 public class DumpDependencyEquationGenerator extends EquationGenerator{
 	
-	public DumpDependencyEquationGenerator(InstanceData data) {
+	public DumpDependencyEquationGenerator(EquationContext data) {
 		super(data);
 	}
 	
@@ -39,20 +39,20 @@ public class DumpDependencyEquationGenerator extends EquationGenerator{
 
 	
 	private void buildDependencyEquations() {
-		List<DumpDependencyData> dumpDependencyDataList = scenarioConfigutration.getDumpDependencyDataList();
+		List<DumpDependencyData> dumpDependencyDataList = context.getScenarioConfig().getDumpDependencyDataList();
 		for(DumpDependencyData dumpDependencyData:dumpDependencyDataList){
 			if(!dumpDependencyData.isInUse()) continue;
 			if(dumpDependencyData.getFirstPitName() != null){
 				Pit pit = getPitFromPitName(dumpDependencyData.getFirstPitName());
-				Dump d1 = projectConfiguration.getDumpfromPitName(dumpDependencyData.getFirstPitName());
+				Dump d1 = context.getProjectConfig().getDumpfromPitName(dumpDependencyData.getFirstPitName());
 				if(d1 == null) continue;
-				Dump d2 = projectConfiguration.getDumpfromDumpName(dumpDependencyData.getDependentDumpName());
+				Dump d2 = context.getProjectConfig().getDumpfromDumpName(dumpDependencyData.getDependentDumpName());
 				buildPitDumpDependencyEquation1(pit, d1, d2);
 				buildDumpDependencyEquation2(d1, d2);
 				
 			} else if(dumpDependencyData.getFirstDumpName() != null){
-				Dump d1 = projectConfiguration.getDumpfromDumpName(dumpDependencyData.getFirstDumpName());
-				Dump d2 = projectConfiguration.getDumpfromDumpName(dumpDependencyData.getDependentDumpName());
+				Dump d1 = context.getProjectConfig().getDumpfromDumpName(dumpDependencyData.getFirstDumpName());
+				Dump d2 = context.getProjectConfig().getDumpfromDumpName(dumpDependencyData.getDependentDumpName());
 				buildDumpDependencyEquation1(d1, d2);
 				buildDumpDependencyEquation2(d1, d2);
 			}
@@ -64,7 +64,7 @@ public class DumpDependencyEquationGenerator extends EquationGenerator{
 	
 	private void buildDumpDependencyEquation1(Dump d1, Dump d2){
 		if(!d1.isHasCapacity()) return;
-		int timePeriod = scenarioConfigutration.getTimePeriod();
+		int timePeriod = context.getTimePeriod();
 		Set<Block> blocks = d1.getBlocks();
 		for(int i=1; i<= timePeriod; i++){
 			StringBuilder sb = new StringBuilder();
@@ -82,7 +82,7 @@ public class DumpDependencyEquationGenerator extends EquationGenerator{
 	
 	private void buildDumpDependencyEquation2(Dump d1, Dump d2){
 		if(!d2.isHasCapacity()) return;
-		int timePeriod = scenarioConfigutration.getTimePeriod();
+		int timePeriod = context.getTimePeriod();
 		Set<Block> blocks = d2.getBlocks();
 		for(int i=1; i<= timePeriod; i++){
 			StringBuilder sb = new StringBuilder();
@@ -100,7 +100,7 @@ public class DumpDependencyEquationGenerator extends EquationGenerator{
 	
 	private void buildPitDumpDependencyEquation1(Pit p, Dump d1, Dump d2){
 		if(!d1.isHasCapacity()) return;
-		int timePeriod = scenarioConfigutration.getTimePeriod();
+		int timePeriod = context.getTimePeriod();
 		Bench lastBench = p.getBench(p.getBenches().size() - 1);
 		List<Block> blocks = lastBench.getBlocks();
 		Set<Block> dumpBlocks = d1.getBlocks();
@@ -120,7 +120,7 @@ public class DumpDependencyEquationGenerator extends EquationGenerator{
 	}
 
 	private Pit getPitFromPitName(String pitname){
-		Map<Integer, Pit> pits = serviceInstanceData.getPits();
+		Map<Integer, Pit> pits = context.getPits();
 		Set<Integer> pitNos = pits.keySet();
 		for(int pitNo: pitNos){
 			Pit pit = pits.get(pitNo);

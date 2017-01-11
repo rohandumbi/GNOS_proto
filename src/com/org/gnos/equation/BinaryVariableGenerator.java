@@ -14,7 +14,7 @@ import com.org.gnos.db.model.CapexInstance;
 
 public class BinaryVariableGenerator extends EquationGenerator{
 
-	public BinaryVariableGenerator(InstanceData data) {
+	public BinaryVariableGenerator(EquationContext data) {
 		super(data);
 	}
 	
@@ -37,8 +37,8 @@ public class BinaryVariableGenerator extends EquationGenerator{
 	
 	public void buildBinaryVariables() {
 		
-		int timePeriod = scenarioConfigutration.getTimePeriod();
-		Map<Integer, Pit> pits = serviceInstanceData.getPits();
+		int timePeriod = context.getTimePeriod();
+		Map<Integer, Pit> pits = context.getPits();
 		Set<Integer> pitNos = pits.keySet();
 		for(Integer pitNo:pitNos){
 			Pit pit = pits.get(pitNo);
@@ -54,8 +54,8 @@ public class BinaryVariableGenerator extends EquationGenerator{
 	}
 	
 	public void buildCapexBinaryVariables() {
-		int timeperiod = scenarioConfigutration.getTimePeriod();
-		List<CapexData> capexDataList = scenarioConfigutration.getCapexDataList();
+		int timeperiod = context.getTimePeriod();
+		List<CapexData> capexDataList = context.getScenarioConfig().getCapexDataList();
 		int capexCount = 0;
 		for(CapexData cd: capexDataList) {
 			capexCount++;

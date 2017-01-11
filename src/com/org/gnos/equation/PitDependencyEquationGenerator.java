@@ -17,10 +17,10 @@ public class PitDependencyEquationGenerator extends EquationGenerator{
 	private String tonnesWeightFieldName;
 	private Map<Integer, List<String>> blockVariableMapping;
 	
-	public PitDependencyEquationGenerator(InstanceData data) {
+	public PitDependencyEquationGenerator(EquationContext data) {
 		super(data);
-		this.tonnesWeightFieldName = projectConfiguration.getRequiredFieldMapping().get("tonnes_wt");
-		this.blockVariableMapping = serviceInstanceData.getBlockVariableMapping();
+		this.tonnesWeightFieldName = context.getTonnesWeightAlisName();
+		this.blockVariableMapping = context.getBlockVariableMapping();
 	}
 	
 	@Override
@@ -41,8 +41,8 @@ public class PitDependencyEquationGenerator extends EquationGenerator{
 
 	
 	private void buildDependencyEquations() {
-		List<PitDependencyData> pitDependencyDataList = scenarioConfigutration.getPitDependencyDataList();
-		int timePeriod = scenarioConfigutration.getTimePeriod();
+		List<PitDependencyData> pitDependencyDataList = context.getScenarioConfig().getPitDependencyDataList();
+		int timePeriod = context.getTimePeriod();
 		for(PitDependencyData pitDependencyData:pitDependencyDataList){
 			if(!pitDependencyData.isInUse()) continue;
 			Pit firstpit = getPitFromPitName(pitDependencyData.getFirstPitName());
@@ -110,7 +110,7 @@ public class PitDependencyEquationGenerator extends EquationGenerator{
 	}
 	
 	private void buildPitDependencyEquation(Pit p1, Bench b1, Bench b2){
-		int timePeriod = scenarioConfigutration.getTimePeriod();
+		int timePeriod = context.getTimePeriod();
 		List<String> variables = getAllVariablesForBench(b2);
 		float benchTonnesWt = getBenchTonnesWt(b2);
 		for(int i=1; i<= timePeriod; i++){
@@ -133,7 +133,7 @@ public class PitDependencyEquationGenerator extends EquationGenerator{
 	}
 	
 	private Pit getPitFromPitName(String pitname){
-		Map<Integer, Pit> pits = serviceInstanceData.getPits();
+		Map<Integer, Pit> pits = context.getPits();
 		Set<Integer> pitNos = pits.keySet();
 		for(int pitNo: pitNos){
 			Pit pit = pits.get(pitNo);

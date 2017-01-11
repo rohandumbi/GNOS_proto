@@ -27,7 +27,7 @@ import com.org.gnos.db.model.ProductJoin;
 public class BoundaryVariableGenerator extends EquationGenerator{
 
 	
-	public BoundaryVariableGenerator(InstanceData data) {
+	public BoundaryVariableGenerator(EquationContext data) {
 		super(data);
 	}
 	
@@ -48,9 +48,9 @@ public class BoundaryVariableGenerator extends EquationGenerator{
 	}
 	
 	public void buildBenchConstraintVariables() {
-		String tonnesWeightFieldName = projectConfiguration.getRequiredFieldMapping().get("tonnes_wt");
-		Map<Integer, Block> allBlocks = serviceInstanceData.getBlocks();
-		Map<Integer, List<String>> blockVariableMapping = serviceInstanceData.getBlockVariableMapping();
+		String tonnesWeightFieldName = context.getTonnesWeightAlisName();
+		Map<Integer, Block> allBlocks = context.getBlocks();
+		Map<Integer, List<String>> blockVariableMapping = context.getBlockVariableMapping();
 		Set<Integer> blockIds = blockVariableMapping.keySet();
 		for(int blockId: blockIds){
 			List<String> variables = blockVariableMapping.get(blockId);

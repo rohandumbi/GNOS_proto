@@ -21,10 +21,10 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 	private Map<Integer, List<String>> blockVariableMapping;
 	final Pattern lastIntPattern = Pattern.compile("[^0-9]+([0-9]+)$");
 	
-	public BenchConstraintEquationGenerator(InstanceData data) {
+	public BenchConstraintEquationGenerator(EquationContext data) {
 		super(data);
-		this.tonnesWeightFieldName = projectConfiguration.getRequiredFieldMapping().get("tonnes_wt");
-		this.blockVariableMapping = serviceInstanceData.getBlockVariableMapping();
+		this.tonnesWeightFieldName = context.getTonnesWeightAlisName();
+		this.blockVariableMapping = context.getBlockVariableMapping();
 	}
 	
 	@Override
@@ -45,8 +45,8 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 	}
 	
 	public void buildBenchConstraintVariables() {
-		Map<Integer, Pit> pits = serviceInstanceData.getPits();
-		int timePeriod = scenarioConfigutration.getTimePeriod();
+		Map<Integer, Pit> pits = context.getPits();
+		int timePeriod = context.getTimePeriod();
 		Set<Integer> pitNos = pits.keySet();
 		for(int pitNo: pitNos){
 			Pit pit = pits.get(pitNo);
@@ -91,9 +91,9 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 	}
 	
 	private void buildBenchUserConstraintVariables() {
-		List<PitBenchConstraintData> pitBenchConstraintDataList = scenarioConfigutration.getPitBenchConstraintDataList();
-		int timePeriod = scenarioConfigutration.getTimePeriod();
-		int startyear = scenarioConfigutration.getStartYear();
+		List<PitBenchConstraintData> pitBenchConstraintDataList = context.getScenarioConfig().getPitBenchConstraintDataList();
+		int timePeriod = context.getTimePeriod();
+		int startyear = context.getStartYear();
 		boolean hasDefaultConstraint = false;
 		List<Integer> exclusionList = new ArrayList<Integer>();
 		PitBenchConstraintData defaultConstraint = null;
@@ -106,9 +106,9 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 				continue;
 			}
 			String pitName = pitBenchConstraintData.getPitName();
-			com.org.gnos.db.model.Pit pit = projectConfiguration.getPitfromPitName(pitName);
+			com.org.gnos.db.model.Pit pit = context.getProjectConfig().getPitfromPitName(pitName);
 			exclusionList.add(pit.getPitNumber());
-			Pit pitdata = serviceInstanceData.getPits().get(pit.getPitNumber());
+			Pit pitdata = context.getPits().get(pit.getPitNumber());
 			for(int i=1; i<= timePeriod; i++){
 				int yearvalue = pitBenchConstraintData.getConstraintData().get(startyear+ i-1);
 				buildEquationForPit(pitdata, i, yearvalue);
@@ -117,7 +117,7 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 		}
 		if(hasDefaultConstraint){
 			System.out.println("PitBenchConstraint: Inside default constraint");
-			Map<Integer, Pit> pits = serviceInstanceData.getPits();
+			Map<Integer, Pit> pits = context.getPits();
 			Set<Integer> pitNos = pits.keySet();
 			for(Integer pitNo: pitNos){
 				if(exclusionList.contains(pitNo)) continue;

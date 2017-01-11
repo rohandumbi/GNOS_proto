@@ -21,13 +21,11 @@ import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.model.CycleTimeMappingData;
-import com.org.gnos.db.model.Dump;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.PitGroup;
-import com.org.gnos.db.model.Stockpile;
 import com.org.gnos.db.model.TruckParameterData;
 
-public class InstanceData {
+public class EquationContext {
 	
 	private Set<Block> wasteBlocks = new HashSet<Block>();
 	private Set<Block> processBlocks = new HashSet<Block>();
@@ -42,9 +40,11 @@ public class InstanceData {
 	private boolean spReclaimEnabled = true;
 	
 	private ProjectConfigutration projectConfiguration;
+	private ScenarioConfigutration scenarioConfiguration;
 	
-	public InstanceData() {
+	public EquationContext() {
 		projectConfiguration = ProjectConfigutration.getInstance();
+		scenarioConfiguration = ScenarioConfigutration.getInstance();
 		pitFieldName = projectConfiguration.getRequiredFieldMapping().get("pit_name");
 		benchFieldName = projectConfiguration.getRequiredFieldMapping().get("bench_rl");
 		loadConfiguration();
@@ -227,6 +227,26 @@ public class InstanceData {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public int getStartYear() {
+		return this.scenarioConfiguration.getStartYear();
+	}
+	
+	public int getTimePeriod() {
+		return this.scenarioConfiguration.getTimePeriod();
+	}
+	
+	public String getTonnesWeightAlisName() {
+		return projectConfiguration.getRequiredFieldMapping().get("tonnes_wt");
+	}
+	
+	public ScenarioConfigutration getScenarioConfig() {
+		return this.scenarioConfiguration;
+	}
+	
+	public ProjectConfigutration getProjectConfig() {
+		return this.projectConfiguration;
 	}
 	
 	private boolean hasValue(String s) {

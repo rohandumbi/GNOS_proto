@@ -29,13 +29,13 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 	private int bytesWritten = 0;
 
 	
-	public GradeConstraintEquationGenerator(InstanceData data) {
+	public GradeConstraintEquationGenerator(EquationContext data) {
 		super(data);
 	}
 	
 	@Override
 	public void generate() {
-		gradeConstraintDataList = scenarioConfigutration.getGradeConstraintDataList();
+		gradeConstraintDataList = context.getScenarioConfig().getGradeConstraintDataList();
 		
 		int bufferSize = 8 * 1024;
 		try {
@@ -52,16 +52,16 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 	
 	public void buildGradeConstraintVariables() {
 		
-		int timePeriod = scenarioConfigutration.getTimePeriod();
-		int startYear = scenarioConfigutration.getStartYear();
-		List<Process> processList = projectConfiguration.getProcessList();
+		int timePeriod = context.getTimePeriod();
+		int startYear = context.getStartYear();
+		List<Process> processList = context.getProjectConfig().getProcessList();
 		for(GradeConstraintData gradeConstraintData: gradeConstraintDataList) {
 			if(!gradeConstraintData.isInUse()) continue;
 			int selectorType = gradeConstraintData.getSelectionType();
 			String selectedGradeName = gradeConstraintData.getSelectedGradeName();
 			Map<String, List<String>> processExprMap = new HashMap<String, List<String>>();
 			Map<String, List<Grade>> processGradeMap = new HashMap<String, List<Grade>>();
-			ProductJoin pj = projectConfiguration.getProductJoinByName(gradeConstraintData.getProductJoinName());
+			ProductJoin pj = context.getProjectConfig().getProductJoinByName(gradeConstraintData.getProductJoinName());
 			if(pj == null || pj.getGradeNames().size() == 0) continue;		
 			int selectedGradeIndex = -1;
 			int loopCount = 0;
@@ -96,7 +96,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 				String eq = "";
 				BigDecimal targetGrade = new BigDecimal(gradeConstraintData.getConstraintData().get(startYear+i -1));
 				if(selectorType == GradeConstraintData.SELECTION_PROCESS_JOIN) {
-					ProcessJoin processJoin = projectConfiguration.getProcessJoinByName(gradeConstraintData.getSelectorName());
+					ProcessJoin processJoin = context.getProjectConfig().getProcessJoinByName(gradeConstraintData.getSelectorName());
 					if(processJoin != null) {
 						for(Model model: processJoin.getlistChildProcesses()){
 							for( Process p: processList){
@@ -127,7 +127,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 					}
 				} else if(selectorType == GradeConstraintData.SELECTION_PIT) {
 					String pitName = gradeConstraintData.getSelectorName();
-					Pit pit = projectConfiguration.getPitfromPitName(pitName);
+					Pit pit = context.getProjectConfig().getPitfromPitName(pitName);
 					if(pit != null) {
 						for( Process p: processList){
 							String processName = p.getModel().getName();
@@ -148,7 +148,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 					
 					
 				} else if(selectorType == GradeConstraintData.SELECTION_PIT_GROUP) {
-					PitGroup pg = projectConfiguration.getPitGroupfromName(gradeConstraintData.getSelectorName());
+					PitGroup pg = context.getProjectConfig().getPitGroupfromName(gradeConstraintData.getSelectorName());
 					Set pitNumbers = getPitsFromPitGroup(pg);
 					for( Process p: processList){
 						String processName = p.getModel().getName();
@@ -211,7 +211,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 			}
 			eq +=   formatDecimalValue(coeff)+"p"+block.getPitNo()+"x"+block.getBlockNo()+"p"+processNumber+"t"+period;
 			
-			if(serviceInstanceData.isSpReclaimEnabled() && period > 1) {
+			if(context.isSpReclaimEnabled() && period > 1) {
 				int stockpileNo = getStockpileNo(block);
 				if(stockpileNo > 0) {
 					if(coeff.doubleValue() > 0) {
@@ -225,7 +225,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 	}
 	
 	private int getStockpileNo(Block b){
-		List<Stockpile> stockpiles = projectConfiguration.getStockPileList();
+		List<Stockpile> stockpiles = context.getProjectConfig().getStockPileList();
 		
 		for(Stockpile sp: stockpiles){
 			if(!sp.isReclaim()) continue;

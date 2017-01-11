@@ -17,7 +17,7 @@ public class DumpCapacityEquationGenerator extends EquationGenerator{
 	
 	private Map<Integer, List<String>> blockVariableMapping;
 	
-	public DumpCapacityEquationGenerator(InstanceData data) {
+	public DumpCapacityEquationGenerator(EquationContext data) {
 		super(data);
 	}
 	
@@ -39,8 +39,8 @@ public class DumpCapacityEquationGenerator extends EquationGenerator{
 
 	
 	private void buildCapacityEquations() {
-		List<Dump> dumpList = projectConfiguration.getDumpList();
-		int timeperiod = scenarioConfigutration.getTimePeriod();
+		List<Dump> dumpList = context.getProjectConfig().getDumpList();
+		int timeperiod = context.getTimePeriod();
 		for(Dump d:dumpList){
 			if(!d.isHasCapacity()) continue;
 			StringBuilder sb= new StringBuilder("");
@@ -51,9 +51,9 @@ public class DumpCapacityEquationGenerator extends EquationGenerator{
 				pits.add(pit);
 			} else {
 				PitGroup pitgroup = d.getAssociatedPitGroup();
-				Set<Integer> pitNos = serviceInstanceData.flattenPitGroup(pitgroup);
+				Set<Integer> pitNos = context.flattenPitGroup(pitgroup);
 				for(int pitNo: pitNos){
-					pits.add(serviceInstanceData.getPits().get(pitNo));
+					pits.add(context.getPits().get(pitNo));
 				}
 			}			
 			for(Pit pit: pits){
@@ -78,7 +78,7 @@ public class DumpCapacityEquationGenerator extends EquationGenerator{
 	
 	
 	private Pit getPitFromPitName(String pitname){
-		Map<Integer, Pit> pits = serviceInstanceData.getPits();
+		Map<Integer, Pit> pits = context.getPits();
 		Set<Integer> pitNos = pits.keySet();
 		for(int pitNo: pitNos){
 			Pit pit = pits.get(pitNo);

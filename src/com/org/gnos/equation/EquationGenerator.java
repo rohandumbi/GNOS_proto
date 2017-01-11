@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Set;
 
 import com.org.gnos.core.GNOSConfig;
-import com.org.gnos.core.ProjectConfigutration;
-import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.db.model.Pit;
 import com.org.gnos.db.model.PitGroup;
 import com.org.gnos.db.model.Product;
@@ -22,9 +20,7 @@ public abstract class EquationGenerator {
 	private static int DECIMAL_POINT = 6;
 	
 	protected BufferedOutputStream output;
-	protected ProjectConfigutration projectConfiguration;
-	protected ScenarioConfigutration scenarioConfigutration;
-	protected InstanceData serviceInstanceData = null;
+	protected EquationContext context = null;
 
 	
 	protected int bytesWritten = 0;
@@ -37,10 +33,8 @@ public abstract class EquationGenerator {
 		System.out.println("DP value is "+DECIMAL_POINT);
 	}
 	
-	public EquationGenerator(InstanceData data) {
-		this.serviceInstanceData = data;
-		this.projectConfiguration = ProjectConfigutration.getInstance();
-		this.scenarioConfigutration = ScenarioConfigutration.getInstance();		
+	public EquationGenerator(EquationContext data) {
+		this.context = data;
 	}
 
 
@@ -98,5 +92,5 @@ public abstract class EquationGenerator {
 	}	
 	
 	// Abstract class
-	abstract void generate();
+	public abstract void generate();
 }

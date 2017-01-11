@@ -12,7 +12,7 @@ import com.org.gnos.db.model.Stockpile;
 public class SPReclaimEquationGenerator extends EquationGenerator{
 	
 
-	public SPReclaimEquationGenerator(InstanceData data) {
+	public SPReclaimEquationGenerator(EquationContext data) {
 		super(data);
 	}
 	
@@ -23,7 +23,7 @@ public class SPReclaimEquationGenerator extends EquationGenerator{
 		try {
 			output = new BufferedOutputStream(new FileOutputStream("spReclaim.txt"), bufferSize);
 			bytesWritten = 0;
-			if(serviceInstanceData.isSpReclaimEnabled()) {
+			if(context.isSpReclaimEnabled()) {
 				buildStockpileEquations();
 			}		
 			output.flush();
@@ -35,8 +35,8 @@ public class SPReclaimEquationGenerator extends EquationGenerator{
 	}
 
 	private void buildStockpileEquations() {
-		List<Stockpile> stockpiles = projectConfiguration.getStockPileList();
-		int timeperiod = scenarioConfigutration.getTimePeriod();
+		List<Stockpile> stockpiles = context.getProjectConfig().getStockPileList();
+		int timeperiod = context.getTimePeriod();
 		for(Stockpile sp: stockpiles) {
 			if(!sp.isReclaim()) return;
 			Set<Block> blocks = sp.getBlocks();

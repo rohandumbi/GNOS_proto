@@ -19,10 +19,10 @@ public class BenchProportionEquationGenerator extends EquationGenerator{
 	private Map<Integer, List<String>> blockVariableMapping;
 	final Pattern lastIntPattern = Pattern.compile("[^0-9]+([0-9]+)$");
 	
-	public BenchProportionEquationGenerator(InstanceData data) {
+	public BenchProportionEquationGenerator(EquationContext data) {
 		super(data);
-		this.tonnesWeightFieldName = projectConfiguration.getRequiredFieldMapping().get("tonnes_wt");
-		this.blockVariableMapping = serviceInstanceData.getBlockVariableMapping();
+		this.tonnesWeightFieldName = context.getTonnesWeightAlisName();
+		this.blockVariableMapping = context.getBlockVariableMapping();
 	}
 	
 	@Override
@@ -42,8 +42,8 @@ public class BenchProportionEquationGenerator extends EquationGenerator{
 	}
 	
 	public void buildBenchProportionEquations() {
-		Map<Integer, Pit> pits = serviceInstanceData.getPits();
-		int timePeriod = scenarioConfigutration.getTimePeriod();
+		Map<Integer, Pit> pits = context.getPits();
+		int timePeriod = context.getTimePeriod();
 		Set<Integer> pitNos = pits.keySet();
 		for(int pitNo: pitNos){
 			Pit pit = pits.get(pitNo);
