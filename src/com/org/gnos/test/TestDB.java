@@ -2,7 +2,6 @@ package com.org.gnos.test;
 
 import com.org.gnos.core.GNOSConfig;
 import com.org.gnos.db.dao.ExpressionDAO;
-import com.org.gnos.db.dao.ProjectDAO;
 import com.org.gnos.db.model.Expression;
 
 public class TestDB {

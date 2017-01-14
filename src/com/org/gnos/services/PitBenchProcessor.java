@@ -2,7 +2,6 @@ package com.org.gnos.services;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -115,7 +114,7 @@ public class PitBenchProcessor {
 	
 	class PitBenchMappingData{
 		int pitNo = -1;
-		List<Integer> benchValues = new ArrayList();
+		List<Integer> benchValues = new ArrayList<Integer>();
 		
 		PitBenchMappingData(int pitNo) {
 			this.pitNo = pitNo;

@@ -16,8 +16,6 @@ import java.util.Set;
 
 import com.org.gnos.core.Block;
 import com.org.gnos.core.Node;
-import com.org.gnos.core.ProjectConfigutration;
-import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.core.Tree;
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.model.CapexData;
@@ -378,20 +376,6 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 			e.printStackTrace();
 		}
 		
-		return blocks;
-	}
-	
-	private Set<Block> findWasteBlocks() {
-		Set<Block> blocks = new HashSet<Block>();
-		Map<Integer, Block> allBlocks = context.getBlocks();
-		if(allBlocks != null){
-			Set<Integer> blockIds = allBlocks.keySet();
-			for(Integer blockId: blockIds){
-				if(!processedBlocks.contains(blockId)){
-					blocks.add(allBlocks.get(blockId));
-				}
-			}
-		}
 		return blocks;
 	}
 	

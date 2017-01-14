@@ -26,9 +26,6 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 
 	private List<GradeConstraintData> gradeConstraintDataList;
 	
-	private int bytesWritten = 0;
-
-	
 	public GradeConstraintEquationGenerator(EquationContext data) {
 		super(data);
 	}
@@ -149,7 +146,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 					
 				} else if(selectorType == GradeConstraintData.SELECTION_PIT_GROUP) {
 					PitGroup pg = context.getProjectConfig().getPitGroupfromName(gradeConstraintData.getSelectorName());
-					Set pitNumbers = getPitsFromPitGroup(pg);
+					Set<Integer> pitNumbers = getPitsFromPitGroup(pg);
 					for( Process p: processList){
 						String processName = p.getModel().getName();
 						List<String> coefficients = processExprMap.get(processName);

@@ -35,13 +35,12 @@ public class CycleTimeFixedFieldGrid extends Composite {
 	
 	public CycleTimeFixedFieldGrid(Composite parent, int style) {
 		super(parent, style);
-		this.parent = parent;
 		ProjectConfigutration projectInstance = ProjectConfigutration.getInstance();
 		this.fixedFieldMap = projectInstance.getCycleTimeData().getFixedFieldMap();
 		//this.requiredFieldNames = requiredFieldNames;
 		this.allSourceFields = projectInstance.getCycletimefields();
 		this.allRows = new ArrayList<>();
-		this.createContent(parent);
+		this.createContent();
 	}
 	
 	private String[] getFixedFields(){
@@ -145,7 +144,7 @@ public class CycleTimeFixedFieldGrid extends Composite {
 		this.presentRow = compositeRow;
 	}
 
-	private void createContent(Composite parent){
+	private void createContent(){
 		this.setLayout(new FormLayout());
 		this.createHeader();
 		for(String field: this.getFixedFields()){

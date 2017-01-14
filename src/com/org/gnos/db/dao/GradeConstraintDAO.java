@@ -14,7 +14,6 @@ import java.util.Map;
 import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.model.GradeConstraintData;
-import com.org.gnos.db.model.PitBenchConstraintData;
 import com.org.gnos.db.model.ProcessConstraintData;
 
 public class GradeConstraintDAO {

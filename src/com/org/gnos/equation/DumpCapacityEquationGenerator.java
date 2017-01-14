@@ -15,8 +15,6 @@ import com.org.gnos.db.model.PitGroup;
 
 public class DumpCapacityEquationGenerator extends EquationGenerator{
 	
-	private Map<Integer, List<String>> blockVariableMapping;
-	
 	public DumpCapacityEquationGenerator(EquationContext data) {
 		super(data);
 	}

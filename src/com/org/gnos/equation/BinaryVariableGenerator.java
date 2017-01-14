@@ -60,11 +60,9 @@ public class BinaryVariableGenerator extends EquationGenerator{
 		for(CapexData cd: capexDataList) {
 			capexCount++;
 			List<CapexInstance> capexInstanceList = cd.getListOfCapexInstances();
-			int capexInstanceCount = 0;
-			for(CapexInstance ci: capexInstanceList){
-				capexInstanceCount++;
+			for (int j = 1; j <= capexInstanceList.size(); j++) {
 				for(int i= 1; i <= timeperiod ; i++){
-					String cv = " c"+capexCount+"i"+capexInstanceCount+"t"+i;
+					String cv = " c"+capexCount+"i"+j+"t"+i;
 					write(cv);
 				}
 			}

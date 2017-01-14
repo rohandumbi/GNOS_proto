@@ -615,7 +615,7 @@ public class ScenarioConfigutration {
 					int id = rs.getInt(1);
 					od.setId(id);
 
-					Set keys = od.getCostData().keySet();
+					Set<Integer> keys = od.getCostData().keySet();
 					Iterator<Integer> it = keys.iterator();
 					while (it.hasNext()) {
 						int key = it.next();
@@ -650,7 +650,6 @@ public class ScenarioConfigutration {
 		Connection conn = DBManager.getConnection();
 		String insert_sql = "insert into fixedcost_year_mapping (scenario_id, cost_head, year, value) values (?, ?, ?, ?)";
 		PreparedStatement pstmt = null;
-		ResultSet rs = null;
 		boolean autoCommit = true;
 
 		try {
@@ -662,7 +661,7 @@ public class ScenarioConfigutration {
 			for (int i = 0; i < fixedCost.length; i++) {
 				FixedOpexCost fixedOpexCost = fixedCost[i];
 				if(fixedOpexCost == null || fixedOpexCost.getCostData() == null) continue;
-				Set keys = fixedOpexCost.getCostData().keySet();
+				Set<Integer> keys = fixedOpexCost.getCostData().keySet();
 				Iterator<Integer> it = keys.iterator();
 				while (it.hasNext()) {
 					int key = it.next();

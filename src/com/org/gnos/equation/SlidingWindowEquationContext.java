@@ -1,5 +1,7 @@
 package com.org.gnos.equation;
 
+import com.org.gnos.core.ScenarioConfigutration;
+
 public class SlidingWindowEquationContext extends EquationContext {
 
 	private short period;
@@ -30,5 +32,13 @@ public class SlidingWindowEquationContext extends EquationContext {
 	}
 	public void setCurrPeriod(short currPeriod) {
 		this.currPeriod = currPeriod;
+	}
+	
+	public int getStartYear() {
+		return ScenarioConfigutration.getInstance().getStartYear();
+	}
+	
+	public int getTimePeriod() {
+		return this.window;
 	}
 }

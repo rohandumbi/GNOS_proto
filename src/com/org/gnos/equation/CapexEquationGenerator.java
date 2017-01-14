@@ -44,7 +44,6 @@ public class CapexEquationGenerator extends EquationGenerator{
 	}
 	
 	private void buildCapexEquations() {
-		int timeperiod = context.getTimePeriod();
 		List<CapexData> capexDataList = context.getScenarioConfig().getCapexDataList();
 		int capexCount = 0;
 		for(CapexData cd: capexDataList) {
@@ -122,16 +121,14 @@ public class CapexEquationGenerator extends EquationGenerator{
 
 	private void buildSet3Equations(CapexData cd, int capexNumber) {
 		int timeperiod = context.getTimePeriod();
-		int capexInstanceNo = 0;
 		List<CapexInstance> capexInstanceList = cd.getListOfCapexInstances();
-		for(CapexInstance ci: capexInstanceList){
-			capexInstanceNo++;
+		for(int j=1; j<= capexInstanceList.size(); j++){
 			StringBuffer sb = new StringBuffer("");
 			for(int i=1; i<= timeperiod; i++){
 				if(i > 1){
 					sb.append(" + ");
 				}
-				sb.append("c"+capexNumber+"i"+capexInstanceNo+"t"+i);			
+				sb.append("c"+capexNumber+"i"+j+"t"+i);			
 			}
 			sb.append(" <= 1 ");
 			write(sb.toString());
@@ -250,7 +247,7 @@ public class CapexEquationGenerator extends EquationGenerator{
 		List<ProcessConstraintData> processConstraintDataList = context.getScenarioConfig().getProcessConstraintDataList();
 		for(ProcessConstraintData pcd: processConstraintDataList){
 			if(!pcd.isInUse()) continue;
-			if(pcd.getSelectionType() == type && pcd.getCoefficientType() == pcd.COEFFICIENT_NONE){
+			if(pcd.getSelectionType() == type && pcd.getCoefficientType() == ProcessConstraintData.COEFFICIENT_NONE){
 				if(pcd.getSelector_name().equals(name)){
 					return pcd.getConstraintData();
 				}

@@ -55,11 +55,11 @@ public class EquationGeneratorService {
 		try {
 
 			in = new FileInputStream("c:\\gnos_run_config.properties");
-
+			prop.load(in);
 			// get the mode
 			short run_mode = Short.parseShort(prop.getProperty("run_mode", "0"));
 			createContext(run_mode);
-			if(run_mode == 1) {
+			if(run_mode == 2) {
 				((SlidingWindowEquationContext)context).setPeriod(Short.parseShort(prop.getProperty("optimisation_period", "0")));
 				((SlidingWindowEquationContext)context).setWindow(Short.parseShort(prop.getProperty("optimisation_window", "0")));
 				((SlidingWindowEquationContext)context).setStepsize(Short.parseShort(prop.getProperty("step_size", "0")));

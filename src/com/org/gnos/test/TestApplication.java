@@ -31,7 +31,7 @@ public class TestApplication {
 		GNOSCSVDataProcessor.getInstance().dumpToDB(projectId);
 		ProjectConfigutration.getInstance().load(projectId);
 	}
-	private boolean test() {
+	public boolean test() {
 		
 		Project project = createProject();
 		loadData(project.getId());
@@ -42,7 +42,6 @@ public class TestApplication {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		TestApplication application = new TestApplication();
 		
 		GNOSConfig.load();
 		ProjectConfigutration.getInstance().load(19);

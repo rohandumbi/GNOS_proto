@@ -2,27 +2,11 @@ package com.org.gnos.equation;
 
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.org.gnos.core.Block;
-import com.org.gnos.core.ProjectConfigutration;
-import com.org.gnos.core.ScenarioConfigutration;
-import com.org.gnos.db.model.Expression;
-import com.org.gnos.db.model.Grade;
-import com.org.gnos.db.model.GradeConstraintData;
-import com.org.gnos.db.model.Model;
-import com.org.gnos.db.model.Pit;
-import com.org.gnos.db.model.PitGroup;
-import com.org.gnos.db.model.Process;
-import com.org.gnos.db.model.ProcessJoin;
-import com.org.gnos.db.model.Product;
-import com.org.gnos.db.model.ProductJoin;
 
 public class BoundaryVariableGenerator extends EquationGenerator{
 

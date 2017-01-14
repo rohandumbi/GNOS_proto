@@ -324,7 +324,6 @@ public class ProjectConfigutration {
 	public void loadProcesses() {
 		String sql = "select model_id, process_no from process where project_id = " + this.projectId + " order by process_no ";
 
-		Map<String, Node> nodes = new HashMap<String, Node>();
 		try (
 				Connection conn = DBManager.getConnection();
 				Statement stmt = conn.createStatement();
@@ -978,7 +977,7 @@ public class ProjectConfigutration {
 			if (savedRequiredFieldMapping == null
 					|| savedRequiredFieldMapping.size() == 0) {
 				pstmt = conn.prepareStatement(insert_sql);
-				Set keys = requiredFieldMapping.keySet();
+				Set<String> keys = requiredFieldMapping.keySet();
 				Iterator<String> it = keys.iterator();
 				while (it.hasNext()) {
 					String key = it.next();
@@ -989,7 +988,7 @@ public class ProjectConfigutration {
 				}
 			} else {
 				pstmt = conn.prepareStatement(update_sql);
-				Set keys = requiredFieldMapping.keySet();
+				Set<String> keys = requiredFieldMapping.keySet();
 				Iterator<String> it = keys.iterator();
 				while (it.hasNext()) {
 					String key = it.next();
@@ -1517,7 +1516,7 @@ public class ProjectConfigutration {
 			insertPstmt = conn.prepareStatement(insert_sql);
 			updatePstmt = conn.prepareStatement(update_sql);
 			Map<String, String> fixedFieldMap = this.cycleTimeMappingData.getFixedFieldMap();
-			Set keys = fixedFieldMap.keySet();
+			Set<String> keys = fixedFieldMap.keySet();
 			Iterator<String> it = keys.iterator();
 			while (it.hasNext()) {
 				String key = it.next();
@@ -1567,7 +1566,7 @@ public class ProjectConfigutration {
 			insertPstmt = conn.prepareStatement(insert_sql);
 			updatePstmt = conn.prepareStatement(update_sql);
 			Map<String, String> dumpFieldMap = this.cycleTimeMappingData.getDumpFieldMap();
-			Set keys = dumpFieldMap.keySet();
+			Set<String> keys = dumpFieldMap.keySet();
 			Iterator<String> it = keys.iterator();
 			while (it.hasNext()) {
 				String key = it.next();
@@ -1617,7 +1616,7 @@ public class ProjectConfigutration {
 			insertPstmt = conn.prepareStatement(insert_sql);
 			updatePstmt = conn.prepareStatement(update_sql);
 			Map<String, String> stockpileFieldMap = this.cycleTimeMappingData.getStockpileFieldMap();
-			Set keys = stockpileFieldMap.keySet();
+			Set<String> keys = stockpileFieldMap.keySet();
 			Iterator<String> it = keys.iterator();
 			while (it.hasNext()) {
 				String key = it.next();
@@ -1667,7 +1666,7 @@ public class ProjectConfigutration {
 			insertPstmt = conn.prepareStatement(insert_sql);
 			updatePstmt = conn.prepareStatement(update_sql);
 			Map<String, String> processFieldMap = this.cycleTimeMappingData.getChildProcessFieldMap();
-			Set keys = processFieldMap.keySet();
+			Set<String> keys = processFieldMap.keySet();
 			Iterator<String> it = keys.iterator();
 			while (it.hasNext()) {
 				String key = it.next();
@@ -1774,7 +1773,7 @@ public class ProjectConfigutration {
 			insertPstmt = conn.prepareStatement(insert_sql);
 			updatePstmt = conn.prepareStatement(update_sql);
 			Map<String, Integer> materialPayloadMap = this.truckParameterData.getMaterialPayloadMap();
-			Set keys = materialPayloadMap.keySet();
+			Set<String> keys = materialPayloadMap.keySet();
 			Iterator<String> it = keys.iterator();
 			while (it.hasNext()) {
 				String key = it.next();
@@ -1847,7 +1846,7 @@ public class ProjectConfigutration {
 		String update_sql = "update truckparam_cycle_time set value = ? where project_id = ? AND (stockpile_name = ? AND process_name = ?)";
 		PreparedStatement insertStmt = null;
 		PreparedStatement updateStmt = null;
-		ResultSet rs = null;
+
 		boolean autoCommit = true;
 
 		try {
@@ -1861,7 +1860,7 @@ public class ProjectConfigutration {
 			for (TruckParameterCycleTime tpmCycleTime: truckParameterCycleTimeList) {
 				//FixedOpexCost fixedOpexCost = fixedCost[i];
 				if(tpmCycleTime == null || tpmCycleTime.getProcessData() == null) continue;
-				Set keys = tpmCycleTime.getProcessData().keySet();
+				Set<String> keys = tpmCycleTime.getProcessData().keySet();
 				Iterator<String> it = keys.iterator();
 				while (it.hasNext()) {
 					String key = it.next();

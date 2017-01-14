@@ -10,8 +10,6 @@ import java.util.Map;
 import java.util.Set;
 
 import com.org.gnos.core.Block;
-import com.org.gnos.core.ProjectConfigutration;
-import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.db.model.Dump;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Model;
@@ -23,7 +21,6 @@ import com.org.gnos.db.model.ProcessJoin;
 import com.org.gnos.db.model.Product;
 import com.org.gnos.db.model.ProductJoin;
 import com.org.gnos.db.model.Stockpile;
-import com.sun.xml.internal.ws.util.pipe.DumpTube;
 
 public class ProcessConstraintEquationGenerator extends EquationGenerator{
 
@@ -177,7 +174,7 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 					
 				} else if(selectorType == ProcessConstraintData.SELECTION_PIT_GROUP) {
 					PitGroup pg = context.getProjectConfig().getPitGroupfromName(processConstraintData.getSelector_name());
-					Set pitNumbers = getPitsFromPitGroup(pg);
+					Set<Integer> pitNumbers = getPitsFromPitGroup(pg);
 					for( Process p: processList){
 						List<String> coefficients;
 						if(applyProcessRestrictions){

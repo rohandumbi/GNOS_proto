@@ -1,9 +1,6 @@
 package com.org.gnos.custom.models;
 
-import java.util.List;
 import java.util.Map;
-
-import com.org.gnos.services.csv.ColumnHeader;
 
 public class ProjectModel {
 	private Map<String, String> projectMetaData;
