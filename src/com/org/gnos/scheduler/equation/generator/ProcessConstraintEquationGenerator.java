@@ -1,7 +1,5 @@
-package com.org.gnos.equation;
+package com.org.gnos.scheduler.equation.generator;
 
-import java.io.BufferedOutputStream;
-import java.io.FileOutputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,25 +19,23 @@ import com.org.gnos.db.model.ProcessJoin;
 import com.org.gnos.db.model.Product;
 import com.org.gnos.db.model.ProductJoin;
 import com.org.gnos.db.model.Stockpile;
+import com.org.gnos.scheduler.equation.ExecutionContext;
 
 public class ProcessConstraintEquationGenerator extends EquationGenerator{
 
 	private List<ProcessConstraintData> processConstraintDataList;
 
-	public ProcessConstraintEquationGenerator(EquationContext data) {
+	public ProcessConstraintEquationGenerator(ExecutionContext data) {
 		super(data);
 	}
 	
 	@Override
 	public void generate() {
 		processConstraintDataList = context.getScenarioConfig().getProcessConstraintDataList();
-		
-		int bufferSize = 8 * 1024;
-		try {
-			output = new BufferedOutputStream(new FileOutputStream("processConstraint.txt"), bufferSize);
+		try {			
 			buildProcessConstraintVariables();
 			output.flush();
-			output.close();
+
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -48,7 +44,8 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 	
 	public void buildProcessConstraintVariables() {
 		
-		int timePeriod = context.getTimePeriod();
+		int timePeriodStart = context.getTimePeriodStart();
+		int timePeriodEnd = context.getTimePeriodEnd();
 		int startYear = context.getStartYear();
 		List<Process> processList = context.getProjectConfig().getProcessList();
 		for(ProcessConstraintData processConstraintData: processConstraintDataList) {
@@ -87,7 +84,7 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 				usetruckHourCoeffcient = true;
 			}
 			
-			for(int i=1; i<= timePeriod; i++){
+			for(int i=timePeriodStart; i<= timePeriodEnd; i++){
 				String eq = "";
 				if(selectorType == ProcessConstraintData.SELECTION_PROCESS_JOIN) {
 					ProcessJoin processJoin = context.getProjectConfig().getProcessJoinByName(processConstraintData.getSelector_name());

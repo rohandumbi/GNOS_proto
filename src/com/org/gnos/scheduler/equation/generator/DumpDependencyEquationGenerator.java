@@ -1,7 +1,5 @@
-package com.org.gnos.equation;
+package com.org.gnos.scheduler.equation.generator;
 
-import java.io.BufferedOutputStream;
-import java.io.FileOutputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -11,23 +9,20 @@ import com.org.gnos.core.Block;
 import com.org.gnos.core.Pit;
 import com.org.gnos.db.model.Dump;
 import com.org.gnos.db.model.DumpDependencyData;
+import com.org.gnos.scheduler.equation.ExecutionContext;
 
 public class DumpDependencyEquationGenerator extends EquationGenerator{
 	
-	public DumpDependencyEquationGenerator(EquationContext data) {
+	public DumpDependencyEquationGenerator(ExecutionContext data) {
 		super(data);
 	}
 	
 	@Override
 	public void generate() {
-		
-		int bufferSize = 8 * 1024;
+
 		try {
-			output = new BufferedOutputStream(new FileOutputStream("dumpDependency.txt"), bufferSize);
-			bytesWritten = 0;
 			buildDependencyEquations();
 			output.flush();
-			output.close();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -61,9 +56,10 @@ public class DumpDependencyEquationGenerator extends EquationGenerator{
 	
 	private void buildDumpDependencyEquation1(Dump d1, Dump d2){
 		if(!d1.isHasCapacity()) return;
-		int timePeriod = context.getTimePeriod();
+		int timePeriodStart = context.getTimePeriodStart();
+		int timePeriodEnd = context.getTimePeriodEnd();
 		Set<Block> blocks = d1.getBlocks();
-		for(int i=1; i<= timePeriod; i++){
+		for(int i=timePeriodStart; i<= timePeriodEnd; i++){
 			StringBuilder sb = new StringBuilder();
 			sb.append(d1.getCapacity()+"d"+d1.getDumpNumber()+"t"+i);
 			for(Block block: blocks){
@@ -79,9 +75,10 @@ public class DumpDependencyEquationGenerator extends EquationGenerator{
 	
 	private void buildDumpDependencyEquation2(Dump d1, Dump d2){
 		if(!d2.isHasCapacity()) return;
-		int timePeriod = context.getTimePeriod();
+		int timePeriodStart = context.getTimePeriodStart();
+		int timePeriodEnd = context.getTimePeriodEnd();
 		Set<Block> blocks = d2.getBlocks();
-		for(int i=1; i<= timePeriod; i++){
+		for(int i=timePeriodStart; i<= timePeriodEnd; i++){
 			StringBuilder sb = new StringBuilder();
 			for(Block block: blocks){
 				for(int j=1; j<=i; j++){
@@ -97,11 +94,12 @@ public class DumpDependencyEquationGenerator extends EquationGenerator{
 	
 	private void buildPitDumpDependencyEquation1(Pit p, Dump d1, Dump d2){
 		if(!d1.isHasCapacity()) return;
-		int timePeriod = context.getTimePeriod();
+		int timePeriodStart = context.getTimePeriodStart();
+		int timePeriodEnd = context.getTimePeriodEnd();
 		Bench lastBench = p.getBench(p.getBenches().size() - 1);
 		List<Block> blocks = lastBench.getBlocks();
 		Set<Block> dumpBlocks = d1.getBlocks();
-		for(int i=1; i<= timePeriod; i++){
+		for(int i=timePeriodStart; i<= timePeriodEnd; i++){
 			StringBuilder sb = new StringBuilder();
 			sb.append(d1.getCapacity()+"p"+p.getPitNo()+"b"+lastBench.getBenchNo()+"t"+i);
 			for(Block block: blocks){

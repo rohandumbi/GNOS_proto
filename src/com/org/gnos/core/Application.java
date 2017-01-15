@@ -1,7 +1,7 @@
 package com.org.gnos.core;
 
 import com.org.gnos.db.DBManager;
-import com.org.gnos.services.EquationGeneratorService;
+import com.org.gnos.scheduler.SchedulerService;
 
 
 public class Application {
@@ -21,6 +21,6 @@ public class Application {
 	}
 	
 	public static void generate() {
-		EquationGeneratorService.getInstance().execute();
+		SchedulerService.getInstance().execute();
 	}
 }

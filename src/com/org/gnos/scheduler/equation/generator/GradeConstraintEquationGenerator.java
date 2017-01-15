@@ -1,7 +1,5 @@
-package com.org.gnos.equation;
+package com.org.gnos.scheduler.equation.generator;
 
-import java.io.BufferedOutputStream;
-import java.io.FileOutputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,26 +19,21 @@ import com.org.gnos.db.model.ProcessJoin;
 import com.org.gnos.db.model.Product;
 import com.org.gnos.db.model.ProductJoin;
 import com.org.gnos.db.model.Stockpile;
+import com.org.gnos.scheduler.equation.ExecutionContext;
 
 public class GradeConstraintEquationGenerator extends EquationGenerator{
 
 	private List<GradeConstraintData> gradeConstraintDataList;
 	
-	public GradeConstraintEquationGenerator(EquationContext data) {
+	public GradeConstraintEquationGenerator(ExecutionContext data) {
 		super(data);
 	}
 	
 	@Override
 	public void generate() {
 		gradeConstraintDataList = context.getScenarioConfig().getGradeConstraintDataList();
-		
-		int bufferSize = 8 * 1024;
 		try {
-			output = new BufferedOutputStream(new FileOutputStream("gradeConstraint.txt"), bufferSize);
-			bytesWritten = 0;
 			buildGradeConstraintVariables();
-			output.flush();
-			output.close();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -49,7 +42,8 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 	
 	public void buildGradeConstraintVariables() {
 		
-		int timePeriod = context.getTimePeriod();
+		int timePeriodStart = context.getTimePeriodStart();
+		int timePeriodEnd = context.getTimePeriodEnd();
 		int startYear = context.getStartYear();
 		List<Process> processList = context.getProjectConfig().getProcessList();
 		for(GradeConstraintData gradeConstraintData: gradeConstraintDataList) {
@@ -89,7 +83,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 				grades.add(p.getListOfGrades().get(selectedGradeIndex));
 			}
 			
-			for(int i=1; i<= timePeriod; i++){
+			for(int i=timePeriodStart; i<= timePeriodEnd; i++){
 				String eq = "";
 				BigDecimal targetGrade = new BigDecimal(gradeConstraintData.getConstraintData().get(startYear+i -1));
 				if(selectorType == GradeConstraintData.SELECTION_PROCESS_JOIN) {

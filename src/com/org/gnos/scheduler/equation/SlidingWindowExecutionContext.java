@@ -1,8 +1,8 @@
-package com.org.gnos.equation;
+package com.org.gnos.scheduler.equation;
 
 import com.org.gnos.core.ScenarioConfigutration;
 
-public class SlidingWindowEquationContext extends EquationContext {
+public class SlidingWindowExecutionContext extends ExecutionContext {
 
 	private short period;
 	private short window;

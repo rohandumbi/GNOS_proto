@@ -1,30 +1,24 @@
-package com.org.gnos.equation;
+package com.org.gnos.scheduler.equation.generator;
 
-import java.io.BufferedOutputStream;
-import java.io.FileOutputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.org.gnos.core.Block;
+import com.org.gnos.scheduler.equation.ExecutionContext;
 
 public class BoundaryVariableGenerator extends EquationGenerator{
 
 	
-	public BoundaryVariableGenerator(EquationContext data) {
+	public BoundaryVariableGenerator(ExecutionContext data) {
 		super(data);
 	}
 	
 	@Override
 	public void generate() {
-		
-		int bufferSize = 8 * 1024;
 		try {
-			output = new BufferedOutputStream(new FileOutputStream("boundaryVariable.txt"), bufferSize);
-			bytesWritten = 0;
 			buildBenchConstraintVariables();
 			output.flush();
-			output.close();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

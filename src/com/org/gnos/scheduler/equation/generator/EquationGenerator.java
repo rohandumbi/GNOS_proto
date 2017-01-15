@@ -1,4 +1,4 @@
-package com.org.gnos.equation;
+package com.org.gnos.scheduler.equation.generator;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -13,6 +13,7 @@ import com.org.gnos.db.model.Pit;
 import com.org.gnos.db.model.PitGroup;
 import com.org.gnos.db.model.Product;
 import com.org.gnos.db.model.ProductJoin;
+import com.org.gnos.scheduler.equation.ExecutionContext;
 
 public abstract class EquationGenerator {
 	
@@ -20,7 +21,7 @@ public abstract class EquationGenerator {
 	private static int DECIMAL_POINT = 6;
 	
 	protected BufferedOutputStream output;
-	protected EquationContext context = null;
+	protected ExecutionContext context = null;
 
 	
 	protected int bytesWritten = 0;
@@ -33,7 +34,7 @@ public abstract class EquationGenerator {
 		System.out.println("DP value is "+DECIMAL_POINT);
 	}
 	
-	public EquationGenerator(EquationContext data) {
+	public EquationGenerator(ExecutionContext data) {
 		this.context = data;
 	}
 
@@ -91,6 +92,16 @@ public abstract class EquationGenerator {
 
 	}	
 	
+	public BufferedOutputStream getOutput() {
+		return output;
+	}
+
+
+	public void setOutput(BufferedOutputStream output) {
+		this.output = output;
+	}
+
+
 	// Abstract class
 	public abstract void generate();
 }

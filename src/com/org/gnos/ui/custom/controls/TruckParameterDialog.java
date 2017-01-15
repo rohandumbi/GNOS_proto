@@ -98,7 +98,7 @@ public class TruckParameterDialog extends Dialog {
 		textFixedTime.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.BOLD));
 		
 		BigDecimal fixedTime = this.truckParameterData.getFixedTime();
-		if(fixedTime.doubleValue() > 0){
+		if(fixedTime!= null && fixedTime.doubleValue() > 0){
 			textFixedTime.setText(String.valueOf(fixedTime));
 		}
 		textFixedTime.addModifyListener(new ModifyListener(){

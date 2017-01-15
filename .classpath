@@ -15,5 +15,6 @@
 	<classpathentry kind="lib" path="lib/org.eclipse.gef_3.11.0.201603210204.jar"/>
 	<classpathentry kind="lib" path="lib/org.eclipse.zest.core_1.5.300.201603210204.jar"/>
 	<classpathentry kind="lib" path="lib/org.eclipse.zest.layouts_1.1.300.201603210204.jar"/>
+	<classpathentry kind="lib" path="lib/cplex.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

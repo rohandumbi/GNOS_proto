@@ -1,4 +1,20 @@
-package com.org.gnos.equation;
+package com.org.gnos.scheduler.equation;
+
+import java.io.BufferedOutputStream;
+
+import com.org.gnos.scheduler.equation.generator.BenchConstraintEquationGenerator;
+import com.org.gnos.scheduler.equation.generator.BenchProportionEquationGenerator;
+import com.org.gnos.scheduler.equation.generator.BinaryVariableGenerator;
+import com.org.gnos.scheduler.equation.generator.BoundaryVariableGenerator;
+import com.org.gnos.scheduler.equation.generator.CapexEquationGenerator;
+import com.org.gnos.scheduler.equation.generator.DumpCapacityEquationGenerator;
+import com.org.gnos.scheduler.equation.generator.DumpDependencyEquationGenerator;
+import com.org.gnos.scheduler.equation.generator.EquationGenerator;
+import com.org.gnos.scheduler.equation.generator.GradeConstraintEquationGenerator;
+import com.org.gnos.scheduler.equation.generator.ObjectiveFunctionEquationGenerator;
+import com.org.gnos.scheduler.equation.generator.PitDependencyEquationGenerator;
+import com.org.gnos.scheduler.equation.generator.ProcessConstraintEquationGenerator;
+import com.org.gnos.scheduler.equation.generator.SPReclaimEquationGenerator;
 
 
 public class EquationGeneratorFactory {
@@ -17,7 +33,7 @@ public class EquationGeneratorFactory {
 	public final static short SP_RECLAIM = 12;
 	
 	
-	public static EquationGenerator getGenerator(short type, EquationContext context) {
+	public static EquationGenerator getGenerator(short type, ExecutionContext context, BufferedOutputStream writer) {
 		EquationGenerator generator = null;
 		
 		switch (type) {
@@ -61,10 +77,8 @@ public class EquationGeneratorFactory {
 					generator = new SPReclaimEquationGenerator(context);
 				}				
 				break;
-			default:
-				break;
 		}
-		
+		generator.setOutput(writer);
 		return generator;
 	}
 

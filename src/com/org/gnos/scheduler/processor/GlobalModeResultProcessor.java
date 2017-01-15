@@ -1,4 +1,5 @@
-package com.org.gnos.equation;
+package com.org.gnos.scheduler.processor;
+
 
 public class GlobalModeResultProcessor extends ResultProcessor{
 

@@ -1,7 +1,5 @@
-package com.org.gnos.equation;
+package com.org.gnos.scheduler.equation.generator;
 
-import java.io.BufferedOutputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -28,6 +26,7 @@ import com.org.gnos.db.model.Pit;
 import com.org.gnos.db.model.Process;
 import com.org.gnos.db.model.Stockpile;
 import com.org.gnos.db.model.TruckParameterCycleTime;
+import com.org.gnos.scheduler.equation.ExecutionContext;
 
 public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 	
@@ -37,26 +36,22 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 	
 	private Set<Integer> processedBlocks;
 	
-	public ObjectiveFunctionEquationGenerator(EquationContext data) {
+	public ObjectiveFunctionEquationGenerator(ExecutionContext data) {
 		super(data);
 	}
 	
 	@Override
 	public void generate() {
 		processedBlocks = new HashSet<Integer>();
-		
-		int bufferSize = 8 * 1024;
 		try {
 			discount_rate = context.getScenarioConfig().getDiscount()/100;
 			System.out.println("Discount :"+discount_rate);
-			output = new BufferedOutputStream(new FileOutputStream("output.txt"), bufferSize);
 			bytesWritten = 0;
 			buildProcessBlockVariables();
 			buildStockpileVariables();
 			buildWasteBlockVariables();
 			buildCapexVariables();
 			output.flush();
-			output.close();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -251,7 +246,8 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 	}
 	
 	private void buildCapexVariables(){
-		int timeperiod =  context.getTimePeriod();
+		int timePeriodStart = context.getTimePeriodStart();
+		int timePeriodEnd = context.getTimePeriodEnd();
 		List<CapexData> capexDataList = context.getScenarioConfig().getCapexDataList();
 		int capexCount = 0;
 		for(CapexData cd: capexDataList) {
@@ -260,7 +256,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 			int capexInstanceCount = 0;
 			for(CapexInstance ci: capexInstanceList){
 				capexInstanceCount++;
-				for(int i= 1; i <= timeperiod ; i++){
+				for(int i= timePeriodStart; i <= timePeriodEnd ; i++){
 					String cv = "c"+capexCount+"i"+capexInstanceCount+"t"+i;
 					BigDecimal value = new BigDecimal(ci.getCapexAmount() * (1 / Math.pow ((1 + discount_rate), i)));
 					write(" -"+formatDecimalValue(value)+cv);

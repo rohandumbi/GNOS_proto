@@ -1,7 +1,5 @@
-package com.org.gnos.equation;
+package com.org.gnos.scheduler.equation.generator;
 
-import java.io.BufferedOutputStream;
-import java.io.FileOutputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +12,7 @@ import com.org.gnos.core.Bench;
 import com.org.gnos.core.Block;
 import com.org.gnos.core.Pit;
 import com.org.gnos.db.model.PitBenchConstraintData;
+import com.org.gnos.scheduler.equation.ExecutionContext;
 
 public class BenchConstraintEquationGenerator extends EquationGenerator{
 
@@ -21,7 +20,7 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 	private Map<Integer, List<String>> blockVariableMapping;
 	final Pattern lastIntPattern = Pattern.compile("[^0-9]+([0-9]+)$");
 	
-	public BenchConstraintEquationGenerator(EquationContext data) {
+	public BenchConstraintEquationGenerator(ExecutionContext data) {
 		super(data);
 		this.tonnesWeightFieldName = context.getTonnesWeightAlisName();
 		this.blockVariableMapping = context.getBlockVariableMapping();
@@ -29,15 +28,10 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 	
 	@Override
 	public void generate() {
-		
-		int bufferSize = 8 * 1024;
 		try {
-			output = new BufferedOutputStream(new FileOutputStream("pitBenchConstraint.txt"), bufferSize);
-			bytesWritten = 0;
 			buildBenchConstraintVariables();
 			buildBenchUserConstraintVariables();
 			output.flush();
-			output.close();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -46,7 +40,8 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 	
 	public void buildBenchConstraintVariables() {
 		Map<Integer, Pit> pits = context.getPits();
-		int timePeriod = context.getTimePeriod();
+		int timePeriodStart = context.getTimePeriodStart();
+		int timePeriodEnd = context.getTimePeriodEnd();
 		Set<Integer> pitNos = pits.keySet();
 		for(int pitNo: pitNos){
 			Pit pit = pits.get(pitNo);
@@ -56,7 +51,7 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 				List<String> variables = getAllVariablesForBench(bench);
 				BigDecimal tonnesWt = getBenchTonnesWt(bench);
 				
-				for(int i=1; i<= timePeriod; i++){
+				for(int i=timePeriodStart; i<= timePeriodEnd; i++){
 					StringBuffer sb1= new StringBuffer();
 					StringBuffer sb2= new StringBuffer();
 					String benchVariable = "p"+pitNo+"b"+bench.getBenchNo()+"t"+i;
@@ -92,7 +87,8 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 	
 	private void buildBenchUserConstraintVariables() {
 		List<PitBenchConstraintData> pitBenchConstraintDataList = context.getScenarioConfig().getPitBenchConstraintDataList();
-		int timePeriod = context.getTimePeriod();
+		int timePeriodStart = context.getTimePeriodStart();
+		int timePeriodEnd = context.getTimePeriodEnd();
 		int startyear = context.getStartYear();
 		boolean hasDefaultConstraint = false;
 		List<Integer> exclusionList = new ArrayList<Integer>();
@@ -109,7 +105,7 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 			com.org.gnos.db.model.Pit pit = context.getProjectConfig().getPitfromPitName(pitName);
 			exclusionList.add(pit.getPitNumber());
 			Pit pitdata = context.getPits().get(pit.getPitNumber());
-			for(int i=1; i<= timePeriod; i++){
+			for(int i=timePeriodStart; i<= timePeriodEnd; i++){
 				int yearvalue = pitBenchConstraintData.getConstraintData().get(startyear+ i-1);
 				buildEquationForPit(pitdata, i, yearvalue);
 			}
@@ -123,7 +119,7 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 				if(exclusionList.contains(pitNo)) continue;
 				
 				Pit pit = pits.get(pitNo);
-				for(int i=1; i<= timePeriod; i++){
+				for(int i=timePeriodStart; i<= timePeriodEnd; i++){
 					int yearvalue = defaultConstraint.getConstraintData().get(startyear+ i-1);
 					buildEquationForPit(pit, i, yearvalue);
 				}

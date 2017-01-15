@@ -1,7 +1,5 @@
-package com.org.gnos.equation;
+package com.org.gnos.scheduler.equation.generator;
 
-import java.io.BufferedOutputStream;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -12,33 +10,26 @@ import com.org.gnos.core.Block;
 import com.org.gnos.core.Pit;
 import com.org.gnos.db.model.Dump;
 import com.org.gnos.db.model.PitGroup;
+import com.org.gnos.scheduler.equation.ExecutionContext;
 
 public class DumpCapacityEquationGenerator extends EquationGenerator{
 	
-	public DumpCapacityEquationGenerator(EquationContext data) {
+	public DumpCapacityEquationGenerator(ExecutionContext data) {
 		super(data);
 	}
 	
 	@Override
 	public void generate() {
-		
-		int bufferSize = 8 * 1024;
-		try {
-			output = new BufferedOutputStream(new FileOutputStream("dumpCapacity.txt"), bufferSize);
-			bytesWritten = 0;
-			buildCapacityEquations();
-			output.flush();
-			output.close();
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
+
+		buildCapacityEquations();
 
 	}
 
 	
 	private void buildCapacityEquations() {
 		List<Dump> dumpList = context.getProjectConfig().getDumpList();
-		int timeperiod = context.getTimePeriod();
+		int timePeriodStart = context.getTimePeriodStart();
+		int timePeriodEnd = context.getTimePeriodEnd();
 		for(Dump d:dumpList){
 			if(!d.isHasCapacity()) continue;
 			StringBuilder sb= new StringBuilder("");
@@ -60,7 +51,7 @@ public class DumpCapacityEquationGenerator extends EquationGenerator{
 					List<Block> blocks = b.getBlocks();
 					for(Block block: blocks){
 						if(!dumpblocks.contains(block)) continue;
-						for(int i= 1; i<=timeperiod; i++){
+						for(int i= timePeriodStart; i<=timePeriodEnd; i++){
 							sb.append(" +p"+block.getPitNo()+"x"+block.getBlockNo()+"w"+d.getDumpNumber()+"t"+i);
 						}
 					}

@@ -1,7 +1,5 @@
-package com.org.gnos.equation;
+package com.org.gnos.scheduler.equation.generator;
 
-import java.io.BufferedOutputStream;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,24 +17,21 @@ import com.org.gnos.db.model.Process;
 import com.org.gnos.db.model.ProcessConstraintData;
 import com.org.gnos.db.model.ProcessJoin;
 import com.org.gnos.db.model.Stockpile;
+import com.org.gnos.scheduler.equation.ExecutionContext;
 
 public class CapexEquationGenerator extends EquationGenerator{
 
 	
-	public CapexEquationGenerator(EquationContext data) {
+	public CapexEquationGenerator(ExecutionContext data) {
 		super(data);
 	}
 	
 	@Override
 	public void generate() {
-		
-		int bufferSize = 8 * 1024;
+
 		try {
-			output = new BufferedOutputStream(new FileOutputStream("capexconstraints.txt"), bufferSize);
-			bytesWritten = 0;
 			buildCapexEquations();
 			output.flush();
-			output.close();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -98,12 +93,13 @@ public class CapexEquationGenerator extends EquationGenerator{
 	}
 	
 	private void buildSet2Equations(CapexData cd, int capexNumber) {
-		int timeperiod = context.getTimePeriod();
+		int timePeriodStart = context.getTimePeriodStart();
+		int timePeriodEnd = context.getTimePeriodEnd();
 		List<CapexInstance> capexInstanceList = cd.getListOfCapexInstances();
 		int capexInstanceCount = capexInstanceList.size();
 		
 		for(int j=1; j<capexInstanceCount; j++){			
-			for(int i=1; i<= timeperiod; i++){
+			for(int i=timePeriodStart; i<= timePeriodEnd; i++){
 				StringBuffer sb = new StringBuffer("");
 				for(int ii=1; ii<=i; ii++){
 					if(ii > 1){
@@ -120,11 +116,12 @@ public class CapexEquationGenerator extends EquationGenerator{
 	}
 
 	private void buildSet3Equations(CapexData cd, int capexNumber) {
-		int timeperiod = context.getTimePeriod();
+		int timePeriodStart = context.getTimePeriodStart();
+		int timePeriodEnd = context.getTimePeriodEnd();
 		List<CapexInstance> capexInstanceList = cd.getListOfCapexInstances();
 		for(int j=1; j<= capexInstanceList.size(); j++){
 			StringBuffer sb = new StringBuffer("");
-			for(int i=1; i<= timeperiod; i++){
+			for(int i=timePeriodStart; i<= timePeriodEnd; i++){
 				if(i > 1){
 					sb.append(" + ");
 				}
@@ -137,10 +134,11 @@ public class CapexEquationGenerator extends EquationGenerator{
 	
 	private void buildCapexEquationForProcesses(List<Process> processList, CapexData cd, int capexNumber, Map<Integer, Float> processConstraintData){
 		List<CapexInstance> capexInstanceList = cd.getListOfCapexInstances();				
-		int timeperiod = context.getTimePeriod();
+		int timePeriodStart = context.getTimePeriodStart();
+		int timePeriodEnd = context.getTimePeriodEnd();
 		int startyear = context.getStartYear();
 		
-		for(int i= 1; i <= timeperiod; i++ ){
+		for(int i= timePeriodStart; i <= timePeriodEnd; i++ ){
 			StringBuffer sb = new StringBuffer("");
 			int count = 0;
 			for(Process p: processList){
@@ -186,10 +184,11 @@ public class CapexEquationGenerator extends EquationGenerator{
 	private void buildCapexEquationForPits(List<Integer> pitnumberList, CapexData cd, int capexNumber, Map<Integer, Float> processConstraintData){
 		List<CapexInstance> capexInstanceList = cd.getListOfCapexInstances();
 		List<Process> processList = context.getProjectConfig().getProcessList();
-		int timeperiod = context.getTimePeriod();
+		int timePeriodStart = context.getTimePeriodStart();
+		int timePeriodEnd = context.getTimePeriodEnd();
 		int startyear = context.getStartYear();
 		
-		for(int i= 1; i <= timeperiod; i++ ){
+		for(int i= timePeriodStart; i <= timePeriodEnd; i++ ){
 			StringBuffer sb = new StringBuffer("");
 			int count = 0;
 			for( Process p: processList){

@@ -1,7 +1,5 @@
-package com.org.gnos.equation;
+package com.org.gnos.scheduler.equation.generator;
 
-import java.io.BufferedOutputStream;
-import java.io.FileOutputStream;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +10,7 @@ import java.util.regex.Pattern;
 import com.org.gnos.core.Bench;
 import com.org.gnos.core.Block;
 import com.org.gnos.core.Pit;
+import com.org.gnos.scheduler.equation.ExecutionContext;
 
 public class BenchProportionEquationGenerator extends EquationGenerator{
 
@@ -19,7 +18,7 @@ public class BenchProportionEquationGenerator extends EquationGenerator{
 	private Map<Integer, List<String>> blockVariableMapping;
 	final Pattern lastIntPattern = Pattern.compile("[^0-9]+([0-9]+)$");
 	
-	public BenchProportionEquationGenerator(EquationContext data) {
+	public BenchProportionEquationGenerator(ExecutionContext data) {
 		super(data);
 		this.tonnesWeightFieldName = context.getTonnesWeightAlisName();
 		this.blockVariableMapping = context.getBlockVariableMapping();
@@ -27,14 +26,9 @@ public class BenchProportionEquationGenerator extends EquationGenerator{
 	
 	@Override
 	public void generate() {
-		
-		int bufferSize = 8 * 1024;
 		try {
-			output = new BufferedOutputStream(new FileOutputStream("benchProportions.txt"), bufferSize);
-			bytesWritten = 0;
 			buildBenchProportionEquations();
 			output.flush();
-			output.close();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -43,7 +37,8 @@ public class BenchProportionEquationGenerator extends EquationGenerator{
 	
 	public void buildBenchProportionEquations() {
 		Map<Integer, Pit> pits = context.getPits();
-		int timePeriod = context.getTimePeriod();
+		int timePeriodStart = context.getTimePeriodStart();
+		int timePeriodEnd = context.getTimePeriodEnd();
 		Set<Integer> pitNos = pits.keySet();
 		for(int pitNo: pitNos){
 			Pit pit = pits.get(pitNo);
@@ -57,7 +52,7 @@ public class BenchProportionEquationGenerator extends EquationGenerator{
 						List<String> blockvariables2 = this.blockVariableMapping.get(block.getId());
 						String tonnage1 = lastBlock.getField(this.tonnesWeightFieldName);
 						String tonnage2 = block.getField(this.tonnesWeightFieldName);
-						for(int i=1; i<= timePeriod; i++){
+						for(int i=timePeriodStart; i<= timePeriodEnd; i++){
 							StringBuilder sb = new StringBuilder("");
 							for(String variable : blockvariables1) {
 								if(variable.startsWith("sp")) continue;

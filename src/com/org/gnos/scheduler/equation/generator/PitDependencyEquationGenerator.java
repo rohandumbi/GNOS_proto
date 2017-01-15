@@ -1,4 +1,4 @@
-package com.org.gnos.equation;
+package com.org.gnos.scheduler.equation.generator;
 
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
@@ -11,13 +11,14 @@ import com.org.gnos.core.Bench;
 import com.org.gnos.core.Block;
 import com.org.gnos.core.Pit;
 import com.org.gnos.db.model.PitDependencyData;
+import com.org.gnos.scheduler.equation.ExecutionContext;
 
 public class PitDependencyEquationGenerator extends EquationGenerator{
 
 	private String tonnesWeightFieldName;
 	private Map<Integer, List<String>> blockVariableMapping;
 	
-	public PitDependencyEquationGenerator(EquationContext data) {
+	public PitDependencyEquationGenerator(ExecutionContext data) {
 		super(data);
 		this.tonnesWeightFieldName = context.getTonnesWeightAlisName();
 		this.blockVariableMapping = context.getBlockVariableMapping();
@@ -25,14 +26,9 @@ public class PitDependencyEquationGenerator extends EquationGenerator{
 	
 	@Override
 	public void generate() {
-		
-		int bufferSize = 8 * 1024;
 		try {
-			output = new BufferedOutputStream(new FileOutputStream("pitDependency.txt"), bufferSize);
-			bytesWritten = 0;
 			buildDependencyEquations();
 			output.flush();
-			output.close();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -109,10 +105,11 @@ public class PitDependencyEquationGenerator extends EquationGenerator{
 	}
 	
 	private void buildPitDependencyEquation(Pit p1, Bench b1, Bench b2){
-		int timePeriod = context.getTimePeriod();
+		int timePeriodStart = context.getTimePeriodStart();
+		int timePeriodEnd = context.getTimePeriodEnd();
 		List<String> variables = getAllVariablesForBench(b2);
 		float benchTonnesWt = getBenchTonnesWt(b2);
-		for(int i=1; i<= timePeriod; i++){
+		for(int i=timePeriodStart; i<= timePeriodEnd; i++){
 			StringBuilder sb = new StringBuilder();
 			int count = 0;
 			

@@ -1,4 +1,4 @@
-package com.org.gnos.equation;
+package com.org.gnos.scheduler.equation;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -25,7 +25,7 @@ import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.PitGroup;
 import com.org.gnos.db.model.TruckParameterData;
 
-public class EquationContext {
+public class ExecutionContext {
 	
 	private Set<Block> wasteBlocks = new HashSet<Block>();
 	private Set<Block> processBlocks = new HashSet<Block>();
@@ -37,16 +37,23 @@ public class EquationContext {
 	private String pitFieldName;
 	private String benchFieldName;
 	
+	int startYear;
+	int timePeriodStart;
+	int timePeriodEnd;
+	
 	private boolean spReclaimEnabled = true;
 	
 	private ProjectConfigutration projectConfiguration;
 	private ScenarioConfigutration scenarioConfiguration;
 	
-	public EquationContext() {
+	public ExecutionContext() {
 		projectConfiguration = ProjectConfigutration.getInstance();
 		scenarioConfiguration = ScenarioConfigutration.getInstance();
 		pitFieldName = projectConfiguration.getRequiredFieldMapping().get("pit_name");
 		benchFieldName = projectConfiguration.getRequiredFieldMapping().get("bench_rl");
+		startYear = scenarioConfiguration.getStartYear();
+		timePeriodStart = 1;
+		timePeriodEnd = scenarioConfiguration.getTimePeriod();
 		loadConfiguration();
 		loadBlocks();
 		loadBlockPayloadMapping();
@@ -229,14 +236,32 @@ public class EquationContext {
 		}
 	}
 	
+	
+	
 	public int getStartYear() {
-		return this.scenarioConfiguration.getStartYear();
+		return startYear;
 	}
-	
-	public int getTimePeriod() {
-		return this.scenarioConfiguration.getTimePeriod();
+
+	public void setStartYear(int startYear) {
+		this.startYear = startYear;
 	}
-	
+
+	public int getTimePeriodStart() {
+		return timePeriodStart;
+	}
+
+	public void setTimePeriodStart(int timePeriodStart) {
+		this.timePeriodStart = timePeriodStart;
+	}
+
+	public int getTimePeriodEnd() {
+		return timePeriodEnd;
+	}
+
+	public void setTimePeriodEnd(int timePeriodEnd) {
+		this.timePeriodEnd = timePeriodEnd;
+	}
+
 	public String getTonnesWeightAlisName() {
 		return projectConfiguration.getRequiredFieldMapping().get("tonnes_wt");
 	}

@@ -5,7 +5,7 @@ import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.db.dao.ProjectDAO;
 import com.org.gnos.db.model.Project;
-import com.org.gnos.services.EquationGeneratorService;
+import com.org.gnos.scheduler.SchedulerService;
 import com.org.gnos.services.csv.GNOSCSVDataProcessor;
 
 public class TestApplication {
@@ -46,8 +46,7 @@ public class TestApplication {
 		GNOSConfig.load();
 		ProjectConfigutration.getInstance().load(19);
 		ScenarioConfigutration.getInstance().load(20);
-		EquationGeneratorService.getInstance().execute();
-
+		SchedulerService.getInstance().execute();
 		
 	}
 

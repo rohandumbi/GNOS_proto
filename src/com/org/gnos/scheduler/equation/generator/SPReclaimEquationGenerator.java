@@ -1,33 +1,28 @@
-package com.org.gnos.equation;
+package com.org.gnos.scheduler.equation.generator;
 
-import java.io.BufferedOutputStream;
-import java.io.FileOutputStream;
 import java.util.List;
 import java.util.Set;
 
 import com.org.gnos.core.Block;
 import com.org.gnos.db.model.Process;
 import com.org.gnos.db.model.Stockpile;
+import com.org.gnos.scheduler.equation.ExecutionContext;
 
 public class SPReclaimEquationGenerator extends EquationGenerator{
 	
 
-	public SPReclaimEquationGenerator(EquationContext data) {
+	public SPReclaimEquationGenerator(ExecutionContext data) {
 		super(data);
 	}
 	
 	@Override
 	public void generate() {
-		
-		int bufferSize = 8 * 1024;
+
 		try {
-			output = new BufferedOutputStream(new FileOutputStream("spReclaim.txt"), bufferSize);
-			bytesWritten = 0;
 			if(context.isSpReclaimEnabled()) {
 				buildStockpileEquations();
 			}		
 			output.flush();
-			output.close();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -36,11 +31,12 @@ public class SPReclaimEquationGenerator extends EquationGenerator{
 
 	private void buildStockpileEquations() {
 		List<Stockpile> stockpiles = context.getProjectConfig().getStockPileList();
-		int timeperiod = context.getTimePeriod();
+		int timePeriodStart = context.getTimePeriodStart();
+		int timePeriodEnd = context.getTimePeriodEnd();
 		for(Stockpile sp: stockpiles) {
 			if(!sp.isReclaim()) return;
 			Set<Block> blocks = sp.getBlocks();
-			for(int i= 1; i <= timeperiod; i++) {
+			for(int i= timePeriodStart; i <= timePeriodEnd; i++) {
 				StringBuilder sbc_sp = new StringBuilder("");
 				StringBuilder sbc_spr = new StringBuilder("");
 				for(Block b: blocks){

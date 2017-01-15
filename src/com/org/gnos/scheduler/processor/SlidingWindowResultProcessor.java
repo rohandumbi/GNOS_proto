@@ -1,11 +1,10 @@
-package com.org.gnos.equation;
+package com.org.gnos.scheduler.processor;
 
 public class SlidingWindowResultProcessor extends ResultProcessor{
 
 	@Override
 	void process() {
-		// TODO Auto-generated method stub
-		
+				
 	}
 
 }

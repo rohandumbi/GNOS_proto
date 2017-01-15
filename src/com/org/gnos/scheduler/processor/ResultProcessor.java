@@ -1,4 +1,4 @@
-package com.org.gnos.equation;
+package com.org.gnos.scheduler.processor;
 
 public abstract class ResultProcessor {
 
