@@ -188,13 +188,11 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 		for(Block block: blocks){		
 			BigDecimal processRatio = new BigDecimal(0);
 			for(String coefficient: coefficients){
-				String expressionName = coefficient.replaceAll("\\s+","_");
-				processRatio =  processRatio.add(block.getComputedField(expressionName));					
+				processRatio =  processRatio.add(context.getExpressionValueforBlock(block, coefficient));					
 			}
 
 			if(processRatio.compareTo(new BigDecimal(0)) == 0) continue;
-			String gradeExpr = grade.getExpression().getName().replaceAll("\\s+","_");
-			BigDecimal blockGrade = block.getComputedField(gradeExpr);
+			BigDecimal blockGrade = context.getExpressionValueforBlock(block, grade.getExpression());
 			BigDecimal coeff = processRatio.multiply(targetGrade.subtract(blockGrade));
 			if(coeff.doubleValue() == 0) continue;
 			if(targetGrade.compareTo(blockGrade) == 1) {

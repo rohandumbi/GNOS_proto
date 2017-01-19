@@ -44,8 +44,8 @@ public class TestApplication {
 	public static void main(String[] args) {
 		
 		GNOSConfig.load();
-		ProjectConfigutration.getInstance().load(19);
-		ScenarioConfigutration.getInstance().load(20);
+		ProjectConfigutration.getInstance().load(24);
+		ScenarioConfigutration.getInstance().load(25);
 		SchedulerService.getInstance().execute();
 		
 	}

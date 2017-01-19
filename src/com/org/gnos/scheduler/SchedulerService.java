@@ -3,7 +3,11 @@ package com.org.gnos.scheduler;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
+
+import sun.org.mozilla.javascript.internal.Context;
 
 import com.org.gnos.scheduler.equation.SlidingWindowExecutionContext;
 import com.org.gnos.scheduler.solver.ISolver;
@@ -28,6 +32,7 @@ public class SchedulerService {
 		loadConfiguration();
 		
 		ISolver solver = new CplexSolver();
+		
 		scheduler.setSolver(solver);
 		scheduler.execute();
 	}
@@ -51,6 +56,19 @@ public class SchedulerService {
 				context.setStepsize(Short.parseShort(prop.getProperty("step_size", "0")));
 				context.setCurrPeriod(Short.parseShort(prop.getProperty("curr_period", "0")));
 			}
+
+			Map<String, Boolean> eqnenablestate = new HashMap<String, Boolean>();
+			eqnenablestate.put("PROCESS_CONSTRAINT", Boolean.valueOf(prop.getProperty("PROCESS_CONSTRAINT", "TRUE")));
+			eqnenablestate.put("BENCH_CONSTRAINT", Boolean.valueOf(prop.getProperty("BENCH_CONSTRAINT", "TRUE")));
+			eqnenablestate.put("GRADE_CONSTRAINT", Boolean.valueOf(prop.getProperty("GRADE_CONSTRAINT", "TRUE")));
+			eqnenablestate.put("BENCH_PROPORTION", Boolean.valueOf(prop.getProperty("BENCH_PROPORTION", "TRUE")));
+			eqnenablestate.put("DUMP_CAPACITIES", Boolean.valueOf(prop.getProperty("DUMP_CAPACITIES", "TRUE")));
+			eqnenablestate.put("CAPEX", Boolean.valueOf(prop.getProperty("CAPEX", "TRUE")));
+			eqnenablestate.put("DUMP_DEPENDENCY", Boolean.valueOf(prop.getProperty("DUMP_DEPENDENCY", "TRUE")));
+			eqnenablestate.put("PIT_DEPENDENCY", Boolean.valueOf(prop.getProperty("PIT_DEPENDENCY", "TRUE")));
+			eqnenablestate.put("BOUNDARY_VARIABLES", Boolean.valueOf(prop.getProperty("BOUNDARY_VARIABLES", "TRUE")));
+			
+			scheduler.getContext().setEquationgEnableMap(eqnenablestate);
 
 		} catch (IOException io) {
 			io.printStackTrace();

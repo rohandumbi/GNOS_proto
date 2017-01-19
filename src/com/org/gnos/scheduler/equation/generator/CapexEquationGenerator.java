@@ -144,12 +144,11 @@ public class CapexEquationGenerator extends EquationGenerator{
 			for(Process p: processList){
 				List<Block> blocks = p.getBlocks();
 				Expression exp = p.getModel().getExpression();
-				String expressionName = exp.getName().replaceAll("\\s+","_");
 				for(Block b: blocks){
 					if(count > 0){
 						sb.append(" + ");
 					}
-					sb.append(b.getComputedField(expressionName)+"p"+b.getPitNo()+"x"+b.getBlockNo()+"p"+p.getProcessNo()+"t"+i);
+					sb.append(context.getExpressionValueforBlock(b, exp)+"p"+b.getPitNo()+"x"+b.getBlockNo()+"p"+p.getProcessNo()+"t"+i);
 					count ++;
 					if(context.isSpReclaimEnabled()) {
 						int stockpileNo = getStockpileNoForReclaim(b);
@@ -157,7 +156,7 @@ public class CapexEquationGenerator extends EquationGenerator{
 							if(count > 0){
 								sb.append(" + ");
 							}
-							sb.append(b.getComputedField(expressionName)+"sp"+stockpileNo+"x"+b.getBlockNo()+"p"+p.getProcessNo()+"t"+i);
+							sb.append(context.getExpressionValueforBlock(b, exp)+"sp"+stockpileNo+"x"+b.getBlockNo()+"p"+p.getProcessNo()+"t"+i);
 							count ++;
 						}					
 					}
@@ -194,13 +193,12 @@ public class CapexEquationGenerator extends EquationGenerator{
 			for( Process p: processList){
 				List<Block> blocks = p.getBlocks();
 				Expression exp = p.getModel().getExpression();
-				String expressionName = exp.getName().replaceAll("\\s+","_");
 				for(Block b: blocks){
 					if(!pitnumberList.contains(b.getPitNo())) continue;
 					if(count > 0){
 						sb.append(" + ");
 					}
-					sb.append(b.getComputedField(expressionName)+"p"+b.getPitNo()+"x"+b.getBlockNo()+"p"+p.getProcessNo()+"t"+i);
+					sb.append(context.getExpressionValueforBlock(b, exp)+"p"+b.getPitNo()+"x"+b.getBlockNo()+"p"+p.getProcessNo()+"t"+i);
 					count ++;
 				}
 			}

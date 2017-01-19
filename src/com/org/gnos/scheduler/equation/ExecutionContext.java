@@ -46,6 +46,8 @@ public class ExecutionContext {
 	private ProjectConfigutration projectConfiguration;
 	private ScenarioConfigutration scenarioConfiguration;
 	
+	private Map<String, Boolean> equationgEnableMap;
+
 	public ExecutionContext() {
 		projectConfiguration = ProjectConfigutration.getInstance();
 		scenarioConfiguration = ScenarioConfigutration.getInstance();
@@ -237,6 +239,15 @@ public class ExecutionContext {
 	}
 	
 	
+	public BigDecimal getExpressionValueforBlock(Block b, Expression expr) {
+		String expressionName = expr.getName().replaceAll("\\s+","_");			
+		return b.getComputedField(expressionName);		
+	}
+	
+	public BigDecimal getExpressionValueforBlock(Block b, String exprName) {
+		String expressionName = exprName.replaceAll("\\s+","_");			
+		return b.getComputedField(expressionName);		
+	}
 	
 	public int getStartYear() {
 		return startYear;
@@ -345,5 +356,17 @@ public class ExecutionContext {
 
 	public boolean isSpReclaimEnabled() {
 		return spReclaimEnabled;
+	}
+	
+	public Map<String, Boolean> getEquationgEnableMap() {
+		return equationgEnableMap;
+	}
+
+	public void setEquationgEnableMap(Map<String, Boolean> equationgEnableMap) {
+		this.equationgEnableMap = equationgEnableMap;
+	}
+	
+	public boolean isGlobalMode() {
+		return true;
 	}
 }

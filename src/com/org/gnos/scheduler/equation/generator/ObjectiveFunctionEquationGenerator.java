@@ -80,8 +80,11 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		Map<Integer, BigDecimal> oreMiningCostMap = fixedOpexCost[0].getCostData();
 		Map<Integer, BigDecimal> truckHourCostMap = fixedOpexCost[4].getCostData();
 		Set<Integer> keys = oreMiningCostMap.keySet();
-		int count = 1;
-		for(int year: keys){
+		int timePeriodStart = context.getTimePeriodStart();
+		int timePeriodEnd = context.getTimePeriodEnd();
+		int startYear = context.getStartYear();
+		for(int i=timePeriodStart; i<= timePeriodEnd; i++ ){
+			int year = startYear + i -1;
 			BigDecimal miningcost = oreMiningCostMap.get(year) ;
 			BigDecimal truckHourCost = truckHourCostMap.get(year);
 			for(Block block: blocks) {
@@ -99,8 +102,8 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 				}
 				BigDecimal processValue = getProcessValue(block, process.getModel(), year);
 				BigDecimal value = processValue.subtract(cost);
-				value = (value.multiply(new BigDecimal(1 / Math.pow ((1 + discount_rate), count))));
-				String variable = "p"+block.getPitNo()+"x"+block.getBlockNo()+"p"+processNumber+"t"+count;
+				value = (value.multiply(new BigDecimal(1 / Math.pow ((1 + discount_rate), i))));
+				String variable = "p"+block.getPitNo()+"x"+block.getBlockNo()+"p"+processNumber+"t"+i;
 				String eq = " "+formatDecimalValue(value)+variable;
 				if(value.doubleValue() > 0){
 					eq = " +"+eq;
@@ -109,7 +112,6 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 				
 				context.addVariable(block, variable);
 			}
-			count ++;
 		}
 	}
 	
@@ -124,6 +126,9 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		String pitNameField = context.getProjectConfig().getRequiredFieldMapping().get("pit_name");
 		List<Stockpile> stockpileList = context.getProjectConfig().getStockPileList();
 		int startYear = context.getStartYear();
+		int timePeriodStart = context.getTimePeriodStart();
+		int timePeriodEnd = context.getTimePeriodEnd();
+		
 		for(Stockpile sp: stockpileList){
 			String condition = (sp.getCondition() == null) ? "" : sp.getCondition();
 			boolean reclaimEnabled = context.isSpReclaimEnabled() && sp.isReclaim() && ( sp.getCapacity() > 0 );
@@ -144,8 +149,8 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 			condition += ")";
 			System.out.format(" Stockpile No: %d  Condition %s : \n", sp.getStockpileNumber(), condition);
 			List<Block> blocks = findBlocks(condition);
-			int count = 1;
-			for(int year: keys){
+			for(int i=timePeriodStart; i<= timePeriodEnd; i++ ){
+				int year = startYear + i -1;
 				BigDecimal miningcost = stockPilingCostMap.get(year).add(oreMiningCostMap.get(year));
 				BigDecimal truckHourCost = truckHourCostMap.get(year);
 				for(Block block: blocks) {
@@ -162,8 +167,8 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 						}
 					}
 					if(sp.getStockpileNumber() == 0) continue;
-					cost = (cost.multiply(new BigDecimal(1 / Math.pow ((1 + discount_rate), count))));
-					String variable = "p"+block.getPitNo()+"x"+block.getBlockNo()+"s"+sp.getStockpileNumber()+"t"+count;
+					cost = (cost.multiply(new BigDecimal(1 / Math.pow ((1 + discount_rate), i))));
+					String variable = "p"+block.getPitNo()+"x"+block.getBlockNo()+"s"+sp.getStockpileNumber()+"t"+i;
 					String eq = " -"+formatDecimalValue(cost)+ variable;
 					write(eq);
 					
@@ -176,7 +181,6 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 					}
 						
 				}
-				count++;
 			}
 		}
 		
@@ -191,6 +195,10 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		Set<Integer> keys = wasteMiningCostMap.keySet();
 		String pitNameField = context.getProjectConfig().getRequiredFieldMapping().get("pit_name");
 		List<Dump> dumpList = context.getProjectConfig().getDumpList();
+		
+		int startYear = context.getStartYear();
+		int timePeriodStart = context.getTimePeriodStart();
+		int timePeriodEnd = context.getTimePeriodEnd();
 		
 		for(Dump dump: dumpList) {			
 			String condition = (dump.getCondition() == null) ? "": dump.getCondition();
@@ -212,8 +220,8 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 			System.out.println(" Dump Condition :"+condition);
 			List<Block> blocks = findBlocks(condition);
 			
-			int count = 1;	
-			for(int year: keys){
+			for(int i=timePeriodStart; i<= timePeriodEnd; i++ ){
+				int year = startYear + i -1;
 				BigDecimal wasteminingcost = wasteMiningCostMap.get(year);	
 				BigDecimal truckHourCost = truckHourCostMap.get(year);
 				for(Block block: blocks) {
@@ -230,15 +238,14 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 					}
 					wasteBlocks.add(block);
 					dump.addBlock(block);
-					cost = (cost.multiply(new BigDecimal(1 / Math.pow ((1 + discount_rate), count))));
-					String variable = "p"+block.getPitNo()+"x"+block.getBlockNo()+"w"+dump.getDumpNumber()+"t"+count;
+					cost = (cost.multiply(new BigDecimal(1 / Math.pow ((1 + discount_rate), i))));
+					String variable = "p"+block.getPitNo()+"x"+block.getBlockNo()+"w"+dump.getDumpNumber()+"t"+i;
 					String eq = " -"+formatDecimalValue(cost)+variable;
 					write(eq);
 					
 					context.addVariable(block, variable);
 					
 				}
-				count++;
 			}
 		}
 		context.setWasteBlocks(wasteBlocks);
@@ -384,8 +391,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		for(OpexData opexData: opexDataList) {
 			if(opexData.getModel().getId() == model.getId()){
 				if(opexData.isRevenue()){
-					String expressionName = opexData.getExpression().getName().replaceAll("\\s+","_");
-					BigDecimal expr_value = b.getComputedField(expressionName);
+					BigDecimal expr_value = context.getExpressionValueforBlock(b, opexData.getExpression());
 					revenue = revenue.add(expr_value.multiply(opexData.getCostData().get(year)));
 				} else {
 					pcost = pcost.add(opexData.getCostData().get(year));

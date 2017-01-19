@@ -260,8 +260,7 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 				coefficientRatio = getTruckHourRatio(block, p.getModel().getName());
 			} else {
 				for(String coefficient: coefficients){
-					String expressionName = coefficient.replaceAll("\\s+","_");
-					coefficientRatio = coefficientRatio.add(block.getComputedField(expressionName));					
+					coefficientRatio = coefficientRatio.add(context.getExpressionValueforBlock(block, coefficient));					
 				}
 			}
 	
@@ -276,6 +275,7 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 						eq +=   " + ";
 					}
 					eq +=  formatDecimalValue(coefficientRatio)+"sp"+stockpileNo+"x"+block.getBlockNo()+"p"+processNumber+"t"+period;
+					
 				}			
 			}
 		}			
@@ -294,8 +294,7 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 				coefficientRatio = getTruckHourRatio(block, sp.getName());
 			} else {
 				for(String coefficient: coefficients){
-					String expressionName = coefficient.replaceAll("\\s+","_");
-					coefficientRatio = coefficientRatio.add(block.getComputedField(expressionName));					
+					coefficientRatio = coefficientRatio.add(context.getExpressionValueforBlock(block, coefficient));					
 				}
 			}
 			
@@ -313,8 +312,7 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 			BigDecimal coefficientRatio = new BigDecimal(0);
 			if(!useTruckHour) {
 				for(String coefficient: coefficients){
-					String expressionName = coefficient.replaceAll("\\s+","_");
-					coefficientRatio = coefficientRatio.add(block.getComputedField(expressionName));					
+					coefficientRatio = coefficientRatio.add(context.getExpressionValueforBlock(block, coefficient));					
 				}
 			}
 			
