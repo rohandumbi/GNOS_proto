@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import sun.org.mozilla.javascript.internal.Context;
-
 import com.org.gnos.scheduler.equation.SlidingWindowExecutionContext;
 import com.org.gnos.scheduler.solver.ISolver;
 import com.org.gnos.scheduler.solver.cplex.CplexSolver;
