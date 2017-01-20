@@ -238,6 +238,9 @@ public class ExecutionContext {
 		}
 	}
 	
+	public void reset() {
+		blockVariableMapping = new HashMap<Integer, List<String>>();
+	}
 	
 	public BigDecimal getExpressionValueforBlock(Block b, Expression expr) {
 		String expressionName = expr.getName().replaceAll("\\s+","_");			

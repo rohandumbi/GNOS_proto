@@ -28,6 +28,7 @@ public class SlidingWindowModeScheduler extends BaseScheduler{
 		int timePeriod = ScenarioConfigutration.getInstance().getTimePeriod();
 		helper.start();
 		for(int i=1; i<= period; i++){
+			context.reset();
 			int timePeriodStart = (i -1)*stepsize + 1;
 			int timePeriodEnd = (i -1)*stepsize + window;
 			if(timePeriodEnd > timePeriod){
