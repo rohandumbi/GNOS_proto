@@ -88,6 +88,11 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 			BigDecimal miningcost = oreMiningCostMap.get(year) ;
 			BigDecimal truckHourCost = truckHourCostMap.get(year);
 			for(Block block: blocks) {
+				if(!context.isGlobalMode()) {
+					if(!context.hasRemainingTonnage(block)){
+						continue;
+					}
+				}
 				BigDecimal cost = new BigDecimal(0);
 				cost = cost.add(miningcost);
 				processedBlocks.add(block.getId());
@@ -154,6 +159,11 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 				BigDecimal miningcost = stockPilingCostMap.get(year).add(oreMiningCostMap.get(year));
 				BigDecimal truckHourCost = truckHourCostMap.get(year);
 				for(Block block: blocks) {
+					if(!context.isGlobalMode()) {
+						if(!context.hasRemainingTonnage(block)){
+							continue;
+						}
+					}
 					BigDecimal cost = new BigDecimal(0);
 					cost = cost.add(miningcost);
 					if(!processedBlocks.contains(block.getId())) continue;
@@ -225,6 +235,11 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 				BigDecimal wasteminingcost = wasteMiningCostMap.get(year);	
 				BigDecimal truckHourCost = truckHourCostMap.get(year);
 				for(Block block: blocks) {
+					if(!context.isGlobalMode()) {
+						if(!context.hasRemainingTonnage(block)){
+							continue;
+						}
+					}
 					BigDecimal cost = new BigDecimal(0);
 					cost = cost.add(wasteminingcost);
 					if(processedBlocks.contains(block.getId())) continue;

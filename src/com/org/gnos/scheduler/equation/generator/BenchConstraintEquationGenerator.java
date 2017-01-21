@@ -131,10 +131,11 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 		StringBuilder sb1 = new StringBuilder();
 		StringBuilder sb2 = new StringBuilder();
 		Set<Bench> benches = pit.getBenches();
+		int timePeriodStart = context.getTimePeriodStart();
 		
 		for(Bench bench:benches){
 			sb1.append("+"+"p"+pit.getPitNo()+"b"+bench.getBenchNo()+"t"+timeperiod);
-			if(timeperiod > 1){
+			if(timeperiod > timePeriodStart){
 				sb2.append("-"+"p"+pit.getPitNo()+"b"+bench.getBenchNo()+"t"+(timeperiod-1));
 			}			
 		}

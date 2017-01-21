@@ -1,6 +1,7 @@
 package com.org.gnos.scheduler.equation.generator;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -50,6 +51,8 @@ public class BenchProportionEquationGenerator extends EquationGenerator{
 					if(lastBlock != null) {
 						List<String> blockvariables1 = this.blockVariableMapping.get(lastBlock.getId());
 						List<String> blockvariables2 = this.blockVariableMapping.get(block.getId());
+						blockvariables1 = blockvariables1 == null ? new ArrayList<String>() : blockvariables1;
+						blockvariables2 = blockvariables2 == null ? new ArrayList<String>() : blockvariables2;
 						String tonnage1 = lastBlock.getField(this.tonnesWeightFieldName);
 						String tonnage2 = block.getField(this.tonnesWeightFieldName);
 						for(int i=timePeriodStart; i<= timePeriodEnd; i++){

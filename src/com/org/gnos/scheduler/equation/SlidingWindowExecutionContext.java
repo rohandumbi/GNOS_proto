@@ -81,6 +81,13 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 		return false;
 	}
 	
+	@Override
+	public boolean hasRemainingTonnage(Block b) {
+		double tonnage = Double.valueOf(b.getField(getTonnesWeightAlisName()));
+		
+		return (tonnage - getMinedTonnesForBlock(b.getBlockNo()) > 0);
+	}
+	
 	public void addMinedTonnesWeightForBlock(int blockNo, double tonnesWeight) {
 		Double minedTonnesW = blockMinedTonnesMapping.get(blockNo);
 		if(minedTonnesW == null){

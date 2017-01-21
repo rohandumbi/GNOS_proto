@@ -242,6 +242,9 @@ public class ExecutionContext {
 		blockVariableMapping = new HashMap<Integer, List<String>>();
 	}
 	
+	public boolean hasRemainingTonnage(Block b){
+		 return true;
+	}
 	public BigDecimal getExpressionValueforBlock(Block b, Expression expr) {
 		String expressionName = expr.getName().replaceAll("\\s+","_");			
 		return b.getComputedField(expressionName);		
