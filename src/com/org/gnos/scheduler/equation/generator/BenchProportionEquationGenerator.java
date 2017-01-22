@@ -15,13 +15,11 @@ import com.org.gnos.scheduler.equation.ExecutionContext;
 
 public class BenchProportionEquationGenerator extends EquationGenerator{
 
-	private String tonnesWeightFieldName;
 	private Map<Integer, List<String>> blockVariableMapping;
 	final Pattern lastIntPattern = Pattern.compile("[^0-9]+([0-9]+)$");
 	
 	public BenchProportionEquationGenerator(ExecutionContext data) {
 		super(data);
-		this.tonnesWeightFieldName = context.getTonnesWeightAlisName();
 		this.blockVariableMapping = context.getBlockVariableMapping();
 	}
 	
@@ -53,8 +51,8 @@ public class BenchProportionEquationGenerator extends EquationGenerator{
 						List<String> blockvariables2 = this.blockVariableMapping.get(block.getId());
 						blockvariables1 = blockvariables1 == null ? new ArrayList<String>() : blockvariables1;
 						blockvariables2 = blockvariables2 == null ? new ArrayList<String>() : blockvariables2;
-						String tonnage1 = lastBlock.getField(this.tonnesWeightFieldName);
-						String tonnage2 = block.getField(this.tonnesWeightFieldName);
+						String tonnage1 = ""+context.getTonnesWtForBlock(lastBlock);
+						String tonnage2 = ""+context.getTonnesWtForBlock(block);
 						for(int i=timePeriodStart; i<= timePeriodEnd; i++){
 							StringBuilder sb = new StringBuilder("");
 							for(String variable : blockvariables1) {

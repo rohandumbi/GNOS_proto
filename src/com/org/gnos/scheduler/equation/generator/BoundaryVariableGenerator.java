@@ -26,7 +26,6 @@ public class BoundaryVariableGenerator extends EquationGenerator{
 	}
 	
 	public void buildBenchConstraintVariables() {
-		String tonnesWeightFieldName = context.getTonnesWeightAlisName();
 		Map<Integer, Block> allBlocks = context.getBlocks();
 		Map<Integer, List<String>> blockVariableMapping = context.getBlockVariableMapping();
 		Set<Integer> blockIds = blockVariableMapping.keySet();
@@ -40,7 +39,7 @@ public class BoundaryVariableGenerator extends EquationGenerator{
 					sb.append(variable +"+");
 				}					
 			}
-			String eq = sb.toString().substring(0,sb.length() -1) +" <= "+b.getField(tonnesWeightFieldName);
+			String eq = sb.toString().substring(0,sb.length() -1) +" <= "+context.getTonnesWtForBlock(b);
 			write(eq);
 		}
 	}

@@ -51,14 +51,14 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 	public int getTimePeriod() {
 		return this.window;
 	}
-	
+/*	
 	@Override
 	public BigDecimal getExpressionValueforBlock(Block b, Expression expr) {
 		String expressionName = expr.getName().replaceAll("\\s+","_");
 		if(expr.isGrade()) {
 			return b.getComputedField(expressionName);		
 		} else {
-			double totalTonnes =  Double.valueOf(b.getField(getTonnesWeightAlisName()));
+			double totalTonnes =  Double.valueOf(b.getField(tonnesWtFieldName));
 			double remainingTonnes = totalTonnes - getMinedTonnesForBlock(b.getBlockNo());
 			
 			if(remainingTonnes <= 0) return new BigDecimal(0);
@@ -75,17 +75,25 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 		Expression expr = ProjectConfigutration.getInstance().getExpressionByName(expressionName);
 		return getExpressionValueforBlock(b, expr);		
 	}
-	
+	*/
 	@Override
 	public boolean isGlobalMode() {
 		return false;
 	}
 	
+	
 	@Override
 	public boolean hasRemainingTonnage(Block b) {
-		double tonnage = Double.valueOf(b.getField(getTonnesWeightAlisName()));
 		
-		return (tonnage - getMinedTonnesForBlock(b.getBlockNo()) > 0);
+		return (getTonnesWtForBlock(b) > 0.01); //0.01 is the tolerance
+	}
+	
+	@Override
+	public double getTonnesWtForBlock(Block b){
+		double tonnage = Double.valueOf(b.getField(tonnesWtFieldName));
+		double remainingTOnnage = tonnage - getMinedTonnesForBlock(b.getBlockNo());
+		
+		return remainingTOnnage;
 	}
 	
 	public void addMinedTonnesWeightForBlock(int blockNo, double tonnesWeight) {

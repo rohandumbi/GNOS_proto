@@ -16,13 +16,11 @@ import com.org.gnos.scheduler.equation.ExecutionContext;
 
 public class BenchConstraintEquationGenerator extends EquationGenerator{
 
-	private String tonnesWeightFieldName;
 	private Map<Integer, List<String>> blockVariableMapping;
 	final Pattern lastIntPattern = Pattern.compile("[^0-9]+([0-9]+)$");
 	
 	public BenchConstraintEquationGenerator(ExecutionContext data) {
 		super(data);
-		this.tonnesWeightFieldName = context.getTonnesWeightAlisName();
 		this.blockVariableMapping = context.getBlockVariableMapping();
 	}
 	
@@ -50,7 +48,7 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 			for(Bench bench: benches){
 				List<String> variables = getAllVariablesForBench(bench);
 				BigDecimal tonnesWt = getBenchTonnesWt(bench);
-				
+				if(variables.size() == 0) continue;
 				for(int i=timePeriodStart; i<= timePeriodEnd; i++){
 					StringBuffer sb1= new StringBuffer();
 					StringBuffer sb2= new StringBuffer();
@@ -162,7 +160,7 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 		BigDecimal tonnesWt = new BigDecimal(0);
 		for(Block block:bench.getBlocks()){
 			try{
-				tonnesWt = tonnesWt.add(new BigDecimal(block.getField(this.tonnesWeightFieldName)));
+				tonnesWt = tonnesWt.add(new BigDecimal(context.getTonnesWtForBlock(block)));
 			} catch(NumberFormatException nfe){
 				System.err.println("Could not parse to float :"+nfe.getMessage());
 			}

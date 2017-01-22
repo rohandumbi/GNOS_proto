@@ -36,6 +36,7 @@ public class ExecutionContext {
 	private Map<String, BigDecimal> cycleTimeDataMapping  = new HashMap<String, BigDecimal>();
 	private String pitFieldName;
 	private String benchFieldName;
+	protected String tonnesWtFieldName;
 	
 	int startYear;
 	int timePeriodStart;
@@ -53,6 +54,7 @@ public class ExecutionContext {
 		scenarioConfiguration = ScenarioConfigutration.getInstance();
 		pitFieldName = projectConfiguration.getRequiredFieldMapping().get("pit_name");
 		benchFieldName = projectConfiguration.getRequiredFieldMapping().get("bench_rl");
+		tonnesWtFieldName = projectConfiguration.getRequiredFieldMapping().get("tonnes_wt");
 		startYear = scenarioConfiguration.getStartYear();
 		timePeriodStart = 1;
 		timePeriodEnd = scenarioConfiguration.getTimePeriod();
@@ -245,6 +247,11 @@ public class ExecutionContext {
 	public boolean hasRemainingTonnage(Block b){
 		 return true;
 	}
+	
+	public double getTonnesWtForBlock(Block b){
+		return Double.valueOf(b.getField(tonnesWtFieldName));
+	}
+	
 	public BigDecimal getExpressionValueforBlock(Block b, Expression expr) {
 		String expressionName = expr.getName().replaceAll("\\s+","_");			
 		return b.getComputedField(expressionName);		
@@ -279,10 +286,6 @@ public class ExecutionContext {
 		this.timePeriodEnd = timePeriodEnd;
 	}
 
-	public String getTonnesWeightAlisName() {
-		return projectConfiguration.getRequiredFieldMapping().get("tonnes_wt");
-	}
-	
 	public ScenarioConfigutration getScenarioConfig() {
 		return this.scenarioConfiguration;
 	}

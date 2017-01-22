@@ -127,7 +127,6 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		Map<Integer, BigDecimal> oreMiningCostMap = fixedOpexCost[0].getCostData();
 		Map<Integer, BigDecimal> stockPilingCostMap = fixedOpexCost[2].getCostData();
 		Map<Integer, BigDecimal> truckHourCostMap = fixedOpexCost[4].getCostData();
-		Set<Integer> keys = stockPilingCostMap.keySet();
 		String pitNameField = context.getProjectConfig().getRequiredFieldMapping().get("pit_name");
 		List<Stockpile> stockpileList = context.getProjectConfig().getStockPileList();
 		int startYear = context.getStartYear();
@@ -187,9 +186,16 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 					// Build reeclaim variable
 					
 					if(reclaimEnabled && (year > startYear)) {
-						buildSPReclaimVariable(block, sp, year);
+						if(context.isGlobalMode()){
+							buildSPReclaimVariable(block, sp, year);
+						}						
+					}						
+				}
+				if(reclaimEnabled && (year > startYear)) {
+					if(!context.isGlobalMode()){
+						buildSWSPReclaimVariable(sp, year);
 					}
-						
+					
 				}
 			}
 		}
@@ -202,7 +208,6 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		if(fixedOpexCost == null || fixedOpexCost.length < 5) return;
 		Map<Integer, BigDecimal> wasteMiningCostMap = fixedOpexCost[1].getCostData();
 		Map<Integer, BigDecimal> truckHourCostMap = fixedOpexCost[4].getCostData();
-		Set<Integer> keys = wasteMiningCostMap.keySet();
 		String pitNameField = context.getProjectConfig().getRequiredFieldMapping().get("pit_name");
 		List<Dump> dumpList = context.getProjectConfig().getDumpList();
 		
@@ -330,7 +335,50 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 			context.addVariable(b, variable);
 		}	
 	}
-	
+	private void buildSWSPReclaimVariable(Stockpile sp, int year) {
+/*		int startYear = context.getStartYear();
+		FixedOpexCost[] fixedOpexCost = context.getScenarioConfig().getFixedCost();
+		if(fixedOpexCost == null || fixedOpexCost.length < 4) return;
+		Map<Integer, BigDecimal> stockPilingReclaimingCostMap = fixedOpexCost[3].getCostData();
+		Map<Integer, BigDecimal> truckHourCostMap = fixedOpexCost[4].getCostData();
+		
+		BigDecimal cost = stockPilingReclaimingCostMap.get(year);
+		BigDecimal truckHourCost = truckHourCostMap.get(year);
+		
+		int timeperiod = year - startYear + 1;
+		
+		int payload = context.getBlockPayloadMapping().get(b.getId());
+		BigDecimal fixedTime = context.getProjectConfig().getTruckParameterData().getFixedTime();
+		if(sp.getStockpileNumber() == 0) return;
+		Set<Process> processes = b.getProcesses();
+		TruckParameterCycleTime cycleTime =  context.getProjectConfig().getTruckParamCycleTimeByStockpileName(sp.getName());
+		
+		for(Process p: processes){
+			BigDecimal totalCost = new BigDecimal(0);
+			BigDecimal processValue = getProcessValue(b, p.getModel(), year);
+			totalCost = totalCost.add(cost);
+			if(payload > 0) {
+				BigDecimal ct = new BigDecimal(0);
+				if(cycleTime.getProcessData() != null){
+					ct = cycleTime.getProcessData().get(p.getModel().getName()).add(fixedTime);
+				} 
+				if(ct != null) {
+					double th_ratio =  ct.doubleValue() /( payload* 60);
+					totalCost = totalCost.add(truckHourCost.multiply(new BigDecimal(th_ratio)));
+				}
+			}
+			BigDecimal value = processValue.subtract(totalCost);
+			value = (value.multiply(new BigDecimal(1 / Math.pow ((1 + discount_rate), timeperiod))));
+			String variable = "sp"+sp.getStockpileNumber()+"x"+b.getBlockNo()+"p"+p.getProcessNo()+"t"+timeperiod;
+			String eq = formatDecimalValue(value)+ variable;
+			if(value.doubleValue() > 0) {
+				eq =  " + " + eq;
+			} 
+			write(eq);
+			context.addVariable(b, variable);
+		}*/
+	}
+
 	private String buildCondition(Process process) {
 		String condition = "";
 

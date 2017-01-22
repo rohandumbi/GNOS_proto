@@ -1,7 +1,5 @@
 package com.org.gnos.scheduler.equation.generator;
 
-import java.io.BufferedOutputStream;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -15,12 +13,10 @@ import com.org.gnos.scheduler.equation.ExecutionContext;
 
 public class PitDependencyEquationGenerator extends EquationGenerator{
 
-	private String tonnesWeightFieldName;
 	private Map<Integer, List<String>> blockVariableMapping;
 	
 	public PitDependencyEquationGenerator(ExecutionContext data) {
 		super(data);
-		this.tonnesWeightFieldName = context.getTonnesWeightAlisName();
 		this.blockVariableMapping = context.getBlockVariableMapping();
 	}
 	
@@ -108,7 +104,7 @@ public class PitDependencyEquationGenerator extends EquationGenerator{
 		int timePeriodStart = context.getTimePeriodStart();
 		int timePeriodEnd = context.getTimePeriodEnd();
 		List<String> variables = getAllVariablesForBench(b2);
-		float benchTonnesWt = getBenchTonnesWt(b2);
+		Double benchTonnesWt = getBenchTonnesWt(b2);
 		for(int i=timePeriodStart; i<= timePeriodEnd; i++){
 			StringBuilder sb = new StringBuilder();
 			int count = 0;
@@ -165,11 +161,11 @@ public class PitDependencyEquationGenerator extends EquationGenerator{
 		return variables;
 	}
 	
-	private float getBenchTonnesWt(Bench bench){
-		float tonnesWt = 0;
+	private double getBenchTonnesWt(Bench bench){
+		Double tonnesWt = 0.0;
 		for(Block block:bench.getBlocks()){
 			try{
-				tonnesWt += Float.parseFloat(block.getField(this.tonnesWeightFieldName));
+				tonnesWt += context.getTonnesWtForBlock(block);
 			} catch(NumberFormatException nfe){
 				System.err.println("Could not parse to float :"+nfe.getMessage());
 			}
