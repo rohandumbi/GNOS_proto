@@ -74,6 +74,7 @@ public class DBStorageHelper implements IStorageHelper {
 			}
 			conn.commit();
 			conn.setAutoCommit(autoCommit);
+			postProcess();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -92,6 +93,10 @@ public class DBStorageHelper implements IStorageHelper {
 	}
 
 	public void processRecord(Record record){
+		
+	}
+	
+	public void postProcess(){
 		
 	}
 

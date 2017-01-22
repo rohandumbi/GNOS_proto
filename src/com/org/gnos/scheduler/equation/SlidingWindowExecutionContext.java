@@ -57,6 +57,8 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 	public int getTimePeriod() {
 		return this.window;
 	}
+	
+	
 /*	
 	@Override
 	public BigDecimal getExpressionValueforBlock(Block b, Expression expr) {
@@ -83,11 +85,21 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 	}
 	*/
 
+	public Map<Integer, SPBlock> getSpBlockMapping() {
+		return spBlockMapping;
+	}
+	public void setSpBlockMapping(Map<Integer, SPBlock> spBlockMapping) {
+		this.spBlockMapping = spBlockMapping;
+	}
 	public BigDecimal getExpressionValueforBlock(SPBlock spb, Expression expr) {
 		String expressionName = expr.getName().replaceAll("\\s+","_");			
 		return spb.getComputedField(expressionName);		
 	}
 	
+	public BigDecimal getExpressionValueforBlock(SPBlock spb, String exprName) {
+		String expressionName = exprName.replaceAll("\\s+","_");			
+		return spb.getComputedField(expressionName);		
+	}
 	@Override
 	public boolean isGlobalMode() {
 		return false;
@@ -186,7 +198,33 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 	public void processStockpiles() {
 		Set<Integer> spNos = spTonnesWigthMapping.keySet();
 		for(int spNo: spNos){
+			SPBlock spb = spBlockMapping.get(spNo);
+			if(spb == null) continue;
+			Map<Integer, Double> blockTonnage = spTonnesWigthMapping.get(spNo);
 			
+			if(blockTonnage == null) continue;
+			Set<Integer> blockNos = blockTonnage.keySet();
+			for(int blockNo: blockNos){
+				Block b = getBlocks().get(blockNo);
+				int payload = getBlockPayloadMapping().get(b.getId());
+				spb.setPayload(payload);
+				double blockTonnesWt = Double.parseDouble(b.getField(tonnesWtFieldName));
+				double ratio = blockTonnesWt/spb.getTonnesWt();
+				Map<String, BigDecimal> spblockcomputedFields = spb.getComputedFields();
+				Map<String, String> computedFields = b.getComputedFields();
+				Set<String> fieldNames = computedFields.keySet();
+				for(String fieldName: fieldNames) {
+					BigDecimal fieldVal = new BigDecimal(computedFields.get(fieldName));
+					fieldVal = fieldVal.multiply(new BigDecimal(ratio));
+					BigDecimal existingVal = spblockcomputedFields.get(fieldName);
+					if(existingVal != null) {
+						fieldVal = fieldVal.add(existingVal);
+					}
+					spblockcomputedFields.put(fieldName, fieldVal);
+				}
+				spb.setComputedFields(spblockcomputedFields);
+				spb.getProcesses().addAll(b.getProcesses());
+			}
 		}
 		
 		spTonnesWigthMapping = new HashMap<Integer,  Map<Integer, Double>>();

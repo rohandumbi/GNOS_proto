@@ -14,7 +14,6 @@ import java.util.Set;
 
 import com.org.gnos.core.Block;
 import com.org.gnos.core.Node;
-import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.core.Tree;
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.model.CapexData;
@@ -193,11 +192,8 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 						}						
 					}						
 				}
-				if(reclaimEnabled && (year > startYear)) {
-					if(!context.isGlobalMode()){
-						buildSWSPReclaimVariable(sp, year);
-					}
-					
+				if(reclaimEnabled && (year > startYear) && !context.isGlobalMode()) {
+					buildSWSPReclaimVariable(sp, year);
 				}
 			}
 		}
@@ -354,7 +350,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		BigDecimal fixedTime = context.getProjectConfig().getTruckParameterData().getFixedTime();
 		if(sp.getStockpileNumber() == 0) return;
 		
-		List<Process> processes = ProjectConfigutration.getInstance().getProcessList();
+		Set<Process> processes = spb.getProcesses();
 		TruckParameterCycleTime cycleTime =  context.getProjectConfig().getTruckParamCycleTimeByStockpileName(sp.getName());
 		
 		for(Process p: processes){

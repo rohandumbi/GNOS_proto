@@ -54,6 +54,10 @@ public class Block {
 		else return new BigDecimal(val);
 	}
 	
+	public  Map<String, String> getComputedFields() {
+		return computedFields;
+	}
+	
 	public String getField(String fieldName) {
 		return this.fields.get(fieldName);
 	}

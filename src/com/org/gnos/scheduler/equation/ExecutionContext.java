@@ -23,6 +23,7 @@ import com.org.gnos.db.DBManager;
 import com.org.gnos.db.model.CycleTimeMappingData;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.PitGroup;
+import com.org.gnos.db.model.Stockpile;
 import com.org.gnos.db.model.TruckParameterData;
 
 public class ExecutionContext {
@@ -238,6 +239,16 @@ public class ExecutionContext {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public Stockpile getStockpileFromNo(int spNo){;
+		List<Stockpile> stockpiles = projectConfiguration.getStockPileList();
+		for(Stockpile sp: stockpiles){
+			if(sp.getStockpileNumber() == spNo) {
+				return sp;
+			}
+		}
+		return null;
 	}
 	
 	public void reset() {

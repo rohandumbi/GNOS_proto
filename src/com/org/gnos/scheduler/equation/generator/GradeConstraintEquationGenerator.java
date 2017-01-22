@@ -20,6 +20,8 @@ import com.org.gnos.db.model.Product;
 import com.org.gnos.db.model.ProductJoin;
 import com.org.gnos.db.model.Stockpile;
 import com.org.gnos.scheduler.equation.ExecutionContext;
+import com.org.gnos.scheduler.equation.SPBlock;
+import com.org.gnos.scheduler.equation.SlidingWindowExecutionContext;
 
 public class GradeConstraintEquationGenerator extends EquationGenerator{
 
@@ -200,7 +202,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 			}
 			eq +=   formatDecimalValue(coeff)+"p"+block.getPitNo()+"x"+block.getBlockNo()+"p"+processNumber+"t"+period;
 			
-			if(context.isSpReclaimEnabled() && period > 1) {
+			if(context.isSpReclaimEnabled() && period > 1 && context.isGlobalMode()) {
 				int stockpileNo = getStockpileNo(block);
 				if(stockpileNo > 0) {
 					if(coeff.doubleValue() > 0) {
@@ -209,7 +211,38 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 					eq +=  formatDecimalValue(coeff)+"sp"+stockpileNo+"x"+block.getBlockNo()+"p"+processNumber+"t"+period;
 				}			
 			}
-		}			
+		}
+		
+		if(context.isSpReclaimEnabled() && period > 1 && !context.isGlobalMode()) {			
+			
+			SlidingWindowExecutionContext swctx = (SlidingWindowExecutionContext) context;
+			Map<Integer, SPBlock> spBlockMapping = swctx.getSpBlockMapping();
+			Set<Integer> spNos = spBlockMapping.keySet();			
+			for(int spNo: spNos){
+				SPBlock spb = spBlockMapping.get(spNo);
+				if(spb == null) continue;
+				
+				BigDecimal processRatio = new BigDecimal(0);
+				for(String coefficient: coefficients){
+					processRatio =  processRatio.add(swctx.getExpressionValueforBlock(spb, coefficient));					
+				}
+				
+				if(processRatio.compareTo(new BigDecimal(0)) == 0) continue;
+				BigDecimal blockGrade = swctx.getExpressionValueforBlock(spb, grade.getExpression());
+				BigDecimal coeff = processRatio.multiply(targetGrade.subtract(blockGrade));
+				if(coeff.doubleValue() == 0) continue;
+
+				Set<Process> processes = spb.getProcesses();
+				for(Process process: processes){
+					if(process.getProcessNo() == processNumber) {
+						if(coeff.doubleValue() > 0) {
+							eq +=   "+ ";
+						}
+						eq +=  formatDecimalValue(coeff)+"sp"+spNo+"x0p"+processNumber+"t"+period;
+					}
+				}
+			}
+		}
 		return eq;
 	}
 	

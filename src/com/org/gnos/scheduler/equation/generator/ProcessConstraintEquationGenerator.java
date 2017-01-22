@@ -19,7 +19,10 @@ import com.org.gnos.db.model.ProcessJoin;
 import com.org.gnos.db.model.Product;
 import com.org.gnos.db.model.ProductJoin;
 import com.org.gnos.db.model.Stockpile;
+import com.org.gnos.db.model.TruckParameterCycleTime;
 import com.org.gnos.scheduler.equation.ExecutionContext;
+import com.org.gnos.scheduler.equation.SPBlock;
+import com.org.gnos.scheduler.equation.SlidingWindowExecutionContext;
 
 public class ProcessConstraintEquationGenerator extends EquationGenerator{
 
@@ -268,7 +271,7 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 					
 			eq +=  "+ "+ formatDecimalValue(coefficientRatio)+ variable;
 			
-			if(context.isSpReclaimEnabled() && period > 1) {
+			if(context.isSpReclaimEnabled() && period > 1 && context.isGlobalMode()) {
 				int stockpileNo = getStockpileNo(block);
 				if(stockpileNo > 0) {
 					if(coefficientRatio.doubleValue() > 0) {
@@ -278,7 +281,49 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 					
 				}			
 			}
-		}			
+		}
+		if(context.isSpReclaimEnabled() && period > 1 && !context.isGlobalMode()) {
+			SlidingWindowExecutionContext swctx = (SlidingWindowExecutionContext) context;
+			BigDecimal fixedTime = context.getProjectConfig().getTruckParameterData().getFixedTime();
+			Map<Integer, SPBlock> spBlockMapping = swctx.getSpBlockMapping();
+			Set<Integer> spNos = spBlockMapping.keySet();			
+			for(int spNo: spNos){
+				Stockpile sp = swctx.getStockpileFromNo(spNo);
+				SPBlock spb = spBlockMapping.get(spNo);
+				if(spb == null) continue;
+				Set<Process> processes = spb.getProcesses();
+				for(Process process: processes){
+					if(process.getProcessNo() == p.getProcessNo()) {
+						BigDecimal coefficientRatio =  new BigDecimal(0);
+						TruckParameterCycleTime cycleTime =  context.getProjectConfig().getTruckParamCycleTimeByStockpileName(sp.getName());
+						if(useTruckHour) {
+							int payload = spb.getPayload();
+							if(payload > 0) {
+								BigDecimal ct = new BigDecimal(0);
+								if(cycleTime.getProcessData() != null){
+									ct = cycleTime.getProcessData().get(p.getModel().getName()).add(fixedTime);
+								} 
+								if(ct != null) {
+									double th_ratio_val =  ct.doubleValue() /( payload* 60);
+									coefficientRatio = new BigDecimal(th_ratio_val);
+								}
+							}
+						} else {
+							for(String coefficient: coefficients){
+								coefficientRatio = coefficientRatio.add(swctx.getExpressionValueforBlock(spb, coefficient));					
+							}
+						}
+						
+						if(coefficientRatio.doubleValue() == 0) continue;
+						
+						if(coefficientRatio.doubleValue() > 0) {
+							eq +=   " + ";
+						}
+						eq +=  formatDecimalValue(coefficientRatio)+"sp"+spNo+"x0p"+processNumber+"t"+period;
+					}
+				}
+			}
+		}
 		return eq;
 	}
 	

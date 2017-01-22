@@ -18,6 +18,8 @@ import com.org.gnos.db.model.ProcessConstraintData;
 import com.org.gnos.db.model.ProcessJoin;
 import com.org.gnos.db.model.Stockpile;
 import com.org.gnos.scheduler.equation.ExecutionContext;
+import com.org.gnos.scheduler.equation.SPBlock;
+import com.org.gnos.scheduler.equation.SlidingWindowExecutionContext;
 
 public class CapexEquationGenerator extends EquationGenerator{
 
@@ -150,7 +152,7 @@ public class CapexEquationGenerator extends EquationGenerator{
 					}
 					sb.append(context.getExpressionValueforBlock(b, exp)+"p"+b.getPitNo()+"x"+b.getBlockNo()+"p"+p.getProcessNo()+"t"+i);
 					count ++;
-					if(context.isSpReclaimEnabled()) {
+					if(context.isSpReclaimEnabled() && context.isGlobalMode() && timePeriodStart > 1) {
 						int stockpileNo = getStockpileNoForReclaim(b);
 						if(stockpileNo > 0) {
 							if(count > 0){
@@ -162,6 +164,27 @@ public class CapexEquationGenerator extends EquationGenerator{
 					}
 					
 				}
+				if(context.isSpReclaimEnabled() && !context.isGlobalMode() && timePeriodStart > 1) {
+					SlidingWindowExecutionContext swctx = (SlidingWindowExecutionContext) context;
+					Map<Integer, SPBlock> spBlockMapping = swctx.getSpBlockMapping();
+					Set<Integer> spNos = spBlockMapping.keySet();			
+					for(int spNo: spNos){
+						SPBlock spb = spBlockMapping.get(spNo);
+						if(spb == null) continue;
+
+						Set<Process> processes = spb.getProcesses();
+						for(Process process: processes){
+							if(process.getProcessNo() == p.getProcessNo()) {
+								if(count > 0){
+									sb.append(" + ");
+								}
+								sb.append(swctx.getExpressionValueforBlock(spb, exp)+"sp"+spNo+"x0p"+p.getProcessNo()+"t"+i);
+								count ++;
+							}
+						}
+					}
+				}
+				
 			}
 			int instanceNumber=0;
 			for(CapexInstance ci: capexInstanceList){

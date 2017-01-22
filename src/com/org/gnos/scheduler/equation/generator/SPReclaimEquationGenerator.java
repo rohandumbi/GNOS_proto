@@ -1,12 +1,15 @@
 package com.org.gnos.scheduler.equation.generator;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.org.gnos.core.Block;
 import com.org.gnos.db.model.Process;
 import com.org.gnos.db.model.Stockpile;
 import com.org.gnos.scheduler.equation.ExecutionContext;
+import com.org.gnos.scheduler.equation.SPBlock;
+import com.org.gnos.scheduler.equation.SlidingWindowExecutionContext;
 
 public class SPReclaimEquationGenerator extends EquationGenerator{
 	
@@ -19,9 +22,11 @@ public class SPReclaimEquationGenerator extends EquationGenerator{
 	public void generate() {
 
 		try {
-			if(context.isSpReclaimEnabled()) {
+			if(context.isSpReclaimEnabled() && context.isGlobalMode()) {
 				buildStockpileEquations();
-			}		
+			} else {
+				buildSWStockpileEquations();
+			}
 			output.flush();
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -34,7 +39,7 @@ public class SPReclaimEquationGenerator extends EquationGenerator{
 		int timePeriodStart = context.getTimePeriodStart();
 		int timePeriodEnd = context.getTimePeriodEnd();
 		for(Stockpile sp: stockpiles) {
-			if(!sp.isReclaim()) return;
+			if(!sp.isReclaim()) continue;
 			Set<Block> blocks = sp.getBlocks();
 			for(int i= timePeriodStart; i <= timePeriodEnd; i++) {
 				StringBuilder sbc_sp = new StringBuilder("");
@@ -62,5 +67,48 @@ public class SPReclaimEquationGenerator extends EquationGenerator{
 			}
 			
 		}
+	}
+	
+	private void buildSWStockpileEquations() {
+		
+		SlidingWindowExecutionContext swctx = (SlidingWindowExecutionContext) context;
+		int timePeriodStart = context.getTimePeriodStart();
+		int timePeriodEnd = context.getTimePeriodEnd();
+		Map<Integer, SPBlock> spBlockMapping = swctx.getSpBlockMapping();
+		Set<Integer> spNos = spBlockMapping.keySet();			
+		for(int spNo: spNos){
+			Stockpile sp = context.getStockpileFromNo(spNo);
+			if(!sp.isReclaim() && !(sp.getCapacity() > 0)) continue;
+			SPBlock spb = spBlockMapping.get(spNo);
+			if(spb == null) continue;
+			Set<Block> blocks = sp.getBlocks();
+			double capacity = sp.getCapacity();
+			if(spb.getTonnesWt() > 0) {
+				capacity = capacity - spb.getTonnesWt();
+			}
+			for(int i= timePeriodStart; i <= timePeriodEnd; i++) {
+				StringBuilder sbc_sp = new StringBuilder("");
+				StringBuilder sbc_spr = new StringBuilder("");
+				for(Block b: blocks){
+					StringBuilder sb_sp = new StringBuilder("");
+					sbc_sp.append(" + p"+b.getPitNo()+"x"+b.getBlockNo()+"s"+sp.getStockpileNumber()+"t1");
+					for(int j=2; j<=i; j++){
+						sb_sp.append(" + p"+b.getPitNo()+"x"+b.getBlockNo()+"s"+sp.getStockpileNumber()+"t"+(j-1));						
+					}
+					sbc_sp.append(sb_sp);
+				}
+				Set<Process> processes = spb.getProcesses();
+				for(int j=2; j<=i; j++){
+					for(Process p: processes) {
+						sbc_spr.append(" - sp"+sp.getStockpileNumber()+"x0p"+p.getProcessNo()+"t"+j);
+					}
+				}
+				 
+				if(capacity > 0 && (sbc_sp.length() > 0 || sbc_spr.length() > 0)){
+					write(sbc_sp.toString()+sbc_spr.toString()+" <= "+capacity);
+				}
+			}
+		}
+	
 	}
 }

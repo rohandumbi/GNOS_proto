@@ -18,8 +18,7 @@ public class SlidingWindowModeDBStorageHelper extends DBStorageHelper {
 	}
 	
 	@Override
-	public void stop() {
-		super.stop();
+	public void postProcess() {
 		SlidingWindowExecutionContext swctx = (SlidingWindowExecutionContext)context;
 		swctx.processStockpiles();
 	}
