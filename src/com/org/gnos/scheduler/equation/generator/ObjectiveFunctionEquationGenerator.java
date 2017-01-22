@@ -14,6 +14,7 @@ import java.util.Set;
 
 import com.org.gnos.core.Block;
 import com.org.gnos.core.Node;
+import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.core.Tree;
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.model.CapexData;
@@ -27,6 +28,8 @@ import com.org.gnos.db.model.Process;
 import com.org.gnos.db.model.Stockpile;
 import com.org.gnos.db.model.TruckParameterCycleTime;
 import com.org.gnos.scheduler.equation.ExecutionContext;
+import com.org.gnos.scheduler.equation.SPBlock;
+import com.org.gnos.scheduler.equation.SlidingWindowExecutionContext;
 
 public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 	
@@ -79,7 +82,6 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		if(fixedOpexCost == null || fixedOpexCost.length < 5) return;
 		Map<Integer, BigDecimal> oreMiningCostMap = fixedOpexCost[0].getCostData();
 		Map<Integer, BigDecimal> truckHourCostMap = fixedOpexCost[4].getCostData();
-		Set<Integer> keys = oreMiningCostMap.keySet();
 		int timePeriodStart = context.getTimePeriodStart();
 		int timePeriodEnd = context.getTimePeriodEnd();
 		int startYear = context.getStartYear();
@@ -336,7 +338,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		}	
 	}
 	private void buildSWSPReclaimVariable(Stockpile sp, int year) {
-/*		int startYear = context.getStartYear();
+		int startYear = context.getStartYear();
 		FixedOpexCost[] fixedOpexCost = context.getScenarioConfig().getFixedCost();
 		if(fixedOpexCost == null || fixedOpexCost.length < 4) return;
 		Map<Integer, BigDecimal> stockPilingReclaimingCostMap = fixedOpexCost[3].getCostData();
@@ -346,16 +348,18 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		BigDecimal truckHourCost = truckHourCostMap.get(year);
 		
 		int timeperiod = year - startYear + 1;
-		
-		int payload = context.getBlockPayloadMapping().get(b.getId());
+		SPBlock spb = ((SlidingWindowExecutionContext)context).getSPBlock(sp.getStockpileNumber());
+		if(spb == null) return;
+		int payload = spb.getPayload();
 		BigDecimal fixedTime = context.getProjectConfig().getTruckParameterData().getFixedTime();
 		if(sp.getStockpileNumber() == 0) return;
-		Set<Process> processes = b.getProcesses();
+		
+		List<Process> processes = ProjectConfigutration.getInstance().getProcessList();
 		TruckParameterCycleTime cycleTime =  context.getProjectConfig().getTruckParamCycleTimeByStockpileName(sp.getName());
 		
 		for(Process p: processes){
 			BigDecimal totalCost = new BigDecimal(0);
-			BigDecimal processValue = getProcessValue(b, p.getModel(), year);
+			BigDecimal processValue = getProcessValueForSPBlock(spb, p.getModel(), year);
 			totalCost = totalCost.add(cost);
 			if(payload > 0) {
 				BigDecimal ct = new BigDecimal(0);
@@ -369,14 +373,14 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 			}
 			BigDecimal value = processValue.subtract(totalCost);
 			value = (value.multiply(new BigDecimal(1 / Math.pow ((1 + discount_rate), timeperiod))));
-			String variable = "sp"+sp.getStockpileNumber()+"x"+b.getBlockNo()+"p"+p.getProcessNo()+"t"+timeperiod;
+			String variable = "sp"+sp.getStockpileNumber()+"x0p"+p.getProcessNo()+"t"+timeperiod;
 			String eq = formatDecimalValue(value)+ variable;
 			if(value.doubleValue() > 0) {
 				eq =  " + " + eq;
 			} 
 			write(eq);
-			context.addVariable(b, variable);
-		}*/
+			((SlidingWindowExecutionContext)context).addVariable(sp.getStockpileNumber(), variable);
+		}
 	}
 
 	private String buildCondition(Process process) {
@@ -465,6 +469,26 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		return value;
 	}
 
+	
+	private BigDecimal getProcessValueForSPBlock(SPBlock b, Model model, int year) {
+		BigDecimal value = new BigDecimal(0);
+		if(model == null) return value;
+		BigDecimal revenue = new BigDecimal(0);
+		BigDecimal pcost = new BigDecimal(0);
+		List<OpexData> opexDataList = context.getScenarioConfig().getOpexDataList();
+		for(OpexData opexData: opexDataList) {
+			if(opexData.getModel().getId() == model.getId()){
+				if(opexData.isRevenue()){
+					BigDecimal expr_value = ((SlidingWindowExecutionContext)context).getExpressionValueforBlock(b, opexData.getExpression());
+					revenue = revenue.add(expr_value.multiply(opexData.getCostData().get(year)));
+				} else {
+					pcost = pcost.add(opexData.getCostData().get(year));
+				}
+			}
+		}
+		value = revenue.subtract(pcost);
+		return value;
+	}
 	
 	private boolean hasValue(String s) {
 		return (s !=null && s.trim().length() >0);

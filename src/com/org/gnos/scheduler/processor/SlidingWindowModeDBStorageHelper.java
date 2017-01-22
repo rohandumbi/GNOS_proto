@@ -13,7 +13,14 @@ public class SlidingWindowModeDBStorageHelper extends DBStorageHelper {
 			swctx.reclaimTonnesWeightForStockpile(record.getOriginSpNo(), record.getValue());
 		}
 		if(record.getDestinationType() == Record.DESTINATION_SP) {
-			swctx.addTonnesWeightForStockpile(record.getDestSpNo(), record.getValue());
+			swctx.addTonnesWeightForStockpile(record.getDestSpNo(), record.getBlockNo(), record.getValue());
 		}
+	}
+	
+	@Override
+	public void stop() {
+		super.stop();
+		SlidingWindowExecutionContext swctx = (SlidingWindowExecutionContext)context;
+		swctx.processStockpiles();
 	}
 }

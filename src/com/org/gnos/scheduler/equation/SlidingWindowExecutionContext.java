@@ -1,11 +1,13 @@
 package com.org.gnos.scheduler.equation;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.org.gnos.core.Block;
-import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.db.model.Expression;
 
@@ -16,8 +18,12 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 	private short stepsize;
 	private short currPeriod;
 	
+	private Map<Integer, List<String>> spblockVariableMapping = new HashMap<Integer, List<String>>();
+	
 	private Map<Integer, Double> blockMinedTonnesMapping = new HashMap<Integer, Double>();
-	private Map<Integer, Double> spTonnesWigthMapping = new HashMap<Integer, Double>();
+	private Map<Integer, Map<Integer, Double>> spTonnesWigthMapping = new HashMap<Integer,  Map<Integer, Double>>();
+	
+	private Map<Integer, SPBlock> spBlockMapping = new HashMap<Integer, SPBlock>();
 	
 	public short getPeriod() {
 		return period;
@@ -76,6 +82,12 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 		return getExpressionValueforBlock(b, expr);		
 	}
 	*/
+
+	public BigDecimal getExpressionValueforBlock(SPBlock spb, Expression expr) {
+		String expressionName = expr.getName().replaceAll("\\s+","_");			
+		return spb.getComputedField(expressionName);		
+	}
+	
 	@Override
 	public boolean isGlobalMode() {
 		return false;
@@ -96,6 +108,19 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 		return remainingTOnnage;
 	}
 	
+	public Map<Integer, List<String>> getSPBlockVariableMapping() {
+		return spblockVariableMapping;
+	}
+
+	public void addVariable(int spNo, String variable){
+		List<String> variables = spblockVariableMapping.get(spNo);
+		if(variables == null){
+			variables = new ArrayList<String>();
+			spblockVariableMapping.put(spNo, variables);
+		}
+		variables.add(variable);
+	}
+	
 	public void addMinedTonnesWeightForBlock(int blockNo, double tonnesWeight) {
 		Double minedTonnesW = blockMinedTonnesMapping.get(blockNo);
 		if(minedTonnesW == null){
@@ -111,28 +136,59 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 		return minedTonnesW;
 	}
 	
-	public void addTonnesWeightForStockpile(int spNo, double tonnesWeight) {
-		Double storedTonnesW = spTonnesWigthMapping.get(spNo);
+	public void addTonnesWeightForStockpile(int spNo, int blockNo, double tonnesWeight) {
+		Map<Integer, Double> storedTonnesW = spTonnesWigthMapping.get(spNo);
 		if(storedTonnesW == null){
-			spTonnesWigthMapping.put(spNo, tonnesWeight);
+			storedTonnesW = new HashMap<Integer, Double>();
+			storedTonnesW.put(blockNo, tonnesWeight);
+			spTonnesWigthMapping.put(spNo, storedTonnesW);
 		} else {
-			spTonnesWigthMapping.put(spNo, storedTonnesW+tonnesWeight);
+			Double tonnesWt = storedTonnesW.get(blockNo);
+			if(tonnesWt == null) {
+				tonnesWt = tonnesWeight;
+			} else {
+				tonnesWt += tonnesWeight;
+			}
+			storedTonnesW.put(blockNo, tonnesWt);
 		}
+		
+		SPBlock spb = spBlockMapping.get(spNo);
+		if(spb == null) {
+			spb = new SPBlock();
+			spBlockMapping.put(spNo, spb);
+		}
+		spb.tonnesWt += tonnesWeight;
 	}
 	
 	public void reclaimTonnesWeightForStockpile(int spNo, double tonnesWeight) {
-		Double storedTonnesW = spTonnesWigthMapping.get(spNo);
-		if(storedTonnesW != null){
-			spTonnesWigthMapping.put(spNo, storedTonnesW-tonnesWeight);
-		}
+		SPBlock spb = spBlockMapping.get(spNo);
+		if(spb != null) {
+			spb.tonnesWt -= tonnesWeight;
+		}		
 	}
-	
 	
 	public double getRemainingTonnesForSp(int spNo) {
-		Double storedTonnesW = spTonnesWigthMapping.get(spNo);
-		if(storedTonnesW == null) return 0;
-		return storedTonnesW;
+		SPBlock spb = spBlockMapping.get(spNo);
+		if(spb == null) return 0;
+		return spb.tonnesWt;
 	}
 	
+	public int getSPBlockPayload(int spNo) {
+		SPBlock spb = spBlockMapping.get(spNo);		
+		if(spb == null) return 0;
+		return spb.getPayload();
+	}
 	
+	public SPBlock getSPBlock(int spNo) {
+		return spBlockMapping.get(spNo);
+	}
+	
+	public void processStockpiles() {
+		Set<Integer> spNos = spTonnesWigthMapping.keySet();
+		for(int spNo: spNos){
+			
+		}
+		
+		spTonnesWigthMapping = new HashMap<Integer,  Map<Integer, Double>>();
+	}
 }
