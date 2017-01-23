@@ -105,6 +105,7 @@ public class PitDependencyEquationGenerator extends EquationGenerator{
 		int timePeriodEnd = context.getTimePeriodEnd();
 		List<String> variables = getAllVariablesForBench(b2);
 		Double benchTonnesWt = getBenchTonnesWt(b2);
+		if(benchTonnesWt <= 0 || variables.size() == 0) return;
 		for(int i=timePeriodStart; i<= timePeriodEnd; i++){
 			StringBuilder sb = new StringBuilder();
 			int count = 0;

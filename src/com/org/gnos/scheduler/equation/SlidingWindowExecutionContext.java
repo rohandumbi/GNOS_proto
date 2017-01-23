@@ -13,6 +13,7 @@ import com.org.gnos.db.model.Expression;
 
 public class SlidingWindowExecutionContext extends ExecutionContext {
 
+	private static final double TONNAGE_TOLERANCE = 0.01;
 	private short period;
 	private short window;
 	private short stepsize;
@@ -109,14 +110,14 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 	@Override
 	public boolean hasRemainingTonnage(Block b) {
 		
-		return (getTonnesWtForBlock(b) > 0.01); //0.01 is the tolerance
+		return (getTonnesWtForBlock(b) > TONNAGE_TOLERANCE); //0.01 is the tolerance
 	}
 	
 	@Override
 	public double getTonnesWtForBlock(Block b){
 		double tonnage = Double.valueOf(b.getField(tonnesWtFieldName));
 		double remainingTOnnage = tonnage - getMinedTonnesForBlock(b.getBlockNo());
-		
+		if(remainingTOnnage < TONNAGE_TOLERANCE) return 0;
 		return remainingTOnnage;
 	}
 	
