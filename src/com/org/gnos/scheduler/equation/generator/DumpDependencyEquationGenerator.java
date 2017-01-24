@@ -63,7 +63,7 @@ public class DumpDependencyEquationGenerator extends EquationGenerator{
 			StringBuilder sb = new StringBuilder();
 			sb.append(d1.getCapacity()+"d"+d1.getDumpNumber()+"t"+i);
 			for(Block block: blocks){
-				for(int j=1; j<=i; j++){
+				for(int j=timePeriodStart; j<=i; j++){
 					sb.append(" - p"+block.getPitNo()+"x"+block.getBlockNo()+"w"+d1.getDumpNumber()+"t"+j);
 				}
 			}
@@ -81,7 +81,7 @@ public class DumpDependencyEquationGenerator extends EquationGenerator{
 		for(int i=timePeriodStart; i<= timePeriodEnd; i++){
 			StringBuilder sb = new StringBuilder();
 			for(Block block: blocks){
-				for(int j=1; j<=i; j++){
+				for(int j=timePeriodStart; j<=i; j++){
 					sb.append("+p"+block.getPitNo()+"x"+block.getBlockNo()+"w"+d2.getDumpNumber()+"t"+j);
 				}
 			}
@@ -104,7 +104,7 @@ public class DumpDependencyEquationGenerator extends EquationGenerator{
 			sb.append(d1.getCapacity()+"p"+p.getPitNo()+"b"+lastBench.getBenchNo()+"t"+i);
 			for(Block block: blocks){
 				if(!dumpBlocks.contains(block)) continue;
-				for(int j=1; j<=i; j++){
+				for(int j=timePeriodStart; j<=i; j++){
 					sb.append(" - p"+block.getPitNo()+"x"+block.getBlockNo()+"w"+d1.getDumpNumber()+"t"+j);
 				}
 			}

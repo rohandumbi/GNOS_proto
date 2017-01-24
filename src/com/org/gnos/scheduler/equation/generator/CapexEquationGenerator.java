@@ -103,7 +103,7 @@ public class CapexEquationGenerator extends EquationGenerator{
 		for(int j=1; j<capexInstanceCount; j++){			
 			for(int i=timePeriodStart; i<= timePeriodEnd; i++){
 				StringBuffer sb = new StringBuffer("");
-				for(int ii=1; ii<=i; ii++){
+				for(int ii=timePeriodStart; ii<=i; ii++){
 					if(ii > 1){
 						sb.append(" + ");
 					}
@@ -189,7 +189,7 @@ public class CapexEquationGenerator extends EquationGenerator{
 			int instanceNumber=0;
 			for(CapexInstance ci: capexInstanceList){
 				instanceNumber++;
-				for(int ii=1; ii<=i; ii++){
+				for(int ii=timePeriodStart; ii<=i; ii++){
 					sb.append(" - "+ci.getExpansionCapacity()+"c"+capexNumber+"i"+instanceNumber+"t"+ii);
 				}				
 			}
@@ -249,7 +249,7 @@ public class CapexEquationGenerator extends EquationGenerator{
 			int instanceNumber=0;
 			for(CapexInstance ci: capexInstanceList){
 				instanceNumber++;
-				for(int ii=1; ii<=i; ii++){
+				for(int ii=timePeriodStart; ii<=i; ii++){
 					sb.append(" - "+ci.getExpansionCapacity()+"c"+capexNumber+"i"+instanceNumber+"t"+ii);
 				}				
 			}
