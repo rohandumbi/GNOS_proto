@@ -90,15 +90,15 @@ public class SPReclaimEquationGenerator extends EquationGenerator{
 				StringBuilder sbc_sp = new StringBuilder("");
 				StringBuilder sbc_spr = new StringBuilder("");
 				for(Block b: blocks){
-					StringBuilder sb_sp = new StringBuilder("");
-					sbc_sp.append(" + p"+b.getPitNo()+"x"+b.getBlockNo()+"s"+sp.getStockpileNumber()+"t1");
-					for(int j=2; j<=i; j++){
-						sb_sp.append(" + p"+b.getPitNo()+"x"+b.getBlockNo()+"s"+sp.getStockpileNumber()+"t"+(j-1));						
+					StringBuilder sb_sp = new StringBuilder("");					
+					for(int j=timePeriodStart; j<=i; j++){
+						sb_sp.append(" + p"+b.getPitNo()+"x"+b.getBlockNo()+"s"+sp.getStockpileNumber()+"t"+j);						
 					}
 					sbc_sp.append(sb_sp);
 				}
 				Set<Process> processes = spb.getProcesses();
-				for(int j=2; j<=i; j++){
+				for(int j=timePeriodStart; j<=i; j++){
+					if(j == 1) continue;
 					for(Process p: processes) {
 						sbc_spr.append(" - sp"+sp.getStockpileNumber()+"x0p"+p.getProcessNo()+"t"+j);
 					}

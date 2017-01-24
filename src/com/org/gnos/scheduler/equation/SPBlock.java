@@ -11,6 +11,7 @@ import com.org.gnos.db.model.Process;
 public class SPBlock {
 
 	double tonnesWt;
+	double lasttonnesWt;
 	private Map<String, BigDecimal> computedFields;
 	int payload;
 	private Set<Process> processes;
@@ -58,5 +59,12 @@ public class SPBlock {
 	public void addProcess(Process p){
 		processes.add(p);
 	}
-	
+
+	public double getLasttonnesWt() {
+		return lasttonnesWt;
+	}
+
+	public void setLasttonnesWt(double lasttonnesWt) {
+		this.lasttonnesWt = lasttonnesWt;
+	}
 }

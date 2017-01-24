@@ -201,9 +201,19 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 		for(int spNo: spNos){
 			SPBlock spb = spBlockMapping.get(spNo);
 			if(spb == null) continue;
-			Map<Integer, Double> blockTonnage = spTonnesWigthMapping.get(spNo);
-			
-			if(blockTonnage == null) continue;
+			Map<Integer, Double> blockTonnage = spTonnesWigthMapping.get(spNo);			
+			if(blockTonnage == null || spb.getLasttonnesWt() == spb.getTonnesWt()) continue;
+			double spbratio = spb.getLasttonnesWt()/spb.getTonnesWt();
+			Map<String, BigDecimal> spbcomputedFields = spb.getComputedFields();
+			Set<String> spbfieldNames = spbcomputedFields.keySet();
+			for(String fieldName: spbfieldNames) {
+				BigDecimal fieldVal = spbcomputedFields.get(fieldName);
+				if(fieldVal != null) {
+					fieldVal = fieldVal.multiply(new BigDecimal(spbratio));
+					spbcomputedFields.put(fieldName, fieldVal);
+				}
+				
+			}
 			Set<Integer> blockNos = blockTonnage.keySet();
 			for(int blockNo: blockNos){
 				Block b = getBlocks().get(blockNo);
@@ -226,6 +236,7 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 				spb.setComputedFields(spblockcomputedFields);
 				spb.getProcesses().addAll(b.getProcesses());
 			}
+			spb.setLasttonnesWt(spb.getTonnesWt());
 		}
 		
 		spTonnesWigthMapping = new HashMap<Integer,  Map<Integer, Double>>();
