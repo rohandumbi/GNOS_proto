@@ -60,10 +60,8 @@ public class BoundaryVariableGenerator extends EquationGenerator{
 			if(sp == null) continue;
 			
 			SPBlock spb = swctx.getSPBlock(spNo);
-			double capacity = sp.getCapacity();
-			if(spb != null) {
-				capacity = capacity - spb.getTonnesWt();
-			}
+			if(spb == null) continue;
+			double capacity = spb.getTonnesWt();
 			List<String> variables = spblockVariableMapping.get(spNo);
 			StringBuilder sb = new StringBuilder("");
 			for(String variable: variables){

@@ -69,6 +69,15 @@ public class DBStorageHelper implements IStorageHelper {
 					ps.setInt(3, -1);
 					ps.setInt(4, record.getOriginSpNo());
 				}
+				ps.setInt(5, record.getOriginType());
+				ps.setInt(6, record.getDestinationType());
+				if(record.getDestinationType() == Record.DESTINATION_PROCESS) {
+					ps.setInt(7, record.getProcessNo());
+				} else if(record.getDestinationType() == Record.DESTINATION_SP) {
+					ps.setInt(7, record.getDestSpNo());
+				} else if(record.getDestinationType() == Record.DESTINATION_WASTE) {
+					ps.setInt(7, record.getWasteNo());
+				}
 				ps.executeUpdate();
 				
 			}
@@ -158,7 +167,7 @@ public class DBStorageHelper implements IStorageHelper {
 	private PreparedStatement getUpdateStatement(int period) throws SQLException {
 		int projectId = ProjectConfigutration.getInstance().getProjectId();
 		int scenarioId = ScenarioConfigutration.getInstance().getScenarioId();
-		String update_sql = "update gnos_result_"+projectId+"_"+scenarioId+" set t"+period +"= ? where pit_no =? AND block_no=? AND sp_no = ?";
+		String update_sql = "update gnos_result_"+projectId+"_"+scenarioId+" set t"+period +"= ? where pit_no =? AND block_no=? AND sp_no = ? AND origin_type = ? AND destination_type = ? AND destination = ? ";
 		PreparedStatement ps = conn.prepareStatement(update_sql);
 		
 		return ps;

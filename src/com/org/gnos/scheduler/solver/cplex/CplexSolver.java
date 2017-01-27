@@ -46,7 +46,7 @@ public class CplexSolver implements ISolver {
 			   
 			if(cplex.solve()){
 				System.out.println("Obj = "+cplex.getObjValue());
-				cplex.writeSolution("temp.sol");
+				cplex.writeSolution("temp_"+timePeiod+".sol");
 				List<Record> records = new ArrayList<Record>();
 				for (int i=0; i<_vars.length; i++) {
 					String ccc=String.valueOf(_vars[i]);

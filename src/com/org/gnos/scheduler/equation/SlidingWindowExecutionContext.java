@@ -219,7 +219,7 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 				Block b = getBlocks().get(blockNo);
 				int payload = getBlockPayloadMapping().get(b.getId());
 				spb.setPayload(payload);
-				double blockTonnesWt = Double.parseDouble(b.getField(tonnesWtFieldName));
+				double blockTonnesWt = blockTonnage.get(blockNo);
 				double ratio = blockTonnesWt/spb.getTonnesWt();
 				Map<String, BigDecimal> spblockcomputedFields = spb.getComputedFields();
 				Map<String, String> computedFields = b.getComputedFields();
