@@ -345,7 +345,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		
 		int timeperiod = year - startYear + 1;
 		SPBlock spb = ((SlidingWindowExecutionContext)context).getSPBlock(sp.getStockpileNumber());
-		if(spb == null) return;
+		if(spb == null || spb.getTonnesWt() == 0) return;
 		int payload = spb.getPayload();
 		BigDecimal fixedTime = context.getProjectConfig().getTruckParameterData().getFixedTime();
 		if(sp.getStockpileNumber() == 0) return;

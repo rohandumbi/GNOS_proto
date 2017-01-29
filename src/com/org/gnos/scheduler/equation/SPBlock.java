@@ -12,7 +12,9 @@ public class SPBlock {
 
 	double tonnesWt;
 	double lasttonnesWt;
+	double reclaimedTonnesWt;
 	private Map<String, BigDecimal> computedFields;
+	private Map<String, BigDecimal> gradeFields;
 	int payload;
 	private Set<Process> processes;
 
@@ -20,6 +22,7 @@ public class SPBlock {
 	public SPBlock() {
 		tonnesWt = 0.0;
 		computedFields = new HashMap<String, BigDecimal>();
+		gradeFields = new HashMap<String, BigDecimal>(); 
 		processes = new HashSet<Process>();
 	}
 
@@ -45,6 +48,20 @@ public class SPBlock {
 		this.computedFields = computedFields;
 	}
 
+	public Map<String, BigDecimal> getGradeFields() {
+		return gradeFields;
+	}
+
+	public BigDecimal getGradeField(String fieldName) {
+		BigDecimal val = this.gradeFields.get(fieldName);
+		if(val == null ) return new BigDecimal(0);
+		else return val;
+	}
+	
+	public void setGradeFields(Map<String, BigDecimal> gradeFields) {
+		this.gradeFields = gradeFields;
+	}
+
 	public int getPayload() {
 		return payload;
 	}
@@ -67,4 +84,21 @@ public class SPBlock {
 	public void setLasttonnesWt(double lasttonnesWt) {
 		this.lasttonnesWt = lasttonnesWt;
 	}
+
+	public double getReclaimedTonnesWt() {
+		return reclaimedTonnesWt;
+	}
+
+	public void setReclaimedTonnesWt(double reclaimedTonnesWt) {
+		this.reclaimedTonnesWt = reclaimedTonnesWt;
+	}
+	
+	public void reset() {
+		lasttonnesWt = 0;
+		reclaimedTonnesWt = 0;
+		computedFields = new HashMap<String, BigDecimal>();
+		gradeFields = new HashMap<String, BigDecimal>(); 
+		processes = new HashSet<Process>();
+	}
+
 }

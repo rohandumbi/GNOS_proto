@@ -3,11 +3,15 @@ package com.org.gnos.scheduler.equation;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.org.gnos.core.Block;
+import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.db.model.Expression;
 
@@ -18,7 +22,7 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 	private short window;
 	private short stepsize;
 	private short currPeriod;
-	
+
 	private Map<Integer, List<String>> spblockVariableMapping = new HashMap<Integer, List<String>>();
 	
 	private Map<Integer, Double> blockMinedTonnesMapping = new HashMap<Integer, Double>();
@@ -26,6 +30,13 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 	
 	private Map<Integer, SPBlock> spBlockMapping = new HashMap<Integer, SPBlock>();
 	
+	private List<Expression> gradeExpressions;
+	private Set<String> gradeFields;
+	
+	public SlidingWindowExecutionContext() {
+		super();
+		parseGradeExpression();
+	}
 	public short getPeriod() {
 		return period;
 	}
@@ -59,32 +70,14 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 		return this.window;
 	}
 	
-	
-/*	
-	@Override
-	public BigDecimal getExpressionValueforBlock(Block b, Expression expr) {
-		String expressionName = expr.getName().replaceAll("\\s+","_");
-		if(expr.isGrade()) {
-			return b.getComputedField(expressionName);		
-		} else {
-			double totalTonnes =  Double.valueOf(b.getField(tonnesWtFieldName));
-			double remainingTonnes = totalTonnes - getMinedTonnesForBlock(b.getBlockNo());
-			
-			if(remainingTonnes <= 0) return new BigDecimal(0);
-			double ratio = totalTonnes/remainingTonnes;
-
-			return b.getComputedField(expressionName).multiply(new BigDecimal(ratio));
-		}
-		
+	private boolean isGradeExpression(String name) {
+		for(Expression expr: gradeExpressions){
+			if(expr.getName().equals(name)){
+				return true;
+			}
+		}		
+		return false;
 	}
-	
-	@Override
-	public BigDecimal getExpressionValueforBlock(Block b, String exprName) {
-		String expressionName = exprName.replaceAll("\\s+","_");
-		Expression expr = ProjectConfigutration.getInstance().getExpressionByName(expressionName);
-		return getExpressionValueforBlock(b, expr);		
-	}
-	*/
 
 	public Map<Integer, SPBlock> getSpBlockMapping() {
 		return spBlockMapping;
@@ -177,6 +170,10 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 		SPBlock spb = spBlockMapping.get(spNo);
 		if(spb != null) {
 			spb.tonnesWt -= tonnesWeight;
+			spb.reclaimedTonnesWt += tonnesWeight;
+			if(spb.reclaimedTonnesWt == spb.lasttonnesWt){
+				spb.reset();
+			}
 		}		
 	}
 	
@@ -203,18 +200,9 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 			if(spb == null) continue;
 			Map<Integer, Double> blockTonnage = spTonnesWigthMapping.get(spNo);			
 			if(blockTonnage == null || spb.getLasttonnesWt() == spb.getTonnesWt()) continue;
-			double spbratio = spb.getLasttonnesWt()/spb.getTonnesWt();
-			Map<String, BigDecimal> spbcomputedFields = spb.getComputedFields();
-			Set<String> spbfieldNames = spbcomputedFields.keySet();
-			for(String fieldName: spbfieldNames) {
-				BigDecimal fieldVal = spbcomputedFields.get(fieldName);
-				if(fieldVal != null) {
-					fieldVal = fieldVal.multiply(new BigDecimal(spbratio));
-					spbcomputedFields.put(fieldName, fieldVal);
-				}
-				
-			}
+			balanceStockpileBlock(spb);
 			Set<Integer> blockNos = blockTonnage.keySet();
+			Set<String> gradeExprs = new HashSet<String>();
 			for(int blockNo: blockNos){
 				Block b = getBlocks().get(blockNo);
 				int payload = getBlockPayloadMapping().get(b.getId());
@@ -225,20 +213,120 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 				Map<String, String> computedFields = b.getComputedFields();
 				Set<String> fieldNames = computedFields.keySet();
 				for(String fieldName: fieldNames) {
-					BigDecimal fieldVal = new BigDecimal(computedFields.get(fieldName));
-					fieldVal = fieldVal.multiply(new BigDecimal(ratio));
-					BigDecimal existingVal = spblockcomputedFields.get(fieldName);
-					if(existingVal != null) {
-						fieldVal = fieldVal.add(existingVal);
+					if(isGradeExpression(fieldName)) {
+						gradeExprs.add(fieldName);
+					} else {
+						BigDecimal fieldVal = new BigDecimal(computedFields.get(fieldName));
+						fieldVal = fieldVal.multiply(new BigDecimal(ratio));
+						BigDecimal existingVal = spblockcomputedFields.get(fieldName);
+						if(existingVal != null) {
+							fieldVal = fieldVal.add(existingVal);
+						}
+						spblockcomputedFields.put(fieldName, fieldVal);
 					}
-					spblockcomputedFields.put(fieldName, fieldVal);
+					
+				}
+				// calculate grade fields
+				Map<String, BigDecimal> spbgradeFields = spb.getGradeFields();
+				double totalBlockTonnage = Double.valueOf(b.getField(tonnesWtFieldName));
+				double blockTonnageRatio = blockTonnesWt/totalBlockTonnage;
+				for(String fieldName: gradeFields ){
+					BigDecimal gradeVal = new BigDecimal(b.getField(fieldName));
+					gradeVal = gradeVal.multiply(new BigDecimal(blockTonnageRatio));
+					BigDecimal spbGradeVal = spbgradeFields.get(fieldName);
+					if(spbGradeVal != null){
+						spbGradeVal = spbGradeVal.add(gradeVal);
+					} else {
+						spbGradeVal = gradeVal;
+					}
+					spbgradeFields.put(fieldName, spbGradeVal);
+					//System.out.format("Sp No: %s, block No: %s, fieldName: %s, value: %s \n", spNo, blockNo, fieldName, gradeVal);
 				}
 				spb.setComputedFields(spblockcomputedFields);
 				spb.getProcesses().addAll(b.getProcesses());
 			}
+			processGrades(spb, gradeExprs);
 			spb.setLasttonnesWt(spb.getTonnesWt());
+			spb.setReclaimedTonnesWt(0);
 		}
 		
 		spTonnesWigthMapping = new HashMap<Integer,  Map<Integer, Double>>();
+	}
+	
+	private void balanceStockpileBlock(SPBlock spb) {
+		double spbratio = (spb.getLasttonnesWt() - spb.getReclaimedTonnesWt())/spb.getTonnesWt();
+		double spbremainingratio = (spb.getLasttonnesWt() - spb.getReclaimedTonnesWt())/spb.getLasttonnesWt();
+		Map<String, BigDecimal> spbcomputedFields = spb.getComputedFields();
+		Map<String, BigDecimal> gradeFields = spb.getGradeFields();
+		Set<String> computedfieldNames = spbcomputedFields.keySet();
+		Set<String> gradefieldNames = gradeFields.keySet();
+		for(String fieldName: computedfieldNames) {
+			BigDecimal fieldVal = spbcomputedFields.get(fieldName);
+			if(fieldVal != null) {
+				fieldVal = fieldVal.multiply(new BigDecimal(spbratio));
+				spbcomputedFields.put(fieldName, fieldVal);
+			}		
+		}
+		for(String fieldName: gradefieldNames) {
+			BigDecimal fieldVal = gradeFields.get(fieldName);
+			if(fieldVal != null) {
+				fieldVal = fieldVal.multiply(new BigDecimal(spbremainingratio));
+				spbcomputedFields.put(fieldName, fieldVal);
+			}
+			
+		}
+	}
+	private void processGrades(SPBlock spb, Set<String> gradeExprs) {
+		for(String exprName: gradeExprs) {
+			Expression expr = ProjectConfigutration.getInstance().getExpressionByName(exprName);
+			String exprValue = expr.getExprvalue();
+			if(expr.isComplex()) {
+				String[] arr = exprValue.split("[+-/*]");
+				String f1 = arr[0].trim();
+				String f2 = arr[1].trim();
+				BigDecimal value = new BigDecimal(0);
+				if(exprValue.indexOf("/")!= -1){
+					value = new BigDecimal(spb.getGradeField(f1).doubleValue()/spb.getGradeField(f2).doubleValue());
+				} else if(exprValue.indexOf("*")!= -1){
+					value = spb.getGradeField(f1).multiply(spb.getGradeField(f2));
+				} else if(exprValue.indexOf("+")!= -1){
+					value = spb.getGradeField(f1).add(spb.getGradeField(f2));
+				} else if(exprValue.indexOf("1")!= -1){
+					value = spb.getGradeField(f1).subtract(spb.getGradeField(f2));
+				}
+				spb.getComputedFields().put(exprName, value);
+				//System.out.println("TestSP: exprName: "+exprName+" f1:"+spb.getGradeField(f1)+" f2:"+spb.getGradeField(f2)+" value:"+value);
+			} else {
+				spb.getComputedFields().put(exprName, spb.getGradeField(exprValue.trim()));
+			}		
+		}		
+	}
+	
+	private Set<String> parseExpressionValue(String exprStr) {
+		Set<String> fields = new HashSet<String>();
+		if(exprStr != null) {
+			String[] arr = exprStr.split("[+-/*]");
+			if(arr != null){
+				for(int i=0; i< arr.length;i++ ){
+					fields.add(arr[i].trim());
+				}			
+			}
+		}
+		return fields;
+	}
+	private void parseGradeExpression() {
+		gradeExpressions = new ArrayList<Expression>();
+		gradeFields = new HashSet<String>();
+		List<Expression> expressions = ProjectConfigutration.getInstance().getExpressions();		
+		for(Expression expression: expressions) {
+			if(expression.isGrade()){
+				gradeExpressions.add(expression);
+				if(expression.isComplex()) {
+					gradeFields.addAll(parseExpressionValue(expression.getExprvalue()));
+				} else {
+					gradeFields.add(expression.getExprvalue());
+				}
+			}
+		}
 	}
 }
