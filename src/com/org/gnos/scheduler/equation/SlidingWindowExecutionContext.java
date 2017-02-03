@@ -37,6 +37,12 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 		super();
 		parseGradeExpression();
 	}
+	
+	@Override
+	public void reset() {
+		super.reset();
+		spblockVariableMapping = new HashMap<Integer, List<String>>();
+	}
 	public short getPeriod() {
 		return period;
 	}
@@ -286,7 +292,13 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 				String f2 = arr[1].trim();
 				BigDecimal value = new BigDecimal(0);
 				if(exprValue.indexOf("/")!= -1){
-					value = new BigDecimal(spb.getGradeField(f1).doubleValue()/spb.getGradeField(f2).doubleValue());
+					//System.out.println("Expression Name :"+exprName+" f1:"+spb.getGradeField(f1)+" f2: "+ spb.getGradeField(f2));
+					if(spb.getGradeField(f1).doubleValue() == 0 && spb.getGradeField(f2).doubleValue() == 0 ) {
+						value =  new BigDecimal(0);
+					} else {
+						value = new BigDecimal(spb.getGradeField(f1).doubleValue()/spb.getGradeField(f2).doubleValue());
+					}
+					
 				} else if(exprValue.indexOf("*")!= -1){
 					value = spb.getGradeField(f1).multiply(spb.getGradeField(f2));
 				} else if(exprValue.indexOf("+")!= -1){

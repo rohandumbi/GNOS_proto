@@ -93,6 +93,10 @@ public class SPBlock {
 		this.reclaimedTonnesWt = reclaimedTonnesWt;
 	}
 	
+	public double getRemainingTonnesWt() {
+		return reclaimedTonnesWt;
+	}
+	
 	public void reset() {
 		lasttonnesWt = 0;
 		reclaimedTonnesWt = 0;
