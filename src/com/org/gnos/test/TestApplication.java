@@ -7,6 +7,7 @@ import com.org.gnos.db.dao.ProjectDAO;
 import com.org.gnos.db.model.Project;
 import com.org.gnos.scheduler.SchedulerService;
 import com.org.gnos.services.csv.GNOSCSVDataProcessor;
+import com.org.gnos.services.endpoints.ProjectEndpoint;
 
 public class TestApplication {
 
@@ -38,16 +39,19 @@ public class TestApplication {
 		deleteProject(project);
 		return true;
 	}
+	public static void testService() {
+		new ProjectEndpoint();
+	}
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		
 		GNOSConfig.load();
-		ProjectConfigutration.getInstance().load(24);
+/*		ProjectConfigutration.getInstance().load(24);
 		ScenarioConfigutration.getInstance().load(25);
-		SchedulerService.getInstance().execute();
-		
+		SchedulerService.getInstance().execute();*/
+		testService();
 	}
 
 }
