@@ -11,6 +11,10 @@ public class ProjectEndpoint {
 	
 	public  ProjectEndpoint() {
 		controller = new ProjectController();
+		
+		/* GET all projects */
 		get("/projects", (req, res) -> controller.getAllprojects(), json());
+		/* Create new project */
+		post("/projects", (req, res) -> controller.createProject(req, res), json());
 	}
 }
