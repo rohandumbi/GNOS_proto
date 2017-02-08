@@ -16,5 +16,7 @@ public class ProjectEndpoint {
 		get("/projects", (req, res) -> controller.getAllprojects(), json());
 		/* Create new project */
 		post("/projects", (req, res) -> controller.createProject(req, res), json());
+		/* DELETE exisitng project */
+		delete("/projects", (req, res) -> controller.deleteProject(req, res), json());
 	}
 }

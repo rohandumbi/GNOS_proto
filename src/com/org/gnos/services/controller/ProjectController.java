@@ -2,7 +2,6 @@ package com.org.gnos.services.controller;
 
 import java.util.List;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -25,7 +24,6 @@ public class ProjectController {
 			String name = jsonObject.get("name").getAsString();
 			String desc = jsonObject.get("desc").getAsString();
 			String fileName = jsonObject.get("fileName").getAsString();
-			System.out.println(name + ":" + desc + ":" + fileName);
 			Project newProject = new Project();
 			newProject.setName(name);
 			newProject.setDesc(desc);
@@ -34,5 +32,17 @@ public class ProjectController {
 			return new ProjectDAO().create(newProject);
 		}
 		return false;
+	}
+	
+	public boolean deleteProject (Request req, Response res) {
+		String projectId = req.queryParams("id");
+		if((projectId == null) || (projectId.isEmpty())){
+			return false;
+		}else{
+			Project project = new Project();
+			project.setId(Integer.parseInt(projectId));
+			new ProjectDAO().delete(project);
+			return true;
+		}	
 	}
 }
