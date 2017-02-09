@@ -13,11 +13,38 @@ import spark.Response;
 
 public class ProjectController {
 
-	public List<Project> getAllprojects() {
+	public List<Project> getAllProjects() {
 		return new ProjectDAO().getAll();
 	}
 	
 	public boolean createProject(Request req, Response res) {
+		/*JsonElement requestObject = new JsonParser().parse(req.body());
+		if(requestObject.isJsonObject()) {
+			JsonObject jsonObject = requestObject.getAsJsonObject();
+			String name = jsonObject.get("name").getAsString();
+			String desc = jsonObject.get("desc").getAsString();
+			String fileName = jsonObject.get("fileName").getAsString();
+			Project newProject = new Project();
+			newProject.setName(name);
+			newProject.setDesc(desc);
+			newProject.setFileName(fileName);
+			
+			return new ProjectDAO().create(newProject);
+		}*/
+		String name =  req.queryParams("name");
+		String desc = req.queryParams("desc");
+		String fileName = req.queryParams("fileName");
+		Project newProject = new Project();
+		newProject.setName(name);
+		newProject.setDesc(desc);
+		newProject.setFileName(fileName);
+		
+		return new ProjectDAO().create(newProject);
+		
+		//return false;
+	}
+	
+	public boolean updateProject(Request req, Response res) {
 		JsonElement requestObject = new JsonParser().parse(req.body());
 		if(requestObject.isJsonObject()) {
 			JsonObject jsonObject = requestObject.getAsJsonObject();
@@ -34,8 +61,7 @@ public class ProjectController {
 		return false;
 	}
 	
-	public boolean deleteProject (Request req, Response res) {
-		String projectId = req.queryParams("id");
+	public boolean deleteProject (String projectId) {
 		if((projectId == null) || (projectId.isEmpty())){
 			return false;
 		}else{
