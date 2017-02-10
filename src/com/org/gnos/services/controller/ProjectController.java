@@ -1,26 +1,28 @@
 package com.org.gnos.services.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.db.dao.ProjectDAO;
+import com.org.gnos.db.model.Field;
 import com.org.gnos.db.model.Project;
-
-import spark.Request;
-import spark.Response;
+import com.org.gnos.services.csv.GNOSCSVDataProcessor;
 
 public class ProjectController {
+	
+	private ProjectDAO dao = null;
+	
+	public ProjectController() {
+		dao = new ProjectDAO();
+	}
 
 	public List<Project> getAllProjects() {
-		return new ProjectDAO().getAll();
+		return dao.getAll();
 	}
 	
-	public boolean createProject(Request req, Response res) {
-		/*JsonElement requestObject = new JsonParser().parse(req.body());
-		if(requestObject.isJsonObject()) {
-			JsonObject jsonObject = requestObject.getAsJsonObject();
+	public Project createProject(JsonObject jsonObject) throws Exception {
 			String name = jsonObject.get("name").getAsString();
 			String desc = jsonObject.get("desc").getAsString();
 			String fileName = jsonObject.get("fileName").getAsString();
@@ -28,47 +30,38 @@ public class ProjectController {
 			newProject.setName(name);
 			newProject.setDesc(desc);
 			newProject.setFileName(fileName);
-			
-			return new ProjectDAO().create(newProject);
-		}*/
-		String name =  req.queryParams("name");
-		String desc = req.queryParams("desc");
-		String fileName = req.queryParams("fileName");
-		Project newProject = new Project();
-		newProject.setName(name);
-		newProject.setDesc(desc);
-		newProject.setFileName(fileName);
-		
-		return new ProjectDAO().create(newProject);
-		
-		//return false;
+
+			boolean created = dao.create(newProject);
+			loadCSVFile(fileName, newProject.getId());
+			if(created) return newProject;
+			throw new Exception();
 	}
 	
-	public boolean updateProject(Request req, Response res) {
-		JsonElement requestObject = new JsonParser().parse(req.body());
-		if(requestObject.isJsonObject()) {
-			JsonObject jsonObject = requestObject.getAsJsonObject();
-			String name = jsonObject.get("name").getAsString();
-			String desc = jsonObject.get("desc").getAsString();
-			String fileName = jsonObject.get("fileName").getAsString();
-			Project newProject = new Project();
-			newProject.setName(name);
-			newProject.setDesc(desc);
-			newProject.setFileName(fileName);
-			
-			return new ProjectDAO().create(newProject);
-		}
-		return false;
-	}
-	
+
 	public boolean deleteProject (String projectId) {
 		if((projectId == null) || (projectId.isEmpty())){
 			return false;
 		}else{
 			Project project = new Project();
 			project.setId(Integer.parseInt(projectId));
-			new ProjectDAO().delete(project);
+			dao.delete(project);
 			return true;
 		}	
+	}
+	
+	
+	private void loadCSVFile(String fileName, int projectId ) {
+		ProjectConfigutration projectConfigutration = ProjectConfigutration.getInstance();
+		projectConfigutration.setProjectId(projectId);
+		GNOSCSVDataProcessor gnosCsvDataProcessor = GNOSCSVDataProcessor.getInstance();
+		gnosCsvDataProcessor.processCsv(fileName);
+		gnosCsvDataProcessor.dumpToDB(projectConfigutration.getProjectId());
+		String[] columns = gnosCsvDataProcessor.getHeaderColumns();
+		List<Field> fields = new ArrayList<Field>();
+		for(int i=0;i < columns.length; i++ ){
+			Field  field = new Field(columns[i]);
+			fields.add(field);
+		}
+		projectConfigutration.setFields(fields);
 	}
 }
