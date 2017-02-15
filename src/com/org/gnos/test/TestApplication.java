@@ -7,6 +7,7 @@ import com.org.gnos.db.dao.ProjectDAO;
 import com.org.gnos.db.model.Project;
 import com.org.gnos.scheduler.SchedulerService;
 import com.org.gnos.services.csv.GNOSCSVDataProcessor;
+import com.org.gnos.services.endpoints.ExpressionEndpoint;
 import com.org.gnos.services.endpoints.ProjectEndpoint;
 
 public class TestApplication {
@@ -41,6 +42,7 @@ public class TestApplication {
 	}
 	public static void testService() {
 		new ProjectEndpoint();
+		new ExpressionEndpoint();
 	}
 	/**
 	 * @param args

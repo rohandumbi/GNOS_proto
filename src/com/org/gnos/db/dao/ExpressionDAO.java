@@ -20,10 +20,9 @@ public class ExpressionDAO {
 	private static final String SQL_DELETE = "delete from expressions where id = ?";
 	private static final String SQL_UPDATE = "update expressions set is_grade = ?, is_complex = ?, expr_value = ?, filter = ? where id = ?";
 	
-	public List<Expression> getAll() {
+	public List<Expression> getAll(int projectId) {
 		
 		List<Expression> expressions = new ArrayList<Expression>();
-		int projectId = ProjectConfigutration.getInstance().getProjectId();
 		Object[] values = {
 				projectId, 
 	   };
@@ -44,12 +43,11 @@ public class ExpressionDAO {
 		return expressions;
 	}
 	
-	public boolean create(Expression expression){
+	public boolean create(Expression expression, int projectId){
 		
 		if (expression.getId() != -1) {
             throw new IllegalArgumentException("Expression is already created.");
         }
-		int projectId = ProjectConfigutration.getInstance().getProjectId();
 		Object[] values = {
 				projectId, 
 				expression.getName(),

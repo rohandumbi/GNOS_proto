@@ -166,7 +166,7 @@ public class ProjectConfigutration {
 	}
 
 	private void loadExpressions() {
-		expressions = new ExpressionDAO().getAll();
+		expressions = new ExpressionDAO().getAll(ProjectConfigutration.getInstance().getProjectId());
 	}
 
 	private void loadModels() {
@@ -1022,7 +1022,7 @@ public class ProjectConfigutration {
 		ExpressionDAO expressiondao = new ExpressionDAO();
 		for (Expression expression : expressions) {
 			if (expression.getId() == -1) {
-				expressiondao.create(expression);
+				expressiondao.create(expression, projectId);
 			} else {
 				expressiondao.update(expression);
 			}
