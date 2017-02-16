@@ -14,7 +14,7 @@ import com.org.gnos.db.model.Field;
 public class FieldDAO {
 
 	
-	public List<Field> get() {
+	public List<Field> getAll() {
 		List<Field> fields = new ArrayList<Field>();
 		String sql = "select id, name, data_type from fields where project_id = "+ ProjectConfigutration.getInstance().getProjectId();
 		try (

@@ -112,7 +112,7 @@ public class ProjectConfigutration {
 	}
 
 	private void loadFieldData() {
-		fields = (new FieldDAO()).get();
+		fields = (new FieldDAO()).getAll();
 	}
 
 	private void loadCycleTimeFieldData(){
