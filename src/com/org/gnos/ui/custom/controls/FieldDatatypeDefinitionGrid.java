@@ -38,9 +38,9 @@ public class FieldDatatypeDefinitionGrid extends Composite {
 	private short getDatatypeCode(String dataType){
 		short code = -1;
 		if(dataType.equalsIgnoreCase("Number")){
-			code = Field.TYPE_NUMBER;
+			code = Field.TYPE_NUMERIC;
 		}else if(dataType.equalsIgnoreCase("Text")){
-			code = Field.TYPE_STRING;
+			code = Field.TYPE_TEXT;
 		} 
 		return code;
 	}
@@ -113,7 +113,7 @@ public class FieldDatatypeDefinitionGrid extends Composite {
 			
 			Combo comboDatatype = new Combo(compositeRow, SWT.NONE);
 			comboDatatype.setItems(this.dataTypes);
-			if(field.getDataType() == Field.TYPE_STRING){
+			if(field.getDataType() == Field.TYPE_TEXT){
 				comboDatatype.select(1);
 			} else {
 				comboDatatype.select(0);

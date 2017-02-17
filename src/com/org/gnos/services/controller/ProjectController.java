@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.google.gson.JsonObject;
 import com.org.gnos.core.ProjectConfigutration;
+import com.org.gnos.db.dao.FieldDAO;
 import com.org.gnos.db.dao.ProjectDAO;
 import com.org.gnos.db.model.Field;
 import com.org.gnos.db.model.Project;
@@ -51,6 +52,7 @@ public class ProjectController {
 	
 	
 	private void loadCSVFile(String fileName, int projectId ) {
+		FieldDAO fdao = new FieldDAO();
 		ProjectConfigutration projectConfigutration = ProjectConfigutration.getInstance();
 		projectConfigutration.setProjectId(projectId);
 		GNOSCSVDataProcessor gnosCsvDataProcessor = GNOSCSVDataProcessor.getInstance();
@@ -61,6 +63,7 @@ public class ProjectController {
 		for(int i=0;i < columns.length; i++ ){
 			Field  field = new Field(columns[i]);
 			fields.add(field);
+			fdao.create(field, projectId);
 		}
 		projectConfigutration.setFields(fields);
 	}

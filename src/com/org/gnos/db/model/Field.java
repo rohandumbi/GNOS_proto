@@ -2,8 +2,10 @@ package com.org.gnos.db.model;
 
 public class Field {
 
-	public final static short TYPE_STRING = 0;
-	public final static short TYPE_NUMBER = 1;
+	public final static short TYPE_TEXT = 1;
+	public final static short TYPE_NUMERIC = 2;
+	public final static short TYPE_UNIT = 3;
+	public final static short TYPE_GRADE = 4;
 	
 	private int id;
 	private String name;
@@ -13,7 +15,7 @@ public class Field {
 		super();
 		this.id = -1;
 		this.name = name;
-		this.dataType = TYPE_NUMBER;
+		this.dataType = TYPE_TEXT;
 	}
 	
 	public Field(int id, String name, short dataType) {

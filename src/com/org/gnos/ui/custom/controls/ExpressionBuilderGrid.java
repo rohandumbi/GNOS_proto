@@ -150,7 +150,7 @@ public class ExpressionBuilderGrid extends Composite {
 		int i = 0;
 		this.numericSourceFields = new ArrayList<String>();
 		for(Field field: this.allSourceFields){
-			if(field.getDataType() == Field.TYPE_NUMBER){
+			if(field.getDataType() == Field.TYPE_NUMERIC){
 				this.numericSourceFields.add(field.getName());
 			}		
 		}

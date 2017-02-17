@@ -9,7 +9,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.model.Expression;
 
