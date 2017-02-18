@@ -9,6 +9,7 @@ import com.org.gnos.scheduler.SchedulerService;
 import com.org.gnos.services.csv.GNOSCSVDataProcessor;
 import com.org.gnos.services.endpoints.ExpressionEndpoint;
 import com.org.gnos.services.endpoints.FieldEndpoint;
+import com.org.gnos.services.endpoints.ModelEndpoint;
 import com.org.gnos.services.endpoints.ProjectEndpoint;
 
 public class TestApplication {
@@ -45,6 +46,7 @@ public class TestApplication {
 		new ProjectEndpoint();
 		new ExpressionEndpoint();
 		new FieldEndpoint();
+		new ModelEndpoint();
 	}
 	/**
 	 * @param args
