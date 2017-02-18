@@ -34,24 +34,27 @@ public class ModelController {
 	
 	public Model updateModel(JsonObject jsonObject, String id) throws Exception {		
 		String name = jsonObject.get("name").getAsString();
-		boolean expr_id = jsonObject.get("expr_id").getAsBoolean();
+		int expr_id = jsonObject.get("expr_id").getAsInt();
 		String condition = jsonObject.get("condition").getAsString();
+		Expression expression = new Expression();
+		expression.setId(expr_id);
 		Model obj = new Model();
 		obj.setId(Integer.parseInt(id));
 		obj.setName(name);
+		obj.setExpression(expression);
 		obj.setCondition(condition);
 		boolean created = dao.update(obj );
 		if(created) return obj;
 		throw new Exception();
 	}
 	
-	public boolean deleteExpression (String id) {
+	public boolean deleteModel (String id) {
 		if((id == null) || (id.isEmpty())){
 			return false;
 		}else{
-			Expression expression = new Expression();
-			expression.setId(Integer.parseInt(id));
-			dao.delete(expression);
+			Model model = new Model();
+			model.setId(Integer.parseInt(id));
+			dao.delete(model);
 			return true;
 		}	
 	}

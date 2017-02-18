@@ -11,6 +11,11 @@ public class Field {
 	private String name;
 	private short dataType;
 	
+	public Field(){
+		super();
+		this.id = -1;
+		this.dataType = TYPE_TEXT;
+	}
 	public Field(String name) {
 		super();
 		this.id = -1;

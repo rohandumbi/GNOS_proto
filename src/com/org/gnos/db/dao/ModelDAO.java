@@ -15,7 +15,7 @@ import com.org.gnos.db.model.Model;
 
 public class ModelDAO {
 
-	private static final String SQL_LIST_ORDER_BY_ID = "select a.id, a.name, a.expr_id, a.filter_str from models a, expressions b where a.project_id = ? AND b.id = a.expr_id order by a.id";
+	private static final String SQL_LIST_ORDER_BY_ID = "select a.id as id, a.name, a.expr_id, a.filter_str, b.id as eid, b.name as ename from models a, expressions b where a.project_id = ? AND b.id = a.expr_id order by a.id";
 	private static final String SQL_INSERT = "insert into models (project_id, name, expr_id, filter_str) values (?, ?, ?, ?)";
 	private static final String SQL_DELETE = "delete from models where id = ?";
 	private static final String SQL_UPDATE = "update models set expr_id= ? , filter_str = ? where id = ?";
@@ -102,10 +102,10 @@ public class ModelDAO {
 		return true;
 	}
 	
-	public void delete(Expression expression){
+	public void delete(Model model){
 		
 		Object[] values = { 
-				expression.getId()
+				model.getId()
 	        };
 
 	        try (
@@ -116,7 +116,7 @@ public class ModelDAO {
 	            if (affectedRows == 0) {
 	                //throw new DAOException("Deleting user failed, no rows affected.");
 	            } else {
-	            	expression.setId(-1);
+	            	model.setId(-1);
 	            }
 	        } catch (SQLException e) {
 	            //throw new DAOException(e);
@@ -130,7 +130,9 @@ public class ModelDAO {
 		model.setCondition(rs.getString("filter_str"));
 		
 		Expression expression = new Expression();
-
+		expression.setId(rs.getInt("eid"));
+		expression.setName(rs.getString("ename"));
+		model.setExpression(expression);
 		return model;
 	}
 	
