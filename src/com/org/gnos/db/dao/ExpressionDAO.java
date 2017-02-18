@@ -23,7 +23,7 @@ public class ExpressionDAO {
 		
 		List<Expression> expressions = new ArrayList<Expression>();
 		Object[] values = {
-				projectId, 
+				projectId 
 	   };
 		
 		try (

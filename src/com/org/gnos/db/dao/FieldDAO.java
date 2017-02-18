@@ -20,11 +20,14 @@ public class FieldDAO {
 	private static final String SQL_UPDATE = "update fields set data_type = ? where id = ?";
 	
 	
-	public List<Field> getAll() {
+	public List<Field> getAll(int projectId) {
 		List<Field> fields = new ArrayList<Field>();
+		Object[] values = {
+				projectId
+	   };
 		try (
 				Connection connection = DBManager.getConnection();
-	            PreparedStatement statement = connection.prepareStatement(SQL_LIST_ORDER_BY_ID);
+	            PreparedStatement statement = prepareStatement(connection, SQL_LIST_ORDER_BY_ID, false, values);
 	            ResultSet resultSet = statement.executeQuery();
 			){
 			while(resultSet.next()){

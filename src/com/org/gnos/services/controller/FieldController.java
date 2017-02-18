@@ -12,6 +12,6 @@ public class FieldController {
 		dao = new FieldDAO();
 	}
 	public List<Field> getAllFields(String projectId) {
-		return dao.getAll();
+		return dao.getAll(Integer.parseInt(projectId));
 	}
 }
