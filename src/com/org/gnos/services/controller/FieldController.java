@@ -31,9 +31,10 @@ public class FieldController {
 	
 	public Field update(JsonObject jsonObject, String id) throws Exception {		
 		String name = jsonObject.get("name").getAsString();
-		short dataType = jsonObject.get("data_type").getAsShort();
+		short dataType = jsonObject.get("dataType").getAsShort();
+		int fieldId = jsonObject.get("id").getAsInt();
 		Field obj = new Field(name);
-		obj.setId(Integer.parseInt(id));
+		obj.setId(fieldId);
 		obj.setDataType(dataType);
 		boolean created = dao.update(obj);
 		if(created) return obj;
