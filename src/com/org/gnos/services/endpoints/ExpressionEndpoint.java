@@ -64,7 +64,7 @@ public class ExpressionEndpoint {
 		}, json());
 
 		/* DELETE exisitng expression */
-		delete("/project/:pid/expressions", (req, res) -> controller.delete(req.params(":id")), json());
+		delete("/project/:pid/expressions/:id", (req, res) -> controller.delete(req.params(":id")), json());
 	}
 
 }
