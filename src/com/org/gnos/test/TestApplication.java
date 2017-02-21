@@ -2,15 +2,16 @@ package com.org.gnos.test;
 
 import com.org.gnos.core.GNOSConfig;
 import com.org.gnos.core.ProjectConfigutration;
-import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.db.dao.ProjectDAO;
 import com.org.gnos.db.model.Project;
-import com.org.gnos.scheduler.SchedulerService;
 import com.org.gnos.services.csv.GNOSCSVDataProcessor;
+import com.org.gnos.services.endpoints.DumpEndpoint;
 import com.org.gnos.services.endpoints.ExpressionEndpoint;
 import com.org.gnos.services.endpoints.FieldEndpoint;
 import com.org.gnos.services.endpoints.ModelEndpoint;
 import com.org.gnos.services.endpoints.ProjectEndpoint;
+import com.org.gnos.services.endpoints.ScenarioEndpoint;
+import com.org.gnos.services.endpoints.StockpileEndpoint;
 
 public class TestApplication {
 
@@ -47,6 +48,9 @@ public class TestApplication {
 		new ExpressionEndpoint();
 		new FieldEndpoint();
 		new ModelEndpoint();
+		new ScenarioEndpoint();
+		new DumpEndpoint();
+		new StockpileEndpoint();
 	}
 	/**
 	 * @param args

@@ -14,11 +14,13 @@ import java.util.Set;
 
 import com.org.gnos.core.Block;
 import com.org.gnos.core.Node;
+import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.core.Tree;
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.model.CapexData;
 import com.org.gnos.db.model.CapexInstance;
 import com.org.gnos.db.model.Dump;
+import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.FixedOpexCost;
 import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.OpexData;
@@ -142,9 +144,9 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 			}
 			condition +=  pitNameField + " in ( ";
 			if(sp.getMappingType() == 0) {
-				condition +=  "'"+sp.getAssociatedPit().getPitName() +"'";
+				condition +=  "'"+sp.getMappedTo() +"'";
 			} else {
-				Set<Integer> pits = context.flattenPitGroup(sp.getAssociatedPitGroup());
+				Set<Integer> pits = context.flattenPitGroup(ProjectConfigutration.getInstance().getPitGroupfromName(sp.getMappedTo()));
 				for(int pitNo: pits){
 					Pit pit = context.getProjectConfig().getPitfromPitNumber(pitNo);
 					condition +=  "'"+pit.getPitName() +"',";
@@ -220,9 +222,9 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 			}
 			condition +=  pitNameField + " in ( ";
 			if(dump.getMappingType() == 0) {
-				condition += "'"+dump.getAssociatedPit().getPitName()+ "'";
+				condition += "'"+dump.getMappedTo()+ "'";
 			} else {
-				Set<Integer> pits = context.flattenPitGroup(dump.getAssociatedPitGroup());
+				Set<Integer> pits = context.flattenPitGroup(ProjectConfigutration.getInstance().getPitGroupfromName(dump.getMappedTo()));
 				for(int pitNo: pits){
 					Pit pit = context.getProjectConfig().getPitfromPitNumber(pitNo);
 					condition +=  "'"+ pit.getPitName() +"',";
@@ -386,11 +388,12 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		if(hasValue(model.getCondition())){
 			condition = model.getCondition();
 		}
-		if(hasValue(model.getExpression().getFilter())) {
+		Expression expr =  ProjectConfigutration.getInstance().getExpressionById(model.getExpressionId());
+		if(hasValue(expr.getFilter())) {
 			if(hasValue(condition)) {
-				condition = condition + " AND "+ model.getExpression().getFilter();
+				condition = condition + " AND "+ expr.getFilter();
 			} else {
-				condition =  model.getExpression().getFilter();
+				condition =  expr.getFilter();
 			}
 		}
 		boolean continueLoop = true;
@@ -404,11 +407,12 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 				if(hasValue(pModel.getCondition())){
 					condition = pModel.getCondition();
 				}
-				if(pModel.getExpression() != null && hasValue(pModel.getExpression().getFilter())) {
+				Expression expr1 =  ProjectConfigutration.getInstance().getExpressionById(model.getExpressionId());
+				if(expr1 != null && hasValue(expr1.getFilter())) {
 					if(hasValue(condition)) {
-						condition = condition + " AND "+ pModel.getExpression().getFilter();
+						condition = condition + " AND "+ expr1.getFilter();
 					} else {
-						condition =  pModel.getExpression().getFilter();
+						condition =  expr1.getFilter();
 					}
 				}
 			}

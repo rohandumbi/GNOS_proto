@@ -3,7 +3,7 @@ package com.org.gnos.db.model;
 public class Model {
 	private int id;
 	private String name;
-	private Expression expression;
+	private int expressionId;
 	private String condition;
 	
 	
@@ -35,12 +35,15 @@ public class Model {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public Expression getExpression() {
-		return expression;
+
+	public int getExpressionId() {
+		return expressionId;
 	}
-	public void setExpression(Expression expression) {
-		this.expression = expression;
+
+	public void setExpressionId(int expressionId) {
+		this.expressionId = expressionId;
 	}
+
 	public String getCondition() {
 		return condition;
 	}

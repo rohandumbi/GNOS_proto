@@ -22,6 +22,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.db.dao.ScenarioDAO;
 import com.org.gnos.db.model.FixedOpexCost;
@@ -224,7 +225,7 @@ public class OpexDefinitionScreen extends GnosScreen {
 				scenario.setStartYear(startingYear);
 				scenario.setTimePeriod(numberOfIncrements);
 				
-				boolean isScenarioCreationSuccessful = scenarioDAO.create(scenario);
+				boolean isScenarioCreationSuccessful = scenarioDAO.create(scenario, ProjectConfigutration.getInstance().getProjectId());
 				if(isScenarioCreationSuccessful){
 					ScenarioConfigutration.getInstance().load(scenario.getId());
 					textScenarioInUse.setText(scenario.getName());

@@ -9,7 +9,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.model.Scenario;
 
@@ -17,23 +16,19 @@ import com.org.gnos.db.model.Scenario;
 public class ScenarioDAO {
 
 	private static final String SQL_GET_BY_ID = "select id, name, start_year, time_period, discount from  scenario where id = ? ";
-	private static final String SQL_LIST_ORDER_BY_MODIFIED_DATE = "select id, name, project_id, start_year, time_period, discount from  scenario where project_id = ?";
+	private static final String SQL_LIST_ORDER_BY_ID = "select id, name, project_id, start_year, time_period, discount from  scenario where project_id = ? order by id";
 	private static final String SQL_INSERT = "insert into scenario (project_id, name, start_year, time_period, discount) values (?, ?, ?, ?, ?)";
 	private static final String SQL_DELETE = "delete from scenario where id = ?";
 	private static final String SQL_UPDATE = "update scenario set start_year = ?, time_period = ?, discount = ? where id = ?";
-	ProjectConfigutration projectConfiguration = null;
 
-	public List<Scenario> getAll() {
+	public List<Scenario> getAll(int projectId) {
 
 		List<Scenario> scenarios = new ArrayList<Scenario>();
-		this.projectConfiguration = ProjectConfigutration.getInstance();
-		Object[] values = { 
-				this.projectConfiguration.getProjectId()
-		};
+		Object[] values = { projectId };
 
 		try(
 			Connection connection = DBManager.getConnection();
-			PreparedStatement statement = prepareStatement(connection, SQL_LIST_ORDER_BY_MODIFIED_DATE, false, values);
+			PreparedStatement statement = prepareStatement(connection, SQL_LIST_ORDER_BY_ID, false, values);
 			ResultSet resultSet = statement.executeQuery();
 		){
 			while(resultSet.next()){
@@ -69,16 +64,14 @@ public class ScenarioDAO {
 		return scenario;
 	}
 
-	public boolean create(Scenario scenario){
+	public boolean create(Scenario scenario, int projectId){
 
 		if (scenario.getId() != -1) {
 			throw new IllegalArgumentException("Scenario is already created.");
 		}
-		this.projectConfiguration = ProjectConfigutration.getInstance();
 
 		Object[] values = {
-				
-				this.projectConfiguration.getProjectId(),
+				projectId,
 				scenario.getName(),
 				scenario.getStartYear(),
 				scenario.getTimePeriod(),
@@ -118,7 +111,8 @@ public class ScenarioDAO {
 				scenario.getName(),
 				scenario.getStartYear(),
 				scenario.getTimePeriod(),
-				scenario.getDiscount()
+				scenario.getDiscount(),
+				scenario.getId()
 		};
 
 		try ( Connection connection = DBManager.getConnection();

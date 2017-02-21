@@ -184,13 +184,7 @@ public class ProjectConfigutration {
 			while (rs.next()) {
 				model = new Model(rs.getInt(1), rs.getString(2));
 				int expressionId = rs.getInt(3);
-				for (Expression expression : expressions) {
-					if (expression.getId() == expressionId) {
-						model.setExpression(expression);
-						break;
-					}
-				}
-
+				model.setExpressionId(expressionId);
 				model.setCondition(rs.getString(4));
 				models.add(model);
 			}
@@ -563,11 +557,7 @@ public class ProjectConfigutration {
 				dump.setHasCapacity(hasCapacity);
 				dump.setCapacity(capacity);
 				dump.setDumpNumber(count);
-				if(mappingType == 0){
-					dump.setAssociatedPit(this.getPitfromPitName(mappedTo));
-				} else {
-					dump.setAssociatedPitGroup(this.getPitGroupfromName(mappedTo));
-				}
+				dump.setMappedTo(mappedTo);
 				count ++;
 				this.dumpList.add(dump);
 			}
@@ -1052,14 +1042,14 @@ public class ProjectConfigutration {
 				if (model.getId() == -1) {
 					pstmt.setInt(1, projectId);
 					pstmt.setString(2, model.getName());
-					pstmt.setInt(3, model.getExpression().getId());
+					pstmt.setInt(3, model.getExpressionId());
 					pstmt.setString(4, model.getCondition());
 					pstmt.executeUpdate();
 					rs = pstmt.getGeneratedKeys();
 					rs.next();
 					model.setId(rs.getInt(1));
 				} else {
-					pstmt1.setInt(1, model.getExpression().getId());
+					pstmt1.setInt(1, model.getExpressionId());
 					pstmt1.setString(2, model.getCondition());
 					pstmt1.setInt(3, model.getId());
 					pstmt1.executeUpdate();
@@ -1407,11 +1397,7 @@ public class ProjectConfigutration {
 					pstmt1.setInt(2, dump.getType());
 					pstmt1.setString(3, dump.getName());
 					pstmt1.setString(4, dump.getCondition());
-					if(dump.getMappingType() == 0){
-						pstmt1.setString(5, dump.getAssociatedPit().getPitName());
-					} else {
-						pstmt1.setString(5, dump.getAssociatedPitGroup().getName());
-					}	
+					pstmt1.setString(5, dump.getMappedTo());	
 					pstmt1.setInt(6, dump.getMappingType());
 					pstmt1.setBoolean(7, dump.isHasCapacity());
 					pstmt1.setInt(8, dump.getCapacity());
@@ -1420,11 +1406,7 @@ public class ProjectConfigutration {
 					pstmt2.setInt(1, dump.getType());
 					pstmt2.setString(2, dump.getName());
 					pstmt2.setString(3, dump.getCondition());
-					if(dump.getMappingType() == 0){
-						pstmt2.setString(4, dump.getAssociatedPit().getPitName());
-					} else {
-						pstmt2.setString(4, dump.getAssociatedPitGroup().getName());
-					}
+					pstmt2.setString(4, dump.getMappedTo());
 					pstmt2.setInt(5, dump.getMappingType());
 					pstmt2.setBoolean(6, dump.isHasCapacity());
 					pstmt2.setInt(7, dump.getCapacity());

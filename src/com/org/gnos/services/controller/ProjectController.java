@@ -19,11 +19,11 @@ public class ProjectController {
 		dao = new ProjectDAO();
 	}
 
-	public List<Project> getAllProjects() {
+	public List<Project> getAll() {
 		return dao.getAll();
 	}
 	
-	public Project createProject(JsonObject jsonObject) throws Exception {
+	public Project create(JsonObject jsonObject) throws Exception {
 			String name = jsonObject.get("name").getAsString();
 			String desc = jsonObject.get("desc").getAsString();
 			String fileName = jsonObject.get("fileName").getAsString();
@@ -39,7 +39,7 @@ public class ProjectController {
 	}
 	
 
-	public boolean deleteProject (String projectId) {
+	public boolean delete(String projectId) {
 		if((projectId == null) || (projectId.isEmpty())){
 			return false;
 		}else{

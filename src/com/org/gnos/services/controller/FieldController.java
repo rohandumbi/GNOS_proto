@@ -13,11 +13,11 @@ public class FieldController {
 		dao = new FieldDAO();
 	}
 	
-	public List<Field> getAllFields(String projectId) {
+	public List<Field> getAll(String projectId) {
 		return dao.getAll(Integer.parseInt(projectId));
 	}
 	
-	public Field createField(JsonObject jsonObject, String pid) throws Exception {
+	public Field create(JsonObject jsonObject, String pid) throws Exception {
 		String name = jsonObject.get("name").getAsString();
 		short dataType = jsonObject.get("data_type").getAsShort();
 		Field obj = new Field(name);
@@ -29,7 +29,7 @@ public class FieldController {
 	}
 	
 	
-	public Field updateField(JsonObject jsonObject, String id) throws Exception {		
+	public Field update(JsonObject jsonObject, String id) throws Exception {		
 		String name = jsonObject.get("name").getAsString();
 		short dataType = jsonObject.get("data_type").getAsShort();
 		Field obj = new Field(name);
@@ -40,7 +40,7 @@ public class FieldController {
 		throw new Exception();
 	}
 	
-	public boolean deleteField (String id) {
+	public boolean delete(String id) {
 		if((id == null) || (id.isEmpty())){
 			return false;
 		}else{

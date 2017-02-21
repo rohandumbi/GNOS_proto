@@ -22,7 +22,7 @@ public class ProjectEndpoint {
 	public  ProjectEndpoint() {
 		controller = new ProjectController();	
 		/* GET all projects */
-		get("/projects", (req, res) -> controller.getAllProjects(), json());
+		get("/projects", (req, res) -> controller.getAll(), json());
 		/* Create new project */
 		post("/projects", new Route() {
 			
@@ -32,7 +32,7 @@ public class ProjectEndpoint {
 				if(requestObject.isJsonObject()) {
 					JsonObject jsonObject = requestObject.getAsJsonObject();
 					try {
-						return controller.createProject(jsonObject);
+						return controller.create(jsonObject);
 					} catch (Exception e) {
 						res.status(400);
 						return new ResponseError("Project creation failed. "+e.getMessage());
@@ -44,6 +44,6 @@ public class ProjectEndpoint {
 		}, json());
 		
 		/* DELETE exisitng project */
-		delete("/projects/:id", (req, res) -> controller.deleteProject(req.params(":id")), json());
+		delete("/projects/:id", (req, res) -> controller.delete(req.params(":id")), json());
 	}
 }

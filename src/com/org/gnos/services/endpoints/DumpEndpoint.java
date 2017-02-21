@@ -10,20 +10,22 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.org.gnos.services.ResponseError;
-import com.org.gnos.services.controller.FieldController;
+import com.org.gnos.services.controller.DumpController;
 
 import spark.Request;
 import spark.Response;
-import spark.Route;
-public class FieldEndpoint {
+import spark.Route;;
 
-	FieldController controller;
+public class DumpEndpoint {
 	
-	public FieldEndpoint() {
-		controller = new FieldController();
-		get("/project/:id/fields", (req, res) -> controller.getAll(req.params(":id")), json());
+	DumpController controller;
+	
+	public DumpEndpoint() {
+		controller = new DumpController();
 		
-		post("/project/:id/fields", new Route() {
+		get("/project/:id/dumps", (req, res) -> controller.getAll(req.params(":id")),  json());
+		
+        post("/project/:id/dumps", new Route() {
 			
 			@Override
 			public Object handle(Request req, Response res) throws Exception {
@@ -34,15 +36,15 @@ public class FieldEndpoint {
 						return controller.create(jsonObject, req.params(":id"));
 					} catch (Exception e) {
 						res.status(400);
-						return new ResponseError("Expression creation failed. "+e.getMessage());
+						return new ResponseError("Dump creation failed. "+e.getMessage());
 					}					
 				}
 				res.status(400);				
-				return new ResponseError("Expression creation failed due to improper input");
+				return new ResponseError("Dump creation failed due to improper input");
 			}
 		}, json());
 		
-        put("/expressions/:id", new Route() {
+        put("/dumps/:id", new Route() {
 			
 			@Override
 			public Object handle(Request req, Response res) throws Exception {
@@ -53,17 +55,16 @@ public class FieldEndpoint {
 						return controller.update(jsonObject, req.params(":id"));
 					} catch (Exception e) {
 						res.status(400);
-						return new ResponseError("Expression creation failed. "+e.getMessage());
+						return new ResponseError("Dump update failed. "+e.getMessage());
 					}					
 				}
 				res.status(400);				
-				return new ResponseError("Expression creation failed due to improper input");
+				return new ResponseError("Dump update failed due to improper input");
 			}
 		}, json());
 
-		/* DELETE exisitng expression */
-		delete("/expressions/:id", (req, res) -> controller.delete(req.params(":id")), json());
+		/* DELETE exisitng dump */
+		delete("/dumps/:id", (req, res) -> controller.delete(req.params(":id")), json());
 	}
-	
-	
+
 }

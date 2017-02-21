@@ -288,23 +288,16 @@ public class DumpDefinitionGrid extends Composite {
 				String text = comboPitGroup.getText();
 				int index = comboPitGroup.getSelectionIndex();
 				if(index <= pitEndIndex) {
-					dump.setMappingType(0);
-					dump.setAssociatedPit(projectConfiguration.getPitfromPitName(text));
+					dump.setMappingType(0);				
 				} else {
 					dump.setMappingType(1);
-					dump.setAssociatedPitGroup(projectConfiguration.getPitGroupfromName(text));
 				}
+				dump.setMappedTo(text);
 
 			}
 		});
-		if(dump.getMappingType() == 0){
-			if(dump.getAssociatedPit() != null) {
-				comboPitGroup.setText(dump.getAssociatedPit().getPitName());
-			}
-		} else {
-			if(dump.getAssociatedPitGroup() != null){
-				comboPitGroup.setText(dump.getAssociatedPitGroup().getName());
-			}
+		if(dump.getMappedTo() != null) {
+			comboPitGroup.setText(dump.getMappedTo());
 		}
 		
 		final Text textExpression = new Text(compositeRow, SWT.BORDER);

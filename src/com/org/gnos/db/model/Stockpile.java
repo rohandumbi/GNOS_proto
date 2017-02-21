@@ -9,8 +9,7 @@ public class Stockpile {
 	private int id;
 	private int type; // 0=External; 1=Internal
 	private String name;
-	private PitGroup associatedPitGroup;
-	private Pit associatedPit;
+	private String mappedTo;
 	private int mappingType;
 	private int stockpileNumber;
 	private boolean hasCapacity;
@@ -20,10 +19,9 @@ public class Stockpile {
 	
 	private Set<Block> blocks = new HashSet<Block>();
 	
-	public Stockpile(String name, PitGroup pitGroup){
+	public Stockpile(String name){
 		this.id = -1;
 		this.name = name;
-		this.associatedPitGroup = pitGroup;
 	}
 	
 	public Stockpile(){
@@ -53,21 +51,13 @@ public class Stockpile {
 	public void setName(String name) {
 		this.name = name;
 	}
-
-	public PitGroup getAssociatedPitGroup() {
-		return associatedPitGroup;
+	
+	public String getMappedTo() {
+		return mappedTo;
 	}
 
-	public void setAssociatedPitGroup(PitGroup associatedPitGroup) {
-		this.associatedPitGroup = associatedPitGroup;
-	}
-
-	public Pit getAssociatedPit() {
-		return associatedPit;
-	}
-
-	public void setAssociatedPit(Pit associatedPit) {
-		this.associatedPit = associatedPit;
+	public void setMappedTo(String mappedTo) {
+		this.mappedTo = mappedTo;
 	}
 
 	public int getMappingType() {

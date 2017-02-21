@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.org.gnos.core.Block;
+import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.db.model.CapexData;
 import com.org.gnos.db.model.CapexInstance;
 import com.org.gnos.db.model.Dump;
@@ -145,7 +146,7 @@ public class CapexEquationGenerator extends EquationGenerator{
 			int count = 0;
 			for(Process p: processList){
 				List<Block> blocks = p.getBlocks();
-				Expression exp = p.getModel().getExpression();
+				Expression exp = ProjectConfigutration.getInstance().getExpressionById(p.getModel().getExpressionId());
 				for(Block b: blocks){
 					if(count > 0){
 						sb.append(" + ");
@@ -215,7 +216,7 @@ public class CapexEquationGenerator extends EquationGenerator{
 			int count = 0;
 			for( Process p: processList){
 				List<Block> blocks = p.getBlocks();
-				Expression exp = p.getModel().getExpression();
+				Expression exp =  ProjectConfigutration.getInstance().getExpressionById(p.getModel().getExpressionId());
 				for(Block b: blocks){
 					if(!pitnumberList.contains(b.getPitNo())) continue;
 					if(count > 0){

@@ -10,12 +10,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.org.gnos.db.DBManager;
-import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Model;
 
 public class ModelDAO {
 
-	private static final String SQL_LIST_ORDER_BY_ID = "select a.id as id, a.name, a.expr_id, a.filter_str, b.id as eid, b.name as ename from models a, expressions b where a.project_id = ? AND b.id = a.expr_id order by a.id";
+	private static final String SQL_LIST_ORDER_BY_ID = "select id, name, expr_id, filter_str from models where a.project_id = ? AND b.id = a.expr_id order by a.id";
 	private static final String SQL_INSERT = "insert into models (project_id, name, expr_id, filter_str) values (?, ?, ?, ?)";
 	private static final String SQL_DELETE = "delete from models where id = ?";
 	private static final String SQL_UPDATE = "update models set expr_id= ? , filter_str = ? where id = ?";
@@ -51,7 +50,7 @@ public class ModelDAO {
 		Object[] values = {
 				projectId, 
 				model.getName(),
-				model.getExpression().getId(),
+				model.getExpressionId(),
 				model.getCondition()
 	   };
 
@@ -85,7 +84,7 @@ public class ModelDAO {
         }
 		
 		Object[] values = {
-				model.getExpression().getId(),
+				model.getExpressionId(),
 				model.getCondition(),
 				model.getId()
 	   };
@@ -127,12 +126,9 @@ public class ModelDAO {
 		Model model = new Model();
 		model.setId(rs.getInt("id"));
 		model.setName(rs.getString("name"));
+		model.setExpressionId(rs.getInt("expr_id"));
 		model.setCondition(rs.getString("filter_str"));
 		
-		Expression expression = new Expression();
-		expression.setId(rs.getInt("eid"));
-		expression.setName(rs.getString("ename"));
-		model.setExpression(expression);
 		return model;
 	}
 	

@@ -187,11 +187,11 @@ public class ModelDefinitionGrid extends Composite {
 		comboExpressionList.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				String expressionName = comboExpressionList.getText();
-				model.setExpression(ProjectConfigutration.getInstance().getExpressionByName(expressionName));
+				model.setExpressionId(ProjectConfigutration.getInstance().getExpressionByName(expressionName).getId());
 			}
 		});
 		
-		Expression associatedExpression = model.getExpression();
+		Expression associatedExpression =  ProjectConfigutration.getInstance().getExpressionById(model.getExpressionId());;
 		if(associatedExpression != null){
 			comboExpressionList.setText(associatedExpression.getName());
 		}else{

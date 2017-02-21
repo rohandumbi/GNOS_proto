@@ -14,12 +14,12 @@ public class ExpressionController {
 		dao = new ExpressionDAO();
 	}
 	
-	public List<Expression> getAllExpressions(String projectIdStr) {
+	public List<Expression> getAll(String projectIdStr) {
 		int projectId = Integer.parseInt(projectIdStr);
 		return dao.getAll(projectId);
 	}
 	
-	public Expression createExpression(JsonObject jsonObject, String pid) throws Exception {
+	public Expression create(JsonObject jsonObject, String pid) throws Exception {
 		String name = jsonObject.get("name").getAsString();
 		boolean isGrade = jsonObject.get("is_grade").getAsBoolean();
 		boolean isComplex = jsonObject.get("is_complex").getAsBoolean();
@@ -37,7 +37,7 @@ public class ExpressionController {
 	}
 	
 	
-	public Expression updateExpression(JsonObject jsonObject, String id) throws Exception {		
+	public Expression update(JsonObject jsonObject, String id) throws Exception {		
 		String name = jsonObject.get("name").getAsString();
 		boolean isGrade = jsonObject.get("is_grade").getAsBoolean();
 		boolean isComplex = jsonObject.get("is_complex").getAsBoolean();
@@ -55,7 +55,7 @@ public class ExpressionController {
 		throw new Exception();
 	}
 	
-	public boolean deleteExpression (String id) {
+	public boolean delete(String id) {
 		if((id == null) || (id.isEmpty())){
 			return false;
 		}else{

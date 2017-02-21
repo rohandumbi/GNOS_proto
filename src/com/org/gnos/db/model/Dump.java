@@ -9,8 +9,7 @@ public class Dump {
 	private int id;
 	private int type; // 0=External; 1=Internal
 	private String name;
-	private PitGroup associatedPitGroup;
-	private Pit associatedPit;
+	private String mappedTo;
 	private int mappingType; // 0 - Pit, 1 - PitGroup
 	private int dumpNumber;
 	private boolean hasCapacity;
@@ -18,10 +17,9 @@ public class Dump {
 	private int capacity;
 	private Set<Block> blocks = new HashSet<Block>();
 	
-	public Dump(String name, PitGroup pitGroup){
+	public Dump(String name){
 		this.id = -1;
 		this.name = name;
-		this.associatedPitGroup = pitGroup;
 	}
 
 	public Dump(){
@@ -52,20 +50,13 @@ public class Dump {
 		this.name = name;
 	}
 
-	public PitGroup getAssociatedPitGroup() {
-		return associatedPitGroup;
+
+	public String getMappedTo() {
+		return mappedTo;
 	}
 
-	public void setAssociatedPitGroup(PitGroup associatedPitGroup) {
-		this.associatedPitGroup = associatedPitGroup;
-	}
-
-	public Pit getAssociatedPit() {
-		return associatedPit;
-	}
-
-	public void setAssociatedPit(Pit associatedPit) {
-		this.associatedPit = associatedPit;
+	public void setMappedTo(String mappedTo) {
+		this.mappedTo = mappedTo;
 	}
 
 	public int getMappingType() {

@@ -5,16 +5,16 @@ import static spark.Spark.delete;
 import static spark.Spark.get;
 import static spark.Spark.post;
 import static spark.Spark.put;
-import spark.Request;
-import spark.Response;
-import spark.Route;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.org.gnos.services.ResponseError;
-import com.org.gnos.services.controller.ExpressionController;
 import com.org.gnos.services.controller.ModelController;
+
+import spark.Request;
+import spark.Response;
+import spark.Route;
 
 public class ModelEndpoint {
 
@@ -23,8 +23,7 @@ public class ModelEndpoint {
 	public ModelEndpoint() {
 		controller = new ModelController();
 		
-		get("/project/:pid/models",
-				(req, res) -> controller.getAllExpressions(req.params(":pid")), json());
+		get("/project/:pid/models",	(req, res) -> controller.getAll(req.params(":pid")), json());
 		
         post("/project/:pid/model", new Route() {
 			
@@ -34,7 +33,7 @@ public class ModelEndpoint {
 				if(requestObject.isJsonObject()) {
 					JsonObject jsonObject = requestObject.getAsJsonObject();
 					try {
-						return controller.createModel(jsonObject, req.params(":pid"));
+						return controller.create(jsonObject, req.params(":pid"));
 					} catch (Exception e) {
 						res.status(400);
 						return new ResponseError("Model creation failed. "+e.getMessage());
@@ -53,7 +52,7 @@ public class ModelEndpoint {
 				if(requestObject.isJsonObject()) {
 					JsonObject jsonObject = requestObject.getAsJsonObject();
 					try {
-						return controller.updateModel(jsonObject, req.params(":id"));
+						return controller.update(jsonObject, req.params(":id"));
 					} catch (Exception e) {
 						res.status(400);
 						return new ResponseError("Model creation failed. "+e.getMessage());
@@ -65,7 +64,7 @@ public class ModelEndpoint {
 		}, json());
 
 		/* DELETE exisitng expression */
-		delete("/expressions/:id", (req, res) -> controller.deleteModel(req.params(":id")), json());
+		delete("/expressions/:id", (req, res) -> controller.delete(req.params(":id")), json());
 	}
 
 }
