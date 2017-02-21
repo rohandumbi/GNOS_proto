@@ -44,7 +44,7 @@ public class ExpressionEndpoint {
 			}
 		}, json());
 		
-        put("/expressions/:id", new Route() {
+        put("/project/:pid/expressions", new Route() {
 			
 			@Override
 			public Object handle(Request req, Response res) throws Exception {
@@ -64,7 +64,7 @@ public class ExpressionEndpoint {
 		}, json());
 
 		/* DELETE exisitng expression */
-		delete("/expressions/:id", (req, res) -> controller.delete(req.params(":id")), json());
+		delete("/project/:pid/expressions", (req, res) -> controller.delete(req.params(":id")), json());
 	}
 
 }

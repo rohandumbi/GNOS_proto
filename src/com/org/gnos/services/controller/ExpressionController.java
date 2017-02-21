@@ -21,9 +21,9 @@ public class ExpressionController {
 	
 	public Expression create(JsonObject jsonObject, String pid) throws Exception {
 		String name = jsonObject.get("name").getAsString();
-		boolean isGrade = jsonObject.get("is_grade").getAsBoolean();
-		boolean isComplex = jsonObject.get("is_complex").getAsBoolean();
-		String exprvalue = jsonObject.get("expr_value").getAsString();
+		boolean isGrade = jsonObject.get("isGrade").getAsBoolean();
+		boolean isComplex = jsonObject.get("isComplex").getAsBoolean();
+		String exprvalue = jsonObject.get("exprvalue").getAsString();
 		String filter = jsonObject.get("filter").getAsString();
 		Expression obj = new Expression();
 		obj.setName(name);
