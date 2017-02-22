@@ -2,8 +2,6 @@ package com.org.gnos.ui.custom.controls;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -21,18 +19,9 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.core.ProjectConfigutration;
-import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.db.model.FixedOpexCost;
-import com.org.gnos.db.model.OreMiningCost;
-import com.org.gnos.db.model.ProcessConstraintData;
-import com.org.gnos.db.model.Scenario;
 import com.org.gnos.db.model.Stockpile;
-import com.org.gnos.db.model.StockpileReclaimingCost;
-import com.org.gnos.db.model.StockpilingCost;
-import com.org.gnos.db.model.TruckHourCost;
 import com.org.gnos.db.model.TruckParameterCycleTime;
-import com.org.gnos.db.model.WasteMiningCost;
-import com.org.gnos.services.TimePeriod;
 
 public class TruckParameterCycleTimeGrid extends Composite {
 

@@ -40,7 +40,7 @@ public class OpexDAO {
 			ResultSet resultSet = statement.executeQuery();
 		){
 			while(resultSet.next()){
-				int id = resultSet.getInt(1);
+				int id = resultSet.getInt("id");
 				OpexData opexData = opexDataMap.get(id);
 				opexData = map(resultSet, opexData);
 				opexDataMap.put(id, opexData);

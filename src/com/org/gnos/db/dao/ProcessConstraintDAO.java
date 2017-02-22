@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,10 +27,10 @@ public class ProcessConstraintDAO {
 	private static final String SQL_UPDATE = "update process_constraint_defn set selector_name = ?, selector_type = ?, coefficient_name = ?, coefficient_type = ?, in_use= ?, is_max = ? where id = ?";
 	private static final String SQL_UPDATE_MAPPING = "update process_constraint_year_mapping set value = ? where process_constraint_id = ? and year = ? ";
 	
-	public List<ProcessConstraintData> getAll() {
+	public List<ProcessConstraintData> getAll(int scenarioId) {
 		
-		List<ProcessConstraintData> processConstraints = new ArrayList<ProcessConstraintData>();
-		int scenarioId = ScenarioConfigutration.getInstance().getScenarioId();
+		List<ProcessConstraintData> processConstraintList = new ArrayList<ProcessConstraintData>();
+		Map<Integer, ProcessConstraintData> procesConstraintMap = new HashMap<Integer, ProcessConstraintData>();
 		Object[] values = {
 				scenarioId, 
 		};		
@@ -39,19 +40,11 @@ public class ProcessConstraintDAO {
 	            ResultSet resultSet = statement.executeQuery();
 	        ){
 			while(resultSet.next()){
-				ProcessConstraintData pcd = null;
 				int id = resultSet.getInt("id");
-				for(ProcessConstraintData processConstraintData: processConstraints){
-					if(processConstraintData.getId() == id){
-						pcd = processConstraintData;
-						break;
-					}
-				}
-				if(pcd == null){
-					pcd = map(resultSet);
-					processConstraints.add(pcd);
-				}
-				pcd.addYear(resultSet.getInt("year"), resultSet.getFloat("value"));
+				ProcessConstraintData pcd = procesConstraintMap.get(id);
+				pcd = map(resultSet, pcd);
+				procesConstraintMap.put(id, pcd);
+				processConstraintList.add(pcd);
 						
 			}
 			
@@ -59,15 +52,14 @@ public class ProcessConstraintDAO {
 			e.printStackTrace();
 		}
 		
-		return processConstraints;
+		return processConstraintList;
 	}
 	
-	public boolean create(ProcessConstraintData pcd){
+	public boolean create(ProcessConstraintData pcd, int scenarioId){
 		
 		if (pcd.getId() != -1) {
             throw new IllegalArgumentException("ProcessConstraint is already created.");
         }
-		int scenarioId = ScenarioConfigutration.getInstance().getScenarioId();
 		Object[] values = {
 				scenarioId, 
 				pcd.getSelector_name(),
@@ -190,15 +182,20 @@ public class ProcessConstraintDAO {
 	        }
 	}
 	
-	private ProcessConstraintData map(ResultSet rs) throws SQLException {
-		ProcessConstraintData pcd = new ProcessConstraintData();
-		pcd.setId(rs.getInt("id"));
-		pcd.setCoefficient_name(rs.getString("coefficient_name"));
-		pcd.setCoefficientType(rs.getInt("coefficient_type"));
-		pcd.setSelector_name(rs.getString("selector_name"));
-		pcd.setSelectionType(rs.getInt("selector_type"));
-		pcd.setInUse(rs.getBoolean("in_use"));
-		pcd.setMax(rs.getBoolean("is_max"));
+	private ProcessConstraintData map(ResultSet rs, ProcessConstraintData pcd) throws SQLException {
+		
+		if(pcd == null) {
+			pcd = new ProcessConstraintData();
+			pcd.setId(rs.getInt("id"));
+			pcd.setCoefficient_name(rs.getString("coefficient_name"));
+			pcd.setCoefficientType(rs.getInt("coefficient_type"));
+			pcd.setSelector_name(rs.getString("selector_name"));
+			pcd.setSelectionType(rs.getInt("selector_type"));
+			pcd.setInUse(rs.getBoolean("in_use"));
+			pcd.setMax(rs.getBoolean("is_max"));
+		}
+		
+		pcd.addYear(rs.getInt("year"), rs.getFloat("value"));
 
 		return pcd;
 	}

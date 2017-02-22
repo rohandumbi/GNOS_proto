@@ -19,21 +19,14 @@ import com.org.gnos.db.dao.ScenarioDAO;
 import com.org.gnos.db.model.CapexData;
 import com.org.gnos.db.model.CapexInstance;
 import com.org.gnos.db.model.DumpDependencyData;
-import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.FixedOpexCost;
 import com.org.gnos.db.model.GradeConstraintData;
-import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.OpexData;
-import com.org.gnos.db.model.OreMiningCost;
 import com.org.gnos.db.model.PitBenchConstraintData;
 import com.org.gnos.db.model.PitDependencyData;
 import com.org.gnos.db.model.ProcessConstraintData;
 import com.org.gnos.db.model.ProcessJoin;
 import com.org.gnos.db.model.Scenario;
-import com.org.gnos.db.model.StockpileReclaimingCost;
-import com.org.gnos.db.model.StockpilingCost;
-import com.org.gnos.db.model.TruckHourCost;
-import com.org.gnos.db.model.WasteMiningCost;
 
 public class ScenarioConfigutration {
 
@@ -148,17 +141,8 @@ public class ScenarioConfigutration {
 				BigDecimal value = rs.getBigDecimal(3);
 				FixedOpexCost fixedOpexCost = fixedCost[costHead];
 				if (fixedOpexCost == null) {
-					if (costHead == 0) {
-						fixedOpexCost = new OreMiningCost();
-					} else if (costHead == 1) {
-						fixedOpexCost = new WasteMiningCost();
-					} else if (costHead == 2) {
-						fixedOpexCost = new StockpilingCost();
-					} else if (costHead == 3) {
-						fixedOpexCost = new StockpileReclaimingCost();
-					} else if (costHead == 4) {
-						fixedOpexCost = new TruckHourCost();
-					}
+					fixedOpexCost = new FixedOpexCost();
+					fixedOpexCost.setCostHead(costHead);
 					fixedCost[costHead] = fixedOpexCost;
 				}
 
@@ -181,7 +165,7 @@ public class ScenarioConfigutration {
 	}
 
 	public void loadProcessConstraintData() {
-		this.processConstraintDataList = new ProcessConstraintDAO().getAll();
+		this.processConstraintDataList = new ProcessConstraintDAO().getAll(scenarioId);
 	}
 
 	public void loadGradeConstraintData() {
@@ -661,7 +645,7 @@ public class ScenarioConfigutration {
 				while (it.hasNext()) {
 					int key = it.next();
 					//pstmt.setInt(1, this.projectConfiguration.getProjectId());
-					pstmt.setInt(1, fixedOpexCost.getScenarioId());
+					pstmt.setInt(1, this.getScenarioId());
 					pstmt.setInt(2, i);
 					pstmt.setInt(3, key);
 					pstmt.setBigDecimal(4, fixedOpexCost.getCostData().get(key));

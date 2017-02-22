@@ -20,12 +20,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.db.model.FixedOpexCost;
-import com.org.gnos.db.model.OreMiningCost;
 import com.org.gnos.db.model.Scenario;
-import com.org.gnos.db.model.StockpileReclaimingCost;
-import com.org.gnos.db.model.StockpilingCost;
-import com.org.gnos.db.model.TruckHourCost;
-import com.org.gnos.db.model.WasteMiningCost;
 
 public class MiningStockpileCostGrid extends Composite {
 
@@ -132,18 +127,8 @@ public class MiningStockpileCostGrid extends Composite {
 			Composite compositeRow = new Composite(this, SWT.BORDER);
 			
 			if(this.existingFixedOpexCost[i] == null){
-				if(i==0){
-					fixedOpexCost = new OreMiningCost();
-				}else if(i==1){
-					fixedOpexCost = new WasteMiningCost();
-				}else if(i==2){
-					fixedOpexCost = new StockpilingCost();
-				}else if(i==3){
-					fixedOpexCost = new StockpileReclaimingCost();
-				}else if(i==4){
-					fixedOpexCost = new TruckHourCost();
-				}
-				fixedOpexCost.setScenarioId(scenario.getId());
+				fixedOpexCost = new FixedOpexCost();
+				fixedOpexCost.setCostHead(i);
 				this.existingFixedOpexCost[i] = fixedOpexCost;
 			}
 			
