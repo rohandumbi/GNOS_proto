@@ -2,19 +2,32 @@ package com.org.gnos.db.model;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class FixedOpexCost {
-	protected int id;
+	
+	public static int ORE_MINING_COST = 0;
+	public static int WASTE_MINING_COST = 1;
+	public static int STOCKPILING_COST = 2;
+	public static int STOCKPILE_RECLAIMING_COST = 3;
+	public static int TRUCK_HOUR_COST = 4;
+	
+	protected int costHead;
 	protected HashMap<Integer, BigDecimal> costData;
-	protected int scenarioId;
 	
-	public int getId() {
-		return id;
-	}
-	public void setId(int id) {
-		this.id = id;
+	public FixedOpexCost() {
+		this.costData = new LinkedHashMap<Integer, BigDecimal>();
 	}
 	
+	
+	public int getCostHead() {
+		return costHead;
+	}
+
+	public void setCostHead(int costHead) {
+		this.costHead = costHead;
+	}
+
 	public HashMap<Integer, BigDecimal> getCostData() {
 		return costData;
 	}
@@ -23,12 +36,8 @@ public class FixedOpexCost {
 		this.costData = costData;
 	}
 	
-	public int getScenarioId() {
-		return scenarioId;
-	}
-	
-	public void setScenarioId(int scenarioId) {
-		this.scenarioId = scenarioId;
+	public void addCostData(int year, BigDecimal value) {
+		this.costData.put(year, value);
 	}
 	
 }
