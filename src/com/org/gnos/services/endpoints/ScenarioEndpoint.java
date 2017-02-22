@@ -36,11 +36,11 @@ public class ScenarioEndpoint {
 						return controller.create(jsonObject, req.params(":id"));
 					} catch (Exception e) {
 						res.status(400);
-						return new ResponseError("Dump creation failed. "+e.getMessage());
+						return new ResponseError("Scenario creation failed. "+e.getMessage());
 					}					
 				}
 				res.status(400);				
-				return new ResponseError("Dump creation failed due to improper input");
+				return new ResponseError("Scenario creation failed due to improper input");
 			}
 		}, json());
 		
@@ -55,11 +55,11 @@ public class ScenarioEndpoint {
 						return controller.update(jsonObject, req.params(":id"));
 					} catch (Exception e) {
 						res.status(400);
-						return new ResponseError("Dump update failed. "+e.getMessage());
+						return new ResponseError("Scenario update failed. "+e.getMessage());
 					}					
 				}
 				res.status(400);				
-				return new ResponseError("Dump update failed due to improper input");
+				return new ResponseError("Scenario update failed due to improper input");
 			}
 		}, json());
 
