@@ -360,7 +360,7 @@ public class ScenarioConfigutration {
 			if (pcd.getId() > 0) {
 				processConstraintdao.update(pcd);
 			} else {
-				processConstraintdao.create(pcd);
+				processConstraintdao.create(pcd, scenarioId);
 			}
 		}
 	}
