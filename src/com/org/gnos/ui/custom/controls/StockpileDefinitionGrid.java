@@ -304,22 +304,14 @@ public class StockpileDefinitionGrid extends Composite {
 				int index = comboPitGroup.getSelectionIndex();
 				if(index <= pitEndIndex) {
 					stockpile.setMappingType(0);
-					stockpile.setAssociatedPit(projectConfiguration.getPitfromPitName(text));
+					
 				} else {
 					stockpile.setMappingType(1);
-					stockpile.setAssociatedPitGroup(projectConfiguration.getPitGroupfromName(text));
 				}
+				stockpile.setMappedTo(text);
 			}
 		});
-		if(stockpile.getMappingType() == 0){
-			if(stockpile.getAssociatedPit() != null) {
-				comboPitGroup.setText(stockpile.getAssociatedPit().getPitName());
-			}
-		} else {
-			if(stockpile.getAssociatedPitGroup() != null){
-				comboPitGroup.setText(stockpile.getAssociatedPitGroup().getName());
-			}
-		}
+		comboPitGroup.setText(stockpile.getMappedTo());
 		
 		final Text textExpression = new Text(compositeRow, SWT.BORDER);
 		FormData fd_textExpression = new FormData();

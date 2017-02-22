@@ -597,11 +597,7 @@ public class ProjectConfigutration {
 				stockpile.setCapacity(capacity);
 				stockpile.setStockpileNumber(count);
 				stockpile.setReclaim(isReclaim);
-				if(mappingType == 0){
-					stockpile.setAssociatedPit(this.getPitfromPitName(mappedTo));
-				} else {
-					stockpile.setAssociatedPitGroup(this.getPitGroupfromName(mappedTo));
-				}
+				stockpile.setMappedTo(mappedTo);
 				count ++;
 				this.stockPileList.add(stockpile);
 			}
@@ -1437,12 +1433,7 @@ public class ProjectConfigutration {
 					pstmt1.setInt(2, stockpile.getType());
 					pstmt1.setString(3, stockpile.getName());
 					pstmt1.setString(4, stockpile.getCondition());
-					if(stockpile.getMappingType() == 0) {
-						pstmt1.setString(5, stockpile.getAssociatedPit().getPitName());
-					} else {
-						pstmt1.setString(5, stockpile.getAssociatedPitGroup().getName());
-					}
-					
+					pstmt1.setString(5, stockpile.getMappedTo());					
 					pstmt1.setInt(6, stockpile.getMappingType());
 					pstmt1.setBoolean(7, stockpile.isHasCapacity());
 					pstmt1.setInt(8, stockpile.getCapacity());
@@ -1452,11 +1443,7 @@ public class ProjectConfigutration {
 					pstmt2.setInt(1, stockpile.getType());
 					pstmt2.setString(2, stockpile.getName());
 					pstmt2.setString(3, stockpile.getCondition());
-					if(stockpile.getMappingType() == 0) {
-						pstmt2.setString(4, stockpile.getAssociatedPit().getPitName());
-					} else {
-						pstmt2.setString(4, stockpile.getAssociatedPitGroup().getName());
-					}
+					pstmt2.setString(4, stockpile.getMappedTo());
 					pstmt2.setInt(5, stockpile.getMappingType());
 					pstmt2.setBoolean(6, stockpile.isHasCapacity());
 					pstmt2.setInt(7, stockpile.getCapacity());

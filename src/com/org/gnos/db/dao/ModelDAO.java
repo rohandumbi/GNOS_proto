@@ -14,7 +14,7 @@ import com.org.gnos.db.model.Model;
 
 public class ModelDAO {
 
-	private static final String SQL_LIST_ORDER_BY_ID = "select id, name, expr_id, filter_str from models where a.project_id = ? AND b.id = a.expr_id order by a.id";
+	private static final String SQL_LIST_ORDER_BY_ID = "select id, name, expr_id, filter_str from models where project_id = ? order by id";
 	private static final String SQL_INSERT = "insert into models (project_id, name, expr_id, filter_str) values (?, ?, ?, ?)";
 	private static final String SQL_DELETE = "delete from models where id = ?";
 	private static final String SQL_UPDATE = "update models set expr_id= ? , filter_str = ? where id = ?";

@@ -70,7 +70,7 @@ public class OpexDefinitionScreen extends GnosScreen {
 	}
 	
 	private String[] getExistingScenarioList() {
-		this.scenarioList = this.scenarioDAO.getAll();
+		this.scenarioList = this.scenarioDAO.getAll(ProjectConfigutration.getInstance().getProjectId());
 		String[] exisitngScenarioNames = new String[this.scenarioList.size()];
 		for(int i=0; i<this.scenarioList.size(); i++){
 			exisitngScenarioNames[i] = this.scenarioList.get(i).getName();
