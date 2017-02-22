@@ -39,6 +39,7 @@ public class OpexDAO {
 			PreparedStatement statement = prepareStatement(connection, SQL_LIST_ORDER_BY_ID, false, values);
 			ResultSet resultSet = statement.executeQuery();
 		){
+			
 			while(resultSet.next()){
 				int id = resultSet.getInt("id");
 				OpexData opexData = opexDataMap.get(id);
@@ -171,18 +172,16 @@ public class OpexDAO {
 	}
 
 	private OpexData map(ResultSet rs, OpexData od) throws SQLException {
-		while (rs.next()) {
-			if (od == null) {
-				od = new OpexData();
-				od.setId(rs.getInt("id"));
-				od.setModelId(rs.getInt("model_id"));
-				od.setExpressionId(rs.getInt("expression_id"));
-				od.setInUse(rs.getBoolean(4));
-				od.setRevenue(rs.getBoolean(5));
-			}
-			od.addYear(rs.getInt("year"), rs.getBigDecimal("value"));
+		if (od == null) {
+			od = new OpexData();
+			od.setId(rs.getInt("id"));
+			od.setModelId(rs.getInt("model_id"));
+			od.setExpressionId(rs.getInt("expression_id"));
+			od.setInUse(rs.getBoolean(4));
+			od.setRevenue(rs.getBoolean(5));
 		}
-		
+		od.addYear(rs.getInt("year"), rs.getBigDecimal("value"));
+	
 		return od;
 	}
 }

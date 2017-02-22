@@ -7,7 +7,6 @@ import java.util.Map;
 public class OpexData {
 
 	private int id;
-	private int scenarioId;
 	private int modelId;
 	private int expressionId;
 	private boolean inUse;
@@ -61,14 +60,6 @@ public class OpexData {
 	
 	public void addYear(int year, BigDecimal value) {
 		this.costData.put(year, value);
-	}
-
-	public int getScenarioId() {
-		return scenarioId;
-	}
-
-	public void setScenarioId(int scenarioId) {
-		this.scenarioId = scenarioId;
 	}
 	
 }
