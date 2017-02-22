@@ -169,11 +169,11 @@ public class ScenarioConfigutration {
 	}
 
 	public void loadGradeConstraintData() {
-		this.gradeConstraintDataList = new GradeConstraintDAO().getAll();
+		this.gradeConstraintDataList = new GradeConstraintDAO().getAll(scenarioId);
 	}
 
 	public void loadBenchConstraintData() {
-		this.pitBenchConstraintDataList = new BenchConstraintDAO().getAll();
+		this.pitBenchConstraintDataList = new BenchConstraintDAO().getAll(scenarioId);
 	}
 	
 	public void loadPitDependencyData() {
@@ -371,7 +371,7 @@ public class ScenarioConfigutration {
 			if (gcd.getId() > 0) {
 				gradeConstraintdao.update(gcd);
 			} else {
-				gradeConstraintdao.create(gcd);
+				gradeConstraintdao.create(gcd, scenarioId);
 			}
 		}
 	}
@@ -383,7 +383,7 @@ public class ScenarioConfigutration {
 			if (pcd.getId() > 0) {
 				benchConstraintdao.update(pcd);
 			} else {
-				benchConstraintdao.create(pcd);
+				benchConstraintdao.create(pcd, scenarioId);
 			}
 		}
 	}

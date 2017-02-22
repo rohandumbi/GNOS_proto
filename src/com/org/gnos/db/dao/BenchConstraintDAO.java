@@ -8,10 +8,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.model.PitBenchConstraintData;
 
@@ -25,10 +25,10 @@ public class BenchConstraintDAO {
 	private static final String SQL_UPDATE = "update bench_constraint_defn set pit_name = ?, in_use= ? where id = ?";
 	private static final String SQL_UPDATE_MAPPING = "update bench_constraint_year_mapping set value = ? where bench_constraint_id = ? and year = ? ";
 	
-	public List<PitBenchConstraintData> getAll() {
+	public List<PitBenchConstraintData> getAll(int scenarioId) {
 		
-		List<PitBenchConstraintData> benchConstraints = new ArrayList<PitBenchConstraintData>();
-		int scenarioId = ScenarioConfigutration.getInstance().getScenarioId();
+		List<PitBenchConstraintData> benchConstraintList = new ArrayList<PitBenchConstraintData>();
+		Map<Integer, PitBenchConstraintData> benchConstraintMap = new HashMap<Integer, PitBenchConstraintData>();
 		Object[] values = {
 				scenarioId, 
 		};		
@@ -38,33 +38,25 @@ public class BenchConstraintDAO {
 	            ResultSet resultSet = statement.executeQuery();
 	        ){
 			while(resultSet.next()){
-				PitBenchConstraintData pcd = null;
 				int id = resultSet.getInt("id");
-				for(PitBenchConstraintData pitBenchConstraintData: benchConstraints){
-					if(pitBenchConstraintData.getId() == id){
-						pcd = pitBenchConstraintData;
-						break;
-					}
-				}
-				if(pcd == null){
-					pcd = map(resultSet);
-					benchConstraints.add(pcd);
-				}
-				pcd.addYear(resultSet.getInt("year"), resultSet.getInt("value"));	
+				PitBenchConstraintData pcd = benchConstraintMap.get(id);
+				pcd = map(resultSet, pcd);
+				benchConstraintMap.put(id, pcd);
+				benchConstraintList.add(pcd);
 			}			
 		} catch(SQLException e){
 			e.printStackTrace();
 		}
 		
-		return benchConstraints;
+		return benchConstraintList;
 	}
 	
-	public boolean create(PitBenchConstraintData pcd){
+	public boolean create(PitBenchConstraintData pcd, int scenarioId){
 		
 		if (pcd.getId() != -1) {
             throw new IllegalArgumentException("ProcessConstraint is already created.");
         }
-		int scenarioId = ScenarioConfigutration.getInstance().getScenarioId();
+
 		Object[] values = {
 				scenarioId, 
 				pcd.getPitName(),
@@ -182,11 +174,15 @@ public class BenchConstraintDAO {
 	        }
 	}
 	
-	private PitBenchConstraintData map(ResultSet rs) throws SQLException {
-		PitBenchConstraintData pcd = new PitBenchConstraintData();
-		pcd.setId(rs.getInt("id"));
-		pcd.setPitName(rs.getString("pit_name"));
-		pcd.setInUse(rs.getBoolean("in_use"));
+	private PitBenchConstraintData map(ResultSet rs, PitBenchConstraintData pcd) throws SQLException {
+		
+		if(pcd == null){
+			pcd = new PitBenchConstraintData();
+			pcd.setId(rs.getInt("id"));
+			pcd.setPitName(rs.getString("pit_name"));
+			pcd.setInUse(rs.getBoolean("in_use"));			
+		}	
+		pcd.addYear(rs.getInt("year"), rs.getInt("value"));	
 		
 		return pcd;
 	}

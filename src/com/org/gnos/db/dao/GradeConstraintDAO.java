@@ -8,13 +8,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.model.GradeConstraintData;
-import com.org.gnos.db.model.ProcessConstraintData;
 
 public class GradeConstraintDAO {
 
@@ -27,10 +26,10 @@ public class GradeConstraintDAO {
 	private static final String SQL_UPDATE = "update grade_constraint_defn set selector_name = ?, selector_type = ?, grade = ?, product_join_name = ?, in_use= ?, is_max = ? where id = ?";
 	private static final String SQL_UPDATE_MAPPING = "update grade_constraint_year_mapping set value = ? where grade_constraint_id = ? and year = ? ";
 	
-	public List<GradeConstraintData> getAll() {
+	public List<GradeConstraintData> getAll(int scenarioId ) {
 		
-		List<GradeConstraintData> gradeConstraints = new ArrayList<GradeConstraintData>();
-		int scenarioId = ScenarioConfigutration.getInstance().getScenarioId();
+		List<GradeConstraintData> gradeConstraintList = new ArrayList<GradeConstraintData>();
+		Map<Integer, GradeConstraintData> gradeConstraintMap = new HashMap<Integer, GradeConstraintData>();
 		Object[] values = {
 				scenarioId, 
 		};		
@@ -40,34 +39,25 @@ public class GradeConstraintDAO {
 	            ResultSet resultSet = statement.executeQuery();
 	        ){
 			while(resultSet.next()){
-				GradeConstraintData gcd = null;
 				int id = resultSet.getInt("id");
-				for(GradeConstraintData gradeConstraintData: gradeConstraints){
-					if(gradeConstraintData.getId() == id){
-						gcd = gradeConstraintData;
-						break;
-					}
-				}
-				if(gcd == null){
-					gcd = map(resultSet);
-					gradeConstraints.add(gcd);
-				}
-				gcd.addYear(resultSet.getInt("year"), resultSet.getFloat("value"));	
+				GradeConstraintData gcd = gradeConstraintMap.get(id);
+				gcd = map(resultSet, gcd);
+				gradeConstraintMap.put(id, gcd);
+				gradeConstraintList.add(gcd);
 			}
 			
 		} catch(SQLException e){
 			e.printStackTrace();
 		}
 		
-		return gradeConstraints;
+		return gradeConstraintList;
 	}
 	
-	public boolean create(GradeConstraintData gcd){
+	public boolean create(GradeConstraintData gcd, int scenarioId){
 		
 		if (gcd.getId() != -1) {
             throw new IllegalArgumentException("ProcessConstraint is already created.");
         }
-		int scenarioId = ScenarioConfigutration.getInstance().getScenarioId();
 		Object[] values = {
 				scenarioId, 
 				gcd.getSelectorName(),
@@ -172,10 +162,10 @@ public class GradeConstraintDAO {
 		return true;
 	}
 	
-	public void delete(ProcessConstraintData pcd){
+	public void delete(GradeConstraintData gcd){
 		
 		Object[] values = { 
-				pcd.getId()
+				gcd.getId()
 	        };
 
 	        try (
@@ -185,21 +175,27 @@ public class GradeConstraintDAO {
 	        ) {
 	        	mappingstatement.executeUpdate();
 	        	statement.executeUpdate();	           
-	            pcd.setId(-1);
+	        	gcd.setId(-1);
 	        } catch (SQLException e) {
 	            //throw new DAOException(e);
 	        }
 	}
 	
-	private GradeConstraintData map(ResultSet rs) throws SQLException {
-		GradeConstraintData gcd = new GradeConstraintData();
-		gcd.setId(rs.getInt("id"));
-		gcd.setProductJoinName(rs.getString("product_join_name"));
-		gcd.setSelectedGradeName(rs.getString("grade"));
-		gcd.setSelectorName(rs.getString("selector_name"));
-		gcd.setSelectionType(rs.getInt("selector_type"));
-		gcd.setInUse(rs.getBoolean("in_use"));
-		gcd.setMax(rs.getBoolean("is_max"));
+	private GradeConstraintData map(ResultSet rs, GradeConstraintData gcd) throws SQLException {
+		
+		if(gcd == null){
+			gcd = new GradeConstraintData();
+			gcd.setId(rs.getInt("id"));
+			gcd.setProductJoinName(rs.getString("product_join_name"));
+			gcd.setSelectedGradeName(rs.getString("grade"));
+			gcd.setSelectorName(rs.getString("selector_name"));
+			gcd.setSelectionType(rs.getInt("selector_type"));
+			gcd.setInUse(rs.getBoolean("in_use"));
+			gcd.setMax(rs.getBoolean("is_max"));
+		}
+		
+		gcd.addYear(rs.getInt("year"), rs.getFloat("value"));
+
 
 		return gcd;
 	}
