@@ -42,7 +42,7 @@ public class FieldEndpoint {
 			}
 		}, json());
 		
-        put("/project/:id/fields", new Route() {
+        put("/field/:id", new Route() {
 			
 			@Override
 			public Object handle(Request req, Response res) throws Exception {
@@ -62,7 +62,7 @@ public class FieldEndpoint {
 		}, json());
 
 		/* DELETE exisitng expression */
-		delete("/expressions/:id", (req, res) -> controller.delete(req.params(":id")), json());
+		delete("/field/:id", (req, res) -> controller.delete(req.params(":id")), json());
 	}
 	
 	

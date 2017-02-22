@@ -456,9 +456,9 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		BigDecimal pcost = new BigDecimal(0);
 		List<OpexData> opexDataList = context.getScenarioConfig().getOpexDataList();
 		for(OpexData opexData: opexDataList) {
-			if(opexData.getModel().getId() == model.getId()){
+			if(opexData.getModelId() == model.getId()){
 				if(opexData.isRevenue()){
-					BigDecimal expr_value = context.getExpressionValueforBlock(b, opexData.getExpression());
+					BigDecimal expr_value = context.getExpressionValueforBlock(b, ProjectConfigutration.getInstance().getExpressionById(opexData.getExpressionId()));
 					revenue = revenue.add(expr_value.multiply(opexData.getCostData().get(year)));
 				} else {
 					pcost = pcost.add(opexData.getCostData().get(year));
@@ -477,9 +477,9 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		BigDecimal pcost = new BigDecimal(0);
 		List<OpexData> opexDataList = context.getScenarioConfig().getOpexDataList();
 		for(OpexData opexData: opexDataList) {
-			if(opexData.getModel().getId() == model.getId()){
+			if(opexData.getModelId() == model.getId()){
 				if(opexData.isRevenue()){
-					BigDecimal expr_value = ((SlidingWindowExecutionContext)context).getExpressionValueforBlock(b, opexData.getExpression());
+					BigDecimal expr_value = ((SlidingWindowExecutionContext)context).getExpressionValueforBlock(b, ProjectConfigutration.getInstance().getExpressionById(opexData.getExpressionId()));
 					revenue = revenue.add(expr_value.multiply(opexData.getCostData().get(year)));
 				} else {
 					pcost = pcost.add(opexData.getCostData().get(year));

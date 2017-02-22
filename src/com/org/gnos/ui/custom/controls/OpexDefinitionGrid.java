@@ -270,11 +270,11 @@ public class OpexDefinitionGrid extends Composite {
 		comboIdentifier.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				String modelName = comboIdentifier.getText();
-				opexData.setModel(ProjectConfigutration.getInstance().getModelByName(modelName));;
+				opexData.setModelId(ProjectConfigutration.getInstance().getModelByName(modelName).getId());;
 			}
 		});
 		if(!isNewOpexData){
-			String modelName = opexData.getModel().getName();
+			String modelName = ProjectConfigutration.getInstance().getModelById(opexData.getModelId()).getName();
 			comboIdentifier.setText(modelName);
 		}
 		
@@ -304,13 +304,13 @@ public class OpexDefinitionGrid extends Composite {
 			if(!opexData.isRevenue()) {
 				comboExpression.setEnabled(false);;
 			} else {
-				comboExpression.setText(opexData.getExpression().getName());
+				comboExpression.setText(ProjectConfigutration.getInstance().getExpressionById(opexData.getExpressionId()).getName());
 			}
 		}
 		comboExpression.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				String expressionName = comboExpression.getText();
-				opexData.setExpression(ProjectConfigutration.getInstance().getExpressionByName(expressionName));;
+				opexData.setExpressionId(ProjectConfigutration.getInstance().getExpressionByName(expressionName).getId());;
 			}
 		});
 		FormData fd_comboExpression = new FormData();

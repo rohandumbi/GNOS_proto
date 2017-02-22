@@ -99,17 +99,16 @@ public class ScenarioConfigutration {
 				int id = rs.getInt(1);
 				int modelId = rs.getInt(2);
 				int expressionId = rs.getInt(3);
-				Model model = this.projectConfiguration.getModelById(modelId);
 
 				od = getOpexDataById(id);
 				if (od == null) {
-					od = new OpexData(model);					
+					od = new OpexData();					
 					od.setId(id);
+					od.setModelId(modelId);
 					od.setInUse(rs.getBoolean(4));
 					od.setRevenue(rs.getBoolean(5));
 					if(od.isRevenue()){
-						Expression expression = this.projectConfiguration.getExpressionById(expressionId);
-						od.setExpression(expression);
+						od.setExpressionId(expressionId);
 					}
 
 					this.opexDataList.add(od);
@@ -600,12 +599,8 @@ public class ScenarioConfigutration {
 					continue;
 				//pstmt.setInt(1, this.projectConfiguration.getProjectId());
 				pstmt.setInt(1, od.getScenarioId());
-				pstmt.setInt(2, od.getModel().getId());
-				if(od.getExpression() != null){
-					pstmt.setInt(3, od.getExpression().getId());
-				}else{
-					pstmt.setNull(3, java.sql.Types.INTEGER);
-				}
+				pstmt.setInt(2, od.getModelId());
+				pstmt.setInt(3, od.getExpressionId());
 				pstmt.setBoolean(4, od.isInUse());
 				pstmt.setBoolean(5, od.isRevenue());
 				pstmt.executeUpdate();

@@ -8,18 +8,11 @@ public class OpexData {
 
 	private int id;
 	private int scenarioId;
-	private Model model;
-	private Expression expression;
+	private int modelId;
+	private int expressionId;
 	private boolean inUse;
 	private boolean isRevenue;
 	private LinkedHashMap<Integer, BigDecimal> costData;
-	
-	public OpexData(Model model) {
-		super();
-		this.id = -1;
-		this.model = model;
-		this.costData = new LinkedHashMap<Integer, BigDecimal>();
-	}
 	
 	public OpexData(){
 		super();
@@ -33,19 +26,23 @@ public class OpexData {
 	public void setId(int id) {
 		this.id = id;
 	}
-	public Model getModel() {
-		return model;
-	}
-	public void setModel(Model model) {
-		this.model = model;
-	}
-	public Expression getExpression() {
-		return expression;
+	
+	public int getModelId() {
+		return modelId;
 	}
 
-	public void setExpression(Expression expression) {
-		this.expression = expression;
+	public void setModelId(int modelId) {
+		this.modelId = modelId;
 	}
+
+	public int getExpressionId() {
+		return expressionId;
+	}
+
+	public void setExpressionId(int expressionId) {
+		this.expressionId = expressionId;
+	}
+
 	public boolean isInUse() {
 		return inUse;
 	}
