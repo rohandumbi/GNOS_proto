@@ -22,10 +22,10 @@ public class ExpressionEndpoint {
 	public ExpressionEndpoint() {
 		controller = new ExpressionController();
 		
-		get("/project/:pid/expressions",
-				(req, res) -> controller.getAll(req.params(":pid")), json());
+		get("/project/:id/expressions",
+				(req, res) -> controller.getAll(req.params(":id")), json());
 		
-        post("/project/:pid/expressions", new Route() {
+        post("/project/:id/expressions", new Route() {
 			
 			@Override
 			public Object handle(Request req, Response res) throws Exception {
@@ -33,7 +33,7 @@ public class ExpressionEndpoint {
 				if(requestObject.isJsonObject()) {
 					JsonObject jsonObject = requestObject.getAsJsonObject();
 					try {
-						return controller.create(jsonObject, req.params(":pid"));
+						return controller.create(jsonObject, req.params(":id"));
 					} catch (Exception e) {
 						res.status(400);
 						return new ResponseError("Expression creation failed. "+e.getMessage());
@@ -44,7 +44,7 @@ public class ExpressionEndpoint {
 			}
 		}, json());
 		
-        put("/project/:pid/expressions", new Route() {
+        put("/expressions/:id", new Route() {
 			
 			@Override
 			public Object handle(Request req, Response res) throws Exception {
@@ -64,7 +64,7 @@ public class ExpressionEndpoint {
 		}, json());
 
 		/* DELETE exisitng expression */
-		delete("/project/:pid/expressions/:id", (req, res) -> controller.delete(req.params(":id")), json());
+		delete("/expressions/:id", (req, res) -> controller.delete(req.params(":id")), json());
 	}
 
 }

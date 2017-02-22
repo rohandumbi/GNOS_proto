@@ -64,7 +64,7 @@ public class ModelEndpoint {
 		}, json());
 
 		/* DELETE exisitng expression */
-		delete("/expressions/:id", (req, res) -> controller.delete(req.params(":id")), json());
+		delete("/model/:id", (req, res) -> controller.delete(req.params(":id")), json());
 	}
 
 }
