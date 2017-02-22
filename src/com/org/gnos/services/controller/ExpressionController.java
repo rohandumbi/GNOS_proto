@@ -24,7 +24,10 @@ public class ExpressionController {
 		boolean isGrade = jsonObject.get("isGrade").getAsBoolean();
 		boolean isComplex = jsonObject.get("isComplex").getAsBoolean();
 		String exprvalue = jsonObject.get("exprvalue").getAsString();
-		String filter = jsonObject.get("filter").getAsString();
+		String filter = null;
+		if(jsonObject.get("filter") != null){
+			filter = jsonObject.get("filter").getAsString();
+		}
 		Expression obj = new Expression();
 		obj.setName(name);
 		obj.setGrade(isGrade);
@@ -37,14 +40,18 @@ public class ExpressionController {
 	}
 	
 	
-	public Expression update(JsonObject jsonObject, String id) throws Exception {		
+	public Expression update(JsonObject jsonObject, String projectId) throws Exception {		
 		String name = jsonObject.get("name").getAsString();
-		boolean isGrade = jsonObject.get("is_grade").getAsBoolean();
-		boolean isComplex = jsonObject.get("is_complex").getAsBoolean();
-		String exprvalue = jsonObject.get("expr_value").getAsString();
-		String filter = jsonObject.get("filter").getAsString();
+		boolean isGrade = jsonObject.get("isGrade").getAsBoolean();
+		boolean isComplex = jsonObject.get("isComplex").getAsBoolean();
+		String exprvalue = jsonObject.get("exprvalue").getAsString();
+		String filter = null;
+		if(jsonObject.get("filter") != null){
+			filter = jsonObject.get("filter").getAsString();
+		}
+		int id = jsonObject.get("id").getAsInt();
 		Expression obj = new Expression();
-		obj.setId(Integer.parseInt(id));
+		obj.setId(id);
 		obj.setName(name);
 		obj.setGrade(isGrade);
 		obj.setComplex(isComplex);
