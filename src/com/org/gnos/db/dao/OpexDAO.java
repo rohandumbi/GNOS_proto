@@ -26,7 +26,7 @@ public class OpexDAO {
 	private static final String SQL_DELETE_OPEX_DEFN = "delete from opex_defn where id = ?";
 	private static final String SQL_DELETE_OPEX_MAPPING = "delete from model_year_mapping where opex_id in (select id from  opex_defn where id = ? )";
 	private static final String SQL_UPDATE_OPEX_DEFN = "update opex_defn set model_id = ? , expression_id = ?, in_use = ?, is_revenue = ? where id = ?";
-	private static final String SQL_UPDATE_OPEX_MAPPING = "update model_year_mapping set value = ?  where opex_id = ?, year = ? ";
+	private static final String SQL_UPDATE_OPEX_MAPPING = "update model_year_mapping set value = ?  where opex_id = ? and year = ? ";
 	
 	public List<OpexData> getAll(int scenarioId) {
 
