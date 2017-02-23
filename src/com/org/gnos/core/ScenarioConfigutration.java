@@ -582,7 +582,7 @@ public class ScenarioConfigutration {
 				if (od.getId() > 0)
 					continue;
 				//pstmt.setInt(1, this.projectConfiguration.getProjectId());
-				pstmt.setInt(1, od.getScenarioId());
+				pstmt.setInt(1,scenarioId);
 				pstmt.setInt(2, od.getModelId());
 				pstmt.setInt(3, od.getExpressionId());
 				pstmt.setBoolean(4, od.isInUse());

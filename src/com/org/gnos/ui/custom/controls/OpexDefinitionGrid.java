@@ -2,11 +2,8 @@ package com.org.gnos.ui.custom.controls;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -33,7 +30,6 @@ import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.OpexData;
-import com.org.gnos.db.model.ProcessConstraintData;
 import com.org.gnos.db.model.Scenario;
 
 public class OpexDefinitionGrid extends Composite {
@@ -339,7 +335,6 @@ public class OpexDefinitionGrid extends Composite {
 
 	public void addRow(){
 		OpexData opexData = new OpexData();
-		opexData.setScenarioId(this.scenario.getId());
 		this.existingOpexDataList.add(opexData);
 		this.addRow(opexData);
 	}
