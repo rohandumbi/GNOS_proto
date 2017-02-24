@@ -45,7 +45,9 @@ public class OpexDAO {
 				OpexData opexData = opexDataMap.get(id);
 				opexData = map(resultSet, opexData);
 				opexDataMap.put(id, opexData);
-				opexDataList.add(opexData);
+				if(!isOpexAddedToList(opexDataList, opexData)){
+					opexDataList.add(opexData);
+				}
 			}
 
 		} catch(SQLException e){
@@ -53,6 +55,17 @@ public class OpexDAO {
 		}
 
 		return opexDataList;
+	}
+	
+	private boolean isOpexAddedToList(List<OpexData> opexDataList, OpexData opexData){
+		boolean isPresent = false;
+		for(OpexData od: opexDataList){
+			if(od.getId() == opexData.getId()){
+				isPresent = true;
+				break;
+			}
+		}
+		return isPresent;
 	}
 
 	public boolean create(OpexData opexData, int scenarioId){
