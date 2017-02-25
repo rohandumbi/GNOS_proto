@@ -10,7 +10,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.org.gnos.services.ResponseError;
-import com.org.gnos.services.controller.OpexController;
+import com.org.gnos.services.controller.FixedCostController;
 
 import spark.Request;
 import spark.Response;
@@ -18,10 +18,10 @@ import spark.Route;
 
 public class FixedCostEndpoint {
 
-		OpexController controller;
+		FixedCostController controller;
 		
 		public FixedCostEndpoint() {
-			controller = new OpexController();
+			controller = new FixedCostController();
 			
 			get("/scenario/:id/fixedcosts", (req, res) -> controller.getAll(req.params(":id")), json());
 			

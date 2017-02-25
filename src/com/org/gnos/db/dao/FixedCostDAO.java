@@ -36,12 +36,19 @@ public class FixedCostDAO {
 			PreparedStatement statement = prepareStatement(connection, SQL_LIST_ORDER_BY_ID, false, values);
 			ResultSet resultSet = statement.executeQuery();
 		){
+			boolean addToList = false;
 			while(resultSet.next()){
 				int costHead = resultSet.getInt("cost_head");
 				FixedOpexCost fixedOpexCost = fixedCostMap.get(costHead);
+				if(fixedOpexCost == null){
+					addToList = true;
+				}
 				fixedOpexCost = map(resultSet, fixedOpexCost);
 				fixedCostMap.put(costHead, fixedOpexCost);
-				fixedCosts.add(fixedOpexCost);
+				if(addToList){
+					fixedCosts.add(fixedOpexCost);
+					addToList = false;
+				}			
 			}
 
 		} catch(SQLException e){
@@ -119,13 +126,12 @@ public class FixedCostDAO {
 	}
 
 	private FixedOpexCost map(ResultSet rs, FixedOpexCost fixedOpexCost) throws SQLException {
-		while (rs.next()) {
-			if (fixedOpexCost == null) {
-				fixedOpexCost = new FixedOpexCost();
-				fixedOpexCost.setCostHead(rs.getInt("cost_head"));
-			}
-			fixedOpexCost.addCostData(rs.getInt("year"), rs.getBigDecimal("value"));
+		if (fixedOpexCost == null) {
+			fixedOpexCost = new FixedOpexCost();
+			fixedOpexCost.setCostHead(rs.getInt("cost_head"));
 		}
+		fixedOpexCost.addCostData(rs.getInt("year"), rs.getBigDecimal("value"));
+		
 		return fixedOpexCost;
 	}
 }
