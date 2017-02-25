@@ -18,7 +18,7 @@ import spark.Route;
 
 public class FixedCostEndpoint {
 
-		FixedCostController controller;
+	FixedCostController controller;
 		
 		public FixedCostEndpoint() {
 			controller = new FixedCostController();
