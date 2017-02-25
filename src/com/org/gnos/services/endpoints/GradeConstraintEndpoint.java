@@ -10,7 +10,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.org.gnos.services.ResponseError;
-import com.org.gnos.services.controller.OpexController;
+import com.org.gnos.services.controller.GradeConstraintController;
 
 import spark.Request;
 import spark.Response;
@@ -18,10 +18,10 @@ import spark.Route;
 
 public class GradeConstraintEndpoint {
 
-		OpexController controller;
+		GradeConstraintController controller;
 		
 		public GradeConstraintEndpoint() {
-			controller = new OpexController();
+			controller = new GradeConstraintController();
 			
 			get("/scenario/:id/gradeconstraints", (req, res) -> controller.getAll(req.params(":id")), json());
 			

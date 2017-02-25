@@ -10,7 +10,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.org.gnos.services.ResponseError;
-import com.org.gnos.services.controller.OpexController;
+import com.org.gnos.services.controller.ProcessConstraintController;
 
 import spark.Request;
 import spark.Response;
@@ -18,10 +18,10 @@ import spark.Route;
 
 public class ProcessConstraintEndpoint {
 
-		OpexController controller;
+		ProcessConstraintController controller;
 		
 		public ProcessConstraintEndpoint() {
-			controller = new OpexController();
+			controller = new ProcessConstraintController();
 			
 			get("/scenario/:id/processconstraints", (req, res) -> controller.getAll(req.params(":id")), json());
 			

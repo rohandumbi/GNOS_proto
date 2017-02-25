@@ -11,7 +11,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.org.gnos.services.ResponseError;
 import com.org.gnos.services.controller.BenchConstraintController;
-import com.org.gnos.services.controller.OpexController;
 
 import spark.Request;
 import spark.Response;
