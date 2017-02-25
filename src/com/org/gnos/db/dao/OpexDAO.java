@@ -48,11 +48,10 @@ public class OpexDAO {
 				}
 				opexData = map(resultSet, opexData);
 				opexDataMap.put(id, opexData);
-				if(!isOpexAddedToList(opexDataList, opexData)){
-				opexDataList.add(opexData);
+				if(addToList) {	
+					opexDataList.add(opexData);
 					addToList = false;
 				}
-			}
 			}
 
 		} catch(SQLException e){
