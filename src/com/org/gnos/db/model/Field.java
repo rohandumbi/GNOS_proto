@@ -10,6 +10,7 @@ public class Field {
 	private int id;
 	private String name;
 	private short dataType;
+	private String weightedUnit;
 	
 	public Field(){
 		super();
@@ -21,6 +22,7 @@ public class Field {
 		this.id = -1;
 		this.name = name;
 		this.dataType = TYPE_TEXT;
+		this.weightedUnit = "";
 	}
 	
 	public Field(int id, String name, short dataType) {
@@ -28,6 +30,7 @@ public class Field {
 		this.id = id;
 		this.name = name;
 		this.dataType = dataType;
+		this.weightedUnit = "";
 	}
 	
 	public int getId() {
@@ -46,10 +49,17 @@ public class Field {
 		return dataType;
 	}
 	public void setDataType(short dataType) {
-		if(dataType < 0 || dataType > 1) return ;
+		if(dataType < 0 || dataType > 4) return ;
 		
 		this.dataType = dataType;
 	}
+	public String getWeightedUnit() {
+		return weightedUnit;
+	}
+	public void setWeightedUnit(String weightedUnit) {
+		this.weightedUnit = weightedUnit;
+	}
+	
 	
 	
 }

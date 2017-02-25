@@ -31,6 +31,7 @@ CREATE TABLE fields(
    project_id INT NOT NULL,
    name VARCHAR(100) NOT NULL,
    data_type TINYINT,
+   weighted_unit VARCHAR(100),
    PRIMARY KEY ( id )
 );
 

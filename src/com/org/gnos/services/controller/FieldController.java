@@ -19,10 +19,11 @@ public class FieldController {
 	
 	public Field create(JsonObject jsonObject, String pid) throws Exception {
 		String name = jsonObject.get("name").getAsString();
-		short dataType = jsonObject.get("data_type").getAsShort();
+		short dataType = jsonObject.get("dataType").getAsShort();
+		String weightedUnit = jsonObject.get("weightedUnit").getAsString();
 		Field obj = new Field(name);
 		obj.setDataType(dataType);
-
+		obj.setWeightedUnit(weightedUnit);
 		boolean created = dao.create(obj, Integer.parseInt(pid));
 		if(created) return obj;
 		throw new Exception();
@@ -33,9 +34,11 @@ public class FieldController {
 		String name = jsonObject.get("name").getAsString();
 		short dataType = jsonObject.get("dataType").getAsShort();
 		int fieldId = jsonObject.get("id").getAsInt();
+		String weightedUnit = jsonObject.get("weightedUnit").getAsString();
 		Field obj = new Field(name);
 		obj.setId(fieldId);
 		obj.setDataType(dataType);
+		obj.setWeightedUnit(weightedUnit);
 		boolean created = dao.update(obj);
 		if(created) return obj;
 		throw new Exception();

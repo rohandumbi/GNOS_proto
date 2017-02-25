@@ -14,10 +14,10 @@ import com.org.gnos.db.model.Field;
 
 public class FieldDAO {
 
-	private static final String SQL_LIST_ORDER_BY_ID = "select  id, name, data_type from  fields where project_id =  ? order by id";
-	private static final String SQL_INSERT = "insert into fields (project_id, name, data_type) values (?, ?, ?)";
+	private static final String SQL_LIST_ORDER_BY_ID = "select  id, name, data_type, weighted_unit from  fields where project_id =  ? order by id";
+	private static final String SQL_INSERT = "insert into fields (project_id, name, data_type, weighted_unit) values (?, ?, ?, ?)";
 	private static final String SQL_DELETE = "delete from fields where id = ?";
-	private static final String SQL_UPDATE = "update fields set data_type = ? where id = ?";
+	private static final String SQL_UPDATE = "update fields set data_type = ?, weighted_unit = ? where id = ?";
 	
 	
 	public List<Field> getAll(int projectId) {
@@ -48,7 +48,8 @@ public class FieldDAO {
 		Object[] values = {
 				projectId, 
 				field.getName(),
-				field.getDataType()
+				field.getDataType(),
+				field.getWeightedUnit()
 	   };
 
 		try ( Connection connection = DBManager.getConnection();
@@ -82,6 +83,7 @@ public class FieldDAO {
 		
 		Object[] values = {
 				field.getDataType(),
+				field.getWeightedUnit(),
 				field.getId()
 	   };
 
@@ -122,7 +124,8 @@ public class FieldDAO {
 		Field field = new Field(rs.getString("name"));
 		field.setId(rs.getInt("id"));
 		field.setDataType(rs.getShort("data_type"));
-
+		field.setWeightedUnit(rs.getString("weighted_unit"));
+		
 		return field;
 	}
 }

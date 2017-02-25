@@ -12,7 +12,6 @@ public class GNOSConfig {
 	public static void load() {		
 		try {
 			prop = new Properties();
-			//prop.load(new FileInputStream("resources/gnos.properties"));
 			prop.load(GNOSConfig.class.getClassLoader().getResourceAsStream("gnos.properties"));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
