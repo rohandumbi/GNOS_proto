@@ -54,12 +54,12 @@ public class TestApplication {
 	}
 	public static void testService() {
 		new ProjectEndpoint();
-		new ExpressionEndpoint();
 		new FieldEndpoint();
+		new ExpressionEndpoint();
 		new ModelEndpoint();
-		new ScenarioEndpoint();
 		new DumpEndpoint();
 		new StockpileEndpoint();
+		new ScenarioEndpoint();
 		new OpexEndpoint();
 		new FixedCostEndpoint();
 		new CapexEndpoint();

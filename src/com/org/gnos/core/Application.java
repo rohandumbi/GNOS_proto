@@ -9,6 +9,7 @@ public class Application {
 	public static void start() {
 		GNOSConfig.load();
 		DBManager.initializePool();
+		EndpointManager.start();
 	}
 
 	public static void shutdown() {
@@ -22,5 +23,9 @@ public class Application {
 	
 	public static void generate() {
 		SchedulerService.getInstance().execute();
+	}
+	
+	public static void main(String[] args) {
+		start();
 	}
 }
