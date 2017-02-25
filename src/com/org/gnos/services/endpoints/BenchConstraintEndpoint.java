@@ -10,6 +10,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.org.gnos.services.ResponseError;
+import com.org.gnos.services.controller.BenchConstraintController;
 import com.org.gnos.services.controller.OpexController;
 
 import spark.Request;
@@ -18,10 +19,10 @@ import spark.Route;
 
 public class BenchConstraintEndpoint {
 
-		OpexController controller;
+		BenchConstraintController controller;
 		
 		public BenchConstraintEndpoint() {
-			controller = new OpexController();
+			controller = new BenchConstraintController();
 			
 			get("/scenario/:id/benchconstraints", (req, res) -> controller.getAll(req.params(":id")), json());
 			
