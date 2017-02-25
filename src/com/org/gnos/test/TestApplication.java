@@ -4,7 +4,6 @@ import com.org.gnos.core.GNOSConfig;
 import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.db.dao.ProjectDAO;
 import com.org.gnos.db.model.Project;
-import com.org.gnos.services.controller.FixedCostController;
 import com.org.gnos.services.csv.GNOSCSVDataProcessor;
 import com.org.gnos.services.endpoints.BenchConstraintEndpoint;
 import com.org.gnos.services.endpoints.CapexEndpoint;
@@ -17,6 +16,7 @@ import com.org.gnos.services.endpoints.GradeConstraintEndpoint;
 import com.org.gnos.services.endpoints.ModelEndpoint;
 import com.org.gnos.services.endpoints.OpexEndpoint;
 import com.org.gnos.services.endpoints.PitDependencyEndpoint;
+import com.org.gnos.services.endpoints.PitEndpoint;
 import com.org.gnos.services.endpoints.ProcessConstraintEndpoint;
 import com.org.gnos.services.endpoints.ProjectEndpoint;
 import com.org.gnos.services.endpoints.ScenarioEndpoint;
@@ -53,6 +53,7 @@ public class TestApplication {
 		return true;
 	}
 	public static void testService() {
+		new PitEndpoint();
 		new ProjectEndpoint();
 		new FieldEndpoint();
 		new ExpressionEndpoint();

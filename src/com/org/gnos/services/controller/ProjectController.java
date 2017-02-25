@@ -5,6 +5,7 @@ import java.util.List;
 import com.google.gson.JsonObject;
 import com.org.gnos.db.dao.ProjectDAO;
 import com.org.gnos.db.model.Project;
+import com.org.gnos.services.PitBenchProcessor;
 import com.org.gnos.services.csv.GNOSCSVDataProcessor;
 
 public class ProjectController {
@@ -52,5 +53,6 @@ public class ProjectController {
 		gnosCsvDataProcessor.processCsv(fileName);
 		gnosCsvDataProcessor.storeFields(projectId);
 		gnosCsvDataProcessor.dumpToDB(projectId);
+		new PitBenchProcessor().updatePitBenchData(projectId);
 	}
 }

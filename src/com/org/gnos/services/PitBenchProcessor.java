@@ -2,32 +2,52 @@ package com.org.gnos.services;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.db.DBManager;
 import com.org.gnos.services.csv.GNOSCSVDataProcessor;
 
 
 public class PitBenchProcessor {
 
-	Map<String, PitBenchMappingData> pitBenchMapping = null;
+	private Map<String, PitBenchMappingData> pitBenchMapping = null;
+	private Map<String, String> requiredFieldMap = new LinkedHashMap<String, String>();
 	
 	public void updatePitBenchData(int projectId){
+		loadRequiredFieldMapping(projectId);
 		parsePitAndBenchData();
 		updateDB(projectId);
 	}
 	
+	private void loadRequiredFieldMapping(int projectId) {
+		String sql_required_mapping = "select mapped_field_name from required_field_mapping where project_id = "+projectId;
+		try(
+				Connection connection = DBManager.getConnection();
+				Statement statement = connection.createStatement();
+				ResultSet rs = statement.executeQuery(sql_required_mapping);
+			){
+				while(rs.next()){
+					requiredFieldMap.put(rs.getString("field_name"), rs.getString("mapped_field_name"));
+				}
+			} catch(SQLException e){
+				e.printStackTrace();
+			}
+		
+	}
+
 	private void parsePitAndBenchData() {
 
-		Map<String, String> requiredFieldMap = ProjectConfigutration.getInstance().getRequiredFieldMapping();
+		//Map<String, String> requiredFieldMap = ProjectConfigutration.getInstance().getRequiredFieldMapping();
 		pitBenchMapping = new HashMap<String, PitBenchMappingData>();
 		String[] columns = GNOSCSVDataProcessor.getInstance().getHeaderColumns();
 		List<String[]> data = GNOSCSVDataProcessor.getInstance().getData();
@@ -67,7 +87,7 @@ public class PitBenchProcessor {
 	private void updateDB(int projectId) {
 
 		Connection conn = DBManager.getConnection();
-		Map<String, String> requiredFieldMap = ProjectConfigutration.getInstance().getRequiredFieldMapping();
+		//Map<String, String> requiredFieldMap = ProjectConfigutration.getInstance().getRequiredFieldMapping();
 		String pitNameAlias = requiredFieldMap.get("pit_name");
 		String benchNameAlias = requiredFieldMap.get("bench_rl");
 		String blockNoAlias = requiredFieldMap.get("block");

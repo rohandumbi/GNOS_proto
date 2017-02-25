@@ -5,6 +5,7 @@ import java.util.List;
 import com.google.gson.JsonObject;
 import com.org.gnos.db.dao.RequiredFieldDAO;
 import com.org.gnos.db.model.RequiredField;
+import com.org.gnos.services.PitBenchProcessor;
 
 public class RequiredFieldController {
 
@@ -35,8 +36,9 @@ public class RequiredFieldController {
 		RequiredField obj = new RequiredField();
 		obj.setFieldName(fieldName);
 		obj.setMappedFieldname(mappedFieldname);
-		boolean created = dao.create(obj, Integer.parseInt(pid));
-		if(created) return obj;
+		boolean updated = dao.create(obj, Integer.parseInt(pid));
+		new PitBenchProcessor().updatePitBenchData(Integer.parseInt(pid));
+		if(updated) return obj;
 		throw new Exception();
 	}
 	
