@@ -30,7 +30,7 @@ public class PitBenchProcessor {
 	}
 	
 	private void loadRequiredFieldMapping(int projectId) {
-		String sql_required_mapping = "select mapped_field_name from required_field_mapping where project_id = "+projectId;
+		String sql_required_mapping = "select field_name, mapped_field_name from required_field_mapping where project_id = "+projectId;
 		try(
 				Connection connection = DBManager.getConnection();
 				Statement statement = connection.createStatement();

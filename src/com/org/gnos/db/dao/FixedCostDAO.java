@@ -36,19 +36,16 @@ public class FixedCostDAO {
 			PreparedStatement statement = prepareStatement(connection, SQL_LIST_ORDER_BY_ID, false, values);
 			ResultSet resultSet = statement.executeQuery();
 		){
-			boolean addToList = false;
 			while(resultSet.next()){
 				int costHead = resultSet.getInt("cost_head");
 				FixedOpexCost fixedOpexCost = fixedCostMap.get(costHead);
 				if(fixedOpexCost == null){
-					addToList = true;
-				}
-				fixedOpexCost = map(resultSet, fixedOpexCost);
-				fixedCostMap.put(costHead, fixedOpexCost);
-				if(addToList){
+					fixedOpexCost = map(resultSet, fixedOpexCost);
+					fixedCostMap.put(costHead, fixedOpexCost);
 					fixedCosts.add(fixedOpexCost);
-					addToList = false;
-				}			
+				} else {
+					map(resultSet, fixedOpexCost);
+				}
 			}
 
 		} catch(SQLException e){

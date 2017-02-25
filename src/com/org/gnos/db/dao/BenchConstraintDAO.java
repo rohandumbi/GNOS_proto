@@ -40,9 +40,13 @@ public class BenchConstraintDAO {
 			while(resultSet.next()){
 				int id = resultSet.getInt("id");
 				PitBenchConstraintData pcd = benchConstraintMap.get(id);
-				pcd = map(resultSet, pcd);
-				benchConstraintMap.put(id, pcd);
-				benchConstraintList.add(pcd);
+				if(pcd == null) {
+					pcd = map(resultSet, pcd);
+					benchConstraintMap.put(id, pcd);
+					benchConstraintList.add(pcd);
+				} else {
+					pcd = map(resultSet, pcd);
+				}				
 			}			
 		} catch(SQLException e){
 			e.printStackTrace();

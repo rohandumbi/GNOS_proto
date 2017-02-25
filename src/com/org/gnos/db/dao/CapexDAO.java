@@ -42,9 +42,14 @@ public class CapexDAO {
 			while(resultSet.next()){
 				int id = resultSet.getInt("id");
 				CapexData cd = capexDataMap.get(id);
-				cd = map(resultSet, cd);
-				capexDataList.add(cd);
-				capexDataMap.put(id, cd);
+				if(cd == null) {
+					cd = map(resultSet, cd);
+					capexDataList.add(cd);
+					capexDataMap.put(id, cd);
+				} else {
+					map(resultSet, cd);
+				}
+				
 			}
 
 		} catch(SQLException e){

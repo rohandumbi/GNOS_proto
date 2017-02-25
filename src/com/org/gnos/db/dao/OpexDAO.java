@@ -39,18 +39,15 @@ public class OpexDAO {
 			PreparedStatement statement = prepareStatement(connection, SQL_LIST_ORDER_BY_ID, false, values);
 			ResultSet resultSet = statement.executeQuery();
 		){
-			boolean addToList = false;
 			while(resultSet.next()){
 				int id = resultSet.getInt("id");
 				OpexData opexData = opexDataMap.get(id);
 				if(opexData == null){
-					addToList = true;
-				}
-				opexData = map(resultSet, opexData);
-				opexDataMap.put(id, opexData);
-				if(addToList) {	
+					opexData = map(resultSet, opexData);
+					opexDataMap.put(id, opexData);
 					opexDataList.add(opexData);
-					addToList = false;
+				} else {
+					map(resultSet, opexData);
 				}
 			}
 

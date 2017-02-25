@@ -41,9 +41,13 @@ public class ProcessConstraintDAO {
 			while(resultSet.next()){
 				int id = resultSet.getInt("id");
 				ProcessConstraintData pcd = procesConstraintMap.get(id);
-				pcd = map(resultSet, pcd);
-				procesConstraintMap.put(id, pcd);
-				processConstraintList.add(pcd);
+				if(pcd == null) {
+					pcd = map(resultSet, pcd);
+					procesConstraintMap.put(id, pcd);
+					processConstraintList.add(pcd);
+				} else {
+					pcd = map(resultSet, pcd);
+				}				
 						
 			}
 			

@@ -41,9 +41,14 @@ public class GradeConstraintDAO {
 			while(resultSet.next()){
 				int id = resultSet.getInt("id");
 				GradeConstraintData gcd = gradeConstraintMap.get(id);
-				gcd = map(resultSet, gcd);
-				gradeConstraintMap.put(id, gcd);
-				gradeConstraintList.add(gcd);
+				if(gcd == null) {
+					gcd = map(resultSet, gcd);
+					gradeConstraintMap.put(id, gcd);
+					gradeConstraintList.add(gcd);
+				} else {
+					map(resultSet, gcd);
+				}
+				
 			}
 			
 		} catch(SQLException e){
