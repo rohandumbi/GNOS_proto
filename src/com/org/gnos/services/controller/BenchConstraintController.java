@@ -22,8 +22,8 @@ public class BenchConstraintController {
 	}
 	
 	public PitBenchConstraintData create(JsonObject jsonObject, String scenarioIdStr) throws Exception {
-		String pitName = jsonObject.get("pit_name").getAsString();
-		boolean inUse = jsonObject.get("in_use").getAsBoolean();
+		String pitName = jsonObject.get("pitName").getAsString();
+		boolean inUse = jsonObject.get("inUse").getAsBoolean();
 		JsonObject constraintDataObj = jsonObject.get("constraintData").getAsJsonObject();
 		PitBenchConstraintData obj = new PitBenchConstraintData();
 		obj.setPitName(pitName);
@@ -40,8 +40,8 @@ public class BenchConstraintController {
 	
 	public PitBenchConstraintData update(JsonObject jsonObject, String id) throws Exception {		
 
-		String pitName = jsonObject.get("pit_name").getAsString();
-		boolean inUse = jsonObject.get("in_use").getAsBoolean();
+		String pitName = jsonObject.get("pitName").getAsString();
+		boolean inUse = jsonObject.get("inUse").getAsBoolean();
 		JsonObject constraintDataObj = jsonObject.get("constraintData").getAsJsonObject();
 		PitBenchConstraintData obj = new PitBenchConstraintData();
 		obj.setId(Integer.parseInt(id));
