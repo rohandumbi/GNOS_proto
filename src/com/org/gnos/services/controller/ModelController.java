@@ -21,7 +21,10 @@ public class ModelController {
 	public Model create(JsonObject jsonObject, String pid) throws Exception {
 		String name = jsonObject.get("name").getAsString();
 		int expressionId = jsonObject.get("expressionId").getAsInt();
-		String condition = jsonObject.get("condition").getAsString();
+		String condition = null;
+		if(jsonObject.get("condition") !=null){
+			condition = jsonObject.get("condition").getAsString();
+		}
 		Model obj = new Model();
 		obj.setName(name);
 		obj.setExpressionId(expressionId);
@@ -35,7 +38,10 @@ public class ModelController {
 	public Model update(JsonObject jsonObject, String id) throws Exception {		
 		String name = jsonObject.get("name").getAsString();
 		int expressionId = jsonObject.get("expressionId").getAsInt();
-		String condition = jsonObject.get("condition").getAsString();
+		String condition = null;
+		if(jsonObject.get("condition") !=null){
+			condition = jsonObject.get("condition").getAsString();
+		}
 		Model obj = new Model();
 		obj.setId(Integer.parseInt(id));
 		obj.setName(name);
