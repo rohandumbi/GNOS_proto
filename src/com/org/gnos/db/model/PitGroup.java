@@ -5,22 +5,28 @@ import java.util.ArrayList;
 public class PitGroup {
 	private int id;
 	private String name;
-	private ArrayList<Pit> listChildPits;
-	private ArrayList<PitGroup> listChildPitGroups;
+	private ArrayList<Integer> listChildPits;
+	private ArrayList<Integer> listChildPitGroups;
+	
+	public PitGroup(){
+		this.id = -1;
+		this.listChildPits = new ArrayList<Integer>();
+		this.listChildPitGroups = new ArrayList<Integer>();
+	}
 	
 	public PitGroup(String name){
 		this.id = -1;
 		this.name = name;
-		this.listChildPits = new ArrayList<Pit>();
-		this.listChildPitGroups = new ArrayList<PitGroup>();
+		this.listChildPits = new ArrayList<Integer>();
+		this.listChildPitGroups = new ArrayList<Integer>();
 	}
 	
-	public void addPit(Pit newPit){
+	public void addPit(Integer newPit){
 		if(newPit == null) return;
 		this.listChildPits.add(newPit);
 	}
 	
-	public void addPitGroup(PitGroup newPitGroup){
+	public void addPitGroup(Integer newPitGroup){
 		if(newPitGroup == null) return;
 		this.listChildPitGroups.add(newPitGroup);
 	}
@@ -37,11 +43,11 @@ public class PitGroup {
 		return name;
 	}
 
-	public ArrayList<Pit> getListChildPits() {
+	public ArrayList<Integer> getListChildPits() {
 		return listChildPits;
 	}
 
-	public ArrayList<PitGroup> getListChildPitGroups() {
+	public ArrayList<Integer> getListChildPitGroups() {
 		return listChildPitGroups;
 	}
 }

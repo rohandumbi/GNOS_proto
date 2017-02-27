@@ -272,7 +272,7 @@ public class PitGroupDumpStockpileDefinitionScreen extends GnosScreen {
 					PitGroup pitGroup = new PitGroup(groupName);
 					String[] selectedPitNames = pitList.getSelection();
 					for(String selectedPitName: selectedPitNames){
-						pitGroup.addPit(getPitByNameFromPitList(selectedPitName));
+						//pitGroup.addPit(getPitByNameFromPitList(selectedPitName));
 					}
 					listOfPitGroups.add(pitGroup);
 					groupList.add(groupName);

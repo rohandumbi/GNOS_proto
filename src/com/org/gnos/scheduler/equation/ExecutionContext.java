@@ -136,11 +136,11 @@ public class ExecutionContext {
 
 	public Set<Integer> flattenPitGroup(PitGroup pg) {
 		 Set<Integer> pits = new HashSet<Integer>();
-		 for(com.org.gnos.db.model.Pit childPit: pg.getListChildPits()){
-			 pits.add(childPit.getPitNumber());
+		 for(Integer childPit: pg.getListChildPits()){
+			 pits.add(childPit);
 		 }
-		 for(PitGroup childGroup: pg.getListChildPitGroups()) {
-			 pits.addAll(flattenPitGroup(childGroup));
+		 for(Integer childGroup: pg.getListChildPitGroups()) {
+			 pits.addAll(flattenPitGroup(projectConfiguration.getPitGroupfromName(""+childGroup)));// Arpan hack
 		 }
 		 
 		 return pits;

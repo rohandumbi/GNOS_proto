@@ -37,10 +37,10 @@ public class PitGroupDefinitionGraph extends Composite {
 	public void addGroup(PitGroup pitGroup){
 		GraphNode groupNode = new GraphNode(this.graph, SWT.NONE, "Group: " + pitGroup.getName());
 		this.existingGroupNodeGraph.put(pitGroup.getName(), groupNode);
-		for(Pit pit : pitGroup.getListChildPits()){
+		/*for(Pit pit : pitGroup.getListChildPits()){
 			GraphNode pitNode = new GraphNode(this.graph, SWT.NONE, "Pit: " + pit.getPitName());
 			new GraphConnection(this.graph, ZestStyles.CONNECTIONS_DIRECTED, pitNode, groupNode);
-		}
+		}*/
 		this.graph.setLayoutAlgorithm(new HorizontalTreeLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);
 	}
 	

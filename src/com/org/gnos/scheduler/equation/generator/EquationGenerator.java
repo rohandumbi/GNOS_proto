@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Set;
 
 import com.org.gnos.core.GNOSConfig;
-import com.org.gnos.db.model.Pit;
 import com.org.gnos.db.model.PitGroup;
 import com.org.gnos.db.model.Product;
 import com.org.gnos.db.model.ProductJoin;
@@ -54,11 +53,12 @@ public abstract class EquationGenerator {
 	protected Set<Integer> getPitsFromPitGroup(PitGroup pg) {
 		Set<Integer> pitNumbers = new HashSet<Integer>();
 		if(pg == null) return pitNumbers;
-		for(Pit p: pg.getListChildPits()){
-			pitNumbers.add(p.getPitNumber());
+		for(Integer p: pg.getListChildPits()){
+			pitNumbers.add(p);
 		}
-		for(PitGroup pgi: pg.getListChildPitGroups()){
-			pitNumbers.addAll(getPitsFromPitGroup(pgi));
+		for(Integer pgi: pg.getListChildPitGroups()){
+			//pitNumbers.addAll(getPitsFromPitGroup(pgi)); // Arpan hack
+			
 		}
 		
 		return pitNumbers;

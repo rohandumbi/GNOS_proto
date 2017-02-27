@@ -5,25 +5,24 @@ import static spark.Spark.delete;
 import static spark.Spark.get;
 import static spark.Spark.post;
 import static spark.Spark.put;
+import spark.Request;
+import spark.Response;
+import spark.Route;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.org.gnos.services.ResponseError;
-import com.org.gnos.services.controller.FieldController;
-
-import spark.Request;
-import spark.Response;
-import spark.Route;
+import com.org.gnos.services.controller.PitGroupController;
 public class PitGroupEndpoint {
 
-	FieldController controller;
+	PitGroupController controller;
 	
 	public PitGroupEndpoint() {
-		controller = new FieldController();
-		get("/project/:id/fields", (req, res) -> controller.getAll(req.params(":id")), json());
+		controller = new PitGroupController();
+		get("/project/:id/pitgroups", (req, res) -> controller.getAll(req.params(":id")), json());
 		
-		post("/project/:id/fields", new Route() {
+		post("/project/:id/pitgroups", new Route() {
 			
 			@Override
 			public Object handle(Request req, Response res) throws Exception {
@@ -42,7 +41,7 @@ public class PitGroupEndpoint {
 			}
 		}, json());
 		
-        put("/field/:id", new Route() {
+        put("/pitgroups/:id", new Route() {
 			
 			@Override
 			public Object handle(Request req, Response res) throws Exception {
@@ -62,7 +61,7 @@ public class PitGroupEndpoint {
 		}, json());
 
 		/* DELETE exisitng expression */
-		delete("/field/:id", (req, res) -> controller.delete(req.params(":id")), json());
+		delete("/pitgroups/:id", (req, res) -> controller.delete(req.params(":id")), json());
 	}
 	
 	

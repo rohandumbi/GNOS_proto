@@ -515,10 +515,10 @@ public class ProjectConfigutration {
 				String child_pit_name = rs.getString(3);
 				String child_pitgroup_name = rs.getString(4);
 				if(child_pit_name != null){
-					pitGroup.addPit(this.getPitfromPitName(child_pit_name));
+					//pitGroup.addPit(this.getPitfromPitName(child_pit_name));
 				}
 				if(child_pitgroup_name != null){
-					pitGroup.addPitGroup(this.getPitGroupfromName(child_pitgroup_name));
+					//pitGroup.addPitGroup(this.getPitGroupfromName(child_pitgroup_name));
 				}
 				//pitGroupList.add(pitGroup);
 
@@ -1357,7 +1357,7 @@ public class ProjectConfigutration {
 			for(PitGroup pitGroup: pitGroupList) {
 
 				if(pitGroup.getId() == -1){//unsaved pit group
-					for(Pit pit: pitGroup.getListChildPits()){
+					/*for(Pit pit: pitGroup.getListChildPits()){
 						pstmt.setInt(1, projectId);
 						pstmt.setString(2, pitGroup.getName());
 						pstmt.setString(3, pit.getPitName());
@@ -1370,7 +1370,7 @@ public class ProjectConfigutration {
 						pstmt.setNull(3, java.sql.Types.VARCHAR);
 						pstmt.setString(4, childGroup.getName());
 						pstmt.executeUpdate();
-					}
+					}*/
 				}
 			}
 
