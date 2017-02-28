@@ -190,14 +190,11 @@ CREATE TABLE product_join_defn(
 DROP TABLE IF EXISTS pitgroup_pit_mapping; 
 
 CREATE TABLE pitgroup_pit_mapping(
-   id INT NOT NULL AUTO_INCREMENT,
    project_id INT NOT NULL,
    name  VARCHAR(100) NOT NULL,
-   child_pit_name VARCHAR(100),
-   child_pitgroup_name VARCHAR(100),
-   primary key (id),
-   unique (project_id, name, child_pit_name),
-   unique (project_id, name, child_pitgroup_name)
+   child_type TINYINT,
+   child VARCHAR(100),
+   unique (project_id, name, child_type, child)
 );
 
 DROP TABLE IF EXISTS dump; 

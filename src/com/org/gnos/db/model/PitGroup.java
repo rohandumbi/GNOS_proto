@@ -3,51 +3,48 @@ package com.org.gnos.db.model;
 import java.util.ArrayList;
 
 public class PitGroup {
-	private int id;
+	
+	public static short CHILD_PIT = 1 ;
+	public static short CHILD_PIT_GROUP = 2 ;
+	
 	private String name;
-	private ArrayList<Integer> listChildPits;
-	private ArrayList<Integer> listChildPitGroups;
+	private ArrayList<String> listChildPits;
+	private ArrayList<String> listChildPitGroups;
 	
 	public PitGroup(){
-		this.id = -1;
-		this.listChildPits = new ArrayList<Integer>();
-		this.listChildPitGroups = new ArrayList<Integer>();
+		this.listChildPits = new ArrayList<String>();
+		this.listChildPitGroups = new ArrayList<String>();
 	}
 	
 	public PitGroup(String name){
-		this.id = -1;
 		this.name = name;
-		this.listChildPits = new ArrayList<Integer>();
-		this.listChildPitGroups = new ArrayList<Integer>();
+		this.listChildPits = new ArrayList<String>();
+		this.listChildPitGroups = new ArrayList<String>();
 	}
 	
-	public void addPit(Integer newPit){
+	public void addPit(String newPit){
 		if(newPit == null) return;
 		this.listChildPits.add(newPit);
 	}
 	
-	public void addPitGroup(Integer newPitGroup){
+	public void addPitGroup(String newPitGroup){
 		if(newPitGroup == null) return;
 		this.listChildPitGroups.add(newPitGroup);
-	}
-	
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
 	}
 
 	public String getName() {
 		return name;
 	}
 
-	public ArrayList<Integer> getListChildPits() {
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public ArrayList<String> getListChildPits() {
 		return listChildPits;
 	}
 
-	public ArrayList<Integer> getListChildPitGroups() {
+	public ArrayList<String> getListChildPitGroups() {
 		return listChildPitGroups;
 	}
 }

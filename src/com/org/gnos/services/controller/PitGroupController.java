@@ -19,17 +19,35 @@ public class PitGroupController {
 		return dao.getAll();
 	}
 	
-	public PitGroup create(JsonObject jsonObject, String projectId) {
-		
-		return null;
+	public PitGroup create(JsonObject jsonObject, String projectId) throws Exception {
+		String name = jsonObject.get("name").getAsString();
+		short childType = jsonObject.get("childType").getAsShort();
+		String child =  jsonObject.get("child").getAsString();
+		PitGroup obj = new PitGroup();
+		obj.setName(name);
+		if(childType == PitGroup.CHILD_PIT) {
+			obj.addPit(child);
+		} else if(childType == PitGroup.CHILD_PIT_GROUP) {
+			obj.addPitGroup(child);
+		}
+		boolean created = dao.create(obj, Integer.parseInt(projectId));
+		if(created) return obj;
+		throw new Exception();
 	}
 	
-	public PitGroup update(JsonObject jsonObject, String id) {
-		
-		return null;
+	
+	public boolean deleteAll(String projectId) {
+		dao.deleteAll(Integer.parseInt(projectId));
+		return true;
 	}
 	
-	public boolean delete(String id) {
+	public boolean deletePit(String projectId, String name, String pitName) {	
+		dao.deletePit(Integer.parseInt(projectId), name, pitName);;
+		return true;
+	}
+	
+	public boolean deletePitGroup(String projectId, String name, String pitGroupname) {
+		dao.deletePitGroup(Integer.parseInt(projectId), name, pitGroupname);
 		return true;
 	}
 }

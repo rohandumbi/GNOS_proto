@@ -1,34 +1,45 @@
 package com.org.gnos.db.dao;
 
 import static com.org.gnos.db.dao.util.DAOUtil.prepareStatement;
+import static com.org.gnos.db.dao.util.DAOUtil.setValues;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.model.PitGroup;
 
 public class PitGroupDAO {
-	private static final String SQL_LIST_ORDER_BY_MODIFIED_DATE = "select id, name, description, fileName, created_date, modified_date from  project order by modified_date";
-	private static final String SQL_INSERT = "insert into project (name, description, fileName, created_date, modified_date) values (?, ?, ?, ?,?)";
-	private static final String SQL_DELETE = "delete from project where id = ?";
-	private static final String SQL_UPDATE = "update project set description = ?, fileName = ?, modified_date = ? where id = ?";
+	private static final String SQL_LIST_ORDER_BY_ID = "select name, child_type, child from pitgroup_pit_mapping where project_id = ? order by id asc ";
+	private static final String SQL_INSERT = "insert into pitgroup_pit_mapping ( project_id , name, child_type, child ) values ( ? , ?, ?, ?) ";
+	private static final String SQL_DELETE_ALL = "delete from pitgroup_pit_mapping where project_id = ?";
+	private static final String SQL_DELETE = "delete from pitgroup_pit_mapping where project_id = ? and name = ? and child_type = ? and child = ? ";
 	
 	public List<PitGroup> getAll() {
 		
 		List<PitGroup> pitGroups = new ArrayList<PitGroup>();
-		
+		Map<String, PitGroup> pitGroupMap = new HashMap<String, PitGroup>();
 		try (
 	            Connection connection = DBManager.getConnection();
-	            PreparedStatement statement = connection.prepareStatement(SQL_LIST_ORDER_BY_MODIFIED_DATE);
+	            PreparedStatement statement = connection.prepareStatement(SQL_LIST_ORDER_BY_ID);
 	            ResultSet resultSet = statement.executeQuery();
 	        ){
 			while(resultSet.next()){
-				pitGroups.add(map(resultSet));				
+				PitGroup pitGroup = pitGroupMap.get(resultSet.getString("name"));
+				if(pitGroup == null) {
+					pitGroup = map(resultSet, pitGroup);
+					pitGroupMap.put(pitGroup.getName(), pitGroup);
+					pitGroups.add(pitGroup);
+				} else {
+					map(resultSet, pitGroup);
+				}
+			
 			}
 			
 		} catch(SQLException e){
@@ -38,33 +49,42 @@ public class PitGroupDAO {
 		return pitGroups;
 	}
 	
-	public boolean create(PitGroup pitGroup){
-		
-		if (pitGroup.getId() != -1) {
-            throw new IllegalArgumentException("Project is already created.");
-        }
-		
-		Object[] values = {
-
-
-	   };
+	public boolean create(PitGroup pitGroup, int projectId){
 
 		try ( Connection connection = DBManager.getConnection();
-	            PreparedStatement statement = prepareStatement(connection, SQL_INSERT, true, values);
+	            PreparedStatement statement = connection.prepareStatement(SQL_INSERT);
 			){
 			
-			int affectedRows = statement.executeUpdate();
-            if (affectedRows == 0) {
-                //throw new DAOException("Creating user failed, no rows affected.");
-            }
-            
-            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                	pitGroup.setId(generatedKeys.getInt(1));
-                } else {
-                    //throw new DAOException("Creating user failed, no generated key obtained.");
-                }
-            }
+			for(String pitName : pitGroup.getListChildPits()) {
+				try{
+					Object[] values = {
+							projectId, 
+							pitGroup.getName(),
+							PitGroup.CHILD_PIT,
+							pitName				
+					};
+					setValues(statement, values);
+					statement.executeUpdate();			
+				} catch (Exception e) {
+					// Ignore exception
+				}
+			}
+			for(String pitGroupName : pitGroup.getListChildPitGroups()) {
+				try{
+					Object[] values = {
+							projectId, 
+							pitGroup.getName(),
+							PitGroup.CHILD_PIT_GROUP,
+							pitGroupName				
+					};
+					setValues(statement, values);
+					statement.executeUpdate();
+					
+				} catch (Exception e) {
+					// Ignore exception
+				}
+			}
+			
 		} catch(SQLException e){
 			e.printStackTrace();
 			return false;
@@ -73,57 +93,72 @@ public class PitGroupDAO {
 	}
 	
 	
-	public boolean update(PitGroup pitGroup){
-		
-		if (pitGroup.getId() == -1) {
-            throw new IllegalArgumentException("Project is not created.");
-        }
-		
-		Object[] values = {
-	   };
 
-		try ( Connection connection = DBManager.getConnection();
-	            PreparedStatement statement = prepareStatement(connection, SQL_UPDATE, true, values);
-			){
-			
-			statement.executeUpdate();        
-          
-		} catch(SQLException e){
-			e.printStackTrace();
-		}
-		return true;
-	}
 	
-	public void delete(PitGroup pitGroup){
+	public void deleteAll(int projectId){
 		
-		Object[] values = { 
-				pitGroup.getId()
-	        };
+		Object[] values = { projectId };
 
 	        try (
 	            Connection connection = DBManager.getConnection();
-	            PreparedStatement statement = prepareStatement(connection, SQL_DELETE, false, values);
+	            PreparedStatement statement = prepareStatement(connection, SQL_DELETE_ALL, false, values);
 	        ) {
-	            int affectedRows = statement.executeUpdate();
-	            if (affectedRows == 0) {
-	                //throw new DAOException("Deleting user failed, no rows affected.");
-	            } else {
-	            	pitGroup.setId(-1);
-	            }
+	            statement.executeUpdate();
 	        } catch (SQLException e) {
 	            //throw new DAOException(e);
 	        }
 	}
 	
-	private PitGroup map(ResultSet rs) throws SQLException {
-		PitGroup pitGroup = new PitGroup();
-		pitGroup.setId(rs.getInt("id"));
-		/*project.setName(rs.getString("name"));
-		project.setDesc(rs.getString("description"));
-		project.setFileName(rs.getString("fileName"));
-		project.setCreatedDate((Date)rs.getTimestamp("created_date"));
-		project.setModifiedDate((Date)rs.getTimestamp("modified_date"));*/
+	public void deletePit(int projectId, String name, String pitName){
+		
+		Object[] values = { 
+				projectId,
+				name,
+				PitGroup.CHILD_PIT,
+				pitName
+		};
 
+        try (
+            Connection connection = DBManager.getConnection();
+            PreparedStatement statement = prepareStatement(connection, SQL_DELETE, false, values);
+        ) {
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            //throw new DAOException(e);
+        }
+	}
+	
+	public void deletePitGroup(int projectId, String name, String pitGroupName){
+		
+		Object[] values = { 
+				projectId,
+				name,
+				PitGroup.CHILD_PIT,
+				pitGroupName
+		};
+
+        try (
+            Connection connection = DBManager.getConnection();
+            PreparedStatement statement = prepareStatement(connection, SQL_DELETE, false, values);
+        ) {
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            //throw new DAOException(e);
+        }
+	}
+	
+	private PitGroup map(ResultSet rs, PitGroup pitGroup) throws SQLException {
+		if(pitGroup == null){
+			pitGroup = new PitGroup();
+			pitGroup.setName(rs.getString("name"));
+		}
+		short childType = rs.getShort("child_type");
+		String child = rs.getString("child");
+		if(childType == PitGroup.CHILD_PIT) {
+			pitGroup.addPit(child);
+		} else if(childType == PitGroup.CHILD_PIT_GROUP) {
+			pitGroup.addPitGroup(child);
+		}
 		return pitGroup;
 	}
 }
