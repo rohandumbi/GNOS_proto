@@ -16,7 +16,7 @@ public class DumpDependencyDAO {
 
 
 	private static final String SQL_LIST_ORDER_BY_ID = "select id, in_use, first_pit_name, first_dump_name, dependent_dump_name from dump_dependency_defn where scenario_id = ? order by id asc ";
-	private static final String SQL_INSERT = "insert into dump_dependency_defnp ( scenario_id , first_pit_name, first_dump_name, dependent_dump_name, in_use) values (?, ?, ?, ?, ?)";
+	private static final String SQL_INSERT = "insert into dump_dependency_defn ( scenario_id , first_pit_name, first_dump_name, dependent_dump_name, in_use) values (?, ?, ?, ?, ?)";
 	private static final String SQL_DELETE = "delete from dump_dependency_defn where id = ?";
 	private static final String SQL_UPDATE = "update dump_dependency_defn set first_pit_name = ? , first_dump_name = ?, dependent_dump_name = ?, in_use = ? where id = ?";
 	
