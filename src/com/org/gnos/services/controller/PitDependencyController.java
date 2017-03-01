@@ -21,13 +21,17 @@ public class PitDependencyController {
 	
 	public PitDependencyData create(JsonObject jsonObject, String id) throws Exception {
 		PitDependencyData obj = new PitDependencyData();
-		obj.setFirstPitName(jsonObject.get("first_pit_name").getAsString());
-		obj.setFirstPitAssociatedBench(jsonObject.get("first_pit_bench_name").getAsString());
-		obj.setDependentPitName(jsonObject.get("dependent_pit_name").getAsString());
-		obj.setDependentPitAssociatedBench(jsonObject.get("dependent_pit_bench_name").getAsString());
-		obj.setMaxLead(jsonObject.get("max_lead").getAsInt());
-		obj.setMinLead(jsonObject.get("min_lead").getAsInt());
-		obj.setInUse(jsonObject.get("in_use").getAsBoolean());
+		obj.setFirstPitName(jsonObject.get("firstPitName").getAsString());
+		if(jsonObject.get("firstPitAssociatedBench") != null){
+			obj.setFirstPitAssociatedBench(jsonObject.get("firstPitAssociatedBench").getAsString());
+		}
+		obj.setDependentPitName(jsonObject.get("dependentPitName").getAsString());
+		if(jsonObject.get("dependentPitAssociatedBench") != null){
+			obj.setDependentPitAssociatedBench(jsonObject.get("dependentPitAssociatedBench").getAsString());
+		}
+		obj.setMaxLead(jsonObject.get("maxLead").getAsInt());
+		obj.setMinLead(jsonObject.get("minLead").getAsInt());
+		obj.setInUse(jsonObject.get("inUse").getAsBoolean());
 		boolean created = dao.create(obj, Integer.parseInt(id));
 		if(created) return obj;
 		throw new Exception();
@@ -37,13 +41,17 @@ public class PitDependencyController {
 	public PitDependencyData update(JsonObject jsonObject, String id) throws Exception {		
 		PitDependencyData obj = new PitDependencyData();
 		obj.setId(Integer.parseInt(id));
-		obj.setFirstPitName(jsonObject.get("first_pit_name").getAsString());
-		obj.setFirstPitAssociatedBench(jsonObject.get("first_pit_bench_name").getAsString());
-		obj.setDependentPitName(jsonObject.get("dependent_pit_name").getAsString());
-		obj.setDependentPitAssociatedBench(jsonObject.get("dependent_pit_bench_name").getAsString());
-		obj.setMaxLead(jsonObject.get("max_lead").getAsInt());
-		obj.setMinLead(jsonObject.get("min_lead").getAsInt());
-		obj.setInUse(jsonObject.get("in_use").getAsBoolean());
+		obj.setFirstPitName(jsonObject.get("firstPitName").getAsString());
+		if(jsonObject.get("firstPitAssociatedBench") != null){
+			obj.setFirstPitAssociatedBench(jsonObject.get("firstPitAssociatedBench").getAsString());
+		}
+		obj.setDependentPitName(jsonObject.get("dependentPitName").getAsString());
+		if(jsonObject.get("dependentPitAssociatedBench") != null){
+			obj.setDependentPitAssociatedBench(jsonObject.get("dependentPitAssociatedBench").getAsString());
+		}
+		obj.setMaxLead(jsonObject.get("maxLead").getAsInt());
+		obj.setMinLead(jsonObject.get("minLead").getAsInt());
+		obj.setInUse(jsonObject.get("inUse").getAsBoolean());
 		boolean updated = dao.update(obj);
 		if(updated) return obj;
 		throw new Exception();
