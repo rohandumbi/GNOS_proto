@@ -11,6 +11,8 @@ import com.org.gnos.services.endpoints.GradeConstraintEndpoint;
 import com.org.gnos.services.endpoints.ModelEndpoint;
 import com.org.gnos.services.endpoints.OpexEndpoint;
 import com.org.gnos.services.endpoints.PitDependencyEndpoint;
+import com.org.gnos.services.endpoints.PitEndpoint;
+import com.org.gnos.services.endpoints.PitGroupEndpoint;
 import com.org.gnos.services.endpoints.ProcessConstraintEndpoint;
 import com.org.gnos.services.endpoints.ProjectEndpoint;
 import com.org.gnos.services.endpoints.ScenarioEndpoint;
@@ -21,6 +23,8 @@ public class EndpointManager {
 	public static void start() {
 		new ProjectEndpoint();
 		new FieldEndpoint();
+		new PitEndpoint();
+		new PitGroupEndpoint();
 		new ExpressionEndpoint();
 		new ModelEndpoint();
 		new DumpEndpoint();

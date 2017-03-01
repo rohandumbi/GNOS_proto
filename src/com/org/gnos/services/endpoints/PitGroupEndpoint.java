@@ -4,7 +4,6 @@ import static com.org.gnos.services.JsonUtil.json;
 import static spark.Spark.delete;
 import static spark.Spark.get;
 import static spark.Spark.post;
-import static spark.Spark.put;
 import spark.Request;
 import spark.Response;
 import spark.Route;
@@ -41,27 +40,15 @@ public class PitGroupEndpoint {
 			}
 		}, json());
 		
-        put("/pitgroups/:id", new Route() {
-			
-			@Override
-			public Object handle(Request req, Response res) throws Exception {
-				JsonElement requestObject = new JsonParser().parse(req.body());
-				if(requestObject.isJsonObject()) {
-					JsonObject jsonObject = requestObject.getAsJsonObject();
-					try {
-						return controller.update(jsonObject, req.params(":id"));
-					} catch (Exception e) {
-						res.status(400);
-						return new ResponseError("Field update failed. "+e.getMessage());
-					}					
-				}
-				res.status(400);				
-				return new ResponseError("Field update failed due to improper input");
-			}
-		}, json());
 
 		/* DELETE exisitng expression */
-		delete("/pitgroups/:id", (req, res) -> controller.delete(req.params(":id")), json());
+		delete("/project/:id/pitgroups", (req, res) -> controller.deleteAll(req.params(":id")), json());
+		
+		delete("/project/:id/pitgroup/:pgname/pit/:pname", 
+				(req, res) -> controller.deletePit(req.params(":id"),req.params(":pgname"), req.params(":pname")), json());
+		
+		delete("/project/:id/pitgroup/:pgname/cpitgroup/:cpgname", 
+				(req, res) -> controller.deletePitGroup(req.params(":id"),req.params(":pgname"), req.params(":cpgname")), json());
 	}
 	
 	

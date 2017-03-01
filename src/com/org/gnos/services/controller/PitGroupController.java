@@ -16,7 +16,7 @@ public class PitGroupController {
 	
 	public List<PitGroup> getAll(String projectId) {
 		
-		return dao.getAll();
+		return dao.getAll(Integer.parseInt(projectId));
 	}
 	
 	public PitGroup create(JsonObject jsonObject, String projectId) throws Exception {

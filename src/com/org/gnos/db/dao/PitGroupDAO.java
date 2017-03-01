@@ -16,18 +16,19 @@ import com.org.gnos.db.DBManager;
 import com.org.gnos.db.model.PitGroup;
 
 public class PitGroupDAO {
-	private static final String SQL_LIST_ORDER_BY_ID = "select name, child_type, child from pitgroup_pit_mapping where project_id = ? order by id asc ";
+	private static final String SQL_LIST_ORDER_BY_ID = "select name, child_type, child from pitgroup_pit_mapping where project_id = ?";
 	private static final String SQL_INSERT = "insert into pitgroup_pit_mapping ( project_id , name, child_type, child ) values ( ? , ?, ?, ?) ";
 	private static final String SQL_DELETE_ALL = "delete from pitgroup_pit_mapping where project_id = ?";
 	private static final String SQL_DELETE = "delete from pitgroup_pit_mapping where project_id = ? and name = ? and child_type = ? and child = ? ";
 	
-	public List<PitGroup> getAll() {
+	public List<PitGroup> getAll(int projectId) {
 		
 		List<PitGroup> pitGroups = new ArrayList<PitGroup>();
 		Map<String, PitGroup> pitGroupMap = new HashMap<String, PitGroup>();
+		Object[] values = { projectId };
 		try (
 	            Connection connection = DBManager.getConnection();
-	            PreparedStatement statement = connection.prepareStatement(SQL_LIST_ORDER_BY_ID);
+	            PreparedStatement statement = prepareStatement(connection, SQL_LIST_ORDER_BY_ID, false, values);
 	            ResultSet resultSet = statement.executeQuery();
 	        ){
 			while(resultSet.next()){
@@ -133,7 +134,7 @@ public class PitGroupDAO {
 		Object[] values = { 
 				projectId,
 				name,
-				PitGroup.CHILD_PIT,
+				PitGroup.CHILD_PIT_GROUP,
 				pitGroupName
 		};
 
