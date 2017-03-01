@@ -21,10 +21,14 @@ public class DumpDependencyController {
 	
 	public DumpDependencyData create(JsonObject jsonObject, String id) throws Exception {
 		DumpDependencyData obj = new DumpDependencyData();
-		obj.setFirstPitName(jsonObject.get("first_pit_name").getAsString());
-		obj.setFirstDumpName(jsonObject.get("first_dump_name").getAsString());
-		obj.setDependentDumpName(jsonObject.get("dependent_dump_name").getAsString());
-		obj.setInUse(jsonObject.get("in_use").getAsBoolean());
+		if(jsonObject.get("firstPitName") != null){
+			obj.setFirstPitName(jsonObject.get("firstPitName").getAsString());
+		}
+		if(jsonObject.get("firstDumpName") !=null){
+			obj.setFirstDumpName(jsonObject.get("firstDumpName").getAsString());
+		}
+		obj.setDependentDumpName(jsonObject.get("dependentDumpName").getAsString());
+		obj.setInUse(jsonObject.get("inUse").getAsBoolean());
 		
 		boolean created = dao.create(obj, Integer.parseInt(id));
 		if(created) return obj;
@@ -35,10 +39,14 @@ public class DumpDependencyController {
 	public DumpDependencyData update(JsonObject jsonObject, String id) throws Exception {		
 		DumpDependencyData obj = new DumpDependencyData();
 		obj.setId(Integer.parseInt(id));
-		obj.setFirstPitName(jsonObject.get("first_pit_name").getAsString());
-		obj.setFirstDumpName(jsonObject.get("first_dump_name").getAsString());
-		obj.setDependentDumpName(jsonObject.get("dependent_dump_name").getAsString());
-		obj.setInUse(jsonObject.get("in_use").getAsBoolean());
+		if(jsonObject.get("firstPitName") != null){
+			obj.setFirstPitName(jsonObject.get("firstPitName").getAsString());
+		}
+		if(jsonObject.get("firstDumpName") !=null){
+			obj.setFirstDumpName(jsonObject.get("firstDumpName").getAsString());
+		}
+		obj.setDependentDumpName(jsonObject.get("dependentDumpName").getAsString());
+		obj.setInUse(jsonObject.get("inUse").getAsBoolean());
 		
 		boolean updated = dao.update(obj);
 		if(updated) return obj;
