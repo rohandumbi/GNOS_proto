@@ -1,62 +1,48 @@
 package com.org.gnos.db.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Product {
 	private String name;
-	private Model associatedProcess;
-	private List<Expression> listOfExpressions;
-	private ArrayList<Grade> listOfGrades;
+	private int modelId; 
+	private Set<Integer> expressionIdList;
+	private Set<Integer> gradeList;
 	
-	public Product(String name, Model associatedProcess){
-		this.associatedProcess = associatedProcess;
-		this.name = name;
-		this.listOfExpressions = new ArrayList<Expression>();
-		this.listOfGrades = new ArrayList<Grade>();
-	}
-
-	public Model getAssociatedProcess() {
-		return associatedProcess;
-	}
-
-	public List<Expression> getListOfExpressions() {
-		return listOfExpressions;
-	}
-
-	public void setListOfExpressions(List<Expression> listOfExpressions) {
-		this.listOfExpressions = listOfExpressions;
+	public Product(){
+		this.expressionIdList = new HashSet<Integer>();
+		this.gradeList = new HashSet<Integer>();
 	}
 
 	public String getName() {
 		return name;
 	}
 
-	public boolean addExpression(Expression expression){
-		for(Expression e: this.listOfExpressions){
-			if(e.getName().equals(expression.getName())){
-				return false;
-			}
-		}
-		this.listOfExpressions.add(expression);
-		return true;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public List<Grade> getListOfGrades() {
-		return listOfGrades;
+	public int getModelId() {
+		return modelId;
 	}
 
-	public void setListOfGrades(ArrayList<Grade> listOfGrades) {
-		this.listOfGrades = listOfGrades;
+	public void setModelId(int modelId) {
+		this.modelId = modelId;
 	}
-	
-	public boolean addGrade(Grade grade){
-		for(Grade g: this.listOfGrades){
-			if(g.getName().equals(grade.getName())){
-				return false;
-			}
-		}
-		this.listOfGrades.add(grade);
-		return true;
+
+	public Set<Integer> getExpressionIdList() {
+		return expressionIdList;
+	}
+
+	public void setExpressionIdList(Set<Integer> expressionIdList) {
+		this.expressionIdList = expressionIdList;
+	}
+
+	public Set<Integer> getGradeList() {
+		return gradeList;
+	}
+
+	public void setGradeList(Set<Integer> gradeList) {
+		this.gradeList = gradeList;
 	}
 }
