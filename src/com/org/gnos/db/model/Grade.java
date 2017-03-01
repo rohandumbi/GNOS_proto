@@ -4,7 +4,7 @@ public class Grade {
 
 	private int id;
 	private String name;
-	private Expression expression;
+	private int expressionId;
 	
 	public Grade(){
 		super();
@@ -27,12 +27,11 @@ public class Grade {
 		this.name = name;
 	}
 
-	public Expression getExpression() {
-		return expression;
+	public int getExpressionId() {
+		return expressionId;
 	}
 
-	public void setExpression(Expression expression) {
-		this.expression = expression;
+	public void setExpressionId(int expressionId) {
+		this.expressionId = expressionId;
 	}
-	
 }

@@ -494,7 +494,7 @@ public class ProjectConfigutration {
 	}
 
 	public void loadPitGroups() {
-		String sql = "select id, name, child_pit_name, child_pitgroup_name from pitgroup_pit_mapping where project_id = "+ this.projectId +" order by id asc ";
+/*		String sql = "select id, name, child_pit_name, child_pitgroup_name from pitgroup_pit_mapping where project_id = "+ this.projectId +" order by id asc ";
 
 		try (
 				Connection conn = DBManager.getConnection();
@@ -526,7 +526,7 @@ public class ProjectConfigutration {
 
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}
+		}*/
 	}
 
 	public void loadDumps() {
@@ -1347,7 +1347,7 @@ public class ProjectConfigutration {
 
 
 	public void savePitGroups() {
-		String insert_sql = "insert into pitgroup_pit_mapping ( project_id , name, child_pit_name, child_pitgroup_name) values ( ? , ?, ?, ?) ";
+/*		String insert_sql = "insert into pitgroup_pit_mapping ( project_id , name, child_pit_name, child_pitgroup_name) values ( ? , ?, ?, ?) ";
 
 		try (
 				Connection conn = DBManager.getConnection();
@@ -1357,7 +1357,7 @@ public class ProjectConfigutration {
 			for(PitGroup pitGroup: pitGroupList) {
 
 				if(pitGroup.getId() == -1){//unsaved pit group
-					/*for(Pit pit: pitGroup.getListChildPits()){
+					for(Pit pit: pitGroup.getListChildPits()){
 						pstmt.setInt(1, projectId);
 						pstmt.setString(2, pitGroup.getName());
 						pstmt.setString(3, pit.getPitName());
@@ -1370,13 +1370,13 @@ public class ProjectConfigutration {
 						pstmt.setNull(3, java.sql.Types.VARCHAR);
 						pstmt.setString(4, childGroup.getName());
 						pstmt.executeUpdate();
-					}*/
+					}
 				}
 			}
 
 		} catch (SQLException e) {
 			System.err.println("Failed saving pit groups. "+e.getMessage());
-		}
+		}*/
 	}
 	public void saveDumps() {
 		String insert_sql = "insert into dump ( project_id , type, name, condition_str, mapped_to, mapping_type, has_capacity, capacity) values ( ? , ?, ?, ?, ?, ?, ?, ?)";
