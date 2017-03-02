@@ -15,13 +15,10 @@ import java.util.Map;
 import java.util.Set;
 
 import com.org.gnos.db.DBManager;
-import com.org.gnos.db.dao.ExpressionDAO;
-import com.org.gnos.db.dao.FieldDAO;
 import com.org.gnos.db.model.CycleTimeMappingData;
 import com.org.gnos.db.model.Dump;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Field;
-import com.org.gnos.db.model.Grade;
 import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.Pit;
 import com.org.gnos.db.model.PitGroup;
@@ -32,7 +29,6 @@ import com.org.gnos.db.model.ProductJoin;
 import com.org.gnos.db.model.Stockpile;
 import com.org.gnos.db.model.TruckParameterCycleTime;
 import com.org.gnos.db.model.TruckParameterData;
-import com.org.gnos.services.PitBenchProcessor;
 
 public class ProjectConfigutration {
 
@@ -98,21 +94,10 @@ public class ProjectConfigutration {
 		dumpList = new ArrayList<Dump>();
 		stockPileList = new ArrayList<Stockpile>();
 
-		loadFieldData();
 		loadCycleTimeFieldData();
-		loadFieldMappingData();
-		loadExpressions();
-		loadModels();
 		loadProcessDetails();
-		loadPitGroups();
-		loadDumps();
-		loadStockpiles();
 		loadCycleTimeMappingData();
 		loadTruckParameters();
-	}
-
-	private void loadFieldData() {
-		fields = (new FieldDAO()).getAll(projectId);
 	}
 
 	private void loadCycleTimeFieldData(){
@@ -134,83 +119,12 @@ public class ProjectConfigutration {
 		}
 	}
 	
-	private void loadFieldMappingData() {
-		String sql = "select field_name, mapped_field_name from required_field_mapping where project_id = "
-				+ this.projectId;
-		Statement stmt = null;
-		ResultSet rs = null;
-		Connection conn = DBManager.getConnection();
 
-		try {
-			stmt = conn.createStatement();
-			stmt.execute(sql);
-			rs = stmt.getResultSet();
-			while (rs.next()) {
-				requiredFieldMapping.put(rs.getString(1), rs.getString(2));
-			}
-			savedRequiredFieldMapping = requiredFieldMapping;
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (stmt != null)
-					stmt.close();
-				if (rs != null)
-					rs.close();
-				if (conn != null)
-					DBManager.releaseConnection(conn);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-	}
 
-	private void loadExpressions() {
-		expressions = new ExpressionDAO().getAll(ProjectConfigutration.getInstance().getProjectId());
-	}
-
-	private void loadModels() {
-		String sql = "select id, name, expr_id, filter_str from models where project_id = "
-				+ this.projectId;
-		Statement stmt = null;
-		ResultSet rs = null;
-		Connection conn = DBManager.getConnection();
-
-		try {
-			stmt = conn.createStatement();
-			stmt.execute(sql);
-			rs = stmt.getResultSet();
-			Model model = null;
-			while (rs.next()) {
-				model = new Model(rs.getInt(1), rs.getString(2));
-				int expressionId = rs.getInt(3);
-				model.setExpressionId(expressionId);
-				model.setCondition(rs.getString(4));
-				models.add(model);
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (stmt != null)
-					stmt.close();
-				if (rs != null)
-					rs.close();
-				if (conn != null)
-					DBManager.releaseConnection(conn);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-	}
 
 	private void loadProcessDetails() {
 		loadProcessTree();
 		loadProcesses();
-		loadProcessJoins();
-		loadProducts();
-		loadProductJoins();
 	}
 
 	public List<Pit> getPitList() {
@@ -337,274 +251,6 @@ public class ProjectConfigutration {
 			e.printStackTrace();
 		}
 
-	}
-	public void loadProcessJoins() {
-		String sql = "select name, child_model_id from process_join_defn where project_id = " + this.projectId + " order by name ";
-		Statement stmt = null;
-		ResultSet rs = null;
-		Connection conn = DBManager.getConnection();
-		try {
-			stmt = conn.createStatement();
-			stmt.execute(sql);
-			rs = stmt.getResultSet();
-
-			while (rs.next()) {
-
-				String processJoinName = rs.getString(1);
-				ProcessJoin processJoin = this.getProcessJoinByName(processJoinName);
-				if(processJoin == null){
-					processJoin = new ProcessJoin(processJoinName);
-					this.processJoins.add(processJoin);
-				}
-				int modelId = rs.getInt(2);
-				Model childModel = this.getModelById(modelId);
-				if(childModel != null){
-					processJoin.addProcess(childModel);
-				}
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (stmt != null)
-					stmt.close();
-				if (rs != null)
-					rs.close();
-				if (conn != null)
-					DBManager.releaseConnection(conn);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	public void loadProducts() {
-		String sql = "select distinct a.name, associated_model_id, child_expression_id, b.id, b.name, b.value from product_defn a LEFT JOIN grade b on b.product_name = a.name and b.project_id = a.project_id "
-				+" where a.project_id = "+ this.projectId + " order by a.name, b.id asc";
-		Statement stmt = null;
-		ResultSet rs = null;
-		Connection conn = DBManager.getConnection();
-		try {
-			stmt = conn.createStatement();
-			stmt.execute(sql);
-			rs = stmt.getResultSet();
-
-			while (rs.next()) {
-
-				String productName = rs.getString(1);
-				int associatedModelId = rs.getInt(2);
-				Product product = this.getProductByName(productName);
-				Model model = this.getModelById(associatedModelId);
-				if(product == null){
-					product = new Product(productName, model);
-					this.productList.add(product);
-				}
-				int expressionId = rs.getInt(3);
-				Expression expression = this.getExpressionById(expressionId);
-				if(expression != null){
-					product.addExpression(expression);
-				}
-				int gradeId = rs.getInt(4);
-				if(gradeId > 0){
-					Grade grade = new Grade();
-					String gradeName = rs.getString(5);
-					String value = rs.getString(6);
-					Expression expr = this.getExpressionByName(value);
-					grade.setName(gradeName);
-					grade.setExpression(expr);
-					grade.setId(gradeId);
-					product.addGrade(grade);
-				}
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (stmt != null)
-					stmt.close();
-				if (rs != null)
-					rs.close();
-				if (conn != null)
-					DBManager.releaseConnection(conn);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	public void loadProductJoins() {
-		String sql = "select distinct name, child_product_name, child_product_join_name from product_join_defn where project_id = "+ this.projectId  +
-				" and ( child_product_name is not null  or child_product_join_name is not null ) order by child_product_name desc";
-
-		String grade_sql = "select distinct id, name from product_join_grade_name_mapping where project_id = "+ this.projectId  +
-				" and product_join_name = ?  order by id asc";
-
-		try (
-				Connection conn = DBManager.getConnection();
-				Statement stmt = conn.createStatement();
-				ResultSet rs = stmt.executeQuery(sql);
-				PreparedStatement pstmt = conn.prepareStatement(grade_sql);
-				){
-
-			while(rs.next()){
-				String productJoinName = rs.getString(1);
-				ProductJoin productJoin = this.getProductJoinByName(productJoinName);
-				if(productJoin == null){
-					productJoin = new ProductJoin(productJoinName);
-					this.productJoinList.add(productJoin);
-
-					// Add grade to product join .. but there must be a better place to do this
-
-					ResultSet rs1 = null;
-					try {
-						pstmt.setString(1, productJoinName);
-						rs1 = pstmt.executeQuery();
-						while(rs1.next()){
-							productJoin.addGradeName(rs1.getString("name"));
-						}
-					} catch(SQLException sqle){
-						System.err.println("Failed to load grades for product Join. "+sqle.getMessage());
-					} finally {
-						try{
-							if(rs1 != null) {
-								rs1.close();
-							}
-						} catch(SQLException sqle){
-							System.err.println("Failed to close resultset. "+sqle.getMessage());
-						}
-					}
-
-				}
-				String childProductName = rs.getString(2);
-				if(childProductName != null) {
-					Product product = this.getProductByName(childProductName);
-					productJoin.addProduct(product);
-				}
-
-				String childProductJoinName = rs.getString(3);
-				if(childProductJoinName != null) {
-					ProductJoin childProductJoin = this.getProductJoinByName(childProductJoinName);
-					productJoin.addProductJoin(childProductJoin);
-				}
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void loadPitGroups() {
-/*		String sql = "select id, name, child_pit_name, child_pitgroup_name from pitgroup_pit_mapping where project_id = "+ this.projectId +" order by id asc ";
-
-		try (
-				Connection conn = DBManager.getConnection();
-				Statement stmt = conn.createStatement();
-				ResultSet rs = stmt.executeQuery(sql);
-
-				){
-
-			while(rs.next()){
-				int id = rs.getInt(1);
-				String name = rs.getString(2);
-				PitGroup pitGroup = this.getPitGroupfromName(name);
-				if(pitGroup == null){
-					pitGroup = new PitGroup(name);
-					pitGroupList.add(pitGroup);
-				}	
-				pitGroup.setId(id);
-				String child_pit_name = rs.getString(3);
-				String child_pitgroup_name = rs.getString(4);
-				if(child_pit_name != null){
-					//pitGroup.addPit(this.getPitfromPitName(child_pit_name));
-				}
-				if(child_pitgroup_name != null){
-					//pitGroup.addPitGroup(this.getPitGroupfromName(child_pitgroup_name));
-				}
-				//pitGroupList.add(pitGroup);
-
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}*/
-	}
-
-	public void loadDumps() {
-		String sql = "select id, type, name, condition_str, mapped_to, mapping_type, has_capacity, capacity from dump where project_id = "+ this.projectId +" order by id asc ";
-
-		try (
-				Connection conn = DBManager.getConnection();
-				Statement stmt = conn.createStatement();
-				ResultSet rs = stmt.executeQuery(sql);
-
-				){
-			int count = 1;
-			while(rs.next()){
-				int id = rs.getInt(1);
-				int type = rs.getInt(2);
-				String name = rs.getString(3);
-				String condition = rs.getString(4);
-				String mappedTo = rs.getString(5);
-				int mappingType = rs.getInt(6);
-				boolean hasCapacity = rs.getBoolean(7);
-				int capacity = rs.getInt(8);
-				Dump dump = new Dump();
-				dump.setId(id);
-				dump.setType(type);
-				dump.setName(name);
-				dump.setCondition(condition);
-				dump.setMappingType(mappingType);
-				dump.setHasCapacity(hasCapacity);
-				dump.setCapacity(capacity);
-				dump.setDumpNumber(count);
-				dump.setMappedTo(mappedTo);
-				count ++;
-				this.dumpList.add(dump);
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void loadStockpiles() {
-		String sql = "select id, type, name, condition_str, mapped_to, mapping_type, has_capacity, capacity, is_reclaim from stockpile where project_id = "+ this.projectId +" order by id asc ";
-
-		try (
-				Connection conn = DBManager.getConnection();
-				Statement stmt = conn.createStatement();
-				ResultSet rs = stmt.executeQuery(sql);
-
-				){
-			int count = 1;
-			while(rs.next()){
-				int id = rs.getInt(1);
-				int type = rs.getInt(2);
-				String name = rs.getString(3);
-				String condition = rs.getString(4);
-				String mappedTo = rs.getString(5);
-				int mappingType = rs.getInt(6);
-				boolean hasCapacity = rs.getBoolean(7);
-				int capacity = rs.getInt(8);
-				boolean isReclaim = rs.getBoolean(9);
-				Stockpile stockpile = new Stockpile();
-				stockpile.setId(id);
-				stockpile.setType(type);
-				stockpile.setName(name);
-				stockpile.setCondition(condition);
-				stockpile.setMappingType(mappingType);
-				stockpile.setHasCapacity(hasCapacity);
-				stockpile.setCapacity(capacity);
-				stockpile.setStockpileNumber(count);
-				stockpile.setReclaim(isReclaim);
-				stockpile.setMappedTo(mappedTo);
-				count ++;
-				this.stockPileList.add(stockpile);
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
 	}
 
 	private void loadCycleTimeMappingData(){
@@ -856,74 +502,11 @@ public class ProjectConfigutration {
 	}
 
 	public void save() {
-		saveFieldData();
-		saveRequiredFieldMappingData();
-		saveExpressionData();
-		saveModelData();
 		saveProcessTree();
-		saveProcessJoins();
-		saveProducts();
-		saveProductJoins();
-		savePitGroups();
-		saveDumps();
-		saveStockpiles();
 		saveCycleTimeData();
 		saveTruckParameterData();
 	}
 
-	public void saveFieldData() {
-
-		Connection conn = DBManager.getConnection();
-		String insert_sql = " insert into fields (project_id, name, data_type) values (?, ?, ?)";
-		String update_sql = " update fields set data_type = ?  where id = ? ";
-		PreparedStatement pstmt = null;
-		PreparedStatement pstmt1 = null;
-		ResultSet rs = null;
-		boolean autoCommit = true;
-
-		try {
-			autoCommit = conn.getAutoCommit();
-			conn.setAutoCommit(false);
-			pstmt = conn.prepareStatement(insert_sql,
-					Statement.RETURN_GENERATED_KEYS);
-			pstmt1 = conn.prepareStatement(update_sql);
-
-			for (Field field : fields) {
-				if (field.getId() == -1) {
-					pstmt.setInt(1, projectId);
-					pstmt.setString(2, field.getName());
-					pstmt.setShort(3, field.getDataType());
-					pstmt.executeUpdate();
-					rs = pstmt.getGeneratedKeys();
-					rs.next();
-					field.setId(rs.getInt(1));
-				} else {
-					pstmt1.setShort(1, field.getDataType());
-					pstmt1.setInt(2, field.getId());
-					pstmt1.executeUpdate();
-				}
-
-			}
-
-			conn.commit();
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				conn.setAutoCommit(autoCommit);
-				if (pstmt != null)
-					pstmt.close();
-				if (rs != null)
-					rs.close();
-				if (conn != null)
-					DBManager.releaseConnection(conn);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-
-	}
 
 	public void saveCycleTimeFields() {
 		String inset_sql = " insert into cycle_time_fields (project_id, name) values (?, ?) ";
@@ -945,130 +528,6 @@ public class ProjectConfigutration {
 		} catch(SQLException e){
 			e.printStackTrace();
 		}
-	}
-	public void saveRequiredFieldMappingData() {
-
-		if (this.newProject) {
-			new PitBenchProcessor().updatePitBenchData(projectId);
-		}
-		Connection conn = DBManager.getConnection();
-		String insert_sql = " insert into required_field_mapping (project_id, field_name, mapped_field_name) values (?, ?, ?)";
-		String update_sql = " update required_field_mapping set mapped_field_name = ? where project_id = ? AND field_name = ? ";
-		PreparedStatement pstmt = null;
-		boolean autoCommit = true;
-
-		try {
-			autoCommit = conn.getAutoCommit();
-			conn.setAutoCommit(false);
-			if (savedRequiredFieldMapping == null
-					|| savedRequiredFieldMapping.size() == 0) {
-				pstmt = conn.prepareStatement(insert_sql);
-				Set<String> keys = requiredFieldMapping.keySet();
-				Iterator<String> it = keys.iterator();
-				while (it.hasNext()) {
-					String key = it.next();
-					pstmt.setInt(1, projectId);
-					pstmt.setString(2, key);
-					pstmt.setString(3, requiredFieldMapping.get(key));
-					pstmt.executeUpdate();
-				}
-			} else {
-				pstmt = conn.prepareStatement(update_sql);
-				Set<String> keys = requiredFieldMapping.keySet();
-				Iterator<String> it = keys.iterator();
-				while (it.hasNext()) {
-					String key = it.next();
-					pstmt.setString(1, requiredFieldMapping.get(key));
-					pstmt.setInt(2, projectId);
-					pstmt.setString(3, key);
-
-					pstmt.executeUpdate();
-				}
-			}
-
-			conn.commit();
-			savedRequiredFieldMapping = requiredFieldMapping;
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				conn.setAutoCommit(autoCommit);
-				if (pstmt != null)
-					pstmt.close();
-				if (conn != null)
-					DBManager.releaseConnection(conn);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-
-	}
-
-	public void saveExpressionData() {
-		ExpressionDAO expressiondao = new ExpressionDAO();
-		for (Expression expression : expressions) {
-			if (expression.getId() == -1) {
-				expressiondao.create(expression, projectId);
-			} else {
-				expressiondao.update(expression);
-			}
-
-		}
-
-	}
-
-	public void saveModelData() {
-
-		Connection conn = DBManager.getConnection();
-		String insert_sql = " insert into models (project_id, name, expr_id, filter_str) values (?, ?, ?, ?)";
-		String update_sql = " update models set expr_id= ? , filter_str = ? where id = ?";
-		PreparedStatement pstmt = null;
-		PreparedStatement pstmt1 = null;
-
-		ResultSet rs = null;
-		boolean autoCommit = true;
-
-		try {
-			autoCommit = conn.getAutoCommit();
-			conn.setAutoCommit(false);
-			pstmt = conn.prepareStatement(insert_sql,
-					Statement.RETURN_GENERATED_KEYS);
-			pstmt1 = conn.prepareStatement(update_sql);
-			for (Model model : models) {
-				if (model.getId() == -1) {
-					pstmt.setInt(1, projectId);
-					pstmt.setString(2, model.getName());
-					pstmt.setInt(3, model.getExpressionId());
-					pstmt.setString(4, model.getCondition());
-					pstmt.executeUpdate();
-					rs = pstmt.getGeneratedKeys();
-					rs.next();
-					model.setId(rs.getInt(1));
-				} else {
-					pstmt1.setInt(1, model.getExpressionId());
-					pstmt1.setString(2, model.getCondition());
-					pstmt1.setInt(3, model.getId());
-					pstmt1.executeUpdate();
-				}
-			}
-			conn.commit();
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				conn.setAutoCommit(autoCommit);
-				if (pstmt != null)
-					pstmt.close();
-				if (rs != null)
-					rs.close();
-				if (conn != null)
-					DBManager.releaseConnection(conn);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-
 	}
 
 	public void saveProcessTree() {
@@ -1172,115 +631,8 @@ public class ProjectConfigutration {
 		}
 	}
 
-	public void saveProcessJoins() {
 
-		if(this.processJoins.size() < 1){ // no process joins defined
-			return;
-		}
-		Connection conn = DBManager.getConnection();
-		String insert_sql = " insert into process_join_defn (project_id, name, child_model_id) values (?, ?, ?)";
-		PreparedStatement pstmt = null;
-		boolean autoCommit = true;
-		try{
-			autoCommit = conn.getAutoCommit();
-			conn.setAutoCommit(false);
-			pstmt = conn.prepareStatement(insert_sql);
-
-			for(ProcessJoin processJoin : this.processJoins){
-				String processJoinName = processJoin.getName();
-				for(Model childModel : processJoin.getlistChildProcesses()){
-					int childModelId = childModel.getId();
-					pstmt.setInt(1, this.projectId);
-					pstmt.setString(2, processJoinName);
-					pstmt.setInt(3, childModelId);
-					pstmt.executeUpdate();
-				}
-			}
-			conn.commit();
-		}catch (SQLException e) {
-			System.err.println("Failed saving process join. "+e.getMessage());
-		} finally {
-			try {
-				conn.setAutoCommit(autoCommit);
-				if (pstmt != null)
-					pstmt.close();
-				if (conn != null)
-					DBManager.releaseConnection(conn);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	public void saveProductJoins() {
-
-		if(this.productJoinList.size() < 1){ // no process joins defined
-			return;
-		}
-		Connection conn = DBManager.getConnection();
-		String insert_sql = " insert into product_join_defn (project_id, name, child_product_name, child_product_join_name) values (?, ?, ?, ?)";
-		String insert_grade_sql = " insert into product_join_grade_name_mapping (project_id, name, product_join_name) values (?, ?, ?)";
-		PreparedStatement pstmt = null;
-		PreparedStatement pstmt1 = null;
-		boolean autoCommit = true;
-		
-		try{
-			autoCommit = conn.getAutoCommit();
-			conn.setAutoCommit(false);
-			pstmt = conn.prepareStatement(insert_sql);
-			pstmt1 = conn.prepareStatement(insert_grade_sql);
-
-			for(ProductJoin productJoin : this.productJoinList) {
-				String productJoinName = productJoin.getName();
-				List<Product> childProducts = productJoin.getlistChildProducts();
-				if(childProducts.size() > 0){//this product join is 0th level product joins and consists only of products ie join of products
-					for(Product childProduct : childProducts) {
-						pstmt.setInt(1, this.projectId);
-						pstmt.setString(2, productJoinName);
-						pstmt.setString(3, childProduct.getName());
-						pstmt.setNull(4, java.sql.Types.VARCHAR);
-						pstmt.executeUpdate();
-					}
-				}else{// this product join is join of product joins
-					List<ProductJoin> childProductJoins = productJoin.getListChildProductJoins();
-					for(ProductJoin chilsProductJoin : childProductJoins) {
-						pstmt.setInt(1, this.projectId);
-						pstmt.setString(2, productJoinName);
-						pstmt.setNull(3, java.sql.Types.VARCHAR);
-						pstmt.setString(4, chilsProductJoin.getName());
-						pstmt.executeUpdate();
-					}
-				}
-				List<String> gradeNames = productJoin.getGradeNames();
-				for(String gradeName: gradeNames){
-					try {
-						pstmt1.setInt(1, this.projectId);
-						pstmt1.setString(2, gradeName);
-						pstmt1.setString(3, productJoinName);
-						pstmt1.executeUpdate();					
-					} catch(SQLException sqle) {
-						System.err.println("Failed saving grade data."+sqle.getMessage());
-					}
-				}
-			}
-
-			conn.commit();
-		}catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				conn.setAutoCommit(autoCommit);
-				if (pstmt != null)
-					pstmt.close();
-				if (conn != null)
-					DBManager.releaseConnection(conn);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	public void saveProducts() {
+/*	public void saveProducts() {
 
 		if(this.productList.size() < 1){ // no products defined
 			return;
@@ -1343,122 +695,7 @@ public class ProjectConfigutration {
 				e.printStackTrace();
 			}
 		}
-	}
-
-
-	public void savePitGroups() {
-/*		String insert_sql = "insert into pitgroup_pit_mapping ( project_id , name, child_pit_name, child_pitgroup_name) values ( ? , ?, ?, ?) ";
-
-		try (
-				Connection conn = DBManager.getConnection();
-				PreparedStatement pstmt = conn.prepareStatement(insert_sql);
-
-				){
-			for(PitGroup pitGroup: pitGroupList) {
-
-				if(pitGroup.getId() == -1){//unsaved pit group
-					for(Pit pit: pitGroup.getListChildPits()){
-						pstmt.setInt(1, projectId);
-						pstmt.setString(2, pitGroup.getName());
-						pstmt.setString(3, pit.getPitName());
-						pstmt.setNull(4, java.sql.Types.VARCHAR);
-						pstmt.executeUpdate();
-					}
-					for(PitGroup childGroup: pitGroup.getListChildPitGroups()){
-						pstmt.setInt(1, projectId);
-						pstmt.setString(2, pitGroup.getName());
-						pstmt.setNull(3, java.sql.Types.VARCHAR);
-						pstmt.setString(4, childGroup.getName());
-						pstmt.executeUpdate();
-					}
-				}
-			}
-
-		} catch (SQLException e) {
-			System.err.println("Failed saving pit groups. "+e.getMessage());
-		}*/
-	}
-	public void saveDumps() {
-		String insert_sql = "insert into dump ( project_id , type, name, condition_str, mapped_to, mapping_type, has_capacity, capacity) values ( ? , ?, ?, ?, ?, ?, ?, ?)";
-		String update_sql = "update dump set type = ? , name = ?, condition_str = ?, mapped_to = ?, mapping_type= ?, has_capacity = ?, capacity = ? where id = ?";
-		try (
-				Connection conn = DBManager.getConnection();
-				PreparedStatement pstmt1 = conn.prepareStatement(insert_sql);
-				PreparedStatement pstmt2 = conn.prepareStatement(update_sql);
-				){
-			int count = 1;
-			for(Dump dump : dumpList) {
-				if(dump.getId() == -1){
-					pstmt1.setInt(1, projectId);
-					pstmt1.setInt(2, dump.getType());
-					pstmt1.setString(3, dump.getName());
-					pstmt1.setString(4, dump.getCondition());
-					pstmt1.setString(5, dump.getMappedTo());	
-					pstmt1.setInt(6, dump.getMappingType());
-					pstmt1.setBoolean(7, dump.isHasCapacity());
-					pstmt1.setInt(8, dump.getCapacity());
-					pstmt1.executeUpdate();
-				}else{
-					pstmt2.setInt(1, dump.getType());
-					pstmt2.setString(2, dump.getName());
-					pstmt2.setString(3, dump.getCondition());
-					pstmt2.setString(4, dump.getMappedTo());
-					pstmt2.setInt(5, dump.getMappingType());
-					pstmt2.setBoolean(6, dump.isHasCapacity());
-					pstmt2.setInt(7, dump.getCapacity());
-					pstmt2.setInt(8, dump.getId());
-					pstmt2.executeUpdate();
-				}
-				dump.setDumpNumber(count);				
-				count++;
-			}
-
-		} catch (SQLException e) {
-			System.err.println("Failed saving dump data. "+e.getMessage());
-		}
-	}
-
-	public void saveStockpiles() {
-		String insert_sql = "insert into stockpile ( project_id , type, name, condition_str, mapped_to, mapping_type, has_capacity, capacity, is_reclaim) values ( ? , ?, ?, ?, ?, ?, ?, ?, ?)";
-		String update_sql = "update stockpile set type = ? , name = ?, condition_str = ?, mapped_to = ?, mapping_type= ?, has_capacity = ?, capacity = ?, is_reclaim = ? where id = ?";
-		try (
-				Connection conn = DBManager.getConnection();
-				PreparedStatement pstmt1 = conn.prepareStatement(insert_sql);
-				PreparedStatement pstmt2 = conn.prepareStatement(update_sql);
-				){
-			int count = 1;
-			for(Stockpile stockpile : stockPileList) {
-				if(stockpile.getId() == -1){
-					pstmt1.setInt(1, projectId);
-					pstmt1.setInt(2, stockpile.getType());
-					pstmt1.setString(3, stockpile.getName());
-					pstmt1.setString(4, stockpile.getCondition());
-					pstmt1.setString(5, stockpile.getMappedTo());					
-					pstmt1.setInt(6, stockpile.getMappingType());
-					pstmt1.setBoolean(7, stockpile.isHasCapacity());
-					pstmt1.setInt(8, stockpile.getCapacity());
-					pstmt1.setBoolean(9, stockpile.isReclaim());
-					pstmt1.executeUpdate();
-				}else{
-					pstmt2.setInt(1, stockpile.getType());
-					pstmt2.setString(2, stockpile.getName());
-					pstmt2.setString(3, stockpile.getCondition());
-					pstmt2.setString(4, stockpile.getMappedTo());
-					pstmt2.setInt(5, stockpile.getMappingType());
-					pstmt2.setBoolean(6, stockpile.isHasCapacity());
-					pstmt2.setInt(7, stockpile.getCapacity());
-					pstmt2.setBoolean(8, stockpile.isReclaim());
-					pstmt2.setInt(9, stockpile.getId());
-					pstmt2.executeUpdate();
-				}
-				stockpile.setStockpileNumber(count);				
-				count++;
-			}
-
-		} catch (SQLException e) {
-			System.err.println("Failed saving dump data. "+e.getMessage());
-		}
-	}
+	}*/
 
 	public void saveCycleTimeData(){
 		saveCycleTimeFixedFieldData();
@@ -2131,25 +1368,6 @@ public class ProjectConfigutration {
 		return productJoinWithGrades;
 	}
 
-	public List<ProductJoin> getProductJoinOfProductsList() {
-		List<ProductJoin> productJoinOfProducts = new ArrayList<ProductJoin>();
-		for(ProductJoin pj: productJoinList){
-			if(pj.getlistChildProducts().size() > 0){
-				productJoinOfProducts.add(pj);
-			}
-		}
-		return productJoinOfProducts;
-	}
-
-	public List<ProductJoin> getProductJoinOfProductsJoinsList() {
-		List<ProductJoin> productJoinOfProductJoins = new ArrayList<ProductJoin>();
-		for(ProductJoin pj: productJoinList){
-			if(pj.getListChildProductJoins().size() > 0){
-				productJoinOfProductJoins.add(pj);
-			}
-		}
-		return productJoinOfProductJoins;
-	}
 
 	public void setProductJoinList(List<ProductJoin> productJoinList) {
 		this.productJoinList = productJoinList;

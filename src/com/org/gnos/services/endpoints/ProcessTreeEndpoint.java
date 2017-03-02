@@ -9,23 +9,23 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.org.gnos.services.ResponseError;
-import com.org.gnos.services.controller.ProductController;
+import com.org.gnos.services.controller.ProcessTreeController;
 
 import spark.Request;
 import spark.Response;
 import spark.Route;
 
-public class ProductEndpoint {
-
-	ProductController controller;
+public class ProcessTreeEndpoint {
 	
-	public ProductEndpoint() {
+	ProcessTreeController controller;
+	
+	public ProcessTreeEndpoint() {
 		
-		controller = new ProductController();
+		controller = new ProcessTreeController();
 		
-		get("/project/:id/products", (req, res) -> controller.getAll(req.params(":id")), json());
+		get("/project/:id/processtreenodes", (req, res) -> controller.getAll(req.params(":id")), json());
 		
-		post("/project/:id/products", new Route() {
+		post("/project/:id/processtreenodes", new Route() {
 			
 			@Override
 			public Object handle(Request req, Response res) throws Exception {
@@ -46,8 +46,11 @@ public class ProductEndpoint {
 		
 
 		/* DELETE exisitng expression */
-		delete("/project/:id/products", (req, res) -> controller.deleteAll(req.params(":id")), json());
+		delete("/project/:id/processtreenodes", (req, res) -> controller.deleteAll(req.params(":id")), json());
+		
+		delete("/project/:id/processtreenodes/model/:mid", 
+				(req, res) -> controller.deleteProcessTreeNode(req.params(":id"), Integer.parseInt(req.params(":mid"))), json());
 
 	}
-	
+
 }

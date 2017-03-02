@@ -18,6 +18,7 @@ import com.org.gnos.services.endpoints.OpexEndpoint;
 import com.org.gnos.services.endpoints.PitDependencyEndpoint;
 import com.org.gnos.services.endpoints.PitEndpoint;
 import com.org.gnos.services.endpoints.ProcessConstraintEndpoint;
+import com.org.gnos.services.endpoints.ProcessEndpoint;
 import com.org.gnos.services.endpoints.ProjectEndpoint;
 import com.org.gnos.services.endpoints.ScenarioEndpoint;
 import com.org.gnos.services.endpoints.StockpileEndpoint;
@@ -69,6 +70,7 @@ public class TestApplication {
 		new BenchConstraintEndpoint();
 		new ProcessConstraintEndpoint();
 		new GradeConstraintEndpoint();
+		new ProcessEndpoint();
 	}
 	/**
 	 * @param args
