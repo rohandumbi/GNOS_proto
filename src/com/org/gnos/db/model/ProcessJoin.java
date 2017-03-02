@@ -1,27 +1,35 @@
 package com.org.gnos.db.model;
 
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ProcessJoin {
 	private String name;
-	private ArrayList<Model> listChildProcesses;
+	private Set<Integer> childProcessList;
 
-	public ProcessJoin(String name){
-		super();
-		this.name = name;
-		this.listChildProcesses = new ArrayList<Model>();
+	public ProcessJoin(){
+		this.childProcessList = new HashSet<Integer>();
 	}
 	
-	public void addProcess(Model newModel){
-		this.listChildProcesses.add(newModel);
+	public void addProcess(Integer modelId){
+		this.childProcessList.add(modelId);
 	}
-	
+
 	public String getName() {
 		return name;
 	}
 
-	public ArrayList<Model> getlistChildProcesses() {
-		return listChildProcesses;
+	public void setName(String name) {
+		this.name = name;
 	}
+
+	public Set<Integer> getChildProcessList() {
+		return childProcessList;
+	}
+
+	public void setChildProcessList(Set<Integer> childProcessList) {
+		this.childProcessList = childProcessList;
+	}
+	
 
 }

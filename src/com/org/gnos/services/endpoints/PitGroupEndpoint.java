@@ -18,7 +18,9 @@ public class PitGroupEndpoint {
 	PitGroupController controller;
 	
 	public PitGroupEndpoint() {
+		
 		controller = new PitGroupController();
+		
 		get("/project/:id/pitgroups", (req, res) -> controller.getAll(req.params(":id")), json());
 		
 		post("/project/:id/pitgroups", new Route() {

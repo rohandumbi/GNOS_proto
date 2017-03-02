@@ -1,48 +1,48 @@
 package com.org.gnos.db.model;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ProductJoin {
+	
+	public static short CHILD_PRODUCT = 1 ;
+	public static short CHILD_PRODUCT_JOIN = 2 ;
+	
 	private String name;
-	private List<Product> listChildProducts;
-	private List<ProductJoin> listChildProductJoins;
+	private Set<String> productList;
+	private Set<String> productJoinList;
 	private List<String> gradeNames;
 
-	public ProductJoin(String name){
-		super();
-		this.name = name;
-		this.listChildProducts = new ArrayList<Product>();
-		this.listChildProductJoins = new ArrayList<ProductJoin>();
+	public ProductJoin(){
+		this.productList = new HashSet<String>();
+		this.productJoinList = new HashSet<String>();
 		this.gradeNames = new ArrayList<String>();
-	}
-	
-	public void addProduct(Product product){
-		this.listChildProducts.add(product);
 	}
 	
 	public String getName() {
 		return name;
 	}
 
-	public List<Product> getlistChildProducts() {
-		return listChildProducts;
-	}
-	
-	public void setListChildProducts(List<Product> listChildProducts) {
-		this.listChildProducts = listChildProducts;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public List<ProductJoin> getListChildProductJoins() {
-		return listChildProductJoins;
+	public Set<String> getProductList() {
+		return productList;
 	}
 
-	public void setListChildProductJoins(List<ProductJoin> listChildProductJoins) {
-		this.listChildProductJoins = listChildProductJoins;
+	public void setProductList(Set<String> productList) {
+		this.productList = productList;
 	}
 
-	public void addProductJoin(ProductJoin productJoin){
-		this.listChildProductJoins.add(productJoin);
+	public Set<String> getProductJoinList() {
+		return productJoinList;
+	}
+
+	public void setProductJoinList(Set<String> productJoinList) {
+		this.productJoinList = productJoinList;
 	}
 
 	public List<String> getGradeNames() {
