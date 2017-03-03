@@ -18,6 +18,7 @@ import com.org.gnos.db.model.PitGroup;
 public class PitGroupDAO {
 	private static final String SQL_LIST_ORDER_BY_ID = "select name, child_type, child from pitgroup_pit_mapping where project_id = ?";
 	private static final String SQL_INSERT = "insert into pitgroup_pit_mapping ( project_id , name, child_type, child ) values ( ? , ?, ?, ?) ";
+	private static final String SQL_INSERT_NEW = "insert into pitgroup_pit_mapping ( project_id , name ) values ( ? , ?) ";
 	private static final String SQL_DELETE_ALL = "delete from pitgroup_pit_mapping where project_id = ?";
 	private static final String SQL_DELETE = "delete from pitgroup_pit_mapping where project_id = ? and name = ? and child_type = ? and child = ? ";
 	
@@ -54,7 +55,21 @@ public class PitGroupDAO {
 
 		try ( Connection connection = DBManager.getConnection();
 	            PreparedStatement statement = connection.prepareStatement(SQL_INSERT);
+				PreparedStatement createStatement = connection.prepareStatement(SQL_INSERT_NEW);
 			){
+			
+			if((pitGroup.getListChildPits().size() == 0) || (pitGroup.getListChildPitGroups().size() == 0)){
+				try{
+					Object[] values = {
+							projectId, 
+							pitGroup.getName()
+					};
+					setValues(createStatement, values);
+					createStatement.executeUpdate();			
+				} catch (Exception e) {
+					// Ignore exception
+				}
+			}
 			
 			for(String pitName : pitGroup.getListChildPits()) {
 				try{
