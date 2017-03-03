@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.google.gson.JsonObject;
 import com.org.gnos.db.dao.TruckParameterCycleTimeDAO;
-import com.org.gnos.db.model.Project;
 import com.org.gnos.db.model.TruckParameterCycleTime;
 
 public class TruckParameterCycleTimeController {
