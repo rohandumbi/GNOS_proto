@@ -21,14 +21,16 @@ public class PitGroupController {
 	
 	public PitGroup create(JsonObject jsonObject, String projectId) throws Exception {
 		String name = jsonObject.get("name").getAsString();
-		short childType = jsonObject.get("childType").getAsShort();
-		String child =  jsonObject.get("child").getAsString();
 		PitGroup obj = new PitGroup();
 		obj.setName(name);
-		if(childType == PitGroup.CHILD_PIT) {
-			obj.addPit(child);
-		} else if(childType == PitGroup.CHILD_PIT_GROUP) {
-			obj.addPitGroup(child);
+		if(jsonObject.get("childType") != null){ //if new pit group child type and child will be null
+			short childType = jsonObject.get("childType").getAsShort();
+			String child =  jsonObject.get("child").getAsString();
+			if(childType == PitGroup.CHILD_PIT) {
+				obj.addPit(child);
+			} else if(childType == PitGroup.CHILD_PIT_GROUP) {
+				obj.addPitGroup(child);
+			}
 		}
 		boolean created = dao.create(obj, Integer.parseInt(projectId));
 		if(created) return obj;
