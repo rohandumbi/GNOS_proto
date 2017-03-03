@@ -2,6 +2,7 @@ package com.org.gnos.core;
 
 import com.org.gnos.services.endpoints.BenchConstraintEndpoint;
 import com.org.gnos.services.endpoints.CapexEndpoint;
+import com.org.gnos.services.endpoints.CycleTimeEndpoint;
 import com.org.gnos.services.endpoints.DumpDependencyEndpoint;
 import com.org.gnos.services.endpoints.DumpEndpoint;
 import com.org.gnos.services.endpoints.ExpressionEndpoint;
@@ -39,6 +40,7 @@ public class EndpointManager {
 		new ProductJoinEndpoint();
 		new DumpEndpoint();
 		new StockpileEndpoint();
+		new CycleTimeEndpoint();
 		new ScenarioEndpoint();
 		new OpexEndpoint();
 		new FixedCostEndpoint();
@@ -48,6 +50,5 @@ public class EndpointManager {
 		new PitDependencyEndpoint();
 		new DumpDependencyEndpoint();
 		new CapexEndpoint();
-
 	}
 }
