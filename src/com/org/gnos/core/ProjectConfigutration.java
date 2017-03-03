@@ -52,8 +52,6 @@ public class ProjectConfigutration {
 	private TruckParameterData truckParameterData = new TruckParameterData();
 	private ArrayList<TruckParameterCycleTime> truckParameterCycleTimeList = new ArrayList<TruckParameterCycleTime>();
 
-	private boolean newProject = true;
-	private Map<String, String> savedRequiredFieldMapping;
 
 	/* Tracking existing cycle time data for the project instance */
 	private ArrayList<String> existingCycleTimeFixedFields = new ArrayList<String>();
@@ -80,7 +78,6 @@ public class ProjectConfigutration {
 			return;
 		}
 		this.projectId = projectId;
-		this.newProject = false;
 
 		// Reinitializing the structures
 		fields = new ArrayList<Field>();
@@ -95,7 +92,6 @@ public class ProjectConfigutration {
 		stockPileList = new ArrayList<Stockpile>();
 
 		loadCycleTimeFieldData();
-		loadProcessDetails();
 		loadCycleTimeMappingData();
 		loadTruckParameters();
 	}
@@ -122,40 +118,6 @@ public class ProjectConfigutration {
 
 
 
-	private void loadProcessDetails() {
-		loadProcessTree();
-		loadProcesses();
-	}
-
-	public List<Pit> getPitList() {
-		if(pitList != null && this.pitList.size() > 0) return this.pitList;
-		this.pitList = new ArrayList<Pit>();
-		String dataTableName = "gnos_data_" + this.projectId;
-		String computedDataTableName = "gnos_computed_data_" + this.projectId;
-		String sql = "select  distinct a.pit_name, b.pit_no from "
-				+ dataTableName + " a, " + computedDataTableName
-				+ " b where a.id = b.row_id";
-
-		try (
-				Connection conn = DBManager.getConnection();
-				Statement stmt = conn.createStatement();
-				ResultSet rs = stmt.executeQuery(sql);
-				) {
-
-			while (rs.next()) {
-				String pit_name = rs.getString(1);
-				int pit_no = rs.getInt(2);
-
-				Pit pit = new Pit(pit_no, pit_name);
-				pitList.add(pit);
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		return this.pitList;
-	}
-
 	public List<String> getBenchNamesAssociatedWithPit(String pitName) {
 		List<String> associatedBenchNames = new ArrayList<String>();
 		String bench_rl_name = this.getRequiredFieldMapping().get("bench_rl");
@@ -181,76 +143,6 @@ public class ProjectConfigutration {
 		}
 
 		return associatedBenchNames;
-	}
-
-	public void loadProcessTree() {
-		String sql = "select model_id, parent_model_id from process_route_defn where project_id = "
-				+ this.projectId + " order by model_id ";
-
-		Map<String, Node> nodes = new HashMap<String, Node>();
-		try (
-				Connection conn = DBManager.getConnection();
-				Statement stmt = conn.createStatement();
-				ResultSet rs =stmt.executeQuery(sql);
-				){
-
-			while (rs.next()) {
-				int modelId = rs.getInt(1);
-				int parentModelId = rs.getInt(2);
-				Model model = this.getModelById(modelId);
-				if (model != null) {
-					Node node = nodes.get(model.getName());
-					if (node == null) {
-						node = new Node(model);
-						node.setSaved(true);
-						nodes.put(model.getName(), node);
-					}
-					if (parentModelId == -1) {
-						processTree.addNode(node, null);
-					} else {
-						Model pModel = this.getModelById(parentModelId);
-						if (pModel != null) {
-							Node pNode = nodes.get(pModel.getName());
-							if (pNode == null) {
-								pNode = new Node(pModel);
-								pNode.setSaved(true);
-								nodes.put(pModel.getName(), pNode);
-							}
-							processTree.addNode(node, pNode);
-							node.setParent(pNode);
-
-						}
-					}
-
-				}
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void loadProcesses() {
-		String sql = "select model_id, process_no from process where project_id = " + this.projectId + " order by process_no ";
-
-		try (
-				Connection conn = DBManager.getConnection();
-				Statement stmt = conn.createStatement();
-				ResultSet rs =stmt.executeQuery(sql);
-				){
-
-			while (rs.next()) {
-				int modelId = rs.getInt(1);
-				int processNo = rs.getInt(2);
-				Model model = this.getModelById(modelId);
-				Process process = new Process();
-				process.setModel(model);
-				process.setProcessNo(processNo);
-				this.processList.add(process);
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
 	}
 
 	private void loadCycleTimeMappingData(){
@@ -391,7 +283,6 @@ public class ProjectConfigutration {
 	private void loadTruckParameters(){
 		loadTruckParamMaterialPayloadMapping();
 		loadTruckParamterFixedTime();
-		loadTruckParamCycleTime();
 	}
 
 	private void loadTruckParamMaterialPayloadMapping(){
@@ -426,50 +317,6 @@ public class ProjectConfigutration {
 		}
 	}
 	
-	private void loadTruckParamCycleTime(){
-		String sql = "select stockpile_name, process_name, value from truckparam_cycle_time where project_id = "
-				+ this.projectId + " order by stockpile_name";
-		//fixedCost = new FixedOpexCost[5];
-		Statement stmt = null;
-		ResultSet rs = null;
-		Connection conn = DBManager.getConnection();
-		try {
-			stmt = conn.createStatement();
-			stmt.execute(sql);
-			rs = stmt.getResultSet();
-			while (rs.next()) {
-				String stockpileName = rs.getString(1);
-				String processName = rs.getString(2);
-				BigDecimal value = rs.getBigDecimal(3);
-				//float value = rs.getFloat(3);
-				//FixedOpexCost fixedOpexCost = fixedCost[costHead];
-				
-				TruckParameterCycleTime truckParamCycleTime = this.getTruckParamCycleTimeByStockpileName(stockpileName);
-				if(truckParamCycleTime == null){
-					truckParamCycleTime = new TruckParameterCycleTime();
-					truckParamCycleTime.setProjectId(projectId);
-					truckParamCycleTime.setStockPileName(stockpileName);
-					this.truckParameterCycleTimeList.add(truckParamCycleTime);
-					this.existingTruckParamCycleTimeStockpiles.add(stockpileName);
-				}
-
-				truckParamCycleTime.getProcessData().put(processName, value);
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (stmt != null)
-					stmt.close();
-				if (rs != null)
-					rs.close();
-				if (conn != null)
-					DBManager.releaseConnection(conn);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-	}
 
 	private void loadTruckParamterFixedTime(){
 		String sql = "select fixed_time from truckparam_fixed_time where project_id = "
@@ -1203,25 +1050,7 @@ public class ProjectConfigutration {
 		return nonGradeExpressions;
 	}
 
-	public Pit getPitfromPitName(String name) {
-		List<Pit> pitList = this.getPitList();
-		for(Pit p : pitList){
-			if(p.getPitName().equals(name)){
-				return p;
-			}
-		}
-		return null;
-	}
 
-	public Pit getPitfromPitNumber(int number) {
-		List<Pit> pitList = this.getPitList();
-		for(Pit p : pitList){
-			if(p.getPitNumber()== number){
-				return p;
-			}
-		}
-		return null;
-	}
 	public PitGroup getPitGroupfromName(String name) {
 
 		for(PitGroup pg : this.pitGroupList){

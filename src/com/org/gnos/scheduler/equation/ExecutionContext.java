@@ -20,9 +20,13 @@ import com.org.gnos.core.Pit;
 import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.db.DBManager;
+import com.org.gnos.db.dao.RequiredFieldDAO;
+import com.org.gnos.db.dao.ScenarioDAO;
 import com.org.gnos.db.model.CycleTimeMappingData;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.PitGroup;
+import com.org.gnos.db.model.RequiredField;
+import com.org.gnos.db.model.Scenario;
 import com.org.gnos.db.model.Stockpile;
 import com.org.gnos.db.model.TruckParameterData;
 
@@ -39,30 +43,47 @@ public class ExecutionContext {
 	private String benchFieldName;
 	protected String tonnesWtFieldName;
 	
+	int projectId;
+	int scenarioId;
+	
 	int startYear;
 	int timePeriodStart;
 	int timePeriodEnd;
 	
 	private boolean spReclaimEnabled = true;
 	
-	private ProjectConfigutration projectConfiguration;
-	private ScenarioConfigutration scenarioConfiguration;
-	
 	private Map<String, Boolean> equationgEnableMap;
 
 	public ExecutionContext() {
-		projectConfiguration = ProjectConfigutration.getInstance();
-		scenarioConfiguration = ScenarioConfigutration.getInstance();
-		pitFieldName = projectConfiguration.getRequiredFieldMapping().get("pit_name");
-		benchFieldName = projectConfiguration.getRequiredFieldMapping().get("bench_rl");
-		tonnesWtFieldName = projectConfiguration.getRequiredFieldMapping().get("tonnes_wt");
-		startYear = scenarioConfiguration.getStartYear();
-		timePeriodStart = 1;
-		timePeriodEnd = scenarioConfiguration.getTimePeriod();
+		
+		loadRequiredFields();
+		loadScenario();
 		loadConfiguration();
 		loadBlocks();
 		loadBlockPayloadMapping();
 		loadCycleTimeDataMapping();
+	}
+	
+	private void loadRequiredFields() {
+		List<RequiredField> requiredFields = new RequiredFieldDAO().getAll(projectId);
+		for(RequiredField requiredField: requiredFields) {
+			switch(requiredField.getFieldName()) {
+				case "pit_name": pitFieldName = requiredField.getMappedFieldname();
+								 break;
+				case "bench_rl": benchFieldName = requiredField.getMappedFieldname();
+								 break;
+				case "tonnes_wt": tonnesWtFieldName = requiredField.getMappedFieldname();
+								 break;
+			}
+		}
+		
+	}
+
+	private void loadScenario() {
+		Scenario scenario = new ScenarioDAO().get(scenarioId);
+		startYear = scenario.getStartYear();
+		timePeriodStart = 1;
+		timePeriodEnd = scenario.getTimePeriod();
 	}
 
 	private void loadConfiguration() {
@@ -85,7 +106,7 @@ public class ExecutionContext {
 		}
 	}
 	private void loadBlocks() {
-		String sql = "select a.*, b.* from gnos_data_"+projectConfiguration.getProjectId()+" a, gnos_computed_data_"+projectConfiguration.getProjectId()+" b where a.id = b.row_id";
+		String sql = "select a.*, b.* from gnos_data_"+projectId+" a, gnos_computed_data_"+projectId+" b where a.id = b.row_id";
 		try (
 				Connection conn = DBManager.getConnection();
 				Statement stmt  = conn.createStatement();
@@ -148,7 +169,7 @@ public class ExecutionContext {
 	
 	private List<Block> findBlocks(String condition) {
 		List<Block> blocks = new ArrayList<Block>();
-		String sql = "select id from gnos_data_"+projectConfiguration.getProjectId() ;
+		String sql = "select id from gnos_data_"+projectId ;
 		if(hasValue(condition)) {
 			sql += " where "+condition;
 		}
@@ -205,7 +226,7 @@ public class ExecutionContext {
 		otherFields.putAll(stockpileFields);
 		otherFields.putAll(processFields);
 		
-		String sql = "select * from gnos_cycle_time_data_"+ projectConfiguration.getProjectId();		
+		String sql = "select * from gnos_cycle_time_data_"+ projectId;		
 
 		try (
 				Connection conn = DBManager.getConnection();
@@ -295,14 +316,6 @@ public class ExecutionContext {
 
 	public void setTimePeriodEnd(int timePeriodEnd) {
 		this.timePeriodEnd = timePeriodEnd;
-	}
-
-	public ScenarioConfigutration getScenarioConfig() {
-		return this.scenarioConfiguration;
-	}
-	
-	public ProjectConfigutration getProjectConfig() {
-		return this.projectConfiguration;
 	}
 	
 	private boolean hasValue(String s) {

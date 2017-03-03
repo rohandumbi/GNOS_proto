@@ -23,6 +23,7 @@ import com.org.gnos.services.endpoints.ProductJoinEndpoint;
 import com.org.gnos.services.endpoints.ProjectEndpoint;
 import com.org.gnos.services.endpoints.ScenarioEndpoint;
 import com.org.gnos.services.endpoints.StockpileEndpoint;
+import com.org.gnos.services.endpoints.TruckParameterCycleTimeEndpoint;
 
 public class EndpointManager {
 
@@ -40,6 +41,7 @@ public class EndpointManager {
 		new ProductJoinEndpoint();
 		new DumpEndpoint();
 		new StockpileEndpoint();
+		new TruckParameterCycleTimeEndpoint();
 		new CycleTimeEndpoint();
 		new ScenarioEndpoint();
 		new OpexEndpoint();
