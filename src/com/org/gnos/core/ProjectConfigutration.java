@@ -503,32 +503,11 @@ public class ProjectConfigutration {
 
 	public void save() {
 		saveProcessTree();
-		saveCycleTimeData();
 		saveTruckParameterData();
 	}
 
 
-	public void saveCycleTimeFields() {
-		String inset_sql = " insert into cycle_time_fields (project_id, name) values (?, ?) ";
-		String delete_sql = " delete from cycle_time_fields where project_id = ? ";
-		try (
-				Connection connection = DBManager.getConnection();
-	            PreparedStatement ps1 = connection.prepareStatement(inset_sql);
-				PreparedStatement ps2 = connection.prepareStatement(delete_sql);
-			){
-			
-			ps2.setInt(1, projectId);
-			ps2.executeUpdate();
-			for (Field field : cycletimefields) {
-				ps1.setInt(1, projectId);
-				ps1.setString(2, field.getName());
-				ps1.executeUpdate();
-			}
-			
-		} catch(SQLException e){
-			e.printStackTrace();
-		}
-	}
+	
 
 	public void saveProcessTree() {
 
