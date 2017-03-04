@@ -127,7 +127,7 @@ public class CapexDAO {
 			for (CapexInstance capexInstance: capexData.getListOfCapexInstances()) {
 				Object[] civalues = {
 						
-						capexInstance.getName(),
+						/*capexInstance.getName(),*/
 						capexInstance.getGroupingName(),
 						capexInstance.getGroupingType(),
 						capexInstance.getCapexAmount(),
