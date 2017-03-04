@@ -77,4 +77,13 @@ public class CapexController {
 			return true;
 		}	
 	}
+	
+	public boolean deleteCapexInstance(String id) {
+		if((id == null) || (id.isEmpty())){
+			return false;
+		}else{
+			dao.deleteCapexInstance(Integer.parseInt(id));
+			return true;
+		}	
+	}
 }

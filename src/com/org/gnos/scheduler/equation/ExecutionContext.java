@@ -17,7 +17,6 @@ import java.util.Set;
 import com.org.gnos.core.Bench;
 import com.org.gnos.core.Block;
 import com.org.gnos.core.Pit;
-import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.dao.RequiredFieldDAO;
@@ -155,18 +154,21 @@ public class ExecutionContext {
 		}
 	}
 
-	public Set<Integer> flattenPitGroup(PitGroup pg) {
-		 Set<Integer> pits = new HashSet<Integer>();
-		 for(Integer childPit: pg.getListChildPits()){
-			 pits.add(childPit);
-		 }
-		 for(Integer childGroup: pg.getListChildPitGroups()) {
-			 pits.addAll(flattenPitGroup(projectConfiguration.getPitGroupfromName(""+childGroup)));// Arpan hack
+	public Set<String> flattenPitGroup(PitGroup pg) {
+		 Set<String> pits = new HashSet<String>();
+		 pits.addAll(pg.getListChildPits());
+		 for(String childGroup: pg.getListChildPitGroups()) {
+			 pits.addAll(flattenPitGroup(getPitGroupfromName(childGroup)));
 		 }
 		 
 		 return pits;
 	}
 	
+	private PitGroup getPitGroupfromName(String childGroup) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	private List<Block> findBlocks(String condition) {
 		List<Block> blocks = new ArrayList<Block>();
 		String sql = "select id from gnos_data_"+projectId ;
@@ -194,11 +196,11 @@ public class ExecutionContext {
 	}
 	
 	private void loadBlockPayloadMapping() {
-		TruckParameterData truckparamdata = projectConfiguration.getTruckParameterData();
+		TruckParameterData truckparamdata = getTruckParameterData();
 		Map<String, Integer> payloadMap = truckparamdata.getMaterialPayloadMap();
 		Set<String> exprnames = payloadMap.keySet();
 		for(String exprname: exprnames){
-			Expression expr = projectConfiguration.getExpressionByName(exprname);
+			Expression expr = getExpressionByName(exprname);
 			if(expr != null){
 				String condition = expr.getFilter();
 				List<Block> blocks = findBlocks(condition);
@@ -210,14 +212,19 @@ public class ExecutionContext {
 		
 	}
 	
+	private Expression getExpressionByName(String exprname) {
+
+		return null;
+	}
+
 	private void loadCycleTimeDataMapping(){
 		
-		CycleTimeMappingData ctd = projectConfiguration.getCycleTimeData();
+		CycleTimeMappingData ctd = getCycleTimeData();
 		Map<String, String> fixedFields = ctd.getFixedFieldMap();
 		String pitNameAlias = fixedFields.get("Pit");
 		String benchAlias = fixedFields.get("Bench");
 		if(pitNameAlias == null || benchAlias == null) return;
-		BigDecimal fixedTime = projectConfiguration.getTruckParameterData().getFixedTime();
+		BigDecimal fixedTime = getTruckParameterData().getFixedTime();
 		Map<String, String> dumpFields = ctd.getDumpFieldMap();
 		Map<String, String> processFields = ctd.getChildProcessFieldMap();
 		Map<String, String> stockpileFields = ctd.getStockpileFieldMap();
@@ -238,7 +245,7 @@ public class ExecutionContext {
 			while (rs.next()) {
 				String pitName = rs.getString(pitNameAlias);
 				int benchName = rs.getInt(benchAlias);
-				com.org.gnos.db.model.Pit pit = projectConfiguration.getPitfromPitName(pitName);
+				com.org.gnos.db.model.Pit pit = getPitfromPitName(pitName);
 				if(pit == null) continue;
 				int pitNo = pit.getPitNumber();
 				Pit corePit = pits.get(pitNo);
@@ -262,8 +269,23 @@ public class ExecutionContext {
 		}
 	}
 	
+	private com.org.gnos.db.model.Pit getPitfromPitName(String pitName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private TruckParameterData getTruckParameterData() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private CycleTimeMappingData getCycleTimeData() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	public Stockpile getStockpileFromNo(int spNo){;
-		List<Stockpile> stockpiles = projectConfiguration.getStockPileList();
+		List<Stockpile> stockpiles = getStockPileList();
 		for(Stockpile sp: stockpiles){
 			if(sp.getStockpileNumber() == spNo) {
 				return sp;
@@ -272,6 +294,10 @@ public class ExecutionContext {
 		return null;
 	}
 	
+	private List<Stockpile> getStockPileList() {
+		return null;
+	}
+
 	public void reset() {
 		blockVariableMapping = new HashMap<Integer, List<String>>();
 	}

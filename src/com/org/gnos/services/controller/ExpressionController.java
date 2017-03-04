@@ -24,6 +24,7 @@ public class ExpressionController {
 		boolean isGrade = jsonObject.get("isGrade").getAsBoolean();
 		boolean isComplex = jsonObject.get("isComplex").getAsBoolean();
 		String exprvalue = jsonObject.get("exprvalue").getAsString();
+		String weightedField = jsonObject.get("weightedField").getAsString();
 		String filter = null;
 		if(jsonObject.get("filter") != null){
 			filter = jsonObject.get("filter").getAsString();
@@ -33,7 +34,8 @@ public class ExpressionController {
 		obj.setGrade(isGrade);
 		obj.setComplex(isComplex);
 		obj.setExprvalue(exprvalue);
-		obj.setFilter(filter);	
+		obj.setFilter(filter);
+		obj.setWeightedField(weightedField);
 		boolean created = dao.create(obj, Integer.parseInt(pid));
 		if(created) return obj;
 		throw new Exception();
@@ -45,6 +47,7 @@ public class ExpressionController {
 		boolean isGrade = jsonObject.get("isGrade").getAsBoolean();
 		boolean isComplex = jsonObject.get("isComplex").getAsBoolean();
 		String exprvalue = jsonObject.get("exprvalue").getAsString();
+		String weightedField = jsonObject.get("weightedField").getAsString();
 		String filter = null;
 		if(jsonObject.get("filter") != null){
 			filter = jsonObject.get("filter").getAsString();
@@ -56,7 +59,8 @@ public class ExpressionController {
 		obj.setGrade(isGrade);
 		obj.setComplex(isComplex);
 		obj.setExprvalue(exprvalue);
-		obj.setFilter(filter);	
+		obj.setFilter(filter);
+		obj.setWeightedField(weightedField);
 		boolean created = dao.update(obj);
 		if(created) return obj;
 		throw new Exception();

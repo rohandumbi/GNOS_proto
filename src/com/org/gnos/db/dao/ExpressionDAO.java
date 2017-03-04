@@ -14,10 +14,10 @@ import com.org.gnos.db.model.Expression;
 
 public class ExpressionDAO {
 
-	private static final String SQL_LIST_ORDER_BY_ID = "select id, name, is_grade, is_complex, expr_value, filter from  expressions where project_id = ? order by id";
-	private static final String SQL_INSERT = "insert into expressions (project_id, name, is_grade, is_complex, expr_value, filter) values (?, ?, ?, ?, ?,?)";
+	private static final String SQL_LIST_ORDER_BY_ID = "select id, name, is_grade, is_complex, expr_value, filter, weighted_field from  expressions where project_id = ? order by id";
+	private static final String SQL_INSERT = "insert into expressions (project_id, name, is_grade, is_complex, expr_value, filter, weighted_field) values (?, ?, ?, ?, ?,?, ?)";
 	private static final String SQL_DELETE = "delete from expressions where id = ?";
-	private static final String SQL_UPDATE = "update expressions set is_grade = ?, is_complex = ?, expr_value = ?, filter = ? where id = ?";
+	private static final String SQL_UPDATE = "update expressions set is_grade = ?, is_complex = ?, expr_value = ?, filter = ?, weighted_field = ? where id = ?";
 	
 	public List<Expression> getAll(int projectId) {
 		
@@ -53,7 +53,8 @@ public class ExpressionDAO {
 				expression.isGrade(),
 				expression.isComplex(),
 				expression.getExprvalue(),
-				expression.getFilter()
+				expression.getFilter(),
+				expression.getWeightedField()
 	   };
 
 		try ( Connection connection = DBManager.getConnection();
@@ -90,6 +91,7 @@ public class ExpressionDAO {
 				expression.isComplex(),
 				expression.getExprvalue(),
 				expression.getFilter(),
+				expression.getWeightedField(),
 				expression.getId()
 	   };
 
@@ -134,6 +136,7 @@ public class ExpressionDAO {
 		expression.setComplex(rs.getBoolean("is_complex"));
 		expression.setExprvalue(rs.getString("expr_value"));
 		expression.setFilter(rs.getString("filter"));
+		expression.setWeightedField(rs.getString("weighted_field"));
 
 		return expression;
 	}

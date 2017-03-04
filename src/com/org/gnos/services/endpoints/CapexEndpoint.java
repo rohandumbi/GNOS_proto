@@ -64,6 +64,8 @@ public class CapexEndpoint {
 			}, json());
 
 			delete("/capex/:id", (req, res) -> controller.delete(req.params(":id")), json());
+			
+			delete("/capex/:id/capexInstance/:instanceid", (req, res) -> controller.deleteCapexInstance(req.params(":instanceid")), json());
 		}
 		
 }

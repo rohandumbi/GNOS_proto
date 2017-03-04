@@ -9,6 +9,7 @@ public class Expression {
 	private boolean isComplex;
 	private String exprvalue;
 	private String filter;
+	private String weightedField;
 	
 	public Expression() {
 		super();
@@ -67,6 +68,14 @@ public class Expression {
 
 	public void setFilter(String filter) {
 		this.filter = filter;
+	}
+
+	public String getWeightedField() {
+		return weightedField;
+	}
+
+	public void setWeightedField(String weightedField) {
+		this.weightedField = weightedField;
 	}
 
 	@Override
