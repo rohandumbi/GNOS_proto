@@ -23,9 +23,9 @@ public class DumpController {
 		String name = jsonObject.get("name").getAsString();
 		short type = jsonObject.get("type").getAsShort();
 		String condition = jsonObject.get("condition").getAsString();
-		String mappedTo = jsonObject.get("mapped_to").getAsString();
-		int mappingType = jsonObject.get("mapping_type").getAsInt();
-		boolean hasCapacity = jsonObject.get("has_capacity").getAsBoolean();
+		String mappedTo = jsonObject.get("mappedTo").getAsString();
+		int mappingType = jsonObject.get("mappingType").getAsInt();
+		boolean hasCapacity = jsonObject.get("hasCapacity").getAsBoolean();
 		int capacity = jsonObject.get("capacity").getAsInt();
 		Dump obj = new Dump();
 		obj.setName(name);
@@ -45,9 +45,9 @@ public class DumpController {
 		String name = jsonObject.get("name").getAsString();
 		short type = jsonObject.get("type").getAsShort();
 		String condition = jsonObject.get("condition").getAsString();
-		String mappedTo = jsonObject.get("mapped_to").getAsString();
-		int mappingType = jsonObject.get("mapping_type").getAsInt();
-		boolean hasCapacity = jsonObject.get("has_capacity").getAsBoolean();
+		String mappedTo = jsonObject.get("mappedTo").getAsString();
+		int mappingType = jsonObject.get("mappingType").getAsInt();
+		boolean hasCapacity = jsonObject.get("hasCapacity").getAsBoolean();
 		int capacity = jsonObject.get("capacity").getAsInt();
 		Dump obj = new Dump();
 		obj.setId(Integer.parseInt(id));
