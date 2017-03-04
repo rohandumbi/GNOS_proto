@@ -24,17 +24,17 @@ public class CapexController {
 	
 	public CapexData create(JsonObject jsonObject, String id) throws Exception {
 		String name = jsonObject.get("name").getAsString();
-		JsonArray instanceArr = jsonObject.get("instances").getAsJsonArray();
+		JsonArray instanceArr = jsonObject.get("listOfCapexInstances").getAsJsonArray();
 		CapexData obj = new CapexData();
 		obj.setName(name);
 		for(JsonElement elm : instanceArr){
 			CapexInstance ci = new CapexInstance();
 			JsonObject instanceObj = elm.getAsJsonObject();
 			ci.setName(instanceObj.get("name").getAsString());
-			ci.setGroupingName(instanceObj.get("group_name").getAsString());
-			ci.setGroupingType(instanceObj.get("group_type").getAsInt());
-			ci.setCapexAmount(instanceObj.get("capex_amount").getAsLong());
-			ci.setExpansionCapacity(instanceObj.get("expansion_capacity").getAsLong());
+			ci.setGroupingName(instanceObj.get("groupingName").getAsString());
+			ci.setGroupingType(instanceObj.get("groupingType").getAsInt());
+			ci.setCapexAmount(instanceObj.get("capexAmount").getAsLong());
+			ci.setExpansionCapacity(instanceObj.get("expansionCapacity").getAsLong());
 			obj.addCapexInstance(ci);
 		}
 		
@@ -46,19 +46,19 @@ public class CapexController {
 	
 	public CapexData update(JsonObject jsonObject, String id) throws Exception {		
 		String name = jsonObject.get("name").getAsString();
-		JsonArray instanceArr = jsonObject.get("instances").getAsJsonArray();
+		JsonArray instanceArr = jsonObject.get("listOfCapexInstances").getAsJsonArray();
 		CapexData obj = new CapexData();
 		obj.setName(name);
 		obj.setId(Integer.parseInt(id));
 		for(JsonElement elm : instanceArr){
 			CapexInstance ci = new CapexInstance();
 			JsonObject instanceObj = elm.getAsJsonObject();
-			ci.setId(instanceObj.get("name").getAsInt());
+			ci.setId(instanceObj.get("id").getAsInt());
 			ci.setName(instanceObj.get("name").getAsString());
-			ci.setGroupingName(instanceObj.get("group_name").getAsString());
-			ci.setGroupingType(instanceObj.get("group_type").getAsInt());
-			ci.setCapexAmount(instanceObj.get("capex_amount").getAsLong());
-			ci.setExpansionCapacity(instanceObj.get("expansion_capacity").getAsLong());
+			ci.setGroupingName(instanceObj.get("groupingName").getAsString());
+			ci.setGroupingType(instanceObj.get("groupingType").getAsInt());
+			ci.setCapexAmount(instanceObj.get("capexAmount").getAsLong());
+			ci.setExpansionCapacity(instanceObj.get("expansionCapacity").getAsLong());
 			obj.addCapexInstance(ci);
 		}
 		
