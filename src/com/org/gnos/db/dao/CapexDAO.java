@@ -121,21 +121,43 @@ public class CapexDAO {
 		}
 
 		try ( Connection connection = DBManager.getConnection();
-				PreparedStatement statement =  connection.prepareStatement(SQL_UPDATE)
+				PreparedStatement statement =  connection.prepareStatement(SQL_UPDATE);
+				PreparedStatement statement1 = connection.prepareStatement(SQL_INSERT_INSTANCE, Statement.RETURN_GENERATED_KEYS)
 				){
 
 			for (CapexInstance capexInstance: capexData.getListOfCapexInstances()) {
-				Object[] civalues = {
-						
-						/*capexInstance.getName(),*/
-						capexInstance.getGroupingName(),
-						capexInstance.getGroupingType(),
-						capexInstance.getCapexAmount(),
-						capexInstance.getExpansionCapacity(),
-						capexInstance.getId(),
-				};
-				setValues(statement, civalues);
-				statement.executeUpdate();
+				if(capexInstance.getId() < 0){// new instance has been added to exisitng capex
+					capexInstance.setCapexId(capexData.getId());
+					Object[] civalues = {
+							capexData.getId(),
+							capexInstance.getName(),
+							capexInstance.getGroupingName(),
+							capexInstance.getGroupingType(),
+							capexInstance.getCapexAmount(),
+							capexInstance.getExpansionCapacity()
+					};
+					setValues(statement1, civalues);
+					statement1.executeUpdate();
+					try (ResultSet generatedKeys = statement1.getGeneratedKeys()) {
+						if (generatedKeys.next()) {
+							capexInstance.setId(generatedKeys.getInt(1));
+						} else {
+							//throw new DAOException("Creating user failed, no generated key obtained.");
+						}
+					}
+				}else{
+					Object[] civalues = {
+							
+							/*capexInstance.getName(),*/
+							capexInstance.getGroupingName(),
+							capexInstance.getGroupingType(),
+							capexInstance.getCapexAmount(),
+							capexInstance.getExpansionCapacity(),
+							capexInstance.getId(),
+					};
+					setValues(statement, civalues);
+					statement.executeUpdate();
+				}
 			}
 
 		} catch(SQLException e){
