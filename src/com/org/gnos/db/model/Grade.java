@@ -2,9 +2,13 @@ package com.org.gnos.db.model;
 
 public class Grade {
 
+	public static final short GRADE_FIELD = 1;
+	public static final short GRADE_EXPRESSION = 2;
+	
 	private int id;
-	private String name;
-	private int expressionId;
+	private String productName;
+	private short type;
+	private String mappedName;
 	
 	public Grade(){
 		super();
@@ -19,19 +23,28 @@ public class Grade {
 		this.id = id;
 	}
 
-	public String getName() {
-		return name;
+	public String getProductName() {
+		return productName;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setProductName(String productName) {
+		this.productName = productName;
 	}
 
-	public int getExpressionId() {
-		return expressionId;
+	public short getType() {
+		return type;
 	}
 
-	public void setExpressionId(int expressionId) {
-		this.expressionId = expressionId;
+	public void setType(short type) {
+		this.type = type;
 	}
+
+	public String getMappedName() {
+		return mappedName;
+	}
+
+	public void setMappedName(String mappedName) {
+		this.mappedName = mappedName;
+	}
+
 }

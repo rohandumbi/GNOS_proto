@@ -7,11 +7,9 @@ public class Product {
 	private String name;
 	private int modelId; 
 	private Set<Integer> expressionIdList;
-	private Set<Integer> gradeList;
 	
 	public Product(){
 		this.expressionIdList = new HashSet<Integer>();
-		this.gradeList = new HashSet<Integer>();
 	}
 
 	public String getName() {
@@ -38,11 +36,4 @@ public class Product {
 		this.expressionIdList = expressionIdList;
 	}
 
-	public Set<Integer> getGradeList() {
-		return gradeList;
-	}
-
-	public void setGradeList(Set<Integer> gradeList) {
-		this.gradeList = gradeList;
-	}
 }

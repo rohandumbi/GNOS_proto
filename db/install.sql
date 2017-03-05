@@ -226,10 +226,11 @@ CREATE TABLE grade(
    id INT NOT NULL AUTO_INCREMENT,
    project_id INT NOT NULL,
    product_name VARCHAR(50) NOT NULL,
-   name VARCHAR(50),
+   type TINYINT,
+   mapped_name VARCHAR(100),
    value VARCHAR(50),
    PRIMARY KEY ( id ),
-   unique key(project_id, name, product_name)
+   unique key(project_id, mapped_name,type, product_name)
 );
 
 
