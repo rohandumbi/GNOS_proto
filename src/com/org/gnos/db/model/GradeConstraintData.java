@@ -15,7 +15,6 @@ public class GradeConstraintData {
 	private int id;
 	private boolean inUse;
 	private String productJoinName;
-	private int selectedGradeIndex;
 	private String selectedGradeName;
 	private boolean isMax;
 	private int selectionType;
@@ -74,14 +73,6 @@ public class GradeConstraintData {
 
 	public void setSelectorName(String selectorName) {
 		this.selectorName = selectorName;
-	}
-
-	public int getSelectedGradeIndex() {
-		return selectedGradeIndex;
-	}
-
-	public void setSelectedGradeIndex(int selectedGradeIndex) {
-		this.selectedGradeIndex = selectedGradeIndex;
 	}
 
 	public int getSelectionType() {

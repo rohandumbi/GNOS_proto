@@ -228,7 +228,6 @@ CREATE TABLE grade(
    product_name VARCHAR(50) NOT NULL,
    type TINYINT,
    mapped_name VARCHAR(100),
-   value VARCHAR(50),
    PRIMARY KEY ( id ),
    unique key(project_id, mapped_name,type, product_name)
 );
