@@ -22,18 +22,18 @@ public class GradeConstraintController {
 	}
 	
 	public GradeConstraintData create(JsonObject jsonObject, String scenarioIdStr) throws Exception {
-		String productJoinName = jsonObject.get("product_join").getAsString();
-		int selectionType = jsonObject.get("selection_ype").getAsInt();
-		String selectedGradeName = jsonObject.get("selected_grade").getAsString();
-		String selectorName = jsonObject.get("selector_name").getAsString();
-		int selectedGradeIndex = jsonObject.get("selected_grade_index").getAsInt();
-		boolean inUse = jsonObject.get("in_use").getAsBoolean();
-		boolean isMax = jsonObject.get("is_max").getAsBoolean();
+		String productJoinName = jsonObject.get("productJoinName").getAsString();
+		int selectionType = jsonObject.get("selectionType").getAsInt();
+		String selectedGradeName = jsonObject.get("selectedGradeName").getAsString();
+		String selectorName = jsonObject.get("selectorName").getAsString();
+		//int selectedGradeIndex = jsonObject.get("selected_grade_index").getAsInt();
+		boolean inUse = jsonObject.get("inUse").getAsBoolean();
+		boolean isMax = jsonObject.get("isMax").getAsBoolean();
 		JsonObject constraintDataObj = jsonObject.get("constraintData").getAsJsonObject();
 		GradeConstraintData obj = new GradeConstraintData();
 		obj.setProductJoinName(productJoinName);
 		obj.setSelectedGradeName(selectedGradeName);
-		obj.setSelectedGradeIndex(selectedGradeIndex);
+		//obj.setSelectedGradeIndex(selectedGradeIndex);
 		obj.setSelectionType(selectionType);
 		obj.setSelectorName(selectorName);
 		obj.setInUse(inUse);
@@ -49,19 +49,19 @@ public class GradeConstraintController {
 	
 	
 	public GradeConstraintData update(JsonObject jsonObject, String id) throws Exception {		
-		String productJoinName = jsonObject.get("product_join").getAsString();
-		int selectionType = jsonObject.get("selection_ype").getAsInt();
-		String selectedGradeName = jsonObject.get("selected_grade").getAsString();
-		String selectorName = jsonObject.get("selector_name").getAsString();
-		int selectedGradeIndex = jsonObject.get("selected_grade_index").getAsInt();
-		boolean inUse = jsonObject.get("in_use").getAsBoolean();
-		boolean isMax = jsonObject.get("is_max").getAsBoolean();
+		String productJoinName = jsonObject.get("productJoinName").getAsString();
+		int selectionType = jsonObject.get("selectionType").getAsInt();
+		String selectedGradeName = jsonObject.get("selectedGradeName").getAsString();
+		String selectorName = jsonObject.get("selectorName").getAsString();
+		//int selectedGradeIndex = jsonObject.get("selected_grade_index").getAsInt();
+		boolean inUse = jsonObject.get("inUse").getAsBoolean();
+		boolean isMax = jsonObject.get("isMax").getAsBoolean();
 		JsonObject constraintDataObj = jsonObject.get("constraintData").getAsJsonObject();
 		GradeConstraintData obj = new GradeConstraintData();
 		obj.setId(Integer.parseInt(id));
 		obj.setProductJoinName(productJoinName);
 		obj.setSelectedGradeName(selectedGradeName);
-		obj.setSelectedGradeIndex(selectedGradeIndex);
+		//obj.setSelectedGradeIndex(selectedGradeIndex);
 		obj.setSelectionType(selectionType);
 		obj.setSelectorName(selectorName);
 		obj.setInUse(inUse);
