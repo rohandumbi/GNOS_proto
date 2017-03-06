@@ -7,6 +7,7 @@ public class Grade {
 	
 	private int id;
 	private String productName;
+	private String name;
 	private short type;
 	private String mappedName;
 	
@@ -45,6 +46,14 @@ public class Grade {
 
 	public void setMappedName(String mappedName) {
 		this.mappedName = mappedName;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 }

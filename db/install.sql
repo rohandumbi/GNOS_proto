@@ -225,11 +225,12 @@ DROP TABLE IF EXISTS grade;
 CREATE TABLE grade(
    id INT NOT NULL AUTO_INCREMENT,
    project_id INT NOT NULL,
-   product_name VARCHAR(50) NOT NULL,
+   product_name VARCHAR(100) NOT NULL,
+   name VARCHAR(100) NOT NULL,
    type TINYINT,
    mapped_name VARCHAR(100),
    PRIMARY KEY ( id ),
-   unique key(project_id, mapped_name,type, product_name)
+   unique key(project_id, product_name, name)
 );
 
 

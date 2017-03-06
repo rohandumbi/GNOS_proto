@@ -14,8 +14,8 @@ import com.org.gnos.db.model.Grade;
 
 public class GradeDAO {
 
-	private static final String SQL_LIST_ORDER_BY_ID = "select id, product_name, type, mapped_name, value from grade where project_id = ? ";
-	private static final String SQL_INSERT = "insert into grade (project_id, product_name, type, mapped_name, value) values (?, ?, ?, ?, ?)";
+	private static final String SQL_LIST_ORDER_BY_ID = "select id, name, product_name, type, mapped_name, value from grade where project_id = ? ";
+	private static final String SQL_INSERT = "insert into grade (project_id, name, product_name, type, mapped_name, value) values (?, ?, ?, ?, ?, ?)";
 	private static final String SQL_DELETE = "delete from grade where id  = ?";
 
 	public List<Grade> getAll(int projectId) {
@@ -44,6 +44,7 @@ public class GradeDAO {
 
 		Object[] values = {
 				projectId,
+				grade.getName(),
 				grade.getProductName(),
 				grade.getType(),
 				grade.getMappedName()
@@ -90,6 +91,7 @@ public class GradeDAO {
 	private Grade map(ResultSet rs) throws SQLException {
 		Grade grade = new Grade();
 		grade.setId(rs.getInt("id"));
+		grade.setName(rs.getString("name"));
 		grade.setProductName(rs.getString("product_name"));
 		grade.setType(rs.getShort("type"));
 		grade.setMappedName(rs.getString("mapped_name"));

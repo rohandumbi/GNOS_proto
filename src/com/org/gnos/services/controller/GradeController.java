@@ -21,9 +21,11 @@ public class GradeController {
 	
 	public Grade create(JsonObject jsonObject, String projectId) throws Exception {
 		String productName = jsonObject.get("productName").getAsString();
+		String name = jsonObject.get("name").getAsString();
 		short type = jsonObject.get("type").getAsShort();
 		String mappedName =  jsonObject.get("mappedName").getAsString();
 		Grade obj = new Grade();
+		obj.setName(name);
 		obj.setProductName(productName);
 		obj.setType(type);
 		obj.setMappedName(mappedName);
