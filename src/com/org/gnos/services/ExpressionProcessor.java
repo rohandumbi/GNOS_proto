@@ -15,12 +15,7 @@ public class ExpressionProcessor {
 	
 	List<Expression> expressions;
 	
-	public void store() {
-		
-		ProjectConfigutration projectConfiguration = ProjectConfigutration.getInstance();
-		int projectId = projectConfiguration.getProjectId();
-		expressions = projectConfiguration.getExpressions();
-		
+	public void store(int projectId) {		
 		
 		modifyTable(projectId);
 		processExpressions(projectId);

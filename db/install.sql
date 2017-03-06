@@ -351,41 +351,6 @@ CREATE TABLE cycle_time_fields(
    PRIMARY KEY ( id )
 );
 
-DROP TABLE IF EXISTS cycletime_fixed_field_mapping;
-
-CREATE TABLE cycletime_fixed_field_mapping(
-   project_id INT NOT NULL,
-   field_name VARCHAR(100) NOT NULL,
-   mapped_field_name VARCHAR(100) NOT NULL,
-   UNIQUE KEY ( project_id, field_name )
-);
-
-DROP TABLE IF EXISTS cycletime_dump_field_mapping;
-
-CREATE TABLE cycletime_dump_field_mapping(
-   project_id INT NOT NULL,
-   field_name VARCHAR(100) NOT NULL,
-   mapped_field_name VARCHAR(100) NOT NULL,
-   UNIQUE KEY ( project_id, field_name )
-);
-
-DROP TABLE IF EXISTS cycletime_stockpile_field_mapping;
-
-CREATE TABLE cycletime_stockpile_field_mapping(
-   project_id INT NOT NULL,
-   field_name VARCHAR(100) NOT NULL,
-   mapped_field_name VARCHAR(100) NOT NULL,
-   UNIQUE KEY ( project_id, field_name )
-);
-
-DROP TABLE IF EXISTS cycletime_process_field_mapping;
-
-CREATE TABLE cycletime_process_field_mapping(
-   project_id INT NOT NULL,
-   field_name VARCHAR(100) NOT NULL,
-   mapped_field_name VARCHAR(100) NOT NULL,
-   UNIQUE KEY ( project_id, field_name )
-);
 
 DROP TABLE IF EXISTS truckparam_material_payload_mapping;
 
