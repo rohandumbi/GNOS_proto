@@ -350,6 +350,15 @@ CREATE TABLE cycle_time_fields(
    PRIMARY KEY ( id )
 );
 
+DROP TABLE IF EXISTS cycletime_field_mapping;
+
+CREATE TABLE cycletime_field_mapping(
+   project_id INT NOT NULL,
+   field_name VARCHAR(100) NOT NULL,
+   mapping_type TINYINT,
+   mapped_field_name VARCHAR(100) NOT NULL,
+   UNIQUE KEY ( project_id, field_name, mapping_type )
+);
 
 DROP TABLE IF EXISTS truckparam_material_payload_mapping;
 
