@@ -65,6 +65,17 @@ public class CycleTimeMappingEndpoint {
 		delete("/project/:id/cycletimemappings", (req, res) -> controller.deleteAll(req.params(":id")), json());
 		
 		delete("/project/:id/cycletimemappings/filed/:fname/type/:mtype", (req, res) -> controller.delete(req.params(":id"), req.params(":fname"), Short.parseShort(req.params(":mtype"))), json());
+		
+		//Fixed time endpoint
+		
+		get("/project/:id/fixedtime", (req, res) -> controller.getFixedTime(req.params(":id")), json());
+		
+		post("/project/:id/fixedtime/:value",  (req, res) -> controller.createFixedTime(req.params(":id"), req.params(":value")), json());
+		
+        put("/project/:id/fixedtime/:value", (req, res) -> controller.updateFixedTime(req.params(":id"), req.params(":value")), json());
+
+		/* DELETE exisitng expression */
+		delete("/project/:id/fixedtime", (req, res) -> controller.deleteFixedTime(req.params(":id")), json());
 	}
 	
 	
