@@ -22,12 +22,12 @@ public class ProcessConstraintController {
 	}
 	
 	public ProcessConstraintData create(JsonObject jsonObject, String scenarioIdStr) throws Exception {
-		int coefficientType = jsonObject.get("coefficient_type").getAsInt();
-		int selectionType = jsonObject.get("selection_ype").getAsInt();
+		int coefficientType = jsonObject.get("coefficientType").getAsInt();
+		int selectionType = jsonObject.get("selectionType").getAsInt();
 		String coefficientName = jsonObject.get("coefficient_name").getAsString();
 		String selectorName = jsonObject.get("selector_name").getAsString();
-		boolean inUse = jsonObject.get("in_use").getAsBoolean();
-		boolean isMax = jsonObject.get("is_max").getAsBoolean();
+		boolean inUse = jsonObject.get("inUse").getAsBoolean();
+		boolean isMax = jsonObject.get("isMax").getAsBoolean();
 		JsonObject constraintDataObj = jsonObject.get("constraintData").getAsJsonObject();
 		ProcessConstraintData obj = new ProcessConstraintData();
 		obj.setCoefficient_name(coefficientName);
@@ -47,12 +47,12 @@ public class ProcessConstraintController {
 	
 	
 	public ProcessConstraintData update(JsonObject jsonObject, String id) throws Exception {		
-		int coefficientType = jsonObject.get("coefficient_type").getAsInt();
-		int selectionType = jsonObject.get("selection_ype").getAsInt();
+		int coefficientType = jsonObject.get("coefficientType").getAsInt();
+		int selectionType = jsonObject.get("selectionType").getAsInt();
 		String coefficientName = jsonObject.get("coefficient_name").getAsString();
 		String selectorName = jsonObject.get("selector_name").getAsString();
-		boolean inUse = jsonObject.get("in_use").getAsBoolean();
-		boolean isMax = jsonObject.get("is_max").getAsBoolean();
+		boolean inUse = jsonObject.get("inUse").getAsBoolean();
+		boolean isMax = jsonObject.get("isMax").getAsBoolean();
 		JsonObject constraintDataObj = jsonObject.get("constraintData").getAsJsonObject();
 		ProcessConstraintData obj = new ProcessConstraintData();
 		obj.setId(Integer.parseInt(id));

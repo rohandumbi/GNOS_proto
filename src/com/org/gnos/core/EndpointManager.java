@@ -9,6 +9,7 @@ import com.org.gnos.services.endpoints.ExpressionEndpoint;
 import com.org.gnos.services.endpoints.FieldEndpoint;
 import com.org.gnos.services.endpoints.FixedCostEndpoint;
 import com.org.gnos.services.endpoints.GradeConstraintEndpoint;
+import com.org.gnos.services.endpoints.GradeEndpoint;
 import com.org.gnos.services.endpoints.ModelEndpoint;
 import com.org.gnos.services.endpoints.OpexEndpoint;
 import com.org.gnos.services.endpoints.PitDependencyEndpoint;
@@ -33,6 +34,7 @@ public class EndpointManager {
 		new PitEndpoint();
 		new PitGroupEndpoint();
 		new ExpressionEndpoint();
+		new GradeEndpoint();
 		new ModelEndpoint();
 		new ProcessEndpoint();
 		new ProcessTreeEndpoint();
