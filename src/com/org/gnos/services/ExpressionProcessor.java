@@ -1,7 +1,6 @@
 package com.org.gnos.services;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
@@ -19,7 +18,7 @@ public class ExpressionProcessor {
 		
 		modifyTable(projectId);
 		processExpressions(projectId);
-		loadBlockData(projectId);
+		//loadBlockData(projectId);
 		
 	}
 	
@@ -103,8 +102,16 @@ public class ExpressionProcessor {
 			
 		}
 	}
+
+	public List<Expression> getExpressions() {
+		return expressions;
+	}
+
+	public void setExpressions(List<Expression> expressions) {
+		this.expressions = expressions;
+	}
 	
-	private void loadBlockData(int projectId) {
+/*	private void loadBlockData(int projectId) {
 		String sql = "select * from gnos_computed_data_"+projectId +" order by block_no";
 		try(
 				Connection conn = DBManager.getConnection();
@@ -116,5 +123,7 @@ public class ExpressionProcessor {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
+	}*/
+	
+	
 }

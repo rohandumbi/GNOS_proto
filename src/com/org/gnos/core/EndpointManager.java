@@ -34,6 +34,7 @@ public class EndpointManager {
 	public static void start() {
 		new ProjectEndpoint();
 		new FieldEndpoint();
+		new RequiredFieldEndpoint();
 		new PitEndpoint();
 		new PitGroupEndpoint();
 		new ExpressionEndpoint();
