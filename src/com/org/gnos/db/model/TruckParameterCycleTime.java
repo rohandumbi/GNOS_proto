@@ -5,7 +5,6 @@ import java.util.HashMap;
 
 public class TruckParameterCycleTime {
 	private HashMap<String, BigDecimal> processData;
-	private int projectId;
 	private String stockPileName;
 	
 	public TruckParameterCycleTime(){
@@ -19,12 +18,7 @@ public class TruckParameterCycleTime {
 	public void setProcessData(HashMap<String, BigDecimal> processData) {
 		this.processData = processData;
 	}
-	public int getProjectId() {
-		return projectId;
-	}
-	public void setProjectId(int projectId) {
-		this.projectId = projectId;
-	}
+
 	public String getStockPileName() {
 		return stockPileName;
 	}
