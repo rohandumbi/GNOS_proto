@@ -28,6 +28,7 @@ import com.org.gnos.services.endpoints.ScenarioEndpoint;
 import com.org.gnos.services.endpoints.SchedulerEndpoint;
 import com.org.gnos.services.endpoints.StockpileEndpoint;
 import com.org.gnos.services.endpoints.TruckParameterCycleTimeEndpoint;
+import com.org.gnos.services.endpoints.TruckParameterPayloadEndpoint;
 
 public class EndpointManager {
 
@@ -61,5 +62,6 @@ public class EndpointManager {
 		new CapexEndpoint();
 		new SchedulerEndpoint();
 		new RequiredFieldEndpoint();
+		new TruckParameterPayloadEndpoint();
 	}
 }
