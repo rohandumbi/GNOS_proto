@@ -23,6 +23,7 @@ import com.org.gnos.services.endpoints.ProcessTreeEndpoint;
 import com.org.gnos.services.endpoints.ProductEndpoint;
 import com.org.gnos.services.endpoints.ProductJoinEndpoint;
 import com.org.gnos.services.endpoints.ProjectEndpoint;
+import com.org.gnos.services.endpoints.RequiredFieldEndpoint;
 import com.org.gnos.services.endpoints.ScenarioEndpoint;
 import com.org.gnos.services.endpoints.SchedulerEndpoint;
 import com.org.gnos.services.endpoints.StockpileEndpoint;
@@ -33,6 +34,7 @@ public class EndpointManager {
 	public static void start() {
 		new ProjectEndpoint();
 		new FieldEndpoint();
+		new RequiredFieldEndpoint();
 		new PitEndpoint();
 		new PitGroupEndpoint();
 		new ExpressionEndpoint();

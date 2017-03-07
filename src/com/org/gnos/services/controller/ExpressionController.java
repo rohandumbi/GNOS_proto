@@ -1,10 +1,12 @@
 package com.org.gnos.services.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gson.JsonObject;
 import com.org.gnos.db.dao.ExpressionDAO;
 import com.org.gnos.db.model.Expression;
+import com.org.gnos.services.ExpressionProcessor;
 
 public class ExpressionController {
 
@@ -37,7 +39,14 @@ public class ExpressionController {
 		obj.setFilter(filter);
 		obj.setWeightedField(weightedField);
 		boolean created = dao.create(obj, Integer.parseInt(pid));
-		if(created) return obj;
+		if(created){
+			List<Expression> expressions = new ArrayList<Expression>();
+			expressions.add(obj);
+			ExpressionProcessor processor = new ExpressionProcessor();
+			processor.setExpressions(expressions);
+			processor.store(Integer.parseInt(pid));
+			return obj;
+		}
 		throw new Exception();
 	}
 	
@@ -61,8 +70,16 @@ public class ExpressionController {
 		obj.setExprvalue(exprvalue);
 		obj.setFilter(filter);
 		obj.setWeightedField(weightedField);
-		boolean created = dao.update(obj);
-		if(created) return obj;
+		boolean updated = dao.update(obj);
+		if(updated){
+			List<Expression> expressions = new ArrayList<Expression>();
+			expressions.add(obj);
+			ExpressionProcessor processor = new ExpressionProcessor();
+			processor.setExpressions(expressions);
+			processor.store(Integer.parseInt(projectId));
+			return obj;
+		}
+
 		throw new Exception();
 	}
 	
