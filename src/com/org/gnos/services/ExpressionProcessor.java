@@ -5,11 +5,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
-import java.util.Map;
 
-import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.db.DBManager;
+import com.org.gnos.db.dao.RequiredFieldDAO;
 import com.org.gnos.db.model.Expression;
+import com.org.gnos.db.model.RequiredField;
 
 public class ExpressionProcessor {
 	
@@ -59,9 +59,16 @@ public class ExpressionProcessor {
 	
 	private void processExpressions (int projectId) {
 		
-		Map<String, String> requiredFieldMapping = ProjectConfigutration.getInstance().getRequiredFieldMapping();
-		String tonnes_wt_alias = requiredFieldMapping.get("tonnes_wt");
-		
+		RequiredFieldDAO rdo = new RequiredFieldDAO();
+		List<RequiredField> requiredFields = rdo.getAll(projectId);
+		String tonnes_wt_alias = "tonnes_wt";
+		for(RequiredField rf: requiredFields){
+			if(rf.getFieldName().equals("tonnes_wt")){
+				tonnes_wt_alias = rf.getMappedFieldname();
+				break;
+			}
+		}
+				
 		Connection conn = DBManager.getConnection();
 		Statement stmt = null;
 		String  sql = null;

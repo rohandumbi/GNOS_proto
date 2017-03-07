@@ -17,17 +17,42 @@ import java.util.Set;
 import com.org.gnos.core.Bench;
 import com.org.gnos.core.Block;
 import com.org.gnos.core.Pit;
-import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.db.DBManager;
+import com.org.gnos.db.dao.BenchConstraintDAO;
+import com.org.gnos.db.dao.CapexDAO;
+import com.org.gnos.db.dao.CycleTimeFieldMappingDAO;
+import com.org.gnos.db.dao.DumpDAO;
+import com.org.gnos.db.dao.DumpDependencyDAO;
+import com.org.gnos.db.dao.ExpressionDAO;
+import com.org.gnos.db.dao.FixedCostDAO;
+import com.org.gnos.db.dao.GradeConstraintDAO;
+import com.org.gnos.db.dao.ModelDAO;
+import com.org.gnos.db.dao.OpexDAO;
+import com.org.gnos.db.dao.PitDependencyDAO;
+import com.org.gnos.db.dao.PitGroupDAO;
+import com.org.gnos.db.dao.ProcessConstraintDAO;
 import com.org.gnos.db.dao.RequiredFieldDAO;
 import com.org.gnos.db.dao.ScenarioDAO;
-import com.org.gnos.db.model.CycleTimeMappingData;
+import com.org.gnos.db.dao.StockpileDAO;
+import com.org.gnos.db.dao.TruckParameterPayloadDAO;
+import com.org.gnos.db.model.CapexData;
+import com.org.gnos.db.model.CycleTimeFieldMapping;
+import com.org.gnos.db.model.Dump;
+import com.org.gnos.db.model.DumpDependencyData;
 import com.org.gnos.db.model.Expression;
+import com.org.gnos.db.model.FixedOpexCost;
+import com.org.gnos.db.model.GradeConstraintData;
+import com.org.gnos.db.model.Model;
+import com.org.gnos.db.model.OpexData;
+import com.org.gnos.db.model.PitBenchConstraintData;
+import com.org.gnos.db.model.PitDependencyData;
+import com.org.gnos.db.model.Process;
+import com.org.gnos.db.model.ProcessConstraintData;
 import com.org.gnos.db.model.PitGroup;
 import com.org.gnos.db.model.RequiredField;
 import com.org.gnos.db.model.Scenario;
 import com.org.gnos.db.model.Stockpile;
-import com.org.gnos.db.model.TruckParameterData;
+import com.org.gnos.db.model.TruckParameterPayload;
 
 public class ExecutionContext {
 	
@@ -42,6 +67,27 @@ public class ExecutionContext {
 	private String benchFieldName;
 	protected String tonnesWtFieldName;
 	
+	/* Data */
+	
+	private List<PitGroup> pitGroups;
+	private List<Stockpile> stockpiles;
+	private List<Dump> dumps;
+	private List<Expression> expressions;
+	private List<Model> models;
+	private List<Process> processes;
+	private List<CycleTimeFieldMapping> cycleTimeFieldMappings;
+	
+	private Scenario scenario;
+	private List<OpexData> opexDataList;
+	private List<FixedOpexCost> fixedOpexCostList;
+	private List<ProcessConstraintData> processConstraintDataList;
+	private List<GradeConstraintData> gradeConstraintDataList;
+	private List<PitBenchConstraintData> pitBenchConstraintDataList;
+	private List<PitDependencyData> pitDependencyDataList;
+	private List<DumpDependencyData> dumpDependencyDataList;
+	private List<CapexData> capexDataList;
+	
+	
 	int projectId;
 	int scenarioId;
 	
@@ -51,18 +97,26 @@ public class ExecutionContext {
 	
 	private boolean spReclaimEnabled = true;
 	
-	private Map<String, Boolean> equationgEnableMap;
+	private Map<String, Boolean> equationEnableMap;
 
 	public ExecutionContext() {
 		
-		loadRequiredFields();
+		loadProject();
 		loadScenario();
-		loadConfiguration();
 		loadBlocks();
-		loadBlockPayloadMapping();
-		loadCycleTimeDataMapping();
 	}
 	
+	private void loadProject() {
+		loadRequiredFields();
+		loadExpressions();
+		loadModels();
+		loadPitGroups();
+		loadStockpiles();
+		loadDumps();		
+		loadBlockPayloadMapping();
+		loadCycleTimeFieldMapping();
+	}
+
 	private void loadRequiredFields() {
 		List<RequiredField> requiredFields = new RequiredFieldDAO().getAll(projectId);
 		for(RequiredField requiredField: requiredFields) {
@@ -78,32 +132,96 @@ public class ExecutionContext {
 		
 	}
 
+	private void loadExpressions() {
+		expressions = new ExpressionDAO().getAll(projectId);
+	}
+	
+	private void loadModels() {
+		models = new ModelDAO().getAll(projectId);
+	}
+	
+	private void loadPitGroups() {
+		pitGroups = new PitGroupDAO().getAll(projectId);
+	}
+	
+	private void loadStockpiles() {
+		stockpiles = new StockpileDAO().getAll(projectId);
+	}
+	
+	private void loadDumps() {
+		dumps = new DumpDAO().getAll(projectId);
+	}
+	private void loadBlockPayloadMapping() {
+		List<TruckParameterPayload> truckParameterPayloads = new TruckParameterPayloadDAO().getAll(projectId);
+		for(TruckParameterPayload truckParameterPayload : truckParameterPayloads){
+			String exprname = truckParameterPayload.getMaterialName();
+			Expression expr = getExpressionByName(exprname);
+			if(expr != null){
+				String condition = expr.getFilter();
+				List<Block> blocks = findBlocks(condition);
+				for(Block b: blocks){
+					blockPayloadMapping.put(b.getId(), truckParameterPayload.getPayload());
+				}				
+			}
+		}
+		
+	}
+
+	private void loadCycleTimeFieldMapping(){
+		
+		cycleTimeFieldMappings = new CycleTimeFieldMappingDAO().getAll(projectId);
+	}
+	
 	private void loadScenario() {
-		Scenario scenario = new ScenarioDAO().get(scenarioId);
+		scenario = new ScenarioDAO().get(scenarioId);
 		startYear = scenario.getStartYear();
 		timePeriodStart = 1;
 		timePeriodEnd = scenario.getTimePeriod();
+		
+		loadOpexData();
+		loadFixedCost();
+		loadProcessConstraintData();
+		loadGradeConstraintData();
+		loadBenchConstraintData();
+		loadPitDependencyData();
+		loadDumpDependencyData();
+		loadCapexData();
 	}
 
-	private void loadConfiguration() {
-		String sql = "select reclaim from scenario_config where scenario_id ="+ ScenarioConfigutration.getInstance().getScenarioId();
-		try (
-				Connection conn = DBManager.getConnection();
-				Statement stmt  = conn.createStatement();
-				ResultSet rs = stmt.executeQuery(sql);			
-			)
-		{
-			while(rs.next()){
-				int reclaim = rs.getInt("reclaim");
-				if(reclaim == 0){
-					spReclaimEnabled = false;
-				}
-			}
-			
-		} catch (SQLException e) {
-			System.err.println("Failed to load blocks "+e.getMessage());
-		}
+
+
+	private void loadOpexData() {
+		opexDataList = new OpexDAO().getAll(scenarioId);
 	}
+
+	private void loadFixedCost() {
+		fixedOpexCostList = new FixedCostDAO().getAll(scenarioId);
+	}
+
+	private void loadProcessConstraintData() {
+		processConstraintDataList = new ProcessConstraintDAO().getAll(scenarioId);
+	}
+
+	private void loadGradeConstraintData() {
+		gradeConstraintDataList = new GradeConstraintDAO().getAll(scenarioId);
+	}
+
+	private void loadBenchConstraintData() {
+		pitBenchConstraintDataList = new BenchConstraintDAO().getAll(scenarioId);
+	}
+
+	private void loadPitDependencyData() {
+		pitDependencyDataList = new PitDependencyDAO().getAll(scenarioId);
+	}
+
+	private void loadDumpDependencyData() {
+		dumpDependencyDataList = new DumpDependencyDAO().getAll(scenarioId);
+	}
+
+	private void loadCapexData() {
+		capexDataList = new CapexDAO().getAll(scenarioId);
+	}
+
 	private void loadBlocks() {
 		String sql = "select a.*, b.* from gnos_data_"+projectId+" a, gnos_computed_data_"+projectId+" b where a.id = b.row_id";
 		try (
@@ -194,98 +312,30 @@ public class ExecutionContext {
 		
 		return blocks;
 	}
+
+	//Helper methods
 	
-	private void loadBlockPayloadMapping() {
-		TruckParameterData truckparamdata = getTruckParameterData();
-		Map<String, Integer> payloadMap = truckparamdata.getMaterialPayloadMap();
-		Set<String> exprnames = payloadMap.keySet();
-		for(String exprname: exprnames){
-			Expression expr = getExpressionByName(exprname);
-			if(expr != null){
-				String condition = expr.getFilter();
-				List<Block> blocks = findBlocks(condition);
-				for(Block b: blocks){
-					blockPayloadMapping.put(b.getId(), payloadMap.get(exprname));
-				}				
+	public Expression getExpressionByName(String name) {
+		if(expressions == null || name == null) return null;
+		for(Expression expression: expressions) {
+			if(expression.getName().equals(name)) {
+				return expression;
 			}
 		}
-		
-	}
-	
-	private Expression getExpressionByName(String exprname) {
-
 		return null;
 	}
 
-	private void loadCycleTimeDataMapping(){
-		
-		CycleTimeMappingData ctd = getCycleTimeData();
-		Map<String, String> fixedFields = ctd.getFixedFieldMap();
-		String pitNameAlias = fixedFields.get("Pit");
-		String benchAlias = fixedFields.get("Bench");
-		if(pitNameAlias == null || benchAlias == null) return;
-		BigDecimal fixedTime = getTruckParameterData().getFixedTime();
-		Map<String, String> dumpFields = ctd.getDumpFieldMap();
-		Map<String, String> processFields = ctd.getChildProcessFieldMap();
-		Map<String, String> stockpileFields = ctd.getStockpileFieldMap();
-		Map<String, String> otherFields = new HashMap<String, String>();
-		otherFields.putAll(dumpFields);
-		otherFields.putAll(stockpileFields);
-		otherFields.putAll(processFields);
-		
-		String sql = "select * from gnos_cycle_time_data_"+ projectId;		
-
-		try (
-				Connection conn = DBManager.getConnection();
-				Statement stmt = conn.createStatement();
-				ResultSet rs = stmt.executeQuery(sql);
-			)
-		
-		{
-			while (rs.next()) {
-				String pitName = rs.getString(pitNameAlias);
-				int benchName = rs.getInt(benchAlias);
-				com.org.gnos.db.model.Pit pit = getPitfromPitName(pitName);
-				if(pit == null) continue;
-				int pitNo = pit.getPitNumber();
-				Pit corePit = pits.get(pitNo);
-				Bench b = corePit.getBench(String.valueOf(benchName));
-				if(b == null) continue;
-				Set<String> keys = otherFields.keySet();
-				for(String key: keys){
-					String columnName = otherFields.get(key);
-					try{
-						BigDecimal data = rs.getBigDecimal(columnName);
-						String dataKey = pit.getPitNumber()+":"+b.getBenchNo()+":"+key;
-						cycleTimeDataMapping.put(dataKey, data.add(fixedTime));
-					} catch(SQLException e) {
-						System.err.println(e.getMessage());
-					}
-				}
-				
+	public Expression getExpressionById(int id) {
+		if(expressions == null) return null;
+		for(Expression expression: expressions) {
+			if(expression.getId() == id) {
+				return expression;
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
 		}
+		return null;
 	}
 	
-	private com.org.gnos.db.model.Pit getPitfromPitName(String pitName) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	private TruckParameterData getTruckParameterData() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	private CycleTimeMappingData getCycleTimeData() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	public Stockpile getStockpileFromNo(int spNo){;
-		List<Stockpile> stockpiles = getStockPileList();
 		for(Stockpile sp: stockpiles){
 			if(sp.getStockpileNumber() == spNo) {
 				return sp;
@@ -293,15 +343,13 @@ public class ExecutionContext {
 		}
 		return null;
 	}
-	
-	private List<Stockpile> getStockPileList() {
-		return null;
-	}
 
 	public void reset() {
 		blockVariableMapping = new HashMap<Integer, List<String>>();
 	}
-	
+	public boolean isGlobalMode() {
+		return true;
+	}
 	public boolean hasRemainingTonnage(Block b){
 		 return true;
 	}
@@ -417,15 +465,151 @@ public class ExecutionContext {
 		return spReclaimEnabled;
 	}
 	
-	public Map<String, Boolean> getEquationgEnableMap() {
-		return equationgEnableMap;
+	public Map<String, Boolean> getEquationEnableMap() {
+		return equationEnableMap;
 	}
 
-	public void setEquationgEnableMap(Map<String, Boolean> equationgEnableMap) {
-		this.equationgEnableMap = equationgEnableMap;
+	public void setEquationEnableMap(Map<String, Boolean> equationEnableMap) {
+		this.equationEnableMap = equationEnableMap;
 	}
-	
-	public boolean isGlobalMode() {
-		return true;
+
+	public List<PitGroup> getPitGroups() {
+		return pitGroups;
+	}
+
+	public void setPitGroups(List<PitGroup> pitGroups) {
+		this.pitGroups = pitGroups;
+	}
+
+	public List<Stockpile> getStockpiles() {
+		return stockpiles;
+	}
+
+	public void setStockpiles(List<Stockpile> stockpiles) {
+		this.stockpiles = stockpiles;
+	}
+
+	public List<Dump> getDumps() {
+		return dumps;
+	}
+
+	public void setDumps(List<Dump> dumps) {
+		this.dumps = dumps;
+	}
+
+	public List<Expression> getExpressions() {
+		return expressions;
+	}
+
+	public void setExpressions(List<Expression> expressions) {
+		this.expressions = expressions;
+	}
+
+	public Scenario getScenario() {
+		return scenario;
+	}
+
+	public void setScenario(Scenario scenario) {
+		this.scenario = scenario;
+	}
+
+	public List<Model> getModels() {
+		return models;
+	}
+
+	public void setModels(List<Model> models) {
+		this.models = models;
+	}
+
+	public List<Process> getProcesses() {
+		return processes;
+	}
+
+	public void setProcesses(List<Process> processes) {
+		this.processes = processes;
+	}
+
+	public List<CycleTimeFieldMapping> getCycleTimeFieldMappings() {
+		return cycleTimeFieldMappings;
+	}
+
+	public void setCycleTimeFieldMappings(List<CycleTimeFieldMapping> cycleTimeFieldMappings) {
+		this.cycleTimeFieldMappings = cycleTimeFieldMappings;
+	}
+
+	public List<OpexData> getOpexDataList() {
+		return opexDataList;
+	}
+
+	public void setOpexDataList(List<OpexData> opexDataList) {
+		this.opexDataList = opexDataList;
+	}
+
+	public List<FixedOpexCost> getFixedOpexCostList() {
+		return fixedOpexCostList;
+	}
+
+	public void setFixedOpexCostList(List<FixedOpexCost> fixedOpexCostList) {
+		this.fixedOpexCostList = fixedOpexCostList;
+	}
+
+	public List<ProcessConstraintData> getProcessConstraintDataList() {
+		return processConstraintDataList;
+	}
+
+	public void setProcessConstraintDataList(List<ProcessConstraintData> processConstraintDataList) {
+		this.processConstraintDataList = processConstraintDataList;
+	}
+
+	public List<GradeConstraintData> getGradeConstraintDataList() {
+		return gradeConstraintDataList;
+	}
+
+	public void setGradeConstraintDataList(List<GradeConstraintData> gradeConstraintDataList) {
+		this.gradeConstraintDataList = gradeConstraintDataList;
+	}
+
+	public List<PitBenchConstraintData> getPitBenchConstraintDataList() {
+		return pitBenchConstraintDataList;
+	}
+
+	public void setPitBenchConstraintDataList(List<PitBenchConstraintData> pitBenchConstraintDataList) {
+		this.pitBenchConstraintDataList = pitBenchConstraintDataList;
+	}
+
+	public List<PitDependencyData> getPitDependencyDataList() {
+		return pitDependencyDataList;
+	}
+
+	public void setPitDependencyDataList(List<PitDependencyData> pitDependencyDataList) {
+		this.pitDependencyDataList = pitDependencyDataList;
+	}
+
+	public List<DumpDependencyData> getDumpDependencyDataList() {
+		return dumpDependencyDataList;
+	}
+
+	public void setDumpDependencyDataList(List<DumpDependencyData> dumpDependencyDataList) {
+		this.dumpDependencyDataList = dumpDependencyDataList;
+	}
+
+	public List<CapexData> getCapexDataList() {
+		return capexDataList;
+	}
+
+	public void setCapexDataList(List<CapexData> capexDataList) {
+		this.capexDataList = capexDataList;
+	}
+
+	public String getPitFieldName() {
+		return pitFieldName;
+	}
+
+	public int getProjectId() {
+		return projectId;
+	}
+
+	public int getScenarioId() {
+		return scenarioId;
 	}
 }

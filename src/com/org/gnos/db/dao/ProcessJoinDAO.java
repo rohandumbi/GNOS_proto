@@ -120,7 +120,7 @@ public class ProcessJoinDAO {
 			processJoin = new ProcessJoin();
 			processJoin.setName(rs.getString("name"));
 		}
-		processJoin.getChildProcessList().add(rs.getInt("child"));
+		processJoin.getChildProcessList().add(rs.getInt("child_model_id"));
 		
 		return processJoin;
 	}

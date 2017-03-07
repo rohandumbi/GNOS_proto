@@ -15,11 +15,6 @@ public class Application {
 		DBManager.terminatePool();
 	}
 	
-	public static void save() {
-		ProjectConfigutration.getInstance().save();
-		ScenarioConfigutration.getInstance().save();
-	}
-	
 	public static void main(String[] args) {
 		start();
 	}

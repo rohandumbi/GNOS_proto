@@ -84,7 +84,7 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 	}
 	
 	private void buildBenchUserConstraintVariables() {
-		List<PitBenchConstraintData> pitBenchConstraintDataList = context.getScenarioConfig().getPitBenchConstraintDataList();
+		List<PitBenchConstraintData> pitBenchConstraintDataList = context.getPitBenchConstraintDataList();
 		int timePeriodStart = context.getTimePeriodStart();
 		int timePeriodEnd = context.getTimePeriodEnd();
 		int startyear = context.getStartYear();
@@ -100,7 +100,7 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 				continue;
 			}
 			String pitName = pitBenchConstraintData.getPitName();
-			com.org.gnos.db.model.Pit pit = context.getProjectConfig().getPitfromPitName(pitName);
+			com.org.gnos.db.model.Pit pit = context.getPitfromPitName(pitName);
 			exclusionList.add(pit.getPitNumber());
 			Pit pitdata = context.getPits().get(pit.getPitNumber());
 			for(int i=timePeriodStart; i<= timePeriodEnd; i++){

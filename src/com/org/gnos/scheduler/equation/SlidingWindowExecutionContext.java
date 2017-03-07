@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Set;
 
 import com.org.gnos.core.Block;
-import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.db.model.Expression;
 
@@ -282,7 +281,7 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 	}
 	private void processGrades(SPBlock spb, Set<String> gradeExprs) {
 		for(String exprName: gradeExprs) {
-			Expression expr = ProjectConfigutration.getInstance().getExpressionByName(exprName);
+			Expression expr = getExpressionByName(exprName);
 			String exprValue = expr.getExprvalue();
 			if(expr.isComplex()) {
 				String[] arr = exprValue.split("[+-/*]");
@@ -327,7 +326,7 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 	private void parseGradeExpression() {
 		gradeExpressions = new ArrayList<Expression>();
 		gradeFields = new HashSet<String>();
-		List<Expression> expressions = ProjectConfigutration.getInstance().getExpressions();		
+		List<Expression> expressions = getExpressions();		
 		for(Expression expression: expressions) {
 			if(expression.isGrade()){
 				gradeExpressions.add(expression);

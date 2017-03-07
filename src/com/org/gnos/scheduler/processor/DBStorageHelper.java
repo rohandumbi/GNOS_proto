@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.db.DBManager;
 import com.org.gnos.scheduler.equation.ExecutionContext;
@@ -21,8 +20,8 @@ public class DBStorageHelper implements IStorageHelper {
 	
 	@Override
 	public void store(List<Record> records, boolean hasMore) {
-		int projectId = ProjectConfigutration.getInstance().getProjectId();
-		int scenarioId = ScenarioConfigutration.getInstance().getScenarioId();
+		int projectId = context.getProjectId();
+		int scenarioId = context.getScenarioId();
 		String insert_sql = "insert into gnos_result_"+projectId+"_"+scenarioId+" (origin_type, pit_no, block_no, sp_no, destination_type, destination) values (? , ?, ?, ?, ?, ?)";
 		Map<Integer, PreparedStatement> stmts = new HashMap<Integer, PreparedStatement>();
 		try ( PreparedStatement ips = conn.prepareStatement(insert_sql); ){
@@ -110,8 +109,8 @@ public class DBStorageHelper implements IStorageHelper {
 	}
 
 	private void createTable() throws SQLException {
-		int projectId = ProjectConfigutration.getInstance().getProjectId();
-		int scenarioId = ScenarioConfigutration.getInstance().getScenarioId();
+		int projectId = context.getProjectId();
+		int scenarioId = context.getScenarioId();
 		dropTable(projectId, scenarioId);
 		String  data_sql = "CREATE TABLE gnos_result_"+projectId+"_"+scenarioId+" ( " +
 				" origin_type TINYINT NOT NULL, " +
@@ -165,8 +164,8 @@ public class DBStorageHelper implements IStorageHelper {
 	}
 
 	private PreparedStatement getUpdateStatement(int period) throws SQLException {
-		int projectId = ProjectConfigutration.getInstance().getProjectId();
-		int scenarioId = ScenarioConfigutration.getInstance().getScenarioId();
+		int projectId = context.getProjectId();
+		int scenarioId = context.getScenarioId();
 		String update_sql = "update gnos_result_"+projectId+"_"+scenarioId+" set t"+period +"= ? where pit_no =? AND block_no=? AND sp_no = ? AND origin_type = ? AND destination_type = ? AND destination = ? ";
 		PreparedStatement ps = conn.prepareStatement(update_sql);
 		
