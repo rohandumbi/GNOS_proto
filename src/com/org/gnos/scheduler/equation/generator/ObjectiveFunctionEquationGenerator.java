@@ -48,7 +48,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 	public void generate() {
 		processedBlocks = new HashSet<Integer>();
 		try {
-			discount_rate = context.getScenarioConfig().getDiscount()/100;
+			discount_rate = context.getScenario().getDiscount()/100;
 			System.out.println("Discount :"+discount_rate);
 			bytesWritten = 0;
 			buildProcessBlockVariables();
@@ -63,8 +63,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 	}
 
 	private void buildProcessBlockVariables() {
-		List<Process> porcesses = context.getProjectConfig().getProcessList();
-		processTree = context.getProjectConfig().getProcessTree();
+		List<Process> porcesses = context.getProcesses();
 		Set<Block> processBlocks = new HashSet<Block>();
 		for(Process process: porcesses) {
 			System.out.println("Equation Generation: process name - "+process.getModel().getName());
@@ -79,10 +78,10 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 	}
 	
 	private void buildProcessVariables(Process process, List<Block> blocks, int processNumber) {
-		FixedOpexCost[] fixedOpexCost = context.getScenarioConfig().getFixedCost();
-		if(fixedOpexCost == null || fixedOpexCost.length < 5) return;
-		Map<Integer, BigDecimal> oreMiningCostMap = fixedOpexCost[0].getCostData();
-		Map<Integer, BigDecimal> truckHourCostMap = fixedOpexCost[4].getCostData();
+		List<FixedOpexCost> fixedOpexCost = context.getFixedOpexCostList();
+		if(fixedOpexCost == null || fixedOpexCost.size() < 5) return;
+		Map<Integer, BigDecimal> oreMiningCostMap = fixedOpexCost.get(0).getCostData();
+		Map<Integer, BigDecimal> truckHourCostMap = fixedOpexCost.get(4).getCostData();
 		int timePeriodStart = context.getTimePeriodStart();
 		int timePeriodEnd = context.getTimePeriodEnd();
 		int startYear = context.getStartYear();
@@ -125,13 +124,13 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 	
 	private void buildStockpileVariables() {
 		
-		FixedOpexCost[] fixedOpexCost = context.getScenarioConfig().getFixedCost();
-		if(fixedOpexCost == null || fixedOpexCost.length < 5) return;
-		Map<Integer, BigDecimal> oreMiningCostMap = fixedOpexCost[0].getCostData();
-		Map<Integer, BigDecimal> stockPilingCostMap = fixedOpexCost[2].getCostData();
-		Map<Integer, BigDecimal> truckHourCostMap = fixedOpexCost[4].getCostData();
-		String pitNameField = context.getProjectConfig().getRequiredFieldMapping().get("pit_name");
-		List<Stockpile> stockpileList = context.getProjectConfig().getStockPileList();
+		List<FixedOpexCost> fixedOpexCost = context.getFixedOpexCostList();
+		if(fixedOpexCost == null || fixedOpexCost.size() < 5) return;
+		Map<Integer, BigDecimal> oreMiningCostMap = fixedOpexCost.get(0).getCostData();
+		Map<Integer, BigDecimal> stockPilingCostMap = fixedOpexCost.get(2).getCostData();
+		Map<Integer, BigDecimal> truckHourCostMap = fixedOpexCost.get(4).getCostData();
+		String pitNameField = context.getPitFieldName();
+		List<Stockpile> stockpileList = context.getStockpiles();
 		int startYear = context.getStartYear();
 		int timePeriodStart = context.getTimePeriodStart();
 		int timePeriodEnd = context.getTimePeriodEnd();
@@ -146,9 +145,9 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 			if(sp.getMappingType() == 0) {
 				condition +=  "'"+sp.getMappedTo() +"'";
 			} else {
-				Set<Integer> pits = context.flattenPitGroup(ProjectConfigutration.getInstance().getPitGroupfromName(sp.getMappedTo()));
+				Set<Integer> pits = context.flattenPitGroup(context.getPitGroupfromName(sp.getMappedTo()));
 				for(int pitNo: pits){
-					Pit pit = context.getProjectConfig().getPitfromPitNumber(pitNo);
+					Pit pit = context.getPitfromPitNumber(pitNo);
 					condition +=  "'"+pit.getPitName() +"',";
 				}
 				condition = condition.substring(0, condition.length() -1);
@@ -204,12 +203,12 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 	
 	private void buildWasteBlockVariables() throws IOException {
 		Set<Block> wasteBlocks = new HashSet<Block>();
-		FixedOpexCost[] fixedOpexCost = context.getScenarioConfig().getFixedCost();
-		if(fixedOpexCost == null || fixedOpexCost.length < 5) return;
-		Map<Integer, BigDecimal> wasteMiningCostMap = fixedOpexCost[1].getCostData();
-		Map<Integer, BigDecimal> truckHourCostMap = fixedOpexCost[4].getCostData();
-		String pitNameField = context.getProjectConfig().getRequiredFieldMapping().get("pit_name");
-		List<Dump> dumpList = context.getProjectConfig().getDumpList();
+		List<FixedOpexCost> fixedOpexCost = context.getFixedOpexCostList();
+		if(fixedOpexCost == null || fixedOpexCost.size() < 5) return;
+		Map<Integer, BigDecimal> wasteMiningCostMap = fixedOpexCost.get(1).getCostData();
+		Map<Integer, BigDecimal> truckHourCostMap = fixedOpexCost.get(4).getCostData();
+		String pitNameField = context.getPitFieldName();
+		List<Dump> dumpList = context.getDumps();
 		
 		int startYear = context.getStartYear();
 		int timePeriodStart = context.getTimePeriodStart();
@@ -224,7 +223,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 			if(dump.getMappingType() == 0) {
 				condition += "'"+dump.getMappedTo()+ "'";
 			} else {
-				Set<Integer> pits = context.flattenPitGroup(ProjectConfigutration.getInstance().getPitGroupfromName(dump.getMappedTo()));
+				Set<Integer> pits = context.flattenPitGroup(context.getPitGroupfromName(dump.getMappedTo()));
 				for(int pitNo: pits){
 					Pit pit = context.getProjectConfig().getPitfromPitNumber(pitNo);
 					condition +=  "'"+ pit.getPitName() +"',";
@@ -275,7 +274,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 	private void buildCapexVariables(){
 		int timePeriodStart = context.getTimePeriodStart();
 		int timePeriodEnd = context.getTimePeriodEnd();
-		List<CapexData> capexDataList = context.getScenarioConfig().getCapexDataList();
+		List<CapexData> capexDataList = context.getCapexDataList();
 		int capexCount = 0;
 		for(CapexData cd: capexDataList) {
 			capexCount++;
@@ -294,10 +293,10 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 	
 	private void buildSPReclaimVariable(Block b, Stockpile sp, int year) {
 		int startYear = context.getStartYear();
-		FixedOpexCost[] fixedOpexCost = context.getScenarioConfig().getFixedCost();
-		if(fixedOpexCost == null || fixedOpexCost.length < 4) return;
-		Map<Integer, BigDecimal> stockPilingReclaimingCostMap = fixedOpexCost[3].getCostData();
-		Map<Integer, BigDecimal> truckHourCostMap = fixedOpexCost[4].getCostData();
+		List<FixedOpexCost> fixedOpexCost = context.getFixedOpexCostList();
+		if(fixedOpexCost == null || fixedOpexCost.size() < 4) return;
+		Map<Integer, BigDecimal> stockPilingReclaimingCostMap = fixedOpexCost.get(3).getCostData();
+		Map<Integer, BigDecimal> truckHourCostMap = fixedOpexCost.get(4).getCostData();
 		
 		BigDecimal cost = stockPilingReclaimingCostMap.get(year);
 		BigDecimal truckHourCost = truckHourCostMap.get(year);
@@ -305,10 +304,10 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		int timeperiod = year - startYear + 1;
 		
 		int payload = context.getBlockPayloadMapping().get(b.getId());
-		BigDecimal fixedTime = context.getProjectConfig().getTruckParameterData().getFixedTime();
+		BigDecimal fixedTime = context.getFixedTime();
 		if(sp.getStockpileNumber() == 0) return;
 		Set<Process> processes = b.getProcesses();
-		TruckParameterCycleTime cycleTime =  context.getProjectConfig().getTruckParamCycleTimeByStockpileName(sp.getName());
+		TruckParameterCycleTime cycleTime =  context.getTruckParamCycleTimeByStockpileName(sp.getName());
 		
 		for(Process p: processes){
 			BigDecimal totalCost = new BigDecimal(0);
@@ -337,10 +336,10 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 	}
 	private void buildSWSPReclaimVariable(Stockpile sp, int year) {
 		int startYear = context.getStartYear();
-		FixedOpexCost[] fixedOpexCost = context.getScenarioConfig().getFixedCost();
-		if(fixedOpexCost == null || fixedOpexCost.length < 4) return;
-		Map<Integer, BigDecimal> stockPilingReclaimingCostMap = fixedOpexCost[3].getCostData();
-		Map<Integer, BigDecimal> truckHourCostMap = fixedOpexCost[4].getCostData();
+		List<FixedOpexCost> fixedOpexCost = context.getFixedOpexCostList();
+		if(fixedOpexCost == null || fixedOpexCost.size() < 4) return;
+		Map<Integer, BigDecimal> stockPilingReclaimingCostMap = fixedOpexCost.get(3).getCostData();
+		Map<Integer, BigDecimal> truckHourCostMap = fixedOpexCost.get(4).getCostData();
 		
 		BigDecimal cost = stockPilingReclaimingCostMap.get(year);
 		BigDecimal truckHourCost = truckHourCostMap.get(year);
@@ -349,7 +348,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		SPBlock spb = ((SlidingWindowExecutionContext)context).getSPBlock(sp.getStockpileNumber());
 		if(spb == null || spb.getTonnesWt() == 0) return;
 		int payload = spb.getPayload();
-		BigDecimal fixedTime = context.getProjectConfig().getTruckParameterData().getFixedTime();
+		BigDecimal fixedTime = context.getFixedTime();
 		if(sp.getStockpileNumber() == 0) return;
 		
 		Set<Process> processes = spb.getProcesses();
@@ -388,7 +387,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		if(hasValue(model.getCondition())){
 			condition = model.getCondition();
 		}
-		Expression expr =  ProjectConfigutration.getInstance().getExpressionById(model.getExpressionId());
+		Expression expr =  context.getExpressionById(model.getExpressionId());
 		if(hasValue(expr.getFilter())) {
 			if(hasValue(condition)) {
 				condition = condition + " AND "+ expr.getFilter();
@@ -407,7 +406,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 				if(hasValue(pModel.getCondition())){
 					condition = pModel.getCondition();
 				}
-				Expression expr1 =  ProjectConfigutration.getInstance().getExpressionById(model.getExpressionId());
+				Expression expr1 =  context.getExpressionById(model.getExpressionId());
 				if(expr1 != null && hasValue(expr1.getFilter())) {
 					if(hasValue(condition)) {
 						condition = condition + " AND "+ expr1.getFilter();
@@ -458,7 +457,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		for(OpexData opexData: opexDataList) {
 			if(opexData.getModelId() == model.getId()){
 				if(opexData.isRevenue()){
-					BigDecimal expr_value = context.getExpressionValueforBlock(b, ProjectConfigutration.getInstance().getExpressionById(opexData.getExpressionId()));
+					BigDecimal expr_value = context.getExpressionValueforBlock(b, context.getExpressionById(opexData.getExpressionId()));
 					revenue = revenue.add(expr_value.multiply(opexData.getCostData().get(year)));
 				} else {
 					pcost = pcost.add(opexData.getCostData().get(year));
@@ -475,11 +474,11 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		if(model == null) return value;
 		BigDecimal revenue = new BigDecimal(0);
 		BigDecimal pcost = new BigDecimal(0);
-		List<OpexData> opexDataList = context.getScenarioConfig().getOpexDataList();
+		List<OpexData> opexDataList = context.getOpexDataList();
 		for(OpexData opexData: opexDataList) {
 			if(opexData.getModelId() == model.getId()){
 				if(opexData.isRevenue()){
-					BigDecimal expr_value = ((SlidingWindowExecutionContext)context).getExpressionValueforBlock(b, ProjectConfigutration.getInstance().getExpressionById(opexData.getExpressionId()));
+					BigDecimal expr_value = ((SlidingWindowExecutionContext)context).getExpressionValueforBlock(b, context.getExpressionById(opexData.getExpressionId()));
 					revenue = revenue.add(expr_value.multiply(opexData.getCostData().get(year)));
 				} else {
 					pcost = pcost.add(opexData.getCostData().get(year));
