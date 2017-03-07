@@ -8,10 +8,10 @@ import java.util.Map;
 import java.util.Set;
 
 import com.org.gnos.core.Block;
+import com.org.gnos.core.Pit;
 import com.org.gnos.db.model.Dump;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Model;
-import com.org.gnos.db.model.Pit;
 import com.org.gnos.db.model.PitGroup;
 import com.org.gnos.db.model.Process;
 import com.org.gnos.db.model.ProcessConstraintData;
@@ -59,27 +59,32 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 			boolean applyProcessRestrictions = false;
 			boolean usetruckHourCoeffcient = false;
 			if(coefficientType == ProcessConstraintData.COEFFICIENT_PRODUCT) {
-				Product p = context.getProjectConfig().getProductByName(processConstraintData.getCoefficient_name());
+				Product p = context.getProductFromName(processConstraintData.getCoefficient_name());
 				if(p != null){
 					List<String> coefficients = new ArrayList<String>();
-					for(Expression e : p.getListOfExpressions()){
-						coefficients.add(e.getName());
+					for(Integer eid : p.getExpressionIdList()){
+						Expression expression = context.getExpressionById(eid);
+						coefficients.add(expression.getName());
 					}
-					processExprMap.put(p.getAssociatedProcess().getName(), coefficients);
+					Model model = context.getModelById(p.getModelId());
+					processExprMap.put(model.getName(), coefficients);
 					applyProcessRestrictions = true;
 				}
 			} else if(coefficientType == ProcessConstraintData.COEFFICIENT_PRODUCT_JOIN) {
-				ProductJoin pj = context.getProjectConfig().getProductJoinByName(processConstraintData.getCoefficient_name());
-				List<Product> products = getProductsFromProductJoin(pj);
-				for(Product p: products){
-					String processName = p.getAssociatedProcess().getName();
+				ProductJoin pj = context.getProductJoinFromName(processConstraintData.getCoefficient_name());
+				Set<String> productNames = getProductsFromProductJoin(pj);
+				for(String productName: productNames){
+					Product p = context.getProductFromName(productName);
+					Model model = context.getModelById(p.getModelId());
+					String processName = model.getName();
 					List<String> coefficients = processExprMap.get(processName);
 					if(coefficients == null){
 						coefficients = new ArrayList<String>();
 						processExprMap.put(processName, coefficients);
 					}
-					for(Expression e : p.getListOfExpressions()){
-						coefficients.add(e.getName());
+					for(Integer eid : p.getExpressionIdList()){
+						Expression expression = context.getExpressionById(eid);
+						coefficients.add(expression.getName());
 					}
 				}
 				applyProcessRestrictions = true;
@@ -90,9 +95,10 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 			for(int i=timePeriodStart; i<= timePeriodEnd; i++){
 				String eq = "";
 				if(selectorType == ProcessConstraintData.SELECTION_PROCESS_JOIN) {
-					ProcessJoin processJoin = context.getProjectConfig().getProcessJoinByName(processConstraintData.getSelector_name());
+					ProcessJoin processJoin = context.getProcessJoinByName(processConstraintData.getSelector_name());
 					if(processJoin != null) {
-						for(Model model: processJoin.getlistChildProcesses()){
+						for(Integer modelId: processJoin.getChildProcessList()){
+							Model model = context.getModelById(modelId);
 							for( Process p: processList){
 								if(p.getModel().getName().equals(model.getName())){
 									List<String> coefficients;
@@ -130,7 +136,7 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 					}
 				} else if(selectorType == ProcessConstraintData.SELECTION_PIT) {
 					String pitName = processConstraintData.getSelector_name();
-					Pit pit = context.getProjectConfig().getPitfromPitName(pitName);
+					Pit pit = context.getPitNameMap().get(pitName);
 					if(pit != null) {
 						for( Process p: processList){
 							List<String> coefficients;
@@ -145,7 +151,7 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 							}
 							List<Block> blocks = new ArrayList<Block>();
 							for(Block b: p.getBlocks()){
-								if(b.getPitNo() == pit.getPitNumber()){
+								if(b.getPitNo() == pit.getPitNo()){
 									blocks.add(b);
 								}
 							}
@@ -156,13 +162,13 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 							coefficients.add(processConstraintData.getCoefficient_name());
 							List<Block> blocks = new ArrayList<Block>();
 							for(Block b: context.getProcessBlocks()){
-								if(pit.getPitNumber() != b.getPitNo()) continue;
+								if(pit.getPitNo() != b.getPitNo()) continue;
 								blocks.add(b);								
 							}
 							eq += buildStockpileConstraintVariables(coefficients,usetruckHourCoeffcient, blocks, i);
 							blocks = new ArrayList<Block>();
 							for(Block b: context.getWasteBlocks()){
-								if(pit.getPitNumber() != b.getPitNo()) continue;
+								if(pit.getPitNo() != b.getPitNo()) continue;
 								blocks.add(b);			
 							}
 							eq += buildWasteConstraintVariables(coefficients, usetruckHourCoeffcient, blocks, i);
@@ -173,7 +179,7 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 					
 					
 				} else if(selectorType == ProcessConstraintData.SELECTION_PIT_GROUP) {
-					PitGroup pg = context.getProjectConfig().getPitGroupfromName(processConstraintData.getSelector_name());
+					PitGroup pg = context.getPitGroupfromName(processConstraintData.getSelector_name());
 					Set<Integer> pitNumbers = getPitsFromPitGroup(pg);
 					for( Process p: processList){
 						List<String> coefficients;
@@ -284,7 +290,7 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 		}
 		if(context.isSpReclaimEnabled() && period > 1 && !context.isGlobalMode()) {
 			SlidingWindowExecutionContext swctx = (SlidingWindowExecutionContext) context;
-			BigDecimal fixedTime = context.getProjectConfig().getTruckParameterData().getFixedTime();
+			BigDecimal fixedTime = context.getFixedTime();
 			Map<Integer, SPBlock> spBlockMapping = swctx.getSpBlockMapping();
 			Set<Integer> spNos = spBlockMapping.keySet();			
 			for(int spNo: spNos){
@@ -295,7 +301,7 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 				for(Process process: processes){
 					if(process.getProcessNo() == p.getProcessNo()) {
 						BigDecimal coefficientRatio =  new BigDecimal(0);
-						TruckParameterCycleTime cycleTime =  context.getProjectConfig().getTruckParamCycleTimeByStockpileName(sp.getName());
+						TruckParameterCycleTime cycleTime =  context.getTruckParamCycleTimeByStockpileName(sp.getName());
 						if(useTruckHour) {
 							int payload = spb.getPayload();
 							if(payload > 0) {
@@ -390,7 +396,7 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 	}
 	
 	private int getStockpileNo(Block b){
-		List<Stockpile> stockpiles = context.getProjectConfig().getStockPileList();
+		List<Stockpile> stockpiles = context.getStockpiles();
 		
 		for(Stockpile sp: stockpiles){
 			if(!sp.isReclaim()) continue;
@@ -405,7 +411,7 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 		return -1;
 	}
 	private Stockpile getStockpile(Block b){
-		List<Stockpile> stockpiles = context.getProjectConfig().getStockPileList();
+		List<Stockpile> stockpiles = context.getStockpiles();
 		
 		for(Stockpile sp: stockpiles){
 			Set<Block> blocks = sp.getBlocks();
@@ -420,7 +426,7 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 	}
 	
 	private List<Dump> getDump(Block b){
-		List<Dump> alldumps = context.getProjectConfig().getDumpList();
+		List<Dump> alldumps = context.getDumps();
 		List<Dump> dumps = new ArrayList<Dump>();
 		for(Dump dump: alldumps){
 			Set<Block> blocks = dump.getBlocks();

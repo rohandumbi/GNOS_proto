@@ -14,8 +14,8 @@ import com.org.gnos.db.model.Grade;
 
 public class GradeDAO {
 
-	private static final String SQL_LIST_ORDER_BY_ID = "select id, name, product_name, type, mapped_name, value from grade where project_id = ? ";
-	private static final String SQL_INSERT = "insert into grade (project_id, name, product_name, type, mapped_name, value) values (?, ?, ?, ?, ?, ?)";
+	private static final String SQL_LIST_ORDER_BY_ID = "select id, name, product_name, type, mapped_name from grade where project_id = ? order by id ";
+	private static final String SQL_INSERT = "insert into grade (project_id, name, product_name, type, mapped_name) values (?, ?, ?, ?, ?)";
 	private static final String SQL_DELETE = "delete from grade where id  = ?";
 
 	public List<Grade> getAll(int projectId) {

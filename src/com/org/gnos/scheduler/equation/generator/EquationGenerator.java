@@ -7,6 +7,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.org.gnos.core.GNOSConfig;
+import com.org.gnos.core.Pit;
+import com.org.gnos.db.model.PitGroup;
 import com.org.gnos.db.model.Product;
 import com.org.gnos.db.model.ProductJoin;
 import com.org.gnos.scheduler.equation.ExecutionContext;
@@ -48,6 +50,20 @@ public abstract class EquationGenerator {
 		return products;
 	}
 
+	protected Set<Integer> getPitsFromPitGroup(PitGroup pg) {
+		Set<Integer> pitNumbers = new HashSet<Integer>();
+		if(pg == null) return pitNumbers;
+		for(String pitName: pg.getListChildPits()){
+			Pit pit = context.getPitNameMap().get(pitName);
+			pitNumbers.add(pit.getPitNo());
+		}
+		for(String pitGroupName: pg.getListChildPitGroups()){
+			PitGroup pitGroup = context.getPitGroupfromName(pitGroupName);
+			pitNumbers.addAll(getPitsFromPitGroup(pitGroup));
+		}		
+		return pitNumbers;
+	}
+	
 	protected Set<Integer> getProcessListFromProductJoin(ProductJoin pj){
 		Set<Integer> processes = new HashSet<Integer>();
 		 for(String productName: pj.getProductList()){

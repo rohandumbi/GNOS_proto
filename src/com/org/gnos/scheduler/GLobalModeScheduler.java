@@ -1,14 +1,15 @@
 package com.org.gnos.scheduler;
 
+import com.org.gnos.db.model.RunConfig;
 import com.org.gnos.scheduler.equation.GlobalModeExecutionContext;
 import com.org.gnos.scheduler.processor.DBStorageHelper;
 
 public class GLobalModeScheduler extends BaseScheduler {
 
 	
-	public GLobalModeScheduler() {
+	public GLobalModeScheduler(RunConfig runConfig) {
 		super();
-		context = new GlobalModeExecutionContext();
+		context = new GlobalModeExecutionContext(runConfig.getProjectId(), runConfig.getScenarioId());
 		helper = new DBStorageHelper();
 		helper.setContext(context);
 	}

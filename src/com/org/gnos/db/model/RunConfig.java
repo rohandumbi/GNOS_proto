@@ -11,6 +11,13 @@ public class RunConfig {
 	private short mode;
 	private Map<String, Boolean> eqnenablestate;
 	
+	private int projectId;
+	private int scenarioId;
+	private boolean isReclaim;
+	private short period;
+	private short window;
+	private short stepSize;
+	
 	public RunConfig() {
 		this.setMode(GLOBAL_MODE);
 		this.setEqnenablestate(new HashMap<String, Boolean>());
@@ -45,4 +52,53 @@ public class RunConfig {
 	public void setMode(short mode) {
 		this.mode = mode;
 	}
+
+	public int getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(int projectId) {
+		this.projectId = projectId;
+	}
+
+	public int getScenarioId() {
+		return scenarioId;
+	}
+
+	public void setScenarioId(int scenarioId) {
+		this.scenarioId = scenarioId;
+	}
+
+	public boolean isReclaim() {
+		return isReclaim;
+	}
+
+	public void setReclaim(boolean isReclaim) {
+		this.isReclaim = isReclaim;
+	}
+
+	public short getPeriod() {
+		return period;
+	}
+
+	public void setPeriod(short period) {
+		this.period = period;
+	}
+	
+	public short getWindow() {
+		return window;
+	}
+
+	public void setWindow(short window) {
+		this.window = window;
+	}
+
+	public short getStepSize() {
+		return stepSize;
+	}
+
+	public void setStepSize(short stepSize) {
+		this.stepSize = stepSize;
+	}
+
 }

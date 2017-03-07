@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.db.DBManager;
 import com.org.gnos.scheduler.equation.ExecutionContext;
 
@@ -120,7 +119,7 @@ public class DBStorageHelper implements IStorageHelper {
 				" destination_type TINYINT NOT NULL, " +
 				" destination INT, tonnage_wt VARCHAR(50), ";
 		
-		for(int i = 1; i<= ScenarioConfigutration.getInstance().getTimePeriod(); i++){
+		for(int i = 1; i<= context.getScenario().getTimePeriod(); i++){
 			data_sql +=  "t"+i+" VARCHAR(50) , ";
 		}
 		data_sql += "  UNIQUE KEY (origin_type, pit_no, block_no, sp_no, destination_type, destination) );";

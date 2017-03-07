@@ -15,8 +15,6 @@ import java.util.Set;
 import com.org.gnos.core.Block;
 import com.org.gnos.core.Node;
 import com.org.gnos.core.Pit;
-import com.org.gnos.core.ProjectConfigutration;
-import com.org.gnos.core.Tree;
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.model.CapexData;
 import com.org.gnos.db.model.CapexInstance;
@@ -34,7 +32,6 @@ import com.org.gnos.scheduler.equation.SlidingWindowExecutionContext;
 
 public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 	
-	private Tree processTree;
 	private int bytesWritten = 0;
 	private float discount_rate = 0; //this has to be made an input variable later
 	
@@ -145,9 +142,9 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 			if(sp.getMappingType() == 0) {
 				condition +=  "'"+sp.getMappedTo() +"'";
 			} else {
-				Set<Integer> pits = context.flattenPitGroup(context.getPitGroupfromName(sp.getMappedTo()));
+				Set<Integer> pits = getPitsFromPitGroup(context.getPitGroupfromName(sp.getMappedTo()));
 				for(int pitNo: pits){
-					Pit pit = context.getPitfromPitNumber(pitNo);
+					Pit pit = context.getPits().get(pitNo);
 					condition +=  "'"+pit.getPitName() +"',";
 				}
 				condition = condition.substring(0, condition.length() -1);
@@ -223,7 +220,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 			if(dump.getMappingType() == 0) {
 				condition += "'"+dump.getMappedTo()+ "'";
 			} else {
-				Set<Integer> pits = context.flattenPitGroup(context.getPitGroupfromName(dump.getMappedTo()));
+				Set<Integer> pits = getPitsFromPitGroup(context.getPitGroupfromName(dump.getMappedTo()));
 				for(int pitNo: pits){
 					Pit pit = context.getPits().get(pitNo);
 					condition +=  "'"+ pit.getPitName() +"',";
@@ -352,7 +349,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		if(sp.getStockpileNumber() == 0) return;
 		
 		Set<Process> processes = spb.getProcesses();
-		TruckParameterCycleTime cycleTime =  context.getProjectConfig().getTruckParamCycleTimeByStockpileName(sp.getName());
+		TruckParameterCycleTime cycleTime =  context.getTruckParamCycleTimeByStockpileName(sp.getName());
 		
 		for(Process p: processes){
 			BigDecimal totalCost = new BigDecimal(0);
@@ -396,7 +393,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 			}
 		}
 		boolean continueLoop = true;
-		Node currNode = processTree.getNodeByName(model.getName());
+		Node currNode = context.getProcessTree().getNodeByName(model.getName());
 		do{
 			Node parent = currNode.getParent();
 			if(parent == null) {

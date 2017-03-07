@@ -69,7 +69,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 			for(String productName: productNames){
 				Product p = context.getProductFromName(productName);
 				Integer processId = p.getModelId();
-				String processName = context.getModelFromId(processId);
+				String processName = context.getModelById(processId).getName();
 				List<String> coefficients = processExprMap.get(processName);
 				if(coefficients == null){
 					coefficients = new ArrayList<String>();
@@ -85,7 +85,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 					grades = new ArrayList<Grade>();
 					processGradeMap.put(processName, grades);
 				}
-				grades.add(p.getListOfGrades().get(selectedGradeIndex));
+				grades.add(context.getGradesForProduct(productName).get(selectedGradeIndex));
 			}
 			
 			for(int i=timePeriodStart; i<= timePeriodEnd; i++){
@@ -94,7 +94,8 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 				if(selectorType == GradeConstraintData.SELECTION_PROCESS_JOIN) {
 					ProcessJoin processJoin = context.getProcessJoinByName(gradeConstraintData.getSelectorName());
 					if(processJoin != null) {
-						for(Model model: processJoin.getlistChildProcesses()){
+						for(Integer modelId: processJoin.getChildProcessList()){
+							Model model = context.getModelById(modelId);
 							for( Process p: processList){
 								String processName = p.getModel().getName();
 								if(processName.equals(model.getName())){
@@ -123,7 +124,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 					}
 				} else if(selectorType == GradeConstraintData.SELECTION_PIT) {
 					String pitName = gradeConstraintData.getSelectorName();
-					Pit pit = context.getPitfromPitName(pitName);
+					Pit pit = context.getPitNameMap().get(pitName);
 					if(pit != null) {
 						for( Process p: processList){
 							String processName = p.getModel().getName();
@@ -197,7 +198,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 			}
 
 			if(processRatio.compareTo(new BigDecimal(0)) == 0) continue;
-			BigDecimal blockGrade = context.getExpressionValueforBlock(block, grade.getExpression());
+			BigDecimal blockGrade = context.getExpressionValueforBlock(block, grade.getMappedName());
 			BigDecimal coeff = processRatio.multiply(targetGrade.subtract(blockGrade));
 			if(coeff.doubleValue() == 0) continue;
 			if(targetGrade.compareTo(blockGrade) == 1) {
@@ -231,7 +232,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 				}
 				
 				if(processRatio.compareTo(new BigDecimal(0)) == 0) continue;
-				BigDecimal blockGrade = swctx.getExpressionValueforBlock(spb, grade.getExpression());
+				BigDecimal blockGrade = swctx.getExpressionValueforBlock(spb, grade.getMappedName());
 				BigDecimal coeff = processRatio.multiply(targetGrade.subtract(blockGrade));
 				if(coeff.doubleValue() == 0) continue;
 
@@ -250,7 +251,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 	}
 	
 	private int getStockpileNo(Block b){
-		List<Stockpile> stockpiles = context.getProjectConfig().getStockPileList();
+		List<Stockpile> stockpiles = context.getStockpiles();
 		
 		for(Stockpile sp: stockpiles){
 			if(!sp.isReclaim()) continue;

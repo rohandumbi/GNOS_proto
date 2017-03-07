@@ -40,7 +40,7 @@ public class DumpCapacityEquationGenerator extends EquationGenerator{
 				PitGroup pitgroup = context.getPitGroupfromName(d.getMappedTo());
 				Set<String> pitNames = context.flattenPitGroup(pitgroup);
 				for(String pitName: pitNames){
-					pits.add(context.getPitfromPitName(pitName));
+					pits.add(context.getPitNameMap().get(pitName));
 				}
 			}			
 			for(Pit pit: pits){
