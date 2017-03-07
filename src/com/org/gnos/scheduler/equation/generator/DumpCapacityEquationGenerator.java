@@ -8,7 +8,6 @@ import java.util.Set;
 import com.org.gnos.core.Bench;
 import com.org.gnos.core.Block;
 import com.org.gnos.core.Pit;
-import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.db.model.Dump;
 import com.org.gnos.db.model.PitGroup;
 import com.org.gnos.scheduler.equation.ExecutionContext;
@@ -21,14 +20,12 @@ public class DumpCapacityEquationGenerator extends EquationGenerator{
 	
 	@Override
 	public void generate() {
-
 		buildCapacityEquations();
-
 	}
 
 	
 	private void buildCapacityEquations() {
-		List<Dump> dumpList = context.getProjectConfig().getDumpList();
+		List<Dump> dumpList = context.getDumps();
 		int timePeriodStart = context.getTimePeriodStart();
 		int timePeriodEnd = context.getTimePeriodEnd();
 		for(Dump d:dumpList){
@@ -40,10 +37,10 @@ public class DumpCapacityEquationGenerator extends EquationGenerator{
 				Pit pit = getPitFromPitName(d.getMappedTo());
 				pits.add(pit);
 			} else {
-				PitGroup pitgroup = ProjectConfigutration.getInstance().getPitGroupfromName(d.getMappedTo());
-				Set<Integer> pitNos = context.flattenPitGroup(pitgroup);
-				for(int pitNo: pitNos){
-					pits.add(context.getPits().get(pitNo));
+				PitGroup pitgroup = context.getPitGroupfromName(d.getMappedTo());
+				Set<String> pitNames = context.flattenPitGroup(pitgroup);
+				for(String pitName: pitNames){
+					pits.add(context.getPitfromPitName(pitName));
 				}
 			}			
 			for(Pit pit: pits){

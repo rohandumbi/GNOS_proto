@@ -31,20 +31,20 @@ public class DumpDependencyEquationGenerator extends EquationGenerator{
 
 	
 	private void buildDependencyEquations() {
-		List<DumpDependencyData> dumpDependencyDataList = context.getScenarioConfig().getDumpDependencyDataList();
+		List<DumpDependencyData> dumpDependencyDataList = context.getDumpDependencyDataList();
 		for(DumpDependencyData dumpDependencyData:dumpDependencyDataList){
 			if(!dumpDependencyData.isInUse()) continue;
 			if(dumpDependencyData.getFirstPitName() != null){
 				Pit pit = getPitFromPitName(dumpDependencyData.getFirstPitName());
-				Dump d1 = context.getProjectConfig().getDumpfromPitName(dumpDependencyData.getFirstPitName());
+				Dump d1 = context.getDumpfromPitName(dumpDependencyData.getFirstPitName());
 				if(d1 == null) continue;
-				Dump d2 = context.getProjectConfig().getDumpfromDumpName(dumpDependencyData.getDependentDumpName());
+				Dump d2 = context.getDumpfromDumpName(dumpDependencyData.getDependentDumpName());
 				buildPitDumpDependencyEquation1(pit, d1, d2);
 				buildDumpDependencyEquation2(d1, d2);
 				
 			} else if(dumpDependencyData.getFirstDumpName() != null){
-				Dump d1 = context.getProjectConfig().getDumpfromDumpName(dumpDependencyData.getFirstDumpName());
-				Dump d2 = context.getProjectConfig().getDumpfromDumpName(dumpDependencyData.getDependentDumpName());
+				Dump d1 = context.getDumpfromDumpName(dumpDependencyData.getFirstDumpName());
+				Dump d2 = context.getDumpfromDumpName(dumpDependencyData.getDependentDumpName());
 				buildDumpDependencyEquation1(d1, d2);
 				buildDumpDependencyEquation2(d1, d2);
 			}

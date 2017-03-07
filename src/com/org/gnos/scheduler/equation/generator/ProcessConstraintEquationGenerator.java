@@ -34,7 +34,7 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 	
 	@Override
 	public void generate() {
-		processConstraintDataList = context.getScenarioConfig().getProcessConstraintDataList();
+		processConstraintDataList = context.getProcessConstraintDataList();
 		try {			
 			buildProcessConstraintVariables();
 			output.flush();
@@ -50,7 +50,7 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 		int timePeriodStart = context.getTimePeriodStart();
 		int timePeriodEnd = context.getTimePeriodEnd();
 		int startYear = context.getStartYear();
-		List<Process> processList = context.getProjectConfig().getProcessList();
+		List<Process> processList = context.getProcessList();
 		for(ProcessConstraintData processConstraintData: processConstraintDataList) {
 			if(!processConstraintData.isInUse()) continue;
 			int selectorType = processConstraintData.getSelectionType();

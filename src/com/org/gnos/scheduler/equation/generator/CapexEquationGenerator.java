@@ -1,18 +1,18 @@
 package com.org.gnos.scheduler.equation.generator;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.org.gnos.core.Block;
-import com.org.gnos.core.ProjectConfigutration;
+import com.org.gnos.core.Pit;
 import com.org.gnos.db.model.CapexData;
 import com.org.gnos.db.model.CapexInstance;
 import com.org.gnos.db.model.Dump;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Model;
-import com.org.gnos.db.model.Pit;
 import com.org.gnos.db.model.PitGroup;
 import com.org.gnos.db.model.Process;
 import com.org.gnos.db.model.ProcessConstraintData;
@@ -42,7 +42,7 @@ public class CapexEquationGenerator extends EquationGenerator{
 	}
 	
 	private void buildCapexEquations() {
-		List<CapexData> capexDataList = context.getScenarioConfig().getCapexDataList();
+		List<CapexData> capexDataList = context.getCapexDataList();
 		int capexCount = 0;
 		for(CapexData cd: capexDataList) {
 			capexCount++;
@@ -53,7 +53,7 @@ public class CapexEquationGenerator extends EquationGenerator{
 	}
 	
 	private void buildSet1Equations(CapexData cd, int capexNumber) {
-		List<Process> processList = context.getProjectConfig().getProcessList();
+		List<Process> processList = context.getProcessList();
 		List<CapexInstance> capexInstanceList = cd.getListOfCapexInstances();
 		int capexInstanceCount = capexInstanceList.size();
 		if(capexInstanceCount < 1) return;
@@ -70,10 +70,11 @@ public class CapexEquationGenerator extends EquationGenerator{
 				}
 			}
 		} else if(groupType == CapexInstance.SELECTION_PROCESS_JOIN){
-			ProcessJoin processJoin = context.getProjectConfig().getProcessJoinByName(groupName);
+			ProcessJoin processJoin = context.getProcessJoinByName(groupName);
 			List<Process> pList = new ArrayList<Process>();
 			if(processJoin != null) {
-				for(Model model: processJoin.getlistChildProcesses()){
+				for(Integer modelId: processJoin.getChildProcessList()){
+					Model model = context.getModelById(modelId);
 					for( Process p: processList){
 						if(p.getModel().getName().equals(model.getName())){
 							pList.add(p);
@@ -83,13 +84,13 @@ public class CapexEquationGenerator extends EquationGenerator{
 			}
 			buildCapexEquationForProcesses(pList, cd, capexNumber,processConstraintData);
 		}  else if(groupType == CapexInstance.SELECTION_PIT){
-			List<Integer> pList = new ArrayList<Integer>();
-			Pit pit = context.getProjectConfig().getPitfromPitName(groupName);
-			pList.add(pit.getPitNumber());
+			Set<Integer> pList = new HashSet<Integer>();
+			Pit pit = context.getPitNameMap().get(groupName);
+			pList.add(pit.getPitNo());
 			buildCapexEquationForPits(pList, cd, capexNumber, processConstraintData);
 		} else if(groupType == CapexInstance.SELECTION_PIT_GROUP){
-			List<Integer> pList = new ArrayList<Integer>();
-			PitGroup pg = context.getProjectConfig().getPitGroupfromName(groupName);
+			Set<Integer> pList = new HashSet<Integer>();
+			PitGroup pg = context.getPitGroupfromName(groupName);
 			pList.addAll(getPitsFromPitGroup(pg));
 			buildCapexEquationForPits(pList, cd, capexNumber, processConstraintData);
 		} 
@@ -146,7 +147,7 @@ public class CapexEquationGenerator extends EquationGenerator{
 			int count = 0;
 			for(Process p: processList){
 				List<Block> blocks = p.getBlocks();
-				Expression exp = ProjectConfigutration.getInstance().getExpressionById(p.getModel().getExpressionId());
+				Expression exp = context.getExpressionById(p.getModel().getExpressionId());
 				for(Block b: blocks){
 					if(count > 0){
 						sb.append(" + ");
@@ -204,9 +205,9 @@ public class CapexEquationGenerator extends EquationGenerator{
 		}
 	}
 	
-	private void buildCapexEquationForPits(List<Integer> pitnumberList, CapexData cd, int capexNumber, Map<Integer, Float> processConstraintData){
+	private void buildCapexEquationForPits(Set<Integer> pitnumberList, CapexData cd, int capexNumber, Map<Integer, Float> processConstraintData){
 		List<CapexInstance> capexInstanceList = cd.getListOfCapexInstances();
-		List<Process> processList = context.getProjectConfig().getProcessList();
+		List<Process> processList = context.getProcessList();
 		int timePeriodStart = context.getTimePeriodStart();
 		int timePeriodEnd = context.getTimePeriodEnd();
 		int startyear = context.getStartYear();
@@ -216,7 +217,7 @@ public class CapexEquationGenerator extends EquationGenerator{
 			int count = 0;
 			for( Process p: processList){
 				List<Block> blocks = p.getBlocks();
-				Expression exp =  ProjectConfigutration.getInstance().getExpressionById(p.getModel().getExpressionId());
+				Expression exp =  context.getExpressionById(p.getModel().getExpressionId());
 				for(Block b: blocks){
 					if(!pitnumberList.contains(b.getPitNo())) continue;
 					if(count > 0){
@@ -265,7 +266,7 @@ public class CapexEquationGenerator extends EquationGenerator{
 	}
 	
 	private Map<Integer, Float> getProcessConstraintData(String name, int type){
-		List<ProcessConstraintData> processConstraintDataList = context.getScenarioConfig().getProcessConstraintDataList();
+		List<ProcessConstraintData> processConstraintDataList = context.getProcessConstraintDataList();
 		for(ProcessConstraintData pcd: processConstraintDataList){
 			if(!pcd.isInUse()) continue;
 			if(pcd.getSelectionType() == type && pcd.getCoefficientType() == ProcessConstraintData.COEFFICIENT_NONE){
@@ -278,7 +279,7 @@ public class CapexEquationGenerator extends EquationGenerator{
 	}
 	
 	private int getStockpileNo(Block b){
-		List<Stockpile> stockpiles = context.getProjectConfig().getStockPileList();
+		List<Stockpile> stockpiles = context.getStockpiles();
 		
 		for(Stockpile sp: stockpiles){
 			Set<Block> blocks = sp.getBlocks();
@@ -293,7 +294,7 @@ public class CapexEquationGenerator extends EquationGenerator{
 	}
 	
 	private int getStockpileNoForReclaim(Block b){
-		List<Stockpile> stockpiles = context.getProjectConfig().getStockPileList();
+		List<Stockpile> stockpiles = context.getStockpiles();
 		
 		for(Stockpile sp: stockpiles){
 			if(!sp.isReclaim()) continue;
@@ -309,7 +310,7 @@ public class CapexEquationGenerator extends EquationGenerator{
 	}
 	
 	private List<Dump> getDump(Block b){
-		List<Dump> alldumps = context.getProjectConfig().getDumpList();
+		List<Dump> alldumps = context.getDumps();
 		List<Dump> dumps = new ArrayList<Dump>();
 		for(Dump dump: alldumps){
 			Set<Block> blocks = dump.getBlocks();

@@ -16,7 +16,9 @@ import java.util.Set;
 
 import com.org.gnos.core.Bench;
 import com.org.gnos.core.Block;
+import com.org.gnos.core.Node;
 import com.org.gnos.core.Pit;
+import com.org.gnos.core.Tree;
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.dao.BenchConstraintDAO;
 import com.org.gnos.db.dao.CapexDAO;
@@ -31,6 +33,7 @@ import com.org.gnos.db.dao.OpexDAO;
 import com.org.gnos.db.dao.PitDependencyDAO;
 import com.org.gnos.db.dao.PitGroupDAO;
 import com.org.gnos.db.dao.ProcessConstraintDAO;
+import com.org.gnos.db.dao.ProcessTreeDAO;
 import com.org.gnos.db.dao.RequiredFieldDAO;
 import com.org.gnos.db.dao.ScenarioDAO;
 import com.org.gnos.db.dao.StockpileDAO;
@@ -46,9 +49,13 @@ import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.OpexData;
 import com.org.gnos.db.model.PitBenchConstraintData;
 import com.org.gnos.db.model.PitDependencyData;
+import com.org.gnos.db.model.PitGroup;
 import com.org.gnos.db.model.Process;
 import com.org.gnos.db.model.ProcessConstraintData;
-import com.org.gnos.db.model.PitGroup;
+import com.org.gnos.db.model.ProcessJoin;
+import com.org.gnos.db.model.ProcessTreeNode;
+import com.org.gnos.db.model.Product;
+import com.org.gnos.db.model.ProductJoin;
 import com.org.gnos.db.model.RequiredField;
 import com.org.gnos.db.model.Scenario;
 import com.org.gnos.db.model.Stockpile;
@@ -60,6 +67,7 @@ public class ExecutionContext {
 	private Set<Block> processBlocks = new HashSet<Block>();
 	private Map<Integer, Block> blocks = new LinkedHashMap<Integer,Block>();
 	private Map<Integer, Pit> pits = new LinkedHashMap<Integer,Pit>();
+	private Map<String, Pit> pitNameMap = new LinkedHashMap<String,Pit>();
 	private Map<Integer, List<String>> blockVariableMapping = new HashMap<Integer, List<String>>();
 	private Map<Integer, Integer> blockPayloadMapping = new HashMap<Integer, Integer>();
 	private Map<String, BigDecimal> cycleTimeDataMapping  = new HashMap<String, BigDecimal>();
@@ -74,7 +82,10 @@ public class ExecutionContext {
 	private List<Dump> dumps;
 	private List<Expression> expressions;
 	private List<Model> models;
-	private List<Process> processes;
+	private List<Process> processList;
+	private List<ProcessJoin> processJoinList;
+	private List<ProductJoin> productJoinList;
+	private List<Product> productList;
 	private List<CycleTimeFieldMapping> cycleTimeFieldMappings;
 	
 	private Scenario scenario;
@@ -110,6 +121,7 @@ public class ExecutionContext {
 		loadRequiredFields();
 		loadExpressions();
 		loadModels();
+		loadProcesses();
 		loadPitGroups();
 		loadStockpiles();
 		loadDumps();		
@@ -138,6 +150,48 @@ public class ExecutionContext {
 	
 	private void loadModels() {
 		models = new ModelDAO().getAll(projectId);
+	}
+	
+	private void loadProcesses() {
+		List<ProcessTreeNode> processTreeNodes = new ProcessTreeDAO().getAll(projectId);
+		
+		Map<String, Node> nodes = new HashMap<String, Node>();
+		Tree processTree = new Tree();
+		for (ProcessTreeNode processTreeNode : processTreeNodes) {
+			int modelId = processTreeNode.getModelId();
+			int parentModelId = processTreeNode.getParentModelId();
+			
+			Model model = this.getModelById(modelId);
+		
+			Node node = nodes.get(model.getName());
+			if (node == null) {
+				node = new Node(model);
+				nodes.put(model.getName(), node);
+			}
+			if (parentModelId == -1) {
+				processTree.addNode(node, null);
+			} else {
+				Model pModel = this.getModelById(parentModelId);
+				if (pModel != null) {
+					Node pNode = nodes.get(pModel.getName());
+					if (pNode == null) {
+						pNode = new Node(pModel);
+						nodes.put(pModel.getName(), pNode);
+					}
+					processTree.addNode(node, pNode);
+					node.setParent(pNode);
+				}
+			}
+		}
+		List<Node> leafNodes = processTree.getLeafNodes();
+		int count = 1;
+		for(Node node: leafNodes) {
+			Process process = new Process();
+			process.setProcessNo(count);
+			process.setModel(node.getData());
+			processList.add(process);
+			count ++;
+		}
 	}
 	
 	private void loadPitGroups() {
@@ -255,6 +309,7 @@ public class ExecutionContext {
 					pit.setPitNo(block.getPitNo());
 					pit.setPitName(block.getField(pitFieldName));
 					pits.put(block.getPitNo(), pit);
+					pitNameMap.put(pit.getPitName(), pit);
 				}
 				Bench bench = pit.getBench(block.getBenchNo());
 				if(bench == null ){
@@ -281,12 +336,17 @@ public class ExecutionContext {
 		 
 		 return pits;
 	}
-	
-	private PitGroup getPitGroupfromName(String childGroup) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
+	public Set<Integer> getPitsFromPitGroup(PitGroup pg) {
+		 Set<String> pits = new HashSet<String>();
+		 pits.addAll(pg.getListChildPits());
+		 for(String childGroup: pg.getListChildPitGroups()) {
+			 pits.addAll(flattenPitGroup(getPitGroupfromName(childGroup)));
+		 }
+		 
+		 return pits;
+	}
+	
 	private List<Block> findBlocks(String condition) {
 		List<Block> blocks = new ArrayList<Block>();
 		String sql = "select id from gnos_data_"+projectId ;
@@ -335,6 +395,15 @@ public class ExecutionContext {
 		return null;
 	}
 	
+	public Model getModelById(int id) {
+		if(models == null) return null;
+		for(Model model: models) {
+			if(model.getId() == id) {
+				return model;
+			}
+		}
+		return null;
+	}
 	public Stockpile getStockpileFromNo(int spNo){;
 		for(Stockpile sp: stockpiles){
 			if(sp.getStockpileNumber() == spNo) {
@@ -343,7 +412,50 @@ public class ExecutionContext {
 		}
 		return null;
 	}
-
+	
+	public PitGroup getPitGroupfromName(String name) {
+		if(pitGroups == null || pitGroups.size() == 0 || name == null) return null;
+		
+		for(PitGroup pitGroup: pitGroups) {
+			if(pitGroup.getName().equals(name)){
+				return pitGroup;
+			}
+		}
+		return null;
+	}
+	
+	public ProductJoin getProductJoinFromName(String name) {
+		if(productJoinList == null || productJoinList.size() == 0 || name == null) return null;
+		
+		for(ProductJoin productJoin: productJoinList) {
+			if(productJoin.getName().equals(name)){
+				return productJoin;
+			}
+		}
+		return null;
+	}
+	
+	public Product getProductFromName(String name) {
+		if(productList == null || productList.size() == 0 || name == null) return null;
+		
+		for(Product product: productList) {
+			if(product.getName().equals(name)){
+				return product;
+			}
+		}
+		return null;
+	}
+	
+	public ProcessJoin getProcessJoinByName(String name) {
+		if(processJoinList == null || processJoinList.size() == 0 || name == null) return null;
+		
+		for(ProcessJoin processJoin: processJoinList) {
+			if(processJoin.getName().equals(name)){
+				return processJoin;
+			}
+		}
+		return null;
+	}
 	public void reset() {
 		blockVariableMapping = new HashMap<Integer, List<String>>();
 	}
@@ -419,6 +531,14 @@ public class ExecutionContext {
 
 	public void setPits(Map<Integer, Pit> pits) {
 		this.pits = pits;
+	}
+
+	public Map<String, Pit> getPitNameMap() {
+		return pitNameMap;
+	}
+
+	public void setPitNameMap(Map<String, Pit> pitNameMap) {
+		this.pitNameMap = pitNameMap;
 	}
 
 	public void setBlocks(Map<Integer, Block> blocks) {
@@ -521,12 +641,36 @@ public class ExecutionContext {
 		this.models = models;
 	}
 
-	public List<Process> getProcesses() {
-		return processes;
+	public List<Process> getProcessList() {
+		return processList;
 	}
 
-	public void setProcesses(List<Process> processes) {
-		this.processes = processes;
+	public void setProcessList(List<Process> processList) {
+		this.processList = processList;
+	}
+
+	public List<ProcessJoin> getProcessJoinList() {
+		return processJoinList;
+	}
+
+	public void setProcessJoinList(List<ProcessJoin> processJoinList) {
+		this.processJoinList = processJoinList;
+	}
+
+	public List<ProductJoin> getProductJoinList() {
+		return productJoinList;
+	}
+
+	public void setProductJoinList(List<ProductJoin> productJoinList) {
+		this.productJoinList = productJoinList;
+	}
+
+	public List<Product> getProductList() {
+		return productList;
+	}
+
+	public void setProductList(List<Product> productList) {
+		this.productList = productList;
 	}
 
 	public List<CycleTimeFieldMapping> getCycleTimeFieldMappings() {

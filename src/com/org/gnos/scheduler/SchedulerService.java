@@ -21,7 +21,7 @@ public class SchedulerService {
 		
 		ISolver solver = new CplexSolver();
 		createScheduler(runconfig.getMode());
-		scheduler.getContext().setEquationgEnableMap(runconfig.getEqnenablestate());
+		scheduler.getContext().setEquationEnableMap(runconfig.getEqnenablestate());
 		scheduler.setSolver(solver);
 		scheduler.execute();
 	}

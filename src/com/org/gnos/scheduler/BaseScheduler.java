@@ -27,42 +27,42 @@ public abstract class BaseScheduler {
 			write("maximize");
 			EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.OBJECTIVE_FUNCTION, context, writer).generate();
 			write("\r\nSubject To");
-			if(context.getEquationgEnableMap().get("BOUNDARY_VARIABLES")) {
+			if(context.getEquationEnableMap().get("BOUNDARY_VARIABLES")) {
 				write("\\ reserve constraints - boundary variable");
 				EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.BOUNDARY_VARIABLE, context, writer).generate();
 			}
-			if(context.getEquationgEnableMap().get("PROCESS_CONSTRAINT")) {
+			if(context.getEquationEnableMap().get("PROCESS_CONSTRAINT")) {
 				write("\\ process constraints");
 				EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.PROCESS_CONSTRAINT, context, writer).generate();
 			}			
-			if(context.getEquationgEnableMap().get("BENCH_CONSTRAINT")) {
+			if(context.getEquationEnableMap().get("BENCH_CONSTRAINT")) {
 				write("\\ bench constraints");
 				EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.BENCH_CONSTRAINT, context, writer).generate();				
 			}
-			if(context.getEquationgEnableMap().get("BENCH_PROPORTION")) {
+			if(context.getEquationEnableMap().get("BENCH_PROPORTION")) {
 				write("\\ bench proportions");
 				EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.BENCH_PROPORTIONS, context, writer).generate();	
 			}
-			if(context.getEquationgEnableMap().get("DUMP_CAPACITIES")) {
+			if(context.getEquationEnableMap().get("DUMP_CAPACITIES")) {
 				write("\\ Dump capacities");
 				EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.DUMP_CAPACITY, context, writer).generate();
 			}
 			write("\\ SP Reclaim");					
 			EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.SP_RECLAIM, context, writer).generate();
 			
-			if(context.getEquationgEnableMap().get("CAPEX")) {
+			if(context.getEquationEnableMap().get("CAPEX")) {
 				write("\\ Capex");	
 				EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.CAPEX, context, writer).generate();
 			}
-			if(context.getEquationgEnableMap().get("DUMP_DEPENDENCY")) {
+			if(context.getEquationEnableMap().get("DUMP_DEPENDENCY")) {
 				write("\\ Dump Dependency");	
 				EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.DUMP_DEPENDENCY, context, writer).generate();
 			}
-			if(context.getEquationgEnableMap().get("PIT_DEPENDENCY")) {
+			if(context.getEquationEnableMap().get("PIT_DEPENDENCY")) {
 				write("\\ pit dependency");
 				EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.PIT_DEPENDENCY, context, writer).generate();
 			}
-			if(context.getEquationgEnableMap().get("GRADE_CONSTRAINT")) {
+			if(context.getEquationEnableMap().get("GRADE_CONSTRAINT")) {
 				write("\\ grade constraints");
 				EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.GRADE_CONSTRAINT, context, writer).generate();
 			}

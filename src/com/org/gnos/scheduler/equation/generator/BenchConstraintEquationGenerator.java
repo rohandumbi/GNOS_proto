@@ -100,12 +100,11 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 				continue;
 			}
 			String pitName = pitBenchConstraintData.getPitName();
-			com.org.gnos.db.model.Pit pit = context.getPitfromPitName(pitName);
-			exclusionList.add(pit.getPitNumber());
-			Pit pitdata = context.getPits().get(pit.getPitNumber());
+			Pit pit = context.getPitNameMap().get(pitName);
+			exclusionList.add(pit.getPitNo());
 			for(int i=timePeriodStart; i<= timePeriodEnd; i++){
 				int yearvalue = pitBenchConstraintData.getConstraintData().get(startyear+ i-1);
-				buildEquationForPit(pitdata, i, yearvalue);
+				buildEquationForPit(pit, i, yearvalue);
 			}
 			
 		}
