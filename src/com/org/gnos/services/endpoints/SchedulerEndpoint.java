@@ -29,14 +29,15 @@ public class SchedulerEndpoint {
 				if(requestObject.isJsonObject()) {
 					JsonObject jsonObject = requestObject.getAsJsonObject();
 					try {
-						return controller.execute(jsonObject, req.params(":id"));
+						return controller.execute(req.params(":pid"), req.params(":sid"), jsonObject );
 					} catch (Exception e) {
 						res.status(400);
 						return new ResponseError("Field creation failed. "+e.getMessage());
 					}					
+				} else {
+					return controller.execute(req.params(":pid"), req.params(":sid"), null );
 				}
-				res.status(400);				
-				return new ResponseError("Field creation failed due to improper input");
+				
 			}
 		}, json());
 	}

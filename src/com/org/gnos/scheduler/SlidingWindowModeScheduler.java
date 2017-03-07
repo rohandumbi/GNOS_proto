@@ -1,14 +1,19 @@
 package com.org.gnos.scheduler;
 
-import com.org.gnos.core.ScenarioConfigutration;
+import com.org.gnos.db.model.RunConfig;
 import com.org.gnos.scheduler.equation.SlidingWindowExecutionContext;
 import com.org.gnos.scheduler.processor.SlidingWindowModeDBStorageHelper;
 
 public class SlidingWindowModeScheduler extends BaseScheduler{
 
-	public SlidingWindowModeScheduler() {
+	public SlidingWindowModeScheduler(RunConfig runConfig) {
 		super();
-		context = new SlidingWindowExecutionContext();
+		context = new SlidingWindowExecutionContext(runConfig.getProjectId(), runConfig.getScenarioId());
+		((SlidingWindowExecutionContext)context).setPeriod(runConfig.getPeriod());
+		((SlidingWindowExecutionContext)context).setWindow(runConfig.getWindow());
+		((SlidingWindowExecutionContext)context).setStepsize(runConfig.getStepSize());
+
+		
 		helper = new SlidingWindowModeDBStorageHelper();
 		helper.setContext(context);
 	}
@@ -24,8 +29,8 @@ public class SlidingWindowModeScheduler extends BaseScheduler{
 		short period = swcontext.getPeriod();
 		short window = swcontext.getWindow();
 		short stepsize = swcontext.getStepsize();
-		int startYear = ScenarioConfigutration.getInstance().getStartYear();
-		int timePeriod = ScenarioConfigutration.getInstance().getTimePeriod();
+		int startYear = context.getScenario().getStartYear();
+		int timePeriod = context.getScenario().getTimePeriod();
 		helper.start();
 		for(int i=1; i<= period; i++){
 			context.reset();

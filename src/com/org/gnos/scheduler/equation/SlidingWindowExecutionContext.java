@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Set;
 
 import com.org.gnos.core.Block;
-import com.org.gnos.core.ScenarioConfigutration;
 import com.org.gnos.db.model.Expression;
 
 public class SlidingWindowExecutionContext extends ExecutionContext {
@@ -30,8 +29,8 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 	private List<Expression> gradeExpressions;
 	private Set<String> gradeFields;
 	
-	public SlidingWindowExecutionContext() {
-		super();
+	public SlidingWindowExecutionContext(int projectId, int scenarioId) {
+		super(projectId, scenarioId);
 		parseGradeExpression();
 	}
 	
@@ -63,10 +62,6 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 	}
 	public void setCurrPeriod(short currPeriod) {
 		this.currPeriod = currPeriod;
-	}
-	
-	public int getStartYear() {
-		return ScenarioConfigutration.getInstance().getStartYear();
 	}
 	
 	public int getTimePeriod() {

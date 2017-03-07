@@ -33,7 +33,7 @@ public class PitDependencyEquationGenerator extends EquationGenerator{
 
 	
 	private void buildDependencyEquations() {
-		List<PitDependencyData> pitDependencyDataList = context.getScenarioConfig().getPitDependencyDataList();
+		List<PitDependencyData> pitDependencyDataList = context.getPitDependencyDataList();
 		for(PitDependencyData pitDependencyData:pitDependencyDataList){
 			if(!pitDependencyData.isInUse()) continue;
 			Pit firstpit = getPitFromPitName(pitDependencyData.getFirstPitName());

@@ -14,8 +14,7 @@ import java.util.Set;
 
 import com.org.gnos.core.Block;
 import com.org.gnos.core.Node;
-import com.org.gnos.core.ProjectConfigutration;
-import com.org.gnos.core.Tree;
+import com.org.gnos.core.Pit;
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.model.CapexData;
 import com.org.gnos.db.model.CapexInstance;
@@ -24,7 +23,6 @@ import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.FixedOpexCost;
 import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.OpexData;
-import com.org.gnos.db.model.Pit;
 import com.org.gnos.db.model.Process;
 import com.org.gnos.db.model.Stockpile;
 import com.org.gnos.db.model.TruckParameterCycleTime;
@@ -34,7 +32,6 @@ import com.org.gnos.scheduler.equation.SlidingWindowExecutionContext;
 
 public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 	
-	private Tree processTree;
 	private int bytesWritten = 0;
 	private float discount_rate = 0; //this has to be made an input variable later
 	
@@ -63,7 +60,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 	}
 
 	private void buildProcessBlockVariables() {
-		List<Process> porcesses = context.getProcesses();
+		List<Process> porcesses = context.getProcessList();
 		Set<Block> processBlocks = new HashSet<Block>();
 		for(Process process: porcesses) {
 			System.out.println("Equation Generation: process name - "+process.getModel().getName());
@@ -145,9 +142,9 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 			if(sp.getMappingType() == 0) {
 				condition +=  "'"+sp.getMappedTo() +"'";
 			} else {
-				Set<Integer> pits = context.flattenPitGroup(context.getPitGroupfromName(sp.getMappedTo()));
+				Set<Integer> pits = getPitsFromPitGroup(context.getPitGroupfromName(sp.getMappedTo()));
 				for(int pitNo: pits){
-					Pit pit = context.getPitfromPitNumber(pitNo);
+					Pit pit = context.getPits().get(pitNo);
 					condition +=  "'"+pit.getPitName() +"',";
 				}
 				condition = condition.substring(0, condition.length() -1);
@@ -223,9 +220,9 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 			if(dump.getMappingType() == 0) {
 				condition += "'"+dump.getMappedTo()+ "'";
 			} else {
-				Set<Integer> pits = context.flattenPitGroup(context.getPitGroupfromName(dump.getMappedTo()));
+				Set<Integer> pits = getPitsFromPitGroup(context.getPitGroupfromName(dump.getMappedTo()));
 				for(int pitNo: pits){
-					Pit pit = context.getProjectConfig().getPitfromPitNumber(pitNo);
+					Pit pit = context.getPits().get(pitNo);
 					condition +=  "'"+ pit.getPitName() +"',";
 				}
 				condition = condition.substring(0, condition.length() -1);
@@ -352,7 +349,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		if(sp.getStockpileNumber() == 0) return;
 		
 		Set<Process> processes = spb.getProcesses();
-		TruckParameterCycleTime cycleTime =  context.getProjectConfig().getTruckParamCycleTimeByStockpileName(sp.getName());
+		TruckParameterCycleTime cycleTime =  context.getTruckParamCycleTimeByStockpileName(sp.getName());
 		
 		for(Process p: processes){
 			BigDecimal totalCost = new BigDecimal(0);
@@ -396,7 +393,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 			}
 		}
 		boolean continueLoop = true;
-		Node currNode = processTree.getNodeByName(model.getName());
+		Node currNode = context.getProcessTree().getNodeByName(model.getName());
 		do{
 			Node parent = currNode.getParent();
 			if(parent == null) {
@@ -424,7 +421,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 	
 	private List<Block> findBlocks(String condition) {
 		List<Block> blocks = new ArrayList<Block>();
-		String sql = "select id from gnos_data_"+context.getProjectConfig().getProjectId() ;
+		String sql = "select id from gnos_data_"+context.getProjectId() ;
 		if(hasValue(condition)) {
 			sql += " where "+condition;
 		}
@@ -453,7 +450,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		if(model == null) return value;
 		BigDecimal revenue = new BigDecimal(0);
 		BigDecimal pcost = new BigDecimal(0);
-		List<OpexData> opexDataList = context.getScenarioConfig().getOpexDataList();
+		List<OpexData> opexDataList = context.getOpexDataList();
 		for(OpexData opexData: opexDataList) {
 			if(opexData.getModelId() == model.getId()){
 				if(opexData.isRevenue()){

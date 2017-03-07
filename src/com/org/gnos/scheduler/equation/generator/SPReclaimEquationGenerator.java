@@ -35,7 +35,7 @@ public class SPReclaimEquationGenerator extends EquationGenerator{
 	}
 
 	private void buildStockpileEquations() {
-		List<Stockpile> stockpiles = context.getProjectConfig().getStockPileList();
+		List<Stockpile> stockpiles = context.getStockpiles();
 		int timePeriodStart = context.getTimePeriodStart();
 		int timePeriodEnd = context.getTimePeriodEnd();
 		for(Stockpile sp: stockpiles) {

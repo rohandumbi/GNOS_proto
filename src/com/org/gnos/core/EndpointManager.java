@@ -3,6 +3,7 @@ package com.org.gnos.core;
 import com.org.gnos.services.endpoints.BenchConstraintEndpoint;
 import com.org.gnos.services.endpoints.CapexEndpoint;
 import com.org.gnos.services.endpoints.CycleTimeEndpoint;
+import com.org.gnos.services.endpoints.CycleTimeMappingEndpoint;
 import com.org.gnos.services.endpoints.DumpDependencyEndpoint;
 import com.org.gnos.services.endpoints.DumpEndpoint;
 import com.org.gnos.services.endpoints.ExpressionEndpoint;
@@ -23,6 +24,7 @@ import com.org.gnos.services.endpoints.ProductEndpoint;
 import com.org.gnos.services.endpoints.ProductJoinEndpoint;
 import com.org.gnos.services.endpoints.ProjectEndpoint;
 import com.org.gnos.services.endpoints.ScenarioEndpoint;
+import com.org.gnos.services.endpoints.SchedulerEndpoint;
 import com.org.gnos.services.endpoints.StockpileEndpoint;
 import com.org.gnos.services.endpoints.TruckParameterCycleTimeEndpoint;
 
@@ -44,6 +46,7 @@ public class EndpointManager {
 		new DumpEndpoint();
 		new StockpileEndpoint();
 		new TruckParameterCycleTimeEndpoint();
+		new CycleTimeMappingEndpoint();
 		new CycleTimeEndpoint();
 		new ScenarioEndpoint();
 		new OpexEndpoint();
@@ -54,5 +57,6 @@ public class EndpointManager {
 		new PitDependencyEndpoint();
 		new DumpDependencyEndpoint();
 		new CapexEndpoint();
+		new SchedulerEndpoint();
 	}
 }
