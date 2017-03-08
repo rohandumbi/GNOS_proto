@@ -42,7 +42,9 @@ public class SchedulerController {
 			}
 			 
 		}
-		SchedulerService.getInstance().execute(runconfig);
+		SchedulerService service = SchedulerService.getInstance();
+		service.setRunconfig(runconfig);
+		new Thread(service).start();
 		return null;
 	}
 
