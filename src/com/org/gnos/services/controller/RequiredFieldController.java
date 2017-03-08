@@ -21,7 +21,7 @@ public class RequiredFieldController {
 	
 	public RequiredField create(JsonObject jsonObject, String pid) throws Exception{
 		String fieldName = jsonObject.get("fieldName").getAsString();
-		String mappedFieldname = jsonObject.get("mappedFieldName").getAsString();
+		String mappedFieldname = jsonObject.get("mappedFieldname").getAsString();
 		RequiredField obj = new RequiredField();
 		obj.setFieldName(fieldName);
 		obj.setMappedFieldname(mappedFieldname);
@@ -32,11 +32,11 @@ public class RequiredFieldController {
 	
 	public RequiredField update(JsonObject jsonObject, String pid) throws Exception{
 		String fieldName = jsonObject.get("fieldName").getAsString();
-		String mappedFieldname = jsonObject.get("mappedFieldName").getAsString();
+		String mappedFieldname = jsonObject.get("mappedFieldname").getAsString();
 		RequiredField obj = new RequiredField();
 		obj.setFieldName(fieldName);
 		obj.setMappedFieldname(mappedFieldname);
-		boolean updated = dao.create(obj, Integer.parseInt(pid));
+		boolean updated = dao.update(obj, Integer.parseInt(pid));
 		new PitBenchProcessor().updatePitBenchData(Integer.parseInt(pid));
 		if(updated) return obj;
 		throw new Exception();
