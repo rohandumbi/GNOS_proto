@@ -34,7 +34,10 @@ public class FieldController {
 		String name = jsonObject.get("name").getAsString();
 		short dataType = jsonObject.get("dataType").getAsShort();
 		int fieldId = jsonObject.get("id").getAsInt();
-		String weightedUnit = jsonObject.get("weightedUnit").getAsString();
+		String weightedUnit = null;
+		if(jsonObject.get("weightedUnit") != null){
+			weightedUnit = jsonObject.get("weightedUnit").getAsString();
+		}
 		Field obj = new Field(name);
 		obj.setId(fieldId);
 		obj.setDataType(dataType);
