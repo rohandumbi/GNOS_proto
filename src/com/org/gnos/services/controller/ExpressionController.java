@@ -26,10 +26,13 @@ public class ExpressionController {
 		boolean isGrade = jsonObject.get("isGrade").getAsBoolean();
 		boolean isComplex = jsonObject.get("isComplex").getAsBoolean();
 		String exprvalue = jsonObject.get("exprvalue").getAsString();
-		String weightedField = jsonObject.get("weightedField").getAsString();
+		String weightedField = null;
 		String filter = null;
 		if(jsonObject.get("filter") != null){
 			filter = jsonObject.get("filter").getAsString();
+		}
+		if(jsonObject.get("weightedField") != null){
+			filter = jsonObject.get("weightedField").getAsString();
 		}
 		Expression obj = new Expression();
 		obj.setName(name);
@@ -56,10 +59,13 @@ public class ExpressionController {
 		boolean isGrade = jsonObject.get("isGrade").getAsBoolean();
 		boolean isComplex = jsonObject.get("isComplex").getAsBoolean();
 		String exprvalue = jsonObject.get("exprvalue").getAsString();
-		String weightedField = jsonObject.get("weightedField").getAsString();
+		String weightedField = null;
 		String filter = null;
 		if(jsonObject.get("filter") != null){
 			filter = jsonObject.get("filter").getAsString();
+		}
+		if(jsonObject.get("weightedField") != null){
+			weightedField = jsonObject.get("weightedField").getAsString();
 		}
 		int id = jsonObject.get("id").getAsInt();
 		Expression obj = new Expression();
