@@ -25,6 +25,8 @@ public class ProductEndpoint {
 		
 		get("/project/:id/products", (req, res) -> controller.getAll(req.params(":id")), json());
 		
+		get("/project/:id/product/:name/grades", (req, res) -> controller.getAllGrades(req.params(":id"), req.params("name")), json());
+		
 		post("/project/:id/products", new Route() {
 			
 			@Override
@@ -47,6 +49,25 @@ public class ProductEndpoint {
 
 		/* DELETE exisitng expression */
 		delete("/project/:id/products", (req, res) -> controller.deleteAll(req.params(":id")), json());
+		
+		delete("/project/:id/products/:name", new Route() {
+			
+			@Override
+			public Object handle(Request req, Response res) throws Exception {
+				JsonElement requestObject = new JsonParser().parse(req.body());
+				if(requestObject.isJsonObject()) {
+					JsonObject jsonObject = requestObject.getAsJsonObject();
+					try {
+						return controller.deleteUnit(jsonObject, req.params(":id"), req.params(":name"));
+					} catch (Exception e) {
+						res.status(400);
+						return new ResponseError("Field creation failed. "+e.getMessage());
+					}					
+				}
+				res.status(400);				
+				return new ResponseError("Field creation failed due to improper input");
+			}
+		}, json());
 
 	}
 	

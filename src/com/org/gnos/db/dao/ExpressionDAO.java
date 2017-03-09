@@ -15,6 +15,8 @@ import com.org.gnos.db.model.Expression;
 public class ExpressionDAO {
 
 	private static final String SQL_LIST_ORDER_BY_ID = "select id, name, is_grade, is_complex, expr_value, filter, weighted_field from  expressions where project_id = ? order by id";
+	private static final String SQL_LIST_BY_WEIGHTED_FIELD = "select id, name, is_grade, is_complex, expr_value, filter, weighted_field from  expressions"
+			+ " where project_id = ? and is_grade = true and weighted_field = ?  order by id";
 	private static final String SQL_INSERT = "insert into expressions (project_id, name, is_grade, is_complex, expr_value, filter, weighted_field) values (?, ?, ?, ?, ?,?, ?)";
 	private static final String SQL_DELETE = "delete from expressions where id = ?";
 	private static final String SQL_UPDATE = "update expressions set is_grade = ?, is_complex = ?, expr_value = ?, filter = ?, weighted_field = ? where id = ?";
@@ -29,6 +31,30 @@ public class ExpressionDAO {
 		try (
 	            Connection connection = DBManager.getConnection();
 				PreparedStatement statement = prepareStatement(connection, SQL_LIST_ORDER_BY_ID, false, values);
+	            ResultSet resultSet = statement.executeQuery();
+	        ){
+			while(resultSet.next()){
+				expressions.add(map(resultSet));				
+			}
+			
+		} catch(SQLException e){
+			e.printStackTrace();
+		}
+		
+		return expressions;
+	}
+
+	public List<Expression> getAllByWeightedField(int projectId, String weightedField) {
+		
+		List<Expression> expressions = new ArrayList<Expression>();
+		Object[] values = {
+				projectId,
+				weightedField
+	   };
+		
+		try (
+	            Connection connection = DBManager.getConnection();
+				PreparedStatement statement = prepareStatement(connection, SQL_LIST_BY_WEIGHTED_FIELD, false, values);
 	            ResultSet resultSet = statement.executeQuery();
 	        ){
 			while(resultSet.next()){
