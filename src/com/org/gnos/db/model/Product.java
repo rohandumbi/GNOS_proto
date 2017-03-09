@@ -15,6 +15,7 @@ public class Product {
 	
 	public Product(){
 		this.expressionIdList = new HashSet<Integer>();
+		this.fieldIdList = new HashSet<Integer>();
 	}
 
 	public String getName() {
