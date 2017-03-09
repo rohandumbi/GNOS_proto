@@ -113,7 +113,8 @@ CREATE TABLE opex_defn(
    id INT NOT NULL AUTO_INCREMENT,
    scenario_id INT NOT NULL,
    model_id INT NOT NULL,
-   expression_id INT,
+   unit_type TINYINT,
+   unit_id INT,
    in_use TINYINT NOT NULL default 1,
    is_revenue TINYINT NOT NULL default 1,
    PRIMARY KEY ( id )

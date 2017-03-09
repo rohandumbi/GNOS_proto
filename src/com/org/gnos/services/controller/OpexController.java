@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.org.gnos.db.dao.OpexDAO;
+import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.OpexData;
 
 public class OpexController {
@@ -23,15 +24,21 @@ public class OpexController {
 	
 	public OpexData create(JsonObject jsonObject, String scenarioIdStr) throws Exception {
 		int modelId = jsonObject.get("modelId").getAsInt();
-		int expressionId = jsonObject.get("expressionId").getAsInt();
+		short unitType = jsonObject.get("unitType").getAsShort();
+		int unitId = jsonObject.get("unitId").getAsInt();
 		boolean inUse = jsonObject.get("inUse").getAsBoolean();
 		boolean isRevenue = jsonObject.get("isRevenue").getAsBoolean();
 		JsonObject costDataObj = jsonObject.get("costData").getAsJsonObject();
 		OpexData obj = new OpexData();
 		obj.setModelId(modelId);
-		obj.setExpressionId(expressionId);
 		obj.setInUse(inUse);
 		obj.setRevenue(isRevenue);
+		
+		if(unitType == Model.UNIT_FIELD) {
+			obj.setFieldId(unitId);
+		} else {
+			obj.setExpressionId(unitId);
+		}
 		
 		for (Entry<String, JsonElement> costData : costDataObj.entrySet()) {
 			obj.addYear(Integer.parseInt(costData.getKey()), costData.getValue().getAsBigDecimal());
@@ -44,16 +51,22 @@ public class OpexController {
 	
 	public OpexData update(JsonObject jsonObject, String id) throws Exception {		
 		int modelId = jsonObject.get("modelId").getAsInt();
-		int expressionId = jsonObject.get("expressionId").getAsInt();
+		short unitType = jsonObject.get("unitType").getAsShort();
+		int unitId = jsonObject.get("unitId").getAsInt();
 		boolean inUse = jsonObject.get("inUse").getAsBoolean();
 		boolean isRevenue = jsonObject.get("isRevenue").getAsBoolean();
 		JsonObject costDataObj = jsonObject.get("costData").getAsJsonObject();
 		OpexData obj = new OpexData();
 		obj.setId(Integer.parseInt(id));
 		obj.setModelId(modelId);
-		obj.setExpressionId(expressionId);
 		obj.setInUse(inUse);
 		obj.setRevenue(isRevenue);
+		
+		if(unitType == Model.UNIT_FIELD) {
+			obj.setFieldId(unitId);
+		} else {
+			obj.setExpressionId(unitId);
+		}
 		
 		for (Entry<String, JsonElement> costData : costDataObj.entrySet()) {
 			obj.addYear(Integer.parseInt(costData.getKey()), costData.getValue().getAsBigDecimal());

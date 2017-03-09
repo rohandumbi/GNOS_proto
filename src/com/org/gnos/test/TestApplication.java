@@ -1,7 +1,6 @@
 package com.org.gnos.test;
 
 import com.org.gnos.core.GNOSConfig;
-import com.org.gnos.core.ProjectConfigutration;
 import com.org.gnos.db.dao.ProjectDAO;
 import com.org.gnos.db.model.Project;
 import com.org.gnos.services.csv.GNOSCSVDataProcessor;
@@ -44,7 +43,6 @@ public class TestApplication {
 	private void loadData(int projectId) {
 		GNOSCSVDataProcessor.getInstance().processCsv("D:\\proj-workspace\\GitRepository\\PersonalWork\\GNOS_proto\\data\\GNOS_data_micro.csv");
 		GNOSCSVDataProcessor.getInstance().dumpToDB(projectId);
-		ProjectConfigutration.getInstance().load(projectId);
 	}
 	public boolean test() {
 		
