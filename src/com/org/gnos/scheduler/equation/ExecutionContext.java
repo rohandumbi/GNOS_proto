@@ -551,6 +551,13 @@ public class ExecutionContext {
 	public double getTonnesWtForBlock(Block b) {
 		return Double.valueOf(b.getField(tonnesWtFieldName));
 	}
+	
+	public BigDecimal getUnitValueforBlock(Block b, int unitId, short unitType) {
+		/*String expressionName = expr.getName().replaceAll("\\s+", "_");
+		return b.getComputedField(expressionName);*/
+		
+		return null;
+	}
 
 	public BigDecimal getExpressionValueforBlock(Block b, Expression expr) {
 		String expressionName = expr.getName().replaceAll("\\s+", "_");

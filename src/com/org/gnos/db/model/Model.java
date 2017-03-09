@@ -1,8 +1,14 @@
 package com.org.gnos.db.model;
 
 public class Model {
+	
+	public static final short UNIT_FIELD = 1;
+	public static final short UNIT_EXPRESSION = 2;
+	
 	private int id;
 	private String name;
+	private short unitType;
+	private int fieldId;
 	private int expressionId;
 	private String condition;
 	
@@ -50,6 +56,20 @@ public class Model {
 	public void setCondition(String condition) {
 		this.condition = condition;
 	}
-	
-	
+
+	public int getFieldId() {
+		return fieldId;
+	}
+
+	public void setFieldId(int fieldId) {
+		this.fieldId = fieldId;
+	}
+
+	public short getUnitType() {
+		return unitType;
+	}
+
+	public void setUnitType(short unitType) {
+		this.unitType = unitType;
+	}	
 }

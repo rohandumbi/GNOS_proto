@@ -11,15 +11,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.model.Product;
 
 public class ProductDAO {
 
-	private static final String SQL_LIST_ORDER_BY_ID = "select name, associated_model_id, child_expression_id from product_defn where project_id = ? ";
-	private static final String SQL_INSERT = "insert into product_defn (project_id, name, associated_model_id, child_expression_id) values (?, ?, ?, ?)";
+	private static final String SQL_LIST_ORDER_BY_ID = "select name, associated_model_id, child_unit_type, child_unit_id from product_defn where project_id = ? ";
+	private static final String SQL_INSERT = "insert into product_defn (project_id, name, associated_model_id, child_unit_type, child_unit_id) values (?, ?, ?, ?, ?)";
 	private static final String SQL_DELETE = "delete from product_defn where project_id = ?";
 	//private static final String SQL_UPDATE = "update product_defn set associated_model_id = ? , child_expression_id = ? where project_id = ? and name = ?";
 	
@@ -57,19 +56,30 @@ public class ProductDAO {
 		try ( Connection connection = DBManager.getConnection();
 				PreparedStatement statement = connection.prepareStatement(SQL_INSERT);
 			){
-			Set<Integer> expressionIdList = product.getExpressionIdList();
-			for(Integer expressionId: expressionIdList) {
+			for(Integer expressionId: product.getExpressionIdList()) {
 				
 				Object[] values = {
 						projectId,
 						product.getName(),
 						product.getModelId(),
+						Product.UNIT_EXPRESSION,
 						expressionId	
 				};
 				setValues(statement, values);
 				statement.executeUpdate();
 			}
-			
+			for(Integer fieldId: product.getFieldIdList()) {
+				
+				Object[] values = {
+						projectId,
+						product.getName(),
+						product.getModelId(),
+						Product.UNIT_FIELD,
+						fieldId	
+				};
+				setValues(statement, values);
+				statement.executeUpdate();
+			}
 
 			
 		} catch(SQLException e){
@@ -99,7 +109,14 @@ public class ProductDAO {
 			product.setModelId(rs.getInt("associated_model_id"));
 			
 		}
-		product.getExpressionIdList().add(rs.getInt("child_expression_id"));
+		short unitType = rs.getShort("child_unit_type");
+		int childUnitId = rs.getInt("child_unit_id");
+		if(unitType == Product.UNIT_FIELD) {
+			product.getFieldIdList().add(childUnitId);
+		} else {
+			product.getExpressionIdList().add(childUnitId);
+		}
+		
 		return product;
 	}
 }

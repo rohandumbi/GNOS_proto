@@ -13,8 +13,13 @@ public class FieldController {
 		dao = new FieldDAO();
 	}
 	
-	public List<Field> getAll(String projectId) {
-		return dao.getAll(Integer.parseInt(projectId));
+	public List<Field> getAll(String projectId, String datatype) {
+		if(datatype != null && datatype.trim().length() > 0) {
+			return dao.getAllByType(Integer.parseInt(projectId), Short.parseShort(datatype));
+		} else {
+			return dao.getAll(Integer.parseInt(projectId));
+		}
+		
 	}
 	
 	public Field create(JsonObject jsonObject, String pid) throws Exception {

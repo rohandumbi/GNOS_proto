@@ -84,7 +84,8 @@ CREATE TABLE models(
    id INT NOT NULL AUTO_INCREMENT,
    project_id INT NOT NULL,
    name  VARCHAR(100) NOT NULL,
-   expr_id INT NOT NULL,
+   unit_type TINYINT(1),
+   unit_id INT NOT NULL,
    filter_str VARCHAR(400),
    PRIMARY KEY ( id )
 );
@@ -166,7 +167,8 @@ CREATE TABLE product_defn(
   project_id INT NOT NULL,
   name  VARCHAR(100) NOT NULL,
   associated_model_id INT,
-  child_expression_id INT
+  child_unit_type TINYINT,
+  child_unit_id INT
 );
 
 DROP TABLE IF EXISTS product_join_defn; 

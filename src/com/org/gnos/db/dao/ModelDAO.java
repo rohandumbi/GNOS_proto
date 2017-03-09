@@ -14,10 +14,10 @@ import com.org.gnos.db.model.Model;
 
 public class ModelDAO {
 
-	private static final String SQL_LIST_ORDER_BY_ID = "select id, name, expr_id, filter_str from models where project_id = ? order by id";
-	private static final String SQL_INSERT = "insert into models (project_id, name, expr_id, filter_str) values (?, ?, ?, ?)";
+	private static final String SQL_LIST_ORDER_BY_ID = "select id, name, unit_type, unit_id, filter_str from models where project_id = ? order by id";
+	private static final String SQL_INSERT = "insert into models (project_id, name, unit_type, unit_id, filter_str) values (?, ?, ?, ?, ?)";
 	private static final String SQL_DELETE = "delete from models where id = ?";
-	private static final String SQL_UPDATE = "update models set expr_id= ? , filter_str = ? where id = ?";
+	private static final String SQL_UPDATE = "update models set unit_id= ?, unit_type = ? , filter_str = ? where id = ?";
 	
 	public List<Model> getAll(int projectId) {
 		
@@ -47,10 +47,17 @@ public class ModelDAO {
 		if (model.getId() != -1) {
             throw new IllegalArgumentException("Model is already created.");
         }
+		int unitId;
+		if(model.getUnitType() == Model.UNIT_FIELD) {
+			unitId = model.getFieldId();
+		} else {
+			unitId = model.getExpressionId();
+		}
 		Object[] values = {
 				projectId, 
 				model.getName(),
-				model.getExpressionId(),
+				model.getUnitType(),
+				unitId,
 				model.getCondition()
 	   };
 
@@ -82,9 +89,15 @@ public class ModelDAO {
 		if (model.getId() == -1) {
             throw new IllegalArgumentException("Expression is not created.");
         }
-		
+		int unitId;
+		if(model.getUnitType() == Model.UNIT_FIELD) {
+			unitId = model.getFieldId();
+		} else {
+			unitId = model.getExpressionId();
+		}
 		Object[] values = {
-				model.getExpressionId(),
+				unitId,
+				model.getUnitType(),
 				model.getCondition(),
 				model.getId()
 	   };
@@ -126,8 +139,13 @@ public class ModelDAO {
 		Model model = new Model();
 		model.setId(rs.getInt("id"));
 		model.setName(rs.getString("name"));
-		model.setExpressionId(rs.getInt("expr_id"));
 		model.setCondition(rs.getString("filter_str"));
+		model.setUnitType(rs.getShort("unit_type"));
+		if(model.getUnitType() == Model.UNIT_FIELD) {
+			model.setFieldId(rs.getInt("unit_id"));
+		} else if(model.getUnitType() == Model.UNIT_EXPRESSION) {
+			model.setExpressionId(rs.getInt("unit_id"));
+		}
 		
 		return model;
 	}

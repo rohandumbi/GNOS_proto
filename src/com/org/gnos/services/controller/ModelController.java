@@ -20,14 +20,19 @@ public class ModelController {
 	
 	public Model create(JsonObject jsonObject, String pid) throws Exception {
 		String name = jsonObject.get("name").getAsString();
-		int expressionId = jsonObject.get("expressionId").getAsInt();
+		short unitType = jsonObject.get("unitType").getAsShort();
+		int unitId = jsonObject.get("unitId").getAsInt();
 		String condition = null;
 		if(jsonObject.get("condition") !=null){
 			condition = jsonObject.get("condition").getAsString();
 		}
 		Model obj = new Model();
 		obj.setName(name);
-		obj.setExpressionId(expressionId);
+		if(unitType == Model.UNIT_FIELD) {
+			obj.setFieldId(unitId);
+		} else {
+			obj.setExpressionId(unitId);
+		}	
 		obj.setCondition(condition);	
 		boolean created = dao.create(obj, Integer.parseInt(pid));
 		if(created) return obj;
@@ -37,7 +42,8 @@ public class ModelController {
 	
 	public Model update(JsonObject jsonObject, String id) throws Exception {		
 		String name = jsonObject.get("name").getAsString();
-		int expressionId = jsonObject.get("expressionId").getAsInt();
+		short unitType = jsonObject.get("unitType").getAsShort();
+		int unitId = jsonObject.get("unitId").getAsInt();
 		String condition = null;
 		if(jsonObject.get("condition") !=null){
 			condition = jsonObject.get("condition").getAsString();
@@ -45,7 +51,11 @@ public class ModelController {
 		Model obj = new Model();
 		obj.setId(Integer.parseInt(id));
 		obj.setName(name);
-		obj.setExpressionId(expressionId);
+		if(unitType == Model.UNIT_FIELD) {
+			obj.setFieldId(unitId);
+		} else {
+			obj.setExpressionId(unitId);
+		}
 		obj.setCondition(condition);
 		boolean created = dao.update(obj );
 		if(created) return obj;

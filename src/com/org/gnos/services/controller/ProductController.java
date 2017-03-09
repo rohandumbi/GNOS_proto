@@ -22,11 +22,17 @@ public class ProductController {
 	public Product create(JsonObject jsonObject, String projectId) throws Exception {
 		String name = jsonObject.get("name").getAsString();
 		int modelId = jsonObject.get("modelId").getAsInt();
-		int expressionId =  jsonObject.get("expressionId").getAsInt();
+		short unitType = jsonObject.get("unitType").getAsShort();
+		int unitId =  jsonObject.get("unitId").getAsInt();
 		Product obj = new Product();
 		obj.setName(name);
 		obj.setModelId(modelId);
-		obj.getExpressionIdList().add(expressionId);
+		if(unitType == Product.UNIT_FIELD) {
+			obj.getFieldIdList().add(unitId);
+		} else {
+			obj.getExpressionIdList().add(unitId);
+		}
+		
 		boolean created = dao.create(obj, Integer.parseInt(projectId));
 		if(created) return obj;
 		throw new Exception();

@@ -21,7 +21,7 @@ public class FieldEndpoint {
 	
 	public FieldEndpoint() {
 		controller = new FieldController();
-		get("/project/:id/fields", (req, res) -> controller.getAll(req.params(":id")), json());
+		get("/project/:id/fields", (req, res) -> controller.getAll(req.params(":id"), req.queryParams("datatype")), json());
 		
 		post("/project/:id/fields", new Route() {
 			
