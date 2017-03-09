@@ -13,6 +13,7 @@ public class SPBlock {
 	double tonnesWt;
 	double lasttonnesWt;
 	double reclaimedTonnesWt;
+	private Map<String, BigDecimal> unitFields;
 	private Map<String, BigDecimal> computedFields;
 	private Map<String, BigDecimal> gradeFields;
 	int payload;
@@ -22,6 +23,7 @@ public class SPBlock {
 	public SPBlock() {
 		tonnesWt = 0.0;
 		computedFields = new HashMap<String, BigDecimal>();
+		unitFields = new HashMap<String, BigDecimal>(); 
 		gradeFields = new HashMap<String, BigDecimal>(); 
 		processes = new HashSet<Process>();
 	}
@@ -57,11 +59,26 @@ public class SPBlock {
 		if(val == null ) return new BigDecimal(0);
 		else return val;
 	}
-	
+		
 	public void setGradeFields(Map<String, BigDecimal> gradeFields) {
 		this.gradeFields = gradeFields;
 	}
 
+	
+	public Map<String, BigDecimal> getUnitFields() {
+		return unitFields;
+	}
+
+	public void setUnitFields(Map<String, BigDecimal> unitFields) {
+		this.unitFields = unitFields;
+	}
+
+	public BigDecimal getUnitField(String fieldName) {
+		BigDecimal val = this.unitFields.get(fieldName);
+		if(val == null ) return new BigDecimal(0);
+		else return val;
+	}
+	
 	public int getPayload() {
 		return payload;
 	}

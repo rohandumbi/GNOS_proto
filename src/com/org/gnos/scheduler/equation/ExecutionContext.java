@@ -27,6 +27,7 @@ import com.org.gnos.db.dao.CycleTimeFieldMappingDAO;
 import com.org.gnos.db.dao.DumpDAO;
 import com.org.gnos.db.dao.DumpDependencyDAO;
 import com.org.gnos.db.dao.ExpressionDAO;
+import com.org.gnos.db.dao.FieldDAO;
 import com.org.gnos.db.dao.FixedCostDAO;
 import com.org.gnos.db.dao.GradeConstraintDAO;
 import com.org.gnos.db.dao.GradeDAO;
@@ -49,6 +50,7 @@ import com.org.gnos.db.model.CycleTimeFieldMapping;
 import com.org.gnos.db.model.Dump;
 import com.org.gnos.db.model.DumpDependencyData;
 import com.org.gnos.db.model.Expression;
+import com.org.gnos.db.model.Field;
 import com.org.gnos.db.model.FixedOpexCost;
 import com.org.gnos.db.model.Grade;
 import com.org.gnos.db.model.GradeConstraintData;
@@ -85,6 +87,7 @@ public class ExecutionContext {
 
 	/* Data */
 
+	private List<Field> fields;
 	private List<PitGroup> pitGroups;
 	private List<Stockpile> stockpiles;
 	private List<Dump> dumps;
@@ -124,14 +127,14 @@ public class ExecutionContext {
 	public ExecutionContext(int projectId, int scenarioId) {
 		this.projectId = projectId;
 		this.scenarioId = scenarioId;
-
+		loadFields();
 		loadRequiredFields();
 		loadBlocks();
 		loadProject();
 		loadScenario();
 	}
 
-	private void loadProject() {	
+	private void loadProject() {
 		loadExpressions();
 		loadModels();
 		loadProcesses();
@@ -148,6 +151,9 @@ public class ExecutionContext {
 		loadCycleTimeFieldMapping();
 	}
 
+	private void loadFields() {
+		fields = new FieldDAO().getAll(projectId);
+	}
 	private void loadRequiredFields() {
 		List<RequiredField> requiredFields = new RequiredFieldDAO().getAll(projectId);
 		for (RequiredField requiredField : requiredFields) {
@@ -405,6 +411,16 @@ public class ExecutionContext {
 
 	// Helper methods
 
+	public Field getFieldById(int id) {
+		if (fields == null)
+			return null;
+		for (Field field : fields) {
+			if (field.getId() == id) {
+				return field;
+			}
+		}
+		return null;
+	}
 	public Expression getExpressionByName(String name) {
 		if (expressions == null || name == null)
 			return null;
@@ -416,6 +432,7 @@ public class ExecutionContext {
 		return null;
 	}
 
+	
 	public Expression getExpressionById(int id) {
 		if (expressions == null)
 			return null;
@@ -553,12 +570,21 @@ public class ExecutionContext {
 	}
 	
 	public BigDecimal getUnitValueforBlock(Block b, int unitId, short unitType) {
-		/*String expressionName = expr.getName().replaceAll("\\s+", "_");
-		return b.getComputedField(expressionName);*/
-		
-		return null;
+		if(unitType == 1) { // 1- Field, 2 - Expression
+			Field field = getFieldById(unitId);
+			try {
+				BigDecimal value = new BigDecimal(b.getField(field.getName()));
+				return value;
+			} catch(Exception e) {
+				return null;
+			}
+		} else {
+			Expression expression = getExpressionById(unitId);
+			String expressionName = expression.getName().replaceAll("\\s+", "_");
+			return b.getComputedField(expressionName);
+		}
 	}
-
+	
 	public BigDecimal getExpressionValueforBlock(Block b, Expression expr) {
 		String expressionName = expr.getName().replaceAll("\\s+", "_");
 		return b.getComputedField(expressionName);

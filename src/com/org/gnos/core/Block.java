@@ -58,6 +58,10 @@ public class Block {
 		return computedFields;
 	}
 	
+	public Map<String, String> getFields() {
+		return fields;
+	}
+
 	public String getField(String fieldName) {
 		return this.fields.get(fieldName);
 	}
