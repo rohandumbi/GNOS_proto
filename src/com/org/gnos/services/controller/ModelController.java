@@ -33,6 +33,7 @@ public class ModelController {
 		} else {
 			obj.setExpressionId(unitId);
 		}	
+		obj.setUnitType(unitType);
 		obj.setCondition(condition);	
 		boolean created = dao.create(obj, Integer.parseInt(pid));
 		if(created) return obj;
@@ -56,6 +57,7 @@ public class ModelController {
 		} else {
 			obj.setExpressionId(unitId);
 		}
+		obj.setUnitType(unitType);
 		obj.setCondition(condition);
 		boolean created = dao.update(obj );
 		if(created) return obj;
