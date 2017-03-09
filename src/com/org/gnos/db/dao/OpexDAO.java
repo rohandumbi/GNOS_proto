@@ -195,6 +195,7 @@ public class OpexDAO {
 			od.setRevenue(rs.getBoolean("is_revenue"));
 			
 			short unitType = rs.getShort("unit_type");
+			od.setUnitType(unitType);
 			if(unitType == OpexData.UNIT_FIELD) {
 				od.setFieldId(rs.getInt("unit_id"));
 			} else {

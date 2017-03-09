@@ -33,6 +33,7 @@ public class OpexController {
 		obj.setModelId(modelId);
 		obj.setInUse(inUse);
 		obj.setRevenue(isRevenue);
+		//obj.setUnitType(unitType);
 		
 		if(unitType == Model.UNIT_FIELD) {
 			obj.setFieldId(unitId);
@@ -61,6 +62,7 @@ public class OpexController {
 		obj.setModelId(modelId);
 		obj.setInUse(inUse);
 		obj.setRevenue(isRevenue);
+		obj.setUnitType(unitType);
 		
 		if(unitType == Model.UNIT_FIELD) {
 			obj.setFieldId(unitId);
