@@ -16,6 +16,7 @@ public class FieldDAO {
 
 	private static final String SQL_LIST_ORDER_BY_ID = "select  id, name, data_type, weighted_unit from  fields where project_id =  ? order by id";
 	private static final String SQL_LIST_BY_TYPE_ORDER_BY_ID = "select  id, name, data_type, weighted_unit from  fields where project_id =  ? and data_type = ? order by id";
+	private static final String SQL_LIST_BY_WEIGHTED_UNIT = "select  id, name, data_type, weighted_unit from  fields where project_id =  ? and data_type = 4 and weighted_unit = ? order by id";
 	private static final String SQL_INSERT = "insert into fields (project_id, name, data_type, weighted_unit) values (?, ?, ?, ?)";
 	private static final String SQL_DELETE = "delete from fields where id = ?";
 	private static final String SQL_UPDATE = "update fields set data_type = ?, weighted_unit = ? where id = ?";
@@ -50,6 +51,27 @@ public class FieldDAO {
 		try (
 				Connection connection = DBManager.getConnection();
 	            PreparedStatement statement = prepareStatement(connection, SQL_LIST_BY_TYPE_ORDER_BY_ID, false, values);
+	            ResultSet resultSet = statement.executeQuery();
+			){
+			while(resultSet.next()){
+				fields.add(map(resultSet));
+			}
+			
+		} catch(SQLException e){
+			e.printStackTrace();
+		}
+		return fields;
+	}
+	
+	public List<Field> getAllByWeightedUnit(int projectId, String weightedUnit) {
+		List<Field> fields = new ArrayList<Field>();
+		Object[] values = {
+				projectId,
+				weightedUnit
+	   };
+		try (
+				Connection connection = DBManager.getConnection();
+	            PreparedStatement statement = prepareStatement(connection, SQL_LIST_BY_WEIGHTED_UNIT, false, values);
 	            ResultSet resultSet = statement.executeQuery();
 			){
 			while(resultSet.next()){

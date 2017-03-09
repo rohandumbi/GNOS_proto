@@ -18,6 +18,7 @@ import com.org.gnos.db.model.Product;
 public class ProductDAO {
 
 	private static final String SQL_LIST_ORDER_BY_ID = "select name, associated_model_id, child_unit_type, child_unit_id from product_defn where project_id = ? ";
+	private static final String SQL_GET_PRODUCT_BY_NAME = "select name, associated_model_id, child_unit_type, child_unit_id from product_defn where project_id = ? and name = ?";
 	private static final String SQL_INSERT = "insert into product_defn (project_id, name, associated_model_id, child_unit_type, child_unit_id) values (?, ?, ?, ?, ?)";
 	private static final String SQL_DELETE = "delete from product_defn where project_id = ?";
 	//private static final String SQL_UPDATE = "update product_defn set associated_model_id = ? , child_expression_id = ? where project_id = ? and name = ?";
@@ -51,6 +52,31 @@ public class ProductDAO {
 		return productList;
 	}
 
+	public Product get(int projectId, String productName) {
+
+		Product product = null;
+		Object[] values = { projectId, productName };
+
+		try(
+			Connection connection = DBManager.getConnection();
+			PreparedStatement statement = prepareStatement(connection, SQL_GET_PRODUCT_BY_NAME, false, values);
+			ResultSet resultSet = statement.executeQuery();
+		){
+			while(resultSet.next()){
+				if(product == null) {
+					product = map(resultSet, product );
+				} else {
+					map(resultSet, product );
+				}
+			}
+
+		} catch(SQLException e){
+			e.printStackTrace();
+		}
+
+		return product;
+	}
+	
 	public boolean create(Product product, int projectId){
 
 		try ( Connection connection = DBManager.getConnection();

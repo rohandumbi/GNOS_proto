@@ -12,6 +12,7 @@ import java.util.List;
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.model.Grade;
 
+@Deprecated
 public class GradeDAO {
 
 	private static final String SQL_LIST_ORDER_BY_ID = "select id, name, product_name, type, mapped_name from grade where project_id = ? order by id ";
@@ -58,13 +59,13 @@ public class GradeDAO {
                 //throw new DAOException("Creating user failed, no rows affected.");
             }
             
-            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+            /*try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     grade.setId(generatedKeys.getInt(1));
                 } else {
                     //throw new DAOException("Creating user failed, no generated key obtained.");
                 }
-            }
+            }*/
 			
 
 			
@@ -90,7 +91,7 @@ public class GradeDAO {
 
 	private Grade map(ResultSet rs) throws SQLException {
 		Grade grade = new Grade();
-		grade.setId(rs.getInt("id"));
+		//grade.setId(rs.getInt("id"));
 		grade.setName(rs.getString("name"));
 		grade.setProductName(rs.getString("product_name"));
 		grade.setType(rs.getShort("type"));

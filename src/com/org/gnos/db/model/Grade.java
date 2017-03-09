@@ -4,25 +4,11 @@ public class Grade {
 
 	public static final short GRADE_FIELD = 1;
 	public static final short GRADE_EXPRESSION = 2;
-	
-	private int id;
+
 	private String productName;
 	private String name;
 	private short type;
 	private String mappedName;
-	
-	public Grade(){
-		super();
-		this.id = -1;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
 
 	public String getProductName() {
 		return productName;

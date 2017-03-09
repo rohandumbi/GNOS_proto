@@ -25,6 +25,8 @@ public class ProductEndpoint {
 		
 		get("/project/:id/products", (req, res) -> controller.getAll(req.params(":id")), json());
 		
+		get("/project/:id/product/:name/grades", (req, res) -> controller.getAllGrades(req.params(":id"), req.params("name")), json());
+		
 		post("/project/:id/products", new Route() {
 			
 			@Override
