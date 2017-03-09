@@ -11,7 +11,6 @@ import com.org.gnos.core.Pit;
 import com.org.gnos.db.model.CapexData;
 import com.org.gnos.db.model.CapexInstance;
 import com.org.gnos.db.model.Dump;
-import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.PitGroup;
 import com.org.gnos.db.model.Process;
@@ -147,12 +146,17 @@ public class CapexEquationGenerator extends EquationGenerator{
 			int count = 0;
 			for(Process p: processList){
 				List<Block> blocks = p.getBlocks();
-				Expression exp = context.getExpressionById(p.getModel().getExpressionId());
+				int unitId;
+				if(p.getModel().getUnitType() == Model.UNIT_FIELD) {
+					unitId = p.getModel().getFieldId();
+				} else {
+					unitId = p.getModel().getExpressionId();
+				}
 				for(Block b: blocks){
 					if(count > 0){
 						sb.append(" + ");
 					}
-					sb.append(context.getExpressionValueforBlock(b, exp)+"p"+b.getPitNo()+"x"+b.getBlockNo()+"p"+p.getProcessNo()+"t"+i);
+					sb.append(context.getUnitValueforBlock(b, unitId, p.getModel().getUnitType())+"p"+b.getPitNo()+"x"+b.getBlockNo()+"p"+p.getProcessNo()+"t"+i);
 					count ++;
 					if(context.isSpReclaimEnabled() && context.isGlobalMode() && timePeriodStart > 1) {
 						int stockpileNo = getStockpileNoForReclaim(b);
@@ -160,7 +164,7 @@ public class CapexEquationGenerator extends EquationGenerator{
 							if(count > 0){
 								sb.append(" + ");
 							}
-							sb.append(context.getExpressionValueforBlock(b, exp)+"sp"+stockpileNo+"x"+b.getBlockNo()+"p"+p.getProcessNo()+"t"+i);
+							sb.append(context.getUnitValueforBlock(b, unitId, p.getModel().getUnitType())+"sp"+stockpileNo+"x"+b.getBlockNo()+"p"+p.getProcessNo()+"t"+i);
 							count ++;
 						}					
 					}
@@ -180,7 +184,7 @@ public class CapexEquationGenerator extends EquationGenerator{
 								if(count > 0){
 									sb.append(" + ");
 								}
-								sb.append(swctx.getExpressionValueforBlock(spb, exp)+"sp"+spNo+"x0p"+p.getProcessNo()+"t"+i);
+								sb.append(swctx.getUnitValueforBlock(spb, unitId, p.getModel().getUnitType())+"sp"+spNo+"x0p"+p.getProcessNo()+"t"+i);
 								count ++;
 							}
 						}
@@ -217,13 +221,18 @@ public class CapexEquationGenerator extends EquationGenerator{
 			int count = 0;
 			for( Process p: processList){
 				List<Block> blocks = p.getBlocks();
-				Expression exp =  context.getExpressionById(p.getModel().getExpressionId());
+				int unitId;
+				if(p.getModel().getUnitType() == Model.UNIT_FIELD) {
+					unitId = p.getModel().getFieldId();
+				} else {
+					unitId = p.getModel().getExpressionId();
+				}
 				for(Block b: blocks){
 					if(!pitnumberList.contains(b.getPitNo())) continue;
 					if(count > 0){
 						sb.append(" + ");
 					}
-					sb.append(context.getExpressionValueforBlock(b, exp)+"p"+b.getPitNo()+"x"+b.getBlockNo()+"p"+p.getProcessNo()+"t"+i);
+					sb.append(context.getUnitValueforBlock(b, unitId, p.getModel().getUnitType())+"p"+b.getPitNo()+"x"+b.getBlockNo()+"p"+p.getProcessNo()+"t"+i);
 					count ++;
 				}
 			}

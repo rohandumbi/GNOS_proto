@@ -9,7 +9,9 @@ import java.util.Map;
 import java.util.Set;
 
 import com.org.gnos.core.Block;
+import com.org.gnos.db.dao.FieldDAO;
 import com.org.gnos.db.model.Expression;
+import com.org.gnos.db.model.Field;
 
 public class SlidingWindowExecutionContext extends ExecutionContext {
 
@@ -91,6 +93,23 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 	public BigDecimal getExpressionValueforBlock(SPBlock spb, String exprName) {
 		String expressionName = exprName.replaceAll("\\s+","_");			
 		return spb.getComputedField(expressionName);		
+	}
+	
+
+	public BigDecimal getUnitValueforBlock(SPBlock spb, int unitId, short unitType) {
+		if(unitType == 1) { // 1- Field, 2 - Expression
+			Field field = getFieldById(unitId);
+			try {
+				BigDecimal value = spb.getUnitField(field.getName());
+				return value;
+			} catch(Exception e) {
+				return null;
+			}
+		} else {
+			Expression expression = getExpressionById(unitId);
+			String expressionName = expression.getName().replaceAll("\\s+", "_");
+			return spb.getComputedField(expressionName);
+		}
 	}
 	@Override
 	public boolean isGlobalMode() {
@@ -224,6 +243,20 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 					}
 					
 				}
+				// Calculate unit fields 
+				Map<String, BigDecimal> spblockunitFields = spb.getUnitFields();
+				
+				List<Field> unitFields = new FieldDAO().getAllByType(this.getProjectId(), Field.TYPE_UNIT);
+				Map<String, String> allFields = b.getFields();
+				for(Field field: unitFields) {
+					BigDecimal fieldVal = new BigDecimal(allFields.get(field.getName()));
+					fieldVal = fieldVal.multiply(new BigDecimal(ratio));
+					BigDecimal existingVal = spblockunitFields.get(field.getName());
+					if(existingVal != null) {
+						fieldVal = fieldVal.add(existingVal);
+					}
+					spblockcomputedFields.put(field.getName(), fieldVal);				
+				}
 				// calculate grade fields
 				Map<String, BigDecimal> spbgradeFields = spb.getGradeFields();
 				double totalBlockTonnage = Double.valueOf(b.getField(tonnesWtFieldName));
@@ -255,9 +288,11 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 		double spbratio = (spb.getLasttonnesWt() - spb.getReclaimedTonnesWt())/spb.getTonnesWt();
 		double spbremainingratio = (spb.getLasttonnesWt() - spb.getReclaimedTonnesWt())/spb.getLasttonnesWt();
 		Map<String, BigDecimal> spbcomputedFields = spb.getComputedFields();
+		Map<String, BigDecimal> spbunitFields = spb.getUnitFields();
 		Map<String, BigDecimal> gradeFields = spb.getGradeFields();
 		Set<String> computedfieldNames = spbcomputedFields.keySet();
 		Set<String> gradefieldNames = gradeFields.keySet();
+		Set<String> spbunitFieldNames = spbunitFields.keySet();
 		for(String fieldName: computedfieldNames) {
 			BigDecimal fieldVal = spbcomputedFields.get(fieldName);
 			if(fieldVal != null) {
@@ -272,6 +307,13 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 				spbcomputedFields.put(fieldName, fieldVal);
 			}
 			
+		}
+		for(String fieldName: spbunitFieldNames) {
+			BigDecimal fieldVal = spbunitFields.get(fieldName);
+			if(fieldVal != null) {
+				fieldVal = fieldVal.multiply(new BigDecimal(spbratio));
+				spbunitFields.put(fieldName, fieldVal);
+			}		
 		}
 	}
 	private void processGrades(SPBlock spb, Set<String> gradeExprs) {
