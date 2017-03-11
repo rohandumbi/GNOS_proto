@@ -115,8 +115,8 @@ public class ProductJoinDAO {
 	public void deleteAll(int projectId, String productJoinName){
 		
 		Object[] values = { 
-				projectId,
-				productJoinName
+				projectId
+				/*productJoinName*/
 		};
 
 	        try (
