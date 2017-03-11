@@ -23,6 +23,8 @@ public class FieldEndpoint {
 		controller = new FieldController();
 		get("/project/:id/fields", (req, res) -> controller.getAll(req.params(":id"), req.queryParams("datatype")), json());
 		
+		get("/project/:id/cycletimefields", (req, res) -> controller.getAllCycletimeFields(req.params(":id")), json());
+		
 		post("/project/:id/fields", new Route() {
 			
 			@Override

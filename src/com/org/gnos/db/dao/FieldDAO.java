@@ -10,11 +10,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.org.gnos.db.DBManager;
+import com.org.gnos.db.model.CycletimeField;
 import com.org.gnos.db.model.Field;
 
 public class FieldDAO {
 
 	private static final String SQL_LIST_ORDER_BY_ID = "select  id, name, data_type, weighted_unit from  fields where project_id =  ? order by id";
+	private static final String SQL_CYCLETIME_FIELD_LIST_ORDER_BY_ID = "select  id, name from cycle_time_fields where project_id =  ? order by id";
 	private static final String SQL_LIST_BY_TYPE_ORDER_BY_ID = "select  id, name, data_type, weighted_unit from  fields where project_id =  ? and data_type = ? order by id";
 	private static final String SQL_LIST_BY_WEIGHTED_UNIT = "select  id, name, data_type, weighted_unit from  fields where project_id =  ? and data_type = 4 and weighted_unit = ? order by id";
 	private static final String SQL_INSERT = "insert into fields (project_id, name, data_type, weighted_unit) values (?, ?, ?, ?)";
@@ -34,6 +36,26 @@ public class FieldDAO {
 			){
 			while(resultSet.next()){
 				fields.add(map(resultSet));
+			}
+			
+		} catch(SQLException e){
+			e.printStackTrace();
+		}
+		return fields;
+	}
+	
+	public List<CycletimeField> getAllCycletimeFields(int projectId) {
+		List<CycletimeField> fields = new ArrayList<CycletimeField>();
+		Object[] values = {
+				projectId
+	   };
+		try (
+				Connection connection = DBManager.getConnection();
+	            PreparedStatement statement = prepareStatement(connection, SQL_CYCLETIME_FIELD_LIST_ORDER_BY_ID, false, values);
+	            ResultSet resultSet = statement.executeQuery();
+			){
+			while(resultSet.next()){
+				fields.add(mapCTFields(resultSet));
 			}
 			
 		} catch(SQLException e){
@@ -170,6 +192,12 @@ public class FieldDAO {
 		field.setDataType(rs.getShort("data_type"));
 		field.setWeightedUnit(rs.getString("weighted_unit"));
 		
+		return field;
+	}
+	
+	private CycletimeField mapCTFields(ResultSet rs)throws SQLException {
+		CycletimeField field = new CycletimeField(rs.getString("name"));
+		field.setId(rs.getInt("id"));
 		return field;
 	}
 }

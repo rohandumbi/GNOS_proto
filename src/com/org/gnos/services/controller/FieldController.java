@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.google.gson.JsonObject;
 import com.org.gnos.db.dao.FieldDAO;
+import com.org.gnos.db.model.CycletimeField;
 import com.org.gnos.db.model.Field;
 
 public class FieldController {
@@ -20,6 +21,10 @@ public class FieldController {
 			return dao.getAll(Integer.parseInt(projectId));
 		}
 		
+	}
+	
+	public List<CycletimeField> getAllCycletimeFields(String projectId) {
+		return dao.getAllCycletimeFields(Integer.parseInt(projectId));		
 	}
 	
 	public Field create(JsonObject jsonObject, String pid) throws Exception {
