@@ -17,8 +17,8 @@ public class CycleTimeFieldMappingDAO {
 	private static final String SQL_LIST_ORDER_BY_ID = "select  field_name, mapping_type, mapped_field_name from  cycletime_field_mapping where project_id =  ? ";
 	private static final String SQL_INSERT = "insert into cycletime_field_mapping (project_id, field_name, mapping_type, mapped_field_name) values (?, ?, ?, ?)";
 	private static final String SQL_DELETE_ALL = "delete from cycletime_field_mapping where project_id = ?";
-	private static final String SQL_DELETE = "delete from cycletime_field_mapping where project_id = ? and field_name ? and mapping_type = ? ";
-	private static final String SQL_UPDATE = "update cycletime_field_mapping set mapped_field_name = ?  where project_id = ? and field_name ? and mapping_type = ? ";
+	private static final String SQL_DELETE = "delete from cycletime_field_mapping where project_id = ? and field_name = ? and mapping_type = ? ";
+	private static final String SQL_UPDATE = "update cycletime_field_mapping set mapped_field_name = ?  where project_id = ? and field_name = ? and mapping_type = ? ";
 	
 	
 	public List<CycleTimeFieldMapping> getAll(int projectId) {
