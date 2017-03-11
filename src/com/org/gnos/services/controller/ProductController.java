@@ -79,6 +79,11 @@ public class ProductController {
 	}
 
 	private Field getFieldById(Integer fieldId, List<Field> fields) {
+		for(Field field: fields){
+			if(field.getId() == fieldId){
+				return field;
+			}
+		}
 		return null;
 	}
 
