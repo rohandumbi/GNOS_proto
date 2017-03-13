@@ -22,7 +22,7 @@ public class CycleFixedTimeDAO {
 		Object[] values = {
 				projectId
 	   };
-		BigDecimal truckHourFixedTime = new BigDecimal(0);
+		BigDecimal truckHourFixedTime = new BigDecimal(-1);
 		try (
 				Connection connection = DBManager.getConnection();
 	            PreparedStatement statement = prepareStatement(connection, SQL_LIST_ORDER_BY_ID, false, values);
