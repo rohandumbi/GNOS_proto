@@ -75,6 +75,11 @@ public class ProductController {
 	}
 	
 	private Expression getExpressionById(Integer expressionId, List<Expression> expressions) {
+		for(Expression expression: expressions){
+			if(expression.getId() == expressionId){
+				return expression;
+			}
+		}
 		return null;
 	}
 
