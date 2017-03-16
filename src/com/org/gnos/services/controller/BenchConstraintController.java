@@ -30,7 +30,7 @@ public class BenchConstraintController {
 		obj.setInUse(inUse);
 		
 		for (Entry<String, JsonElement> constraintData : constraintDataObj.entrySet()) {
-			obj.addYear(Integer.parseInt(constraintData.getKey()), constraintData.getValue().getAsInt());
+			obj.addYear(Integer.parseInt(constraintData.getKey()), constraintData.getValue().getAsFloat());
 		}
 		boolean created = dao.create(obj, Integer.parseInt(scenarioIdStr));
 		if(created) return obj;
@@ -49,7 +49,7 @@ public class BenchConstraintController {
 		obj.setInUse(inUse);
 		
 		for (Entry<String, JsonElement> constraintData : constraintDataObj.entrySet()) {
-			obj.addYear(Integer.parseInt(constraintData.getKey()), constraintData.getValue().getAsInt());
+			obj.addYear(Integer.parseInt(constraintData.getKey()), constraintData.getValue().getAsFloat());
 		}
 		
 		boolean created = dao.update(obj);

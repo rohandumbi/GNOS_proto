@@ -287,7 +287,7 @@ DROP TABLE IF EXISTS bench_constraint_year_mapping;
 CREATE TABLE bench_constraint_year_mapping(
    bench_constraint_id INT NOT NULL,
    year INT NOT NULL,
-   value INT NOT NULL,
+   value FLOAT NOT NULL,
    unique key( bench_constraint_id, year)
 );
 

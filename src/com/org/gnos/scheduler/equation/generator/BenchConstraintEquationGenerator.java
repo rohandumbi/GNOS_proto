@@ -103,7 +103,7 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 			Pit pit = context.getPitNameMap().get(pitName);
 			exclusionList.add(pit.getPitNo());
 			for(int i=timePeriodStart; i<= timePeriodEnd; i++){
-				int yearvalue = pitBenchConstraintData.getConstraintData().get(startyear+ i-1);
+				float yearvalue = pitBenchConstraintData.getConstraintData().get(startyear+ i-1);
 				buildEquationForPit(pit, i, yearvalue);
 			}
 			
@@ -117,14 +117,14 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 				
 				Pit pit = pits.get(pitNo);
 				for(int i=timePeriodStart; i<= timePeriodEnd; i++){
-					int yearvalue = defaultConstraint.getConstraintData().get(startyear+ i-1);
+					float yearvalue = defaultConstraint.getConstraintData().get(startyear+ i-1);
 					buildEquationForPit(pit, i, yearvalue);
 				}
 			}
 		}
 	}
 	
-	private void buildEquationForPit(Pit pit, int timeperiod, int yearvalue){
+	private void buildEquationForPit(Pit pit, int timeperiod, float yearvalue){
 		StringBuilder sb1 = new StringBuilder();
 		StringBuilder sb2 = new StringBuilder();
 		Set<Bench> benches = pit.getBenches();

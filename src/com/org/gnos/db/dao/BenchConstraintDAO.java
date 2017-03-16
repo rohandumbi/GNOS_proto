@@ -86,7 +86,7 @@ public class BenchConstraintDAO {
                 }
             }
             if(pcd.getId() > 0) {
-            	Map<Integer, Integer> yearValueMapping = pcd.getConstraintData();
+            	Map<Integer, Float> yearValueMapping = pcd.getConstraintData();
             	for(Integer year: yearValueMapping.keySet()){
             		try {
             			Object[] yearvalues = {
@@ -128,7 +128,7 @@ public class BenchConstraintDAO {
 			
 			statement.executeUpdate();        
 			if(pcd.getId() > 0) {
-            	Map<Integer, Integer> yearValueMapping = pcd.getConstraintData();
+            	Map<Integer, Float> yearValueMapping = pcd.getConstraintData();
             	for(Integer year: yearValueMapping.keySet()){
             		try {
             			Object[] yearvalues = {
@@ -186,7 +186,7 @@ public class BenchConstraintDAO {
 			pcd.setPitName(rs.getString("pit_name"));
 			pcd.setInUse(rs.getBoolean("in_use"));			
 		}	
-		pcd.addYear(rs.getInt("year"), rs.getInt("value"));	
+		pcd.addYear(rs.getInt("year"), rs.getFloat("value"));	
 		
 		return pcd;
 	}
