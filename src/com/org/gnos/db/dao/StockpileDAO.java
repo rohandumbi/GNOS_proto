@@ -31,8 +31,12 @@ public class StockpileDAO {
 			PreparedStatement statement = prepareStatement(connection, SQL_LIST_ORDER_BY_ID, false, values);
 			ResultSet resultSet = statement.executeQuery();
 		){
+			int count = 1;
 			while(resultSet.next()){
-				stockpiles.add(map(resultSet));				
+				Stockpile sp = map(resultSet);
+				sp.setStockpileNumber(count);
+				stockpiles.add(sp);
+				count++;
 			}
 
 		} catch(SQLException e){

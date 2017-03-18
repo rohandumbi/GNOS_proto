@@ -85,7 +85,7 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 	public void setSpBlockMapping(Map<Integer, SPBlock> spBlockMapping) {
 		this.spBlockMapping = spBlockMapping;
 	}
-	public BigDecimal getExpressionValueforBlock(SPBlock spb, Expression expr) {
+/*	public BigDecimal getExpressionValueforBlock(SPBlock spb, Expression expr) {
 		String expressionName = expr.getName().replaceAll("\\s+","_");			
 		return spb.getComputedField(expressionName);		
 	}
@@ -94,7 +94,7 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 		String expressionName = exprName.replaceAll("\\s+","_");			
 		return spb.getComputedField(expressionName);		
 	}
-	
+	*/
 
 	public BigDecimal getUnitValueforBlock(SPBlock spb, int unitId, short unitType) {
 		if(unitType == 1) { // 1- Field, 2 - Expression
@@ -111,6 +111,20 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 			return spb.getComputedField(expressionName);
 		}
 	}
+	
+	public BigDecimal getUnitValueforBlock(SPBlock spb, String unitName, short unitType) {
+		if(unitType == 1) { // 1- Field, 2 - Expression
+			try {
+				BigDecimal value = spb.getUnitField(unitName);
+				return value;
+			} catch(Exception e) {
+				return null;
+			}
+		} else {
+			return spb.getComputedField(unitName);
+		}
+	}
+	
 	@Override
 	public boolean isGlobalMode() {
 		return false;
@@ -255,7 +269,7 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 					if(existingVal != null) {
 						fieldVal = fieldVal.add(existingVal);
 					}
-					spblockcomputedFields.put(field.getName(), fieldVal);				
+					spblockunitFields.put(field.getName(), fieldVal);				
 				}
 				// calculate grade fields
 				Map<String, BigDecimal> spbgradeFields = spb.getGradeFields();
@@ -274,6 +288,7 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 					//System.out.format("Sp No: %s, block No: %s, fieldName: %s, value: %s \n", spNo, blockNo, fieldName, gradeVal);
 				}
 				spb.setComputedFields(spblockcomputedFields);
+				spb.setUnitFields(spblockunitFields);
 				spb.getProcesses().addAll(b.getProcesses());
 			}
 			processGrades(spb, gradeExprs);

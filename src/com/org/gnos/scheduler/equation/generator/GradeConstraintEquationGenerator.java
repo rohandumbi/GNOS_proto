@@ -10,6 +10,7 @@ import java.util.Set;
 import com.org.gnos.core.Block;
 import com.org.gnos.core.Pit;
 import com.org.gnos.db.model.Expression;
+import com.org.gnos.db.model.Field;
 import com.org.gnos.db.model.Grade;
 import com.org.gnos.db.model.GradeConstraintData;
 import com.org.gnos.db.model.Model;
@@ -52,7 +53,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 			if(!gradeConstraintData.isInUse()) continue;
 			int selectorType = gradeConstraintData.getSelectionType();
 			String selectedGradeName = gradeConstraintData.getSelectedGradeName();
-			Map<String, List<String>> processExprMap = new HashMap<String, List<String>>();
+			Map<String, List<Object>> processExprMap = new HashMap<String, List<Object>>();
 			Map<String, List<Grade>> processGradeMap = new HashMap<String, List<Grade>>();
 			ProductJoin pj = context.getProductJoinFromName(gradeConstraintData.getProductJoinName());
 			if(pj == null || pj.getGradeNames().size() == 0) continue;		
@@ -70,14 +71,19 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 				Product p = context.getProductFromName(productName);
 				Integer processId = p.getModelId();
 				String processName = context.getModelById(processId).getName();
-				List<String> coefficients = processExprMap.get(processName);
+				List<Object> coefficients = processExprMap.get(processName);
 				if(coefficients == null){
-					coefficients = new ArrayList<String>();
+					coefficients = new ArrayList<Object>();
 					processExprMap.put(processName, coefficients);
 				}
 				for(Integer eid : p.getExpressionIdList()){
 					Expression e = context.getExpressionById(eid);
-					coefficients.add(e.getName());
+					coefficients.add(e);
+				}
+				
+				for(Integer fieldId : p.getFieldIdList()){
+					Field f = context.getFieldById(fieldId);
+					coefficients.add(f);
 				}
 				
 				List<Grade> grades = processGradeMap.get(processName);
@@ -99,7 +105,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 							for( Process p: processList){
 								String processName = p.getModel().getName();
 								if(processName.equals(model.getName())){
-									List<String> coefficients = processExprMap.get(processName);
+									List<Object> coefficients = processExprMap.get(processName);
 									List<Grade> grades = processGradeMap.get(processName);
 									for(Grade grade: grades){
 										eq += buildGradeConstraintVariables(p.getProcessNo(), coefficients, grade, p.getBlocks(), i, targetGrade);
@@ -114,7 +120,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 					for( Process p: processList){
 						String processName = p.getModel().getName();
 						if(p.getModel().getName().equals(gradeConstraintData.getSelectorName())){
-							List<String> coefficients = processExprMap.get(processName);
+							List<Object> coefficients = processExprMap.get(processName);
 							List<Grade> grades = processGradeMap.get(processName);
 							for(Grade grade: grades){
 								eq += buildGradeConstraintVariables(p.getProcessNo(), coefficients, grade, p.getBlocks(), i, targetGrade);
@@ -128,7 +134,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 					if(pit != null) {
 						for( Process p: processList){
 							String processName = p.getModel().getName();
-							List<String> coefficients = processExprMap.get(processName);
+							List<Object> coefficients = processExprMap.get(processName);
 							List<Grade> grades = processGradeMap.get(processName);
 							List<Block> blocks = new ArrayList<Block>();
 							for(Block b: p.getBlocks()){
@@ -149,7 +155,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 					Set<Integer> pitNumbers = getPitsFromPitGroup(pg);
 					for( Process p: processList){
 						String processName = p.getModel().getName();
-						List<String> coefficients = processExprMap.get(processName);
+						List<Object> coefficients = processExprMap.get(processName);
 						List<Grade> grades = processGradeMap.get(processName);
 						List<Block> blocks = new ArrayList<Block>();
 						for(Block b: p.getBlocks()){
@@ -164,7 +170,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 				} else {
 					for( Process p: processList){
 						String processName = p.getModel().getName();
-						List<String> coefficients = processExprMap.get(processName);
+						List<Object> coefficients = processExprMap.get(processName);
 						List<Grade> grades = processGradeMap.get(processName);
 						for(Grade grade: grades){
 							eq += buildGradeConstraintVariables(p.getProcessNo(), coefficients, grade, p.getBlocks(), i, targetGrade);
@@ -188,17 +194,27 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 	}
 
 	
-	public String buildGradeConstraintVariables(int processNumber, List<String> coefficients, Grade grade, List<Block> blocks, int period, BigDecimal targetGrade) {
+	public String buildGradeConstraintVariables(int processNumber, List<Object> coefficients, Grade grade, List<Block> blocks, int period, BigDecimal targetGrade) {
 		
 		String eq = "";
 		for(Block block: blocks){		
 			BigDecimal processRatio = new BigDecimal(0);
-			for(String coefficient: coefficients){
-				processRatio =  processRatio.add(context.getExpressionValueforBlock(block, coefficient));					
+			for(Object coefficient: coefficients){
+				short unitType = 0;
+				int unitId = 0;
+				if(coefficient instanceof Expression) {
+					unitType = Product.UNIT_EXPRESSION;
+					unitId = ((Expression)coefficient).getId();
+				} else {
+					unitType = Product.UNIT_FIELD;
+					unitId = ((Field)coefficient).getId();
+				}
+				
+				processRatio =  processRatio.add(context.getUnitValueforBlock(block, unitId, unitType));					
 			}
 
 			if(processRatio.compareTo(new BigDecimal(0)) == 0) continue;
-			BigDecimal blockGrade = context.getExpressionValueforBlock(block, grade.getMappedName());
+			BigDecimal blockGrade = context.getUnitValueforBlock(block, grade.getMappedName(), grade.getType());
 			BigDecimal coeff = processRatio.multiply(targetGrade.subtract(blockGrade));
 			if(coeff.doubleValue() == 0) continue;
 			if(targetGrade.compareTo(blockGrade) == 1) {
@@ -227,12 +243,21 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 				if(spb == null) continue;
 				
 				BigDecimal processRatio = new BigDecimal(0);
-				for(String coefficient: coefficients){
-					processRatio =  processRatio.add(swctx.getExpressionValueforBlock(spb, coefficient));					
+				for(Object coefficient: coefficients){
+					short unitType = 0;
+					int unitId = 0;
+					if(coefficient instanceof Expression) {
+						unitType = Product.UNIT_EXPRESSION;
+						unitId = ((Expression)coefficient).getId();
+					} else {
+						unitType = Product.UNIT_FIELD;
+						unitId = ((Field)coefficient).getId();
+					}
+					processRatio =  processRatio.add(swctx.getUnitValueforBlock(spb, unitId, unitType));					
 				}
 				
 				if(processRatio.compareTo(new BigDecimal(0)) == 0) continue;
-				BigDecimal blockGrade = swctx.getExpressionValueforBlock(spb, grade.getMappedName());
+				BigDecimal blockGrade = swctx.getUnitValueforBlock(spb, grade.getMappedName(), grade.getType());
 				BigDecimal coeff = processRatio.multiply(targetGrade.subtract(blockGrade));
 				if(coeff.doubleValue() == 0) continue;
 

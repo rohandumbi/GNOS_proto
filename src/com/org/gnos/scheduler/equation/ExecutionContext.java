@@ -30,7 +30,6 @@ import com.org.gnos.db.dao.ExpressionDAO;
 import com.org.gnos.db.dao.FieldDAO;
 import com.org.gnos.db.dao.FixedCostDAO;
 import com.org.gnos.db.dao.GradeConstraintDAO;
-import com.org.gnos.db.dao.GradeDAO;
 import com.org.gnos.db.dao.ModelDAO;
 import com.org.gnos.db.dao.OpexDAO;
 import com.org.gnos.db.dao.PitDependencyDAO;
@@ -98,7 +97,6 @@ public class ExecutionContext {
 	private List<ProcessJoin> processJoinList;
 	private List<ProductJoin> productJoinList;
 	private List<Product> productList;
-	private List<Grade> gradeList;
 	private List<CycleTimeFieldMapping> cycleTimeFieldMappings;
 	private List<TruckParameterCycleTime> truckParameterCycleTimeList;
 	private BigDecimal fixedTime;
@@ -141,7 +139,6 @@ public class ExecutionContext {
 		loadProducts();
 		loadProcessJoins();
 		loadProductJoins();
-		loadGrades();
 		loadPitGroups();
 		loadStockpiles();
 		loadDumps();
@@ -149,6 +146,7 @@ public class ExecutionContext {
 		loadFixedTime();
 		loadTruckParamCycleTime();
 		loadCycleTimeFieldMapping();
+		loadCycleTimeDataMapping();
 	}
 
 	private void loadFields() {
@@ -235,10 +233,6 @@ public class ExecutionContext {
 		productJoinList = new ProductJoinDAO().getAll(projectId);
 	}
 
-	private void loadGrades() {
-		gradeList = new GradeDAO().getAll(projectId);
-	}
-
 	private void loadPitGroups() {
 		pitGroups = new PitGroupDAO().getAll(projectId);
 	}
@@ -264,7 +258,6 @@ public class ExecutionContext {
 				}
 			}
 		}
-
 	}
 
 	private void loadFixedTime() {
@@ -279,6 +272,60 @@ public class ExecutionContext {
 		cycleTimeFieldMappings = new CycleTimeFieldMappingDAO().getAll(projectId);
 	}
 
+
+	private void loadCycleTimeDataMapping(){
+		
+		String pitNameAlias = null;
+		String benchAlias = null;
+		Map<String, String> cycleTimeFieldsMap = new HashMap<String, String>();
+		for(CycleTimeFieldMapping cycleTimeFieldMapping : cycleTimeFieldMappings) {
+			if(cycleTimeFieldMapping.getMappingType() == CycleTimeFieldMapping.FIXED_FIELD_MAPPING) {
+				if(cycleTimeFieldMapping.getFieldName().equals("pit")) {
+					pitNameAlias = cycleTimeFieldMapping.getMappedFieldName();
+				} else if(cycleTimeFieldMapping.getFieldName().equals("bench")) {
+					benchAlias = cycleTimeFieldMapping.getMappedFieldName();
+				}
+			} else {
+				cycleTimeFieldsMap.put(cycleTimeFieldMapping.getFieldName(), cycleTimeFieldMapping.getMappedFieldName());
+			}
+		}
+		if(pitNameAlias == null || benchAlias == null) return;
+		
+		String sql = "select * from gnos_cycle_time_data_"+ projectId;		
+
+		try (
+				Connection conn = DBManager.getConnection();
+				Statement stmt = conn.createStatement();
+				ResultSet rs = stmt.executeQuery(sql);
+			)
+		
+		{
+			while (rs.next()) {
+				String pitName = rs.getString(pitNameAlias);
+				int benchName = rs.getInt(benchAlias);
+				Pit pit = getPitNameMap().get(pitName);
+				if(pit == null) continue;
+				Bench b = pit.getBench(String.valueOf(benchName));
+				if(b == null) continue;
+				Set<String> keys = cycleTimeFieldsMap.keySet();
+				for(String key: keys){
+					String columnName = cycleTimeFieldsMap.get(key);
+					try{
+						BigDecimal data = rs.getBigDecimal(columnName);
+						String dataKey = pit.getPitNo()+":"+b.getBenchNo()+":"+key;
+						cycleTimeDataMapping.put(dataKey, data.add(fixedTime));
+					} catch(SQLException e) {
+						System.err.println(e.getMessage());
+					}
+				}
+				
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
 	private void loadScenario() {
 		scenario = new ScenarioDAO().get(scenarioId);
 		startYear = scenario.getStartYear();
@@ -421,6 +468,18 @@ public class ExecutionContext {
 		}
 		return null;
 	}
+	
+	public Field getFieldByName(String name) {
+		if (fields == null)
+			return null;
+		for (Field field : fields) {
+			if (field.getName().equals(name)) {
+				return field;
+			}
+		}
+		return null;
+	}
+	
 	public Expression getExpressionByName(String name) {
 		if (expressions == null || name == null)
 			return null;
@@ -535,9 +594,40 @@ public class ExecutionContext {
 
 	public List<Grade> getGradesForProduct(String productName) {
 		List<Grade> grades = new ArrayList<Grade>();
-		for (Grade grade : gradeList) {
-			if (grade.getProductName().equals(productName)) {
-				grades.add(grade);
+		Product product = getProductFromName(productName);
+		Set<Integer> fieldIdList = product.getFieldIdList();
+		Set<Integer> expressionIdList = product.getExpressionIdList();
+		
+		if(fieldIdList != null && fieldIdList.size() > 0) {
+			for(Integer fieldId: fieldIdList) {
+				Field field = getFieldById(fieldId);
+				if(field != null) {
+					for(Field f: fields) {
+						if(f.getDataType() != Field.TYPE_GRADE || !f.getWeightedUnit().equals(field.getName())) continue;
+						Grade grade = new Grade();
+						grade.setName(f.getName());
+						grade.setProductName(productName);
+						grade.setType(Grade.GRADE_FIELD);
+						grade.setMappedName(f.getName());
+						grades.add(grade);
+					}
+				}
+			}
+		}
+		if(expressionIdList != null && expressionIdList.size() > 0) {
+			for(Integer expressionId: expressionIdList) {
+				Expression expression = getExpressionById(expressionId);
+				if(expression != null) {
+					for(Expression e: expressions) {
+						if(!e.isGrade() || !e.getWeightedField().equals(expression.getName())) continue;
+						Grade grade = new Grade();
+						grade.setName(e.getName());
+						grade.setProductName(productName);
+						grade.setType(Grade.GRADE_EXPRESSION);
+						grade.setMappedName(e.getName());
+						grades.add(grade);
+					}
+				}
 			}
 		}
 		return grades;
@@ -585,7 +675,20 @@ public class ExecutionContext {
 		}
 	}
 	
-	public BigDecimal getExpressionValueforBlock(Block b, Expression expr) {
+	public BigDecimal getUnitValueforBlock(Block b, String unitName, short unitType) {
+		if(unitType == 1) { // 1- Field, 2 - Expression
+			try {
+				BigDecimal value = new BigDecimal(b.getField(unitName));
+				return value;
+			} catch(Exception e) {
+				return null;
+			}
+		} else {
+			return b.getComputedField(unitName);
+		}
+	}
+	
+/*	public BigDecimal getExpressionValueforBlock(Block b, Expression expr) {
 		String expressionName = expr.getName().replaceAll("\\s+", "_");
 		return b.getComputedField(expressionName);
 	}
@@ -593,7 +696,7 @@ public class ExecutionContext {
 	public BigDecimal getExpressionValueforBlock(Block b, String exprName) {
 		String expressionName = exprName.replaceAll("\\s+", "_");
 		return b.getComputedField(expressionName);
-	}
+	}*/
 
 	public int getStartYear() {
 		return startYear;
