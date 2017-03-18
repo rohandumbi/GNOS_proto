@@ -384,14 +384,17 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		if(hasValue(model.getCondition())){
 			condition = model.getCondition();
 		}
-		Expression expr =  context.getExpressionById(model.getExpressionId());
-		if(hasValue(expr.getFilter())) {
-			if(hasValue(condition)) {
-				condition = condition + " AND "+ expr.getFilter();
-			} else {
-				condition =  expr.getFilter();
+		if(model.getUnitType() == Model.UNIT_EXPRESSION) {
+			Expression expr =  context.getExpressionById(model.getExpressionId());
+			if(hasValue(expr.getFilter())) {
+				if(hasValue(condition)) {
+					condition = condition + " AND "+ expr.getFilter();
+				} else {
+					condition =  expr.getFilter();
+				}
 			}
 		}
+		
 		boolean continueLoop = true;
 		Node currNode = context.getProcessTree().getNodeByName(model.getName());
 		do{
@@ -403,14 +406,16 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 				if(hasValue(pModel.getCondition())){
 					condition = pModel.getCondition();
 				}
-				Expression expr1 =  context.getExpressionById(model.getExpressionId());
-				if(expr1 != null && hasValue(expr1.getFilter())) {
-					if(hasValue(condition)) {
-						condition = condition + " AND "+ expr1.getFilter();
-					} else {
-						condition =  expr1.getFilter();
+				if(pModel.getUnitType() == Model.UNIT_EXPRESSION) {
+					Expression expr1 =  context.getExpressionById(pModel.getExpressionId());
+					if(expr1 != null && hasValue(expr1.getFilter())) {
+						if(hasValue(condition)) {
+							condition = condition + " AND "+ expr1.getFilter();
+						} else {
+							condition =  expr1.getFilter();
+						}
 					}
-				}
+				}			
 			}
 			currNode = parent;
 		}
@@ -451,10 +456,16 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		BigDecimal revenue = new BigDecimal(0);
 		BigDecimal pcost = new BigDecimal(0);
 		List<OpexData> opexDataList = context.getOpexDataList();
+		int unitId;
+		if(model.getUnitType() == Model.UNIT_FIELD) {
+			unitId = model.getFieldId();
+		} else {
+			unitId = model.getExpressionId();
+		}
 		for(OpexData opexData: opexDataList) {
 			if(opexData.getModelId() == model.getId()){
 				if(opexData.isRevenue()){
-					BigDecimal expr_value = context.getExpressionValueforBlock(b, context.getExpressionById(opexData.getExpressionId()));
+					BigDecimal expr_value = context.getUnitValueforBlock(b, unitId, model.getUnitType());
 					revenue = revenue.add(expr_value.multiply(opexData.getCostData().get(year)));
 				} else {
 					pcost = pcost.add(opexData.getCostData().get(year));
@@ -471,11 +482,17 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		if(model == null) return value;
 		BigDecimal revenue = new BigDecimal(0);
 		BigDecimal pcost = new BigDecimal(0);
+		int unitId;
+		if(model.getUnitType() == Model.UNIT_FIELD) {
+			unitId = model.getFieldId();
+		} else {
+			unitId = model.getExpressionId();
+		}
 		List<OpexData> opexDataList = context.getOpexDataList();
 		for(OpexData opexData: opexDataList) {
 			if(opexData.getModelId() == model.getId()){
 				if(opexData.isRevenue()){
-					BigDecimal expr_value = ((SlidingWindowExecutionContext)context).getExpressionValueforBlock(b, context.getExpressionById(opexData.getExpressionId()));
+					BigDecimal expr_value = ((SlidingWindowExecutionContext)context).getUnitValueforBlock(b, unitId, model.getUnitType());
 					revenue = revenue.add(expr_value.multiply(opexData.getCostData().get(year)));
 				} else {
 					pcost = pcost.add(opexData.getCostData().get(year));

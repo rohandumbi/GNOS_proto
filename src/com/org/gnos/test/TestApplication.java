@@ -1,26 +1,15 @@
 package com.org.gnos.test;
 
-import com.org.gnos.core.GNOSConfig;
+import java.util.List;
+
+import com.org.gnos.core.Application;
+import com.org.gnos.db.dao.ExpressionDAO;
 import com.org.gnos.db.dao.ProjectDAO;
+import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Project;
+import com.org.gnos.services.ExpressionProcessor;
+import com.org.gnos.services.PitBenchProcessor;
 import com.org.gnos.services.csv.GNOSCSVDataProcessor;
-import com.org.gnos.services.endpoints.BenchConstraintEndpoint;
-import com.org.gnos.services.endpoints.CapexEndpoint;
-import com.org.gnos.services.endpoints.DumpDependencyEndpoint;
-import com.org.gnos.services.endpoints.DumpEndpoint;
-import com.org.gnos.services.endpoints.ExpressionEndpoint;
-import com.org.gnos.services.endpoints.FieldEndpoint;
-import com.org.gnos.services.endpoints.FixedCostEndpoint;
-import com.org.gnos.services.endpoints.GradeConstraintEndpoint;
-import com.org.gnos.services.endpoints.ModelEndpoint;
-import com.org.gnos.services.endpoints.OpexEndpoint;
-import com.org.gnos.services.endpoints.PitDependencyEndpoint;
-import com.org.gnos.services.endpoints.PitEndpoint;
-import com.org.gnos.services.endpoints.ProcessConstraintEndpoint;
-import com.org.gnos.services.endpoints.ProcessEndpoint;
-import com.org.gnos.services.endpoints.ProjectEndpoint;
-import com.org.gnos.services.endpoints.ScenarioEndpoint;
-import com.org.gnos.services.endpoints.StockpileEndpoint;
 
 public class TestApplication {
 
@@ -44,6 +33,18 @@ public class TestApplication {
 		GNOSCSVDataProcessor.getInstance().processCsv("D:\\proj-workspace\\GitRepository\\PersonalWork\\GNOS_proto\\data\\GNOS_data_micro.csv");
 		GNOSCSVDataProcessor.getInstance().dumpToDB(projectId);
 	}
+	
+	public void reloadData(int projectId) {
+		GNOSCSVDataProcessor.getInstance().processCsv("C:\\Arpan\\Workspace\\personal\\GNOS\\data\\electron_test_data_v2.csv");
+		GNOSCSVDataProcessor.getInstance().reImportToDB(projectId);
+		new PitBenchProcessor().updatePitBenchData(projectId);
+		
+		List<Expression> expressions = new ExpressionDAO().getAll(projectId);
+		ExpressionProcessor processor = new ExpressionProcessor();
+		processor.setExpressions(expressions);
+		processor.store(projectId);
+	}
+	
 	public boolean test() {
 		
 		Project project = createProject();
@@ -51,35 +52,22 @@ public class TestApplication {
 		deleteProject(project);
 		return true;
 	}
-	public static void testService() {
-		new PitEndpoint();
-		new ProjectEndpoint();
-		new FieldEndpoint();
-		new ExpressionEndpoint();
-		new ModelEndpoint();
-		new DumpEndpoint();
-		new StockpileEndpoint();
-		new ScenarioEndpoint();
-		new OpexEndpoint();
-		new FixedCostEndpoint();
-		new CapexEndpoint();
-		new PitDependencyEndpoint();
-		new DumpDependencyEndpoint();
-		new BenchConstraintEndpoint();
-		new ProcessConstraintEndpoint();
-		new GradeConstraintEndpoint();
-		new ProcessEndpoint();
-	}
+
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		
-		GNOSConfig.load();
-/*		ProjectConfigutration.getInstance().load(24);
-		ScenarioConfigutration.getInstance().load(25);
-		SchedulerService.getInstance().execute();*/
-		testService();
+		Application.start();
+		//new TestApplication().reloadData(1);
+
+		/*RunConfig runconfig = new RunConfig();
+		runconfig.setMode(RunConfig.GLOBAL_MODE);
+		runconfig.setProjectId(1);
+		runconfig.setScenarioId(2);
+		SchedulerService service = SchedulerService.getInstance();
+		service.setRunconfig(runconfig);
+		service.execute();*/
 	}
 
 }

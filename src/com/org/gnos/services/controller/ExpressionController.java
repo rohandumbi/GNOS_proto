@@ -54,7 +54,7 @@ public class ExpressionController {
 	}
 	
 	
-	public Expression update(JsonObject jsonObject, String projectId) throws Exception {		
+	public Expression update(JsonObject jsonObject, String projectId, String eid) throws Exception {		
 		String name = jsonObject.get("name").getAsString();
 		boolean isGrade = jsonObject.get("isGrade").getAsBoolean();
 		boolean isComplex = jsonObject.get("isComplex").getAsBoolean();
@@ -67,7 +67,7 @@ public class ExpressionController {
 		if(jsonObject.get("weightedField") != null){
 			weightedField = jsonObject.get("weightedField").getAsString();
 		}
-		int id = jsonObject.get("id").getAsInt();
+		int id = Integer.parseInt(eid);
 		Expression obj = new Expression();
 		obj.setId(id);
 		obj.setName(name);

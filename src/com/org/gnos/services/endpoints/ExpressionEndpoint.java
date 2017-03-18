@@ -44,7 +44,7 @@ public class ExpressionEndpoint {
 			}
 		}, json());
 		
-        put("/expressions/:id", new Route() {
+        put("/project/:pid/expressions/:id", new Route() {
 			
 			@Override
 			public Object handle(Request req, Response res) throws Exception {
@@ -52,7 +52,7 @@ public class ExpressionEndpoint {
 				if(requestObject.isJsonObject()) {
 					JsonObject jsonObject = requestObject.getAsJsonObject();
 					try {
-						return controller.update(jsonObject, req.params(":id"));
+						return controller.update(jsonObject, req.params(":pid"), req.params(":id"));
 					} catch (Exception e) {
 						res.status(400);
 						return new ResponseError("Expression creation failed. "+e.getMessage());

@@ -48,6 +48,73 @@ public class GNOSCSVDataProcessor {
 	}
 	
 
+	public void reImportToDB(int projectId) {
+		
+		String computed_data_delete_sql = "delete from gnos_computed_data_"+projectId;
+		String gnos_data_delete_sql = "delete from gnos_data_"+projectId;
+		String computed_data_insert_sql = "insert into gnos_computed_data_"+projectId+ " (row_id) values (?)";
+		
+		boolean autoCommit = true;
+		
+		
+		StringBuffer  buff = new StringBuffer("insert into gnos_data_"+projectId);
+		StringBuffer values = new StringBuffer("");
+        int columnCount = columns.length;
+        for(int i=0; i <= columnCount ; i++){
+        	values.append("? ");
+        	if(i < columnCount ){
+        		values.append(",");
+        	}
+        }
+        buff.append(" values ("+values.toString() +") ");
+        Connection conn = DBManager.getConnection();
+		
+		try (
+				PreparedStatement ps = conn.prepareStatement(computed_data_delete_sql);
+				PreparedStatement ps1 = conn.prepareStatement(gnos_data_delete_sql);
+				PreparedStatement ps2 = conn.prepareStatement(computed_data_insert_sql);
+				PreparedStatement ps3 = conn.prepareStatement(buff.toString());
+		){
+			autoCommit = conn.getAutoCommit();
+			conn.setAutoCommit(false);
+            ps.executeUpdate();
+            ps1.executeUpdate();
+            
+			final int batchSize = 1000;
+            int count = 0;
+            for(int i=0; i < data.size() ; i++) {
+            	String[] row = data.get(i);
+            	
+            	ps3.setInt(1, count + 1);
+            	int j=1;
+            	for(; j <=  row.length ; j++) {
+            		ps3.setString(j+1, row[j-1]);
+            	}
+            	
+            	ps3.executeUpdate();
+				ps2.setInt(1, count + 1);
+				ps2.executeUpdate();
+            	if (++count % batchSize == 0) {
+            		conn.commit();
+                }
+            }
+            //ps.executeBatch();
+            conn.commit();
+            
+		}  
+		catch (SQLException sqle) {
+			sqle.printStackTrace();
+		} finally {
+			try {
+				conn.setAutoCommit(autoCommit);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			DBManager.releaseConnection(conn);
+		}
+		
+	}
 	
 	public void dumpToDB(int projectId) {
 		Connection conn = DBManager.getConnection();

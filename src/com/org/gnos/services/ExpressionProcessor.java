@@ -70,11 +70,15 @@ public class ExpressionProcessor {
 				
 		Connection conn = DBManager.getConnection();
 		Statement stmt = null;
+		Statement resetstmt = null;
 		String  sql = null;
+		String  reset_sql = null;
 		try {
 			stmt = conn.createStatement();
+			resetstmt = conn.createStatement();
 			for(Expression expr: this.expressions){
 				String columnName = expr.getName().replaceAll("\\s+","_").toLowerCase();
+				reset_sql = "update gnos_computed_data_"+projectId+" b set b."+columnName +" = 0 ";
 				if(expr.isGrade()) {
 					sql = "update gnos_data_"+projectId+" a, gnos_computed_data_"+projectId+" b set b."+columnName +" = IFNULL("+ expr.getExprvalue()+" , 0)";
 				} else {
@@ -82,6 +86,8 @@ public class ExpressionProcessor {
 				}
 				sql = sql+ " where a.id = b.row_id ";
 				if(expr.getFilter() != null && expr.getFilter().trim().length() > 0) {
+					//Reset if there are any filter
+					resetstmt.executeUpdate(reset_sql);
 					sql = sql+ " AND ( "+expr.getFilter() +" )";
 				}
 				System.out.println("sql :"+sql);
