@@ -13,9 +13,9 @@ public class SPBlock {
 	double tonnesWt;
 	double lasttonnesWt;
 	double reclaimedTonnesWt;
-	private Map<String, BigDecimal> unitFields;
+	private Map<String, BigDecimal> fields;
 	private Map<String, BigDecimal> computedFields;
-	private Map<String, BigDecimal> gradeFields;
+//	private Map<String, BigDecimal> gradeFields;
 	int payload;
 	private Set<Process> processes;
 
@@ -23,8 +23,8 @@ public class SPBlock {
 	public SPBlock() {
 		tonnesWt = 0.0;
 		computedFields = new HashMap<String, BigDecimal>();
-		unitFields = new HashMap<String, BigDecimal>(); 
-		gradeFields = new HashMap<String, BigDecimal>(); 
+		fields = new HashMap<String, BigDecimal>(); 
+//		gradeFields = new HashMap<String, BigDecimal>(); 
 		processes = new HashSet<Process>();
 	}
 
@@ -50,7 +50,7 @@ public class SPBlock {
 		this.computedFields = computedFields;
 	}
 
-	public Map<String, BigDecimal> getGradeFields() {
+/*	public Map<String, BigDecimal> getGradeFields() {
 		return gradeFields;
 	}
 
@@ -62,19 +62,19 @@ public class SPBlock {
 		
 	public void setGradeFields(Map<String, BigDecimal> gradeFields) {
 		this.gradeFields = gradeFields;
-	}
+	}*/
 
 	
-	public Map<String, BigDecimal> getUnitFields() {
-		return unitFields;
+	public Map<String, BigDecimal> getFields() {
+		return fields;
 	}
 
-	public void setUnitFields(Map<String, BigDecimal> unitFields) {
-		this.unitFields = unitFields;
+	public void setFields(Map<String, BigDecimal> fields) {
+		this.fields = fields;
 	}
 
-	public BigDecimal getUnitField(String fieldName) {
-		BigDecimal val = this.unitFields.get(fieldName);
+	public BigDecimal getField(String fieldName) {
+		BigDecimal val = this.fields.get(fieldName);
 		if(val == null ) return new BigDecimal(0);
 		else return val;
 	}
@@ -118,7 +118,7 @@ public class SPBlock {
 		lasttonnesWt = 0;
 		reclaimedTonnesWt = 0;
 		computedFields = new HashMap<String, BigDecimal>();
-		gradeFields = new HashMap<String, BigDecimal>(); 
+		//gradeFields = new HashMap<String, BigDecimal>(); 
 		processes = new HashSet<Process>();
 	}
 

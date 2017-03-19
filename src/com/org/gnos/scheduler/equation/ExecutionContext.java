@@ -664,18 +664,38 @@ public class ExecutionContext {
 			Field field = getFieldById(unitId);
 			try {
 				BigDecimal value = new BigDecimal(b.getField(field.getName()));
-				return value;
+				BigDecimal tonnesWtvalue = new BigDecimal(b.getField(tonnesWtFieldName));
+				if(tonnesWtvalue.doubleValue() == 0) return new BigDecimal(0);
+				return value.divide(tonnesWtvalue);
 			} catch(Exception e) {
 				return null;
 			}
 		} else {
 			Expression expression = getExpressionById(unitId);
+			if(expression == null) {
+				return new BigDecimal(0);
+			}
 			String expressionName = expression.getName().replaceAll("\\s+", "_");
 			return b.getComputedField(expressionName);
 		}
 	}
 	
 	public BigDecimal getUnitValueforBlock(Block b, String unitName, short unitType) {
+		if(unitType == 1) { // 1- Field, 2 - Expression
+			try {
+				BigDecimal value = new BigDecimal(b.getField(unitName));
+				BigDecimal tonnesWtvalue = new BigDecimal(b.getField(tonnesWtFieldName));
+				if(tonnesWtvalue.doubleValue() == 0) return new BigDecimal(0);
+				return value.divide(tonnesWtvalue);
+			} catch(Exception e) {
+				return null;
+			}
+		} else {
+			return b.getComputedField(unitName);
+		}
+	}
+	
+	public BigDecimal getGradeValueforBlock(Block b, String unitName, short unitType) {
 		if(unitType == 1) { // 1- Field, 2 - Expression
 			try {
 				BigDecimal value = new BigDecimal(b.getField(unitName));
@@ -687,7 +707,6 @@ public class ExecutionContext {
 			return b.getComputedField(unitName);
 		}
 	}
-	
 /*	public BigDecimal getExpressionValueforBlock(Block b, Expression expr) {
 		String expressionName = expr.getName().replaceAll("\\s+", "_");
 		return b.getComputedField(expressionName);
@@ -724,6 +743,14 @@ public class ExecutionContext {
 
 	private boolean hasValue(String s) {
 		return (s != null && s.trim().length() > 0);
+	}
+
+	public List<Field> getFields() {
+		return fields;
+	}
+
+	public void setFields(List<Field> fields) {
+		this.fields = fields;
 	}
 
 	public Set<Block> getWasteBlocks() {

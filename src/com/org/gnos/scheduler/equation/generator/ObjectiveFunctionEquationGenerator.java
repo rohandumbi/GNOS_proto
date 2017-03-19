@@ -456,16 +456,17 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		BigDecimal revenue = new BigDecimal(0);
 		BigDecimal pcost = new BigDecimal(0);
 		List<OpexData> opexDataList = context.getOpexDataList();
-		int unitId;
-		if(model.getUnitType() == Model.UNIT_FIELD) {
-			unitId = model.getFieldId();
-		} else {
-			unitId = model.getExpressionId();
-		}
+
 		for(OpexData opexData: opexDataList) {
 			if(opexData.getModelId() == model.getId()){
 				if(opexData.isRevenue()){
-					BigDecimal expr_value = context.getUnitValueforBlock(b, unitId, model.getUnitType());
+					int unitId;
+					if(opexData.getUnitType() == OpexData.UNIT_FIELD) {
+						unitId = opexData.getFieldId();
+					} else {
+						unitId = opexData.getExpressionId();
+					}
+					BigDecimal expr_value = context.getUnitValueforBlock(b, unitId, opexData.getUnitType());
 					revenue = revenue.add(expr_value.multiply(opexData.getCostData().get(year)));
 				} else {
 					pcost = pcost.add(opexData.getCostData().get(year));

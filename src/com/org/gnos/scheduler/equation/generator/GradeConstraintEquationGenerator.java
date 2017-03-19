@@ -214,7 +214,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 			}
 
 			if(processRatio.compareTo(new BigDecimal(0)) == 0) continue;
-			BigDecimal blockGrade = context.getUnitValueforBlock(block, grade.getMappedName(), grade.getType());
+			BigDecimal blockGrade = context.getGradeValueforBlock(block, grade.getMappedName(), grade.getType());
 			BigDecimal coeff = processRatio.multiply(targetGrade.subtract(blockGrade));
 			if(coeff.doubleValue() == 0) continue;
 			if(targetGrade.compareTo(blockGrade) == 1) {
@@ -257,7 +257,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 				}
 				
 				if(processRatio.compareTo(new BigDecimal(0)) == 0) continue;
-				BigDecimal blockGrade = swctx.getUnitValueforBlock(spb, grade.getMappedName(), grade.getType());
+				BigDecimal blockGrade = swctx.getGradeValueforBlock(spb, grade.getMappedName(), grade.getType());
 				BigDecimal coeff = processRatio.multiply(targetGrade.subtract(blockGrade));
 				if(coeff.doubleValue() == 0) continue;
 
