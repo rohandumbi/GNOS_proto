@@ -1006,6 +1006,10 @@ public class ExecutionContext {
 		return pitFieldName;
 	}
 
+	public String getTonnesWtFieldName() {
+		return tonnesWtFieldName;
+	}
+
 	public int getProjectId() {
 		return projectId;
 	}

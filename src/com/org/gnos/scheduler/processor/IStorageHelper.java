@@ -8,7 +8,7 @@ public interface IStorageHelper {
 
 	public void start();
 	
-	public void store(List<Record> records, boolean hasMore);
+	public void store(List<Record> records);
 	
 	public void stop();
 	

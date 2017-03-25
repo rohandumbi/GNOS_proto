@@ -11,6 +11,7 @@ import java.util.Set;
 import com.org.gnos.core.Block;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Field;
+import com.org.gnos.scheduler.processor.SlidingWindowModeDBStorageHelper;
 
 public class SlidingWindowExecutionContext extends ExecutionContext {
 
@@ -230,7 +231,7 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 		return spBlockMapping.get(spNo);
 	}
 	
-	public void processStockpiles() {
+	public void processStockpiles(SlidingWindowModeDBStorageHelper storeHelper) {
 		Set<Integer> spNos = spTonnesWigthMapping.keySet();
 		for(int spNo: spNos){
 			SPBlock spb = spBlockMapping.get(spNo);
@@ -301,6 +302,7 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 				spb.getProcesses().addAll(b.getProcesses());
 			}
 			processGrades(spb, gradeExprs);
+			storeHelper.processStockpileInventory(spNo, spb);
 			spb.setLasttonnesWt(spb.getTonnesWt());
 			spb.setReclaimedTonnesWt(0);
 		}

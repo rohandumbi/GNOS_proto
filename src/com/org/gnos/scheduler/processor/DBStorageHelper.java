@@ -20,9 +20,13 @@ public class DBStorageHelper implements IStorageHelper {
 	protected Connection conn;
 	protected ExecutionContext context;
 	
-	private static String report_insert_sql ="";
+	protected static String report_insert_sql ="";
+	
 	@Override
-	public void store(List<Record> records, boolean hasMore) {
+	public void store(List<Record> records) {
+		
+		// Store for reports 
+		storeInReports(records);
 		int projectId = context.getProjectId();
 		int scenarioId = context.getScenarioId();
 		String insert_sql = "insert into gnos_result_"+projectId+"_"+scenarioId+" (origin_type, pit_no, block_no, sp_no, destination_type, destination) values (? , ?, ?, ?, ?, ?)";
@@ -85,8 +89,7 @@ public class DBStorageHelper implements IStorageHelper {
 			}
 			conn.commit();
 			conn.setAutoCommit(autoCommit);
-			storeInReports(records, hasMore);
-			postProcess();
+			postProcess();			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -104,17 +107,17 @@ public class DBStorageHelper implements IStorageHelper {
 
 	}
 
-	public void storeInReports(List<Record> records, boolean hasMore) {
+	public void storeInReports(List<Record> records) {
 		Map<Integer, PreparedStatement> stmts = new HashMap<Integer, PreparedStatement>();
 		List<Field> fields = context.getFields();
 		try ( PreparedStatement ips = conn.prepareStatement(report_insert_sql); ){
 			boolean autoCommit = conn.getAutoCommit();
 			conn.setAutoCommit(false);
 			for(Record record:records){
-				processRecord(record);
 				try {
 					Block b = context.getBlocks().get(record.getBlockNo());
 					double tonnesWt = context.getTonnesWtForBlock(b);
+					double ratio = record.getValue()/tonnesWt;
 					ips.setString(1, context.getScenario().getName());
 					ips.setInt(2, record.getOriginType());
 					ips.setInt(3, record.getPitNo());
@@ -129,12 +132,17 @@ public class DBStorageHelper implements IStorageHelper {
 						ips.setInt(7, record.getWasteNo());
 					}
 					ips.setDouble(8, record.getValue());
-					ips.setDouble(9, record.getValue()/tonnesWt);
+					ips.setDouble(9, ratio);
 					int index = 10;
 					for(Field f: fields) {
 						if(f.getDataType() == Field.TYPE_GRADE) {
 							String associatedFieldName = f.getWeightedUnit();
 							BigDecimal value = new BigDecimal(b.getField(f.getName())).multiply(new BigDecimal(b.getField(associatedFieldName)));
+							value = value.multiply(new BigDecimal(ratio));
+							ips.setString(index, value.toString());
+						} else if(f.getDataType() == Field.TYPE_UNIT){
+							BigDecimal value = new BigDecimal(b.getField(f.getName()));
+							value = value.multiply(new BigDecimal(ratio));
 							ips.setString(index, value.toString());
 						} else {
 							ips.setString(index, b.getField(f.getName()));
@@ -150,7 +158,6 @@ public class DBStorageHelper implements IStorageHelper {
 			}
 			conn.commit();
 			conn.setAutoCommit(autoCommit);
-			postProcess();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -164,8 +171,6 @@ public class DBStorageHelper implements IStorageHelper {
 				e.printStackTrace();
 			}
 		}
-		
-
 	}
 	
 	public void processRecord(Record record){
@@ -226,7 +231,12 @@ public class DBStorageHelper implements IStorageHelper {
 			if(f.getDataType() == Field.TYPE_GRADE) {
 				name = name+"_u";
 			}
-			data_sql +=  ","+ name +" VARCHAR(50) ";
+			if(f.getDataType() == Field.TYPE_GRADE || f.getDataType() == Field.TYPE_UNIT) {
+				data_sql +=  ","+ name +" double ";
+			} else {
+				data_sql +=  ","+ name +" VARCHAR(50) ";
+			}
+			
 			sbuff_sql.append("," + name);
 			sbuff.append(", ?");
 		}
@@ -242,6 +252,10 @@ public class DBStorageHelper implements IStorageHelper {
 		{			
 			stmt.executeUpdate(data_sql);
 		} 
+		
+	}
+	
+	protected void createStockpileInventory() throws SQLException  {
 		
 	}
 	
@@ -280,6 +294,7 @@ public class DBStorageHelper implements IStorageHelper {
 		try {
 			createTable();
 			createReportTable();
+			createStockpileInventory();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

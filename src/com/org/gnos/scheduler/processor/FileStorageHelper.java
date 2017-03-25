@@ -21,14 +21,12 @@ public class FileStorageHelper implements IStorageHelper {
 		}
 	}
 	@Override
-	public void store(List<Record> records, boolean hasMore) {
+	public void store(List<Record> records) {
 		for(Record record: records){
 			writer.write(record.toString());
 			writer.flush();
 		}
-		if(!hasMore){
-			writer.close();
-		}
+		writer.close();
 	}
 	@Override
 	public void setContext(ExecutionContext context) {

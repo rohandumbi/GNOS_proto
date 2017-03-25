@@ -57,7 +57,7 @@ public class CplexSolver implements ISolver {
 						records.add(record);
 					}
 				} //for int
-				helper.store(records, false);
+				helper.store(records);
 			} //if solve
 			else {
 			    System.out.println("Model not solved");
