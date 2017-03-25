@@ -1,5 +1,6 @@
 package com.org.gnos.scheduler.processor;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -9,7 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.org.gnos.core.Block;
 import com.org.gnos.db.DBManager;
+import com.org.gnos.db.model.Field;
 import com.org.gnos.scheduler.equation.ExecutionContext;
 
 public class DBStorageHelper implements IStorageHelper {
@@ -17,6 +20,7 @@ public class DBStorageHelper implements IStorageHelper {
 	protected Connection conn;
 	protected ExecutionContext context;
 	
+	private static String report_insert_sql ="";
 	@Override
 	public void store(List<Record> records, boolean hasMore) {
 		int projectId = context.getProjectId();
@@ -81,6 +85,7 @@ public class DBStorageHelper implements IStorageHelper {
 			}
 			conn.commit();
 			conn.setAutoCommit(autoCommit);
+			storeInReports(records, hasMore);
 			postProcess();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -99,6 +104,70 @@ public class DBStorageHelper implements IStorageHelper {
 
 	}
 
+	public void storeInReports(List<Record> records, boolean hasMore) {
+		Map<Integer, PreparedStatement> stmts = new HashMap<Integer, PreparedStatement>();
+		List<Field> fields = context.getFields();
+		try ( PreparedStatement ips = conn.prepareStatement(report_insert_sql); ){
+			boolean autoCommit = conn.getAutoCommit();
+			conn.setAutoCommit(false);
+			for(Record record:records){
+				processRecord(record);
+				try {
+					Block b = context.getBlocks().get(record.getBlockNo());
+					double tonnesWt = context.getTonnesWtForBlock(b);
+					ips.setString(1, context.getScenario().getName());
+					ips.setInt(2, record.getOriginType());
+					ips.setInt(3, record.getPitNo());
+					ips.setInt(4, record.getOriginSpNo());
+					ips.setInt(5, record.getBlockNo());
+					ips.setInt(6, record.getDestinationType());
+					if(record.getDestinationType() == Record.DESTINATION_PROCESS) {
+						ips.setInt(7, record.getProcessNo());
+					} else if(record.getDestinationType() == Record.DESTINATION_SP) {
+						ips.setInt(7, record.getDestSpNo());
+					} else if(record.getDestinationType() == Record.DESTINATION_WASTE) {
+						ips.setInt(7, record.getWasteNo());
+					}
+					ips.setDouble(8, record.getValue());
+					ips.setDouble(9, record.getValue()/tonnesWt);
+					int index = 10;
+					for(Field f: fields) {
+						if(f.getDataType() == Field.TYPE_GRADE) {
+							String associatedFieldName = f.getWeightedUnit();
+							BigDecimal value = new BigDecimal(b.getField(f.getName())).multiply(new BigDecimal(b.getField(associatedFieldName)));
+							ips.setString(index, value.toString());
+						} else {
+							ips.setString(index, b.getField(f.getName()));
+						}					
+						
+						index ++;
+					}
+					ips.executeUpdate();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+				
+			}
+			conn.commit();
+			conn.setAutoCommit(autoCommit);
+			postProcess();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			Set<Integer> keys = stmts.keySet();
+			try {
+				for(Integer key: keys){
+					(stmts.get(key)).close();
+				}
+				
+			} catch(SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+
+	}
+	
 	public void processRecord(Record record){
 		
 	}
@@ -134,6 +203,48 @@ public class DBStorageHelper implements IStorageHelper {
 		
 	}
 	
+	private void createReportTable() throws SQLException {
+		int projectId = context.getProjectId();
+		dropReportTable(projectId);
+		
+		StringBuffer sbuff_sql = new StringBuffer("insert into gnos_report_"+projectId+" (scenario_name, origin_type, pit_no, sp_no, block_no, destination_type, destination, quantity_mined, ratio ");
+		StringBuffer sbuff = new StringBuffer(" ( ?, ?, ?, ?, ?, ?, ?, ?, ? ");
+		String  data_sql = "CREATE TABLE gnos_report_"+projectId+" ( " +
+				"scenario_name VARCHAR(50), " +
+				" origin_type TINYINT NOT NULL, " +			
+				" pit_no INT NOT NULL default -1," +
+				" sp_no INT NOT NULL default -1," +
+				" block_no INT  NOT NULL default -1," +
+				" destination_type TINYINT NOT NULL, " +
+				" destination INT, " + 
+				" quantity_mined VARCHAR(50) ," +
+				" ratio double ";
+		
+		
+		for(Field f : context.getFields()){
+			String name = f.getName();
+			if(f.getDataType() == Field.TYPE_GRADE) {
+				name = name+"_u";
+			}
+			data_sql +=  ","+ name +" VARCHAR(50) ";
+			sbuff_sql.append("," + name);
+			sbuff.append(", ?");
+		}
+		data_sql += " ); ";
+		//data_sql += "  UNIQUE KEY (scenario_name, origin_type, pit_no, block_no, destination_type, destination) );";
+		sbuff_sql.append(")");
+		sbuff.append(")");
+		report_insert_sql = sbuff_sql.toString() + " values " + sbuff.toString();
+		System.out.println("Sql =>"+data_sql);
+		try (
+				Statement stmt = conn.createStatement();
+			)
+		{			
+			stmt.executeUpdate(data_sql);
+		} 
+		
+	}
+	
 	private void dropTable(int projectId, int scenarioId) throws SQLException {
 		String  data_table_sql = "DROP TABLE IF EXISTS gnos_result_"+projectId+"_"+scenarioId+"; ";
 
@@ -146,6 +257,18 @@ public class DBStorageHelper implements IStorageHelper {
 		
 	}
 
+	private void dropReportTable(int projectId) throws SQLException {
+		String  data_table_sql = "DROP TABLE IF EXISTS gnos_report_"+projectId+"; ";
+
+		try (
+				Statement stmt = conn.createStatement();
+			)
+		{
+			stmt.executeUpdate(data_table_sql);
+		} 
+		
+	}
+	
 	@Override
 	public void setContext(ExecutionContext context) {
 		this.context = context;
@@ -156,6 +279,7 @@ public class DBStorageHelper implements IStorageHelper {
 		conn = DBManager.getConnection();
 		try {
 			createTable();
+			createReportTable();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
