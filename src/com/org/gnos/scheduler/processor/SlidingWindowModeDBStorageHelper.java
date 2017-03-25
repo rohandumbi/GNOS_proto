@@ -33,7 +33,8 @@ public class SlidingWindowModeDBStorageHelper extends DBStorageHelper {
 	@Override
 	public void postProcess() {
 		SlidingWindowExecutionContext swctx = (SlidingWindowExecutionContext)context;
-		swctx.processStockpiles(this);
+		swctx.processStockpiles();
+		swctx.finalizeStockpiles(this);
 	}
 	
 	@Override
@@ -87,7 +88,10 @@ public class SlidingWindowModeDBStorageHelper extends DBStorageHelper {
 						}
 					} else {
 						SPBlock spb = swctx.getSPBlock(record.getOriginSpNo());
-						double ratio = record.getValue()/spb.getLasttonnesWt();
+						double ratio = 0;
+						if(spb.getLasttonnesWt() > 0) {
+							ratio = record.getValue()/spb.getLasttonnesWt();
+						}
 						ips.setDouble(8, record.getValue());
 						ips.setDouble(9, ratio);
 						

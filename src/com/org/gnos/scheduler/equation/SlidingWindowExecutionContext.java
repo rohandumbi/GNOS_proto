@@ -209,9 +209,9 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 		if(spb != null) {
 			spb.tonnesWt -= tonnesWeight;
 			spb.reclaimedTonnesWt += tonnesWeight;
-			if(spb.reclaimedTonnesWt == spb.lasttonnesWt){
+			/*if(spb.reclaimedTonnesWt == spb.lasttonnesWt){
 				spb.reset();
-			}
+			}*/
 		}		
 	}
 	
@@ -231,7 +231,23 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 		return spBlockMapping.get(spNo);
 	}
 	
-	public void processStockpiles(SlidingWindowModeDBStorageHelper storeHelper) {
+	public void finalizeStockpiles(SlidingWindowModeDBStorageHelper storeHelper) {
+		
+		Set<Integer> spNos = spBlockMapping.keySet();
+		for(int spNo: spNos){
+			SPBlock spb = spBlockMapping.get(spNo);
+			if(!(spb.getLasttonnesWt() == spb.getTonnesWt() && spb.getReclaimedTonnesWt() == 0)) {
+				storeHelper.processStockpileInventory(spNo, spb);
+			}			
+			spb.setLasttonnesWt(spb.getTonnesWt());
+			if(spb.reclaimedTonnesWt == spb.lasttonnesWt){
+				spb.reset();
+			}
+			spb.setReclaimedTonnesWt(0);
+		}
+		
+	}
+	public void processStockpiles() {
 		Set<Integer> spNos = spTonnesWigthMapping.keySet();
 		for(int spNo: spNos){
 			SPBlock spb = spBlockMapping.get(spNo);
@@ -302,9 +318,6 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 				spb.getProcesses().addAll(b.getProcesses());
 			}
 			processGrades(spb, gradeExprs);
-			storeHelper.processStockpileInventory(spNo, spb);
-			spb.setLasttonnesWt(spb.getTonnesWt());
-			spb.setReclaimedTonnesWt(0);
 		}
 		
 		spTonnesWigthMapping = new HashMap<Integer,  Map<Integer, Double>>();

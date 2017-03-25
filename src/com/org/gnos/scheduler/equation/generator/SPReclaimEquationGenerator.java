@@ -80,7 +80,7 @@ public class SPReclaimEquationGenerator extends EquationGenerator{
 			Stockpile sp = context.getStockpileFromNo(spNo);
 			if(!sp.isReclaim() && !(sp.getCapacity() > 0)) continue;
 			SPBlock spb = spBlockMapping.get(spNo);
-			if(spb == null) continue;
+			if(spb == null || spb.getTonnesWt() == 0) continue;
 			Set<Block> blocks = sp.getBlocks();
 			double capacity = sp.getCapacity();
 			if(spb.getTonnesWt() > 0) {
