@@ -131,9 +131,10 @@ public class DBStorageHelper implements IStorageHelper {
 					} else if(record.getDestinationType() == Record.DESTINATION_WASTE) {
 						ips.setInt(7, record.getWasteNo());
 					}
-					ips.setDouble(8, record.getValue());
-					ips.setDouble(9, ratio);
-					int index = 10;
+					ips.setDouble(8, record.getTimePeriod());
+					ips.setDouble(9, record.getValue());
+					ips.setDouble(10, ratio);
+					int index = 11;
 					for(Field f: fields) {
 						if(f.getDataType() == Field.TYPE_GRADE) {
 							String associatedFieldName = f.getWeightedUnit();
@@ -212,8 +213,8 @@ public class DBStorageHelper implements IStorageHelper {
 		int projectId = context.getProjectId();
 		dropReportTable(projectId);
 		
-		StringBuffer sbuff_sql = new StringBuffer("insert into gnos_report_"+projectId+" (scenario_name, origin_type, pit_no, sp_no, block_no, destination_type, destination, quantity_mined, ratio ");
-		StringBuffer sbuff = new StringBuffer(" ( ?, ?, ?, ?, ?, ?, ?, ?, ? ");
+		StringBuffer sbuff_sql = new StringBuffer("insert into gnos_report_"+projectId+" (scenario_name, origin_type, pit_no, sp_no, block_no, destination_type, destination, period, quantity_mined, ratio ");
+		StringBuffer sbuff = new StringBuffer(" ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ");
 		String  data_sql = "CREATE TABLE gnos_report_"+projectId+" ( " +
 				"scenario_name VARCHAR(50), " +
 				" origin_type TINYINT NOT NULL, " +			
@@ -222,6 +223,7 @@ public class DBStorageHelper implements IStorageHelper {
 				" block_no INT  NOT NULL default -1," +
 				" destination_type TINYINT NOT NULL, " +
 				" destination INT, " + 
+				" period INT, " + 
 				" quantity_mined VARCHAR(50) ," +
 				" ratio double ";
 		

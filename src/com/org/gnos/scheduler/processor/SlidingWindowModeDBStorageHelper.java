@@ -61,14 +61,15 @@ public class SlidingWindowModeDBStorageHelper extends DBStorageHelper {
 					} else if(record.getDestinationType() == Record.DESTINATION_WASTE) {
 						ips.setInt(7, record.getWasteNo());
 					}
+					ips.setInt(8, record.getTimePeriod());
 					if(record.getOriginType() == Record.ORIGIN_PIT) {
 						Block b = context.getBlocks().get(record.getBlockNo());
 						double tonnesWt = Double.valueOf(b.getField(context.getTonnesWtFieldName()));
 						double ratio = record.getValue()/tonnesWt;
-						ips.setDouble(8, record.getValue());
-						ips.setDouble(9, ratio);
+						ips.setDouble(9, record.getValue());
+						ips.setDouble(10, ratio);
 						
-						int index = 10;
+						int index = 11;
 											
 						for(Field f: fields) {
 							if(f.getDataType() == Field.TYPE_GRADE) {
@@ -92,10 +93,10 @@ public class SlidingWindowModeDBStorageHelper extends DBStorageHelper {
 						if(spb.getLasttonnesWt() > 0) {
 							ratio = record.getValue()/spb.getLasttonnesWt();
 						}
-						ips.setDouble(8, record.getValue());
-						ips.setDouble(9, ratio);
+						ips.setDouble(9, record.getValue());
+						ips.setDouble(10, ratio);
 						
-						int index = 10;
+						int index = 11;
 											
 						for(Field f: fields) {
 							if(f.getDataType() == Field.TYPE_GRADE) {
