@@ -76,6 +76,10 @@ public class ReportController {
 				}
 			}
 		}
+		if(groupbytype == 2) {
+			sqlbuilder.append(" AND origin_type = 1 ");
+		}
+		
 		sqlbuilder.append(groupByClause);
 
 		Object[] values = { scenarioName };
