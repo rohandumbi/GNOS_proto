@@ -39,7 +39,7 @@ public class ReportEndpoint {
 				}
 			}, json());
 			
-			post("/project/:id/report/grade", new Route() {
+			/*post("/project/:id/report/grade", new Route() {
 				
 				@Override
 				public Object handle(Request req, Response res) throws Exception {
@@ -56,7 +56,7 @@ public class ReportEndpoint {
 					res.status(400);				
 					return new ResponseError("Field creation failed due to improper input");
 				}
-			}, json());
+			}, json());*/
 		}
 		
 }
