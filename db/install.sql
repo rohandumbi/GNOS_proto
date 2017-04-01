@@ -398,3 +398,21 @@ CREATE TABLE scenario_config(
    reclaim TINYINT,
    unique key(scenario_id)
 );
+
+DROP TABLE IF EXISTS report_defn; 
+
+CREATE TABLE report_defn(
+   id INT NOT NULL AUTO_INCREMENT,
+   project_id INT NOT NULL,
+   name VARCHAR(50),
+   type TINYINT,
+   unique key(project_id, name)
+);
+
+DROP TABLE IF EXISTS report_field_mapping; 
+
+CREATE TABLE report_field_mapping(
+   report_id INT,
+   v_field_name VARCHAR(50),
+   h_field_name VARCHAR(50)
+);

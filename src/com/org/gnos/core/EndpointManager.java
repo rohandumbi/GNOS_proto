@@ -22,6 +22,7 @@ import com.org.gnos.services.endpoints.ProcessTreeEndpoint;
 import com.org.gnos.services.endpoints.ProductEndpoint;
 import com.org.gnos.services.endpoints.ProductJoinEndpoint;
 import com.org.gnos.services.endpoints.ProjectEndpoint;
+import com.org.gnos.services.endpoints.ReportEndpoint;
 import com.org.gnos.services.endpoints.RequiredFieldEndpoint;
 import com.org.gnos.services.endpoints.ScenarioEndpoint;
 import com.org.gnos.services.endpoints.SchedulerEndpoint;
@@ -62,5 +63,6 @@ public class EndpointManager {
 		new SchedulerEndpoint();
 		new RequiredFieldEndpoint();
 		new TruckParameterPayloadEndpoint();
+		new ReportEndpoint();
 	}
 }
