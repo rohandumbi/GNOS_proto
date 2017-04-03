@@ -404,7 +404,12 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 			} else {
 				Model pModel = parent.getData();
 				if(hasValue(pModel.getCondition())){
-					condition = pModel.getCondition();
+					if(hasValue(condition)) {
+						condition = condition + " AND "+  pModel.getCondition();
+					} else {
+						condition = pModel.getCondition();
+					}
+					
 				}
 				if(pModel.getUnitType() == Model.UNIT_EXPRESSION) {
 					Expression expr1 =  context.getExpressionById(pModel.getExpressionId());
