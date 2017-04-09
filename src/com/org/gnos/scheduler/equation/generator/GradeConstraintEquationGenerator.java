@@ -56,18 +56,23 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 			Map<String, List<Object>> processExprMap = new HashMap<String, List<Object>>();
 			Map<String, List<Grade>> processGradeMap = new HashMap<String, List<Grade>>();
 			ProductJoin pj = context.getProductJoinFromName(gradeConstraintData.getProductJoinName());
-			if(pj == null || pj.getGradeNames().size() == 0) continue;		
+			if(pj == null) continue;		
 			int selectedGradeIndex = -1;
-			int loopCount = 0;
-			for(String gradeName: pj.getGradeNames()){
-				if(gradeName.equals(selectedGradeName)){
-					selectedGradeIndex = loopCount;
-					break;
-				}			
-				loopCount++;
-			}
+
 			Set<String> productNames = getProductsFromProductJoin(pj);
 			for(String productName: productNames){
+				
+				if(selectedGradeIndex == -1 ) {
+					List<Grade> grades = context.getGradesForProduct(productName);
+					int loopCount = 0;
+					for(Grade grade: grades){
+						if(grade.getName().equals(selectedGradeName)){
+							selectedGradeIndex = loopCount;
+							break;
+						}			
+						loopCount++;
+					}
+				}
 				Product p = context.getProductFromName(productName);
 				Integer processId = p.getModelId();
 				String processName = context.getModelById(processId).getName();
@@ -101,6 +106,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 					ProcessJoin processJoin = context.getProcessJoinByName(gradeConstraintData.getSelectorName());
 					if(processJoin != null) {
 						for(Integer modelId: processJoin.getChildProcessList()){
+							if(modelId == 0) continue;
 							Model model = context.getModelById(modelId);
 							for( Process p: processList){
 								String processName = p.getModel().getName();

@@ -12,7 +12,11 @@ import java.util.Set;
 
 import com.org.gnos.core.Block;
 import com.org.gnos.db.DBManager;
+import com.org.gnos.db.model.Dump;
+import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Field;
+import com.org.gnos.db.model.Process;
+import com.org.gnos.db.model.Stockpile;
 import com.org.gnos.scheduler.equation.ExecutionContext;
 
 public class DBStorageHelper implements IStorageHelper {
@@ -110,6 +114,7 @@ public class DBStorageHelper implements IStorageHelper {
 	public void storeInReports(List<Record> records) {
 		Map<Integer, PreparedStatement> stmts = new HashMap<Integer, PreparedStatement>();
 		List<Field> fields = context.getFields();
+		List<Expression> expressions = context.getExpressions();
 		try ( PreparedStatement ips = conn.prepareStatement(report_insert_sql); ){
 			boolean autoCommit = conn.getAutoCommit();
 			conn.setAutoCommit(false);
@@ -125,11 +130,14 @@ public class DBStorageHelper implements IStorageHelper {
 					ips.setInt(5, record.getBlockNo());
 					ips.setInt(6, record.getDestinationType());
 					if(record.getDestinationType() == Record.DESTINATION_PROCESS) {
-						ips.setInt(7, record.getProcessNo());
+						Process process = context.getProcessByNumber(record.getProcessNo());
+						ips.setString(7, process.getModel().getName());
 					} else if(record.getDestinationType() == Record.DESTINATION_SP) {
-						ips.setInt(7, record.getDestSpNo());
+						Stockpile sp = context.getStockpileFromNo(record.getDestSpNo());
+						ips.setString(7, sp.getName());
 					} else if(record.getDestinationType() == Record.DESTINATION_WASTE) {
-						ips.setInt(7, record.getWasteNo());
+						Dump dump = context.getDumpfromNo(record.getWasteNo());
+						ips.setString(7, dump.getName());
 					}
 					ips.setDouble(8, record.getTimePeriod());
 					ips.setDouble(9, record.getValue());
@@ -148,6 +156,20 @@ public class DBStorageHelper implements IStorageHelper {
 						} else {
 							ips.setString(index, b.getField(f.getName()));
 						}					
+						
+						index ++;
+					}
+					for(Expression expression: expressions) {
+						if(expression.isGrade()) {
+							String associatedFieldName = expression.getWeightedField();
+							BigDecimal value = b.getComputedField(expression.getName()).multiply(new BigDecimal(b.getField(associatedFieldName)));
+							value = value.multiply(new BigDecimal(ratio));
+							ips.setString(index, value.toString());
+						} else {
+							BigDecimal value = b.getComputedField(expression.getName());
+							value = value.multiply(new BigDecimal(ratio));
+							ips.setString(index, value.toString());
+						}				
 						
 						index ++;
 					}
@@ -222,7 +244,7 @@ public class DBStorageHelper implements IStorageHelper {
 				" sp_no INT NOT NULL default -1," +
 				" block_no INT  NOT NULL default -1," +
 				" destination_type TINYINT NOT NULL, " +
-				" destination INT, " + 
+				" destination VARCHAR(50), " + 
 				" period INT, " + 
 				" quantity_mined VARCHAR(50) ," +
 				" ratio double ";
@@ -242,6 +264,17 @@ public class DBStorageHelper implements IStorageHelper {
 			sbuff_sql.append("," + name);
 			sbuff.append(", ?");
 		}
+		
+		for(Expression expression : context.getExpressions()){
+			String name = expression.getName();
+			if(expression.isGrade()) {
+				name = name+"_u";
+			}
+			data_sql +=  ","+ name +" double ";			
+			sbuff_sql.append("," + name);
+			sbuff.append(", ?");
+		}
+		
 		data_sql += " ); ";
 		//data_sql += "  UNIQUE KEY (scenario_name, origin_type, pit_no, block_no, destination_type, destination) );";
 		sbuff_sql.append(")");

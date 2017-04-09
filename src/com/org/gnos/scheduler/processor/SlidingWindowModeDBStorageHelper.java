@@ -10,7 +10,11 @@ import java.util.Map;
 import java.util.Set;
 
 import com.org.gnos.core.Block;
+import com.org.gnos.db.model.Dump;
+import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Field;
+import com.org.gnos.db.model.Process;
+import com.org.gnos.db.model.Stockpile;
 import com.org.gnos.scheduler.equation.SPBlock;
 import com.org.gnos.scheduler.equation.SlidingWindowExecutionContext;
 
@@ -42,6 +46,7 @@ public class SlidingWindowModeDBStorageHelper extends DBStorageHelper {
 		SlidingWindowExecutionContext swctx = (SlidingWindowExecutionContext)context;
 		Map<Integer, PreparedStatement> stmts = new HashMap<Integer, PreparedStatement>();
 		List<Field> fields = context.getFields();
+		List<Expression> expressions = context.getExpressions();
 		try ( PreparedStatement ips = conn.prepareStatement(report_insert_sql); ){
 			boolean autoCommit = conn.getAutoCommit();
 			conn.setAutoCommit(false);
@@ -55,11 +60,14 @@ public class SlidingWindowModeDBStorageHelper extends DBStorageHelper {
 					ips.setInt(5, record.getBlockNo());
 					ips.setInt(6, record.getDestinationType());
 					if(record.getDestinationType() == Record.DESTINATION_PROCESS) {
-						ips.setInt(7, record.getProcessNo());
+						Process process = context.getProcessByNumber(record.getProcessNo());
+						ips.setString(7, process.getModel().getName());
 					} else if(record.getDestinationType() == Record.DESTINATION_SP) {
-						ips.setInt(7, record.getDestSpNo());
+						Stockpile sp = context.getStockpileFromNo(record.getDestSpNo());
+						ips.setString(7, sp.getName());
 					} else if(record.getDestinationType() == Record.DESTINATION_WASTE) {
-						ips.setInt(7, record.getWasteNo());
+						Dump dump = context.getDumpfromNo(record.getWasteNo());
+						ips.setString(7, dump.getName());
 					}
 					ips.setInt(8, record.getTimePeriod());
 					if(record.getOriginType() == Record.ORIGIN_PIT) {
@@ -87,6 +95,20 @@ public class SlidingWindowModeDBStorageHelper extends DBStorageHelper {
 							
 							index ++;
 						}
+						for(Expression expression: expressions) {
+							if(expression.isGrade()) {
+								String associatedFieldName = expression.getWeightedField();
+								BigDecimal value = b.getComputedField(expression.getName()).multiply(new BigDecimal(b.getField(associatedFieldName)));
+								value = value.multiply(new BigDecimal(ratio));
+								ips.setString(index, value.toString());
+							} else {
+								BigDecimal value = b.getComputedField(expression.getName());
+								value = value.multiply(new BigDecimal(ratio));
+								ips.setString(index, value.toString());
+							}				
+							
+							index ++;
+						}
 					} else {
 						SPBlock spb = swctx.getSPBlock(record.getOriginSpNo());
 						double ratio = 0;
@@ -110,6 +132,21 @@ public class SlidingWindowModeDBStorageHelper extends DBStorageHelper {
 							} else {
 								ips.setString(index, spb.getField(f.getName()).toString());
 							}					
+							
+							index ++;
+						}
+						
+						for(Expression expression: expressions) {
+							if(expression.isGrade()) {
+								String associatedFieldName = expression.getWeightedField();
+								BigDecimal value = spb.getComputedField(expression.getName()).multiply(spb.getField(associatedFieldName));
+								value = value.multiply(new BigDecimal(ratio));
+								ips.setString(index, value.toString());
+							} else {
+								BigDecimal value = spb.getComputedField(expression.getName());
+								value = value.multiply(new BigDecimal(ratio));
+								ips.setString(index, value.toString());
+							}				
 							
 							index ++;
 						}

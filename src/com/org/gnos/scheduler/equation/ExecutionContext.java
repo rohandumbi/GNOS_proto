@@ -30,6 +30,7 @@ import com.org.gnos.db.dao.ExpressionDAO;
 import com.org.gnos.db.dao.FieldDAO;
 import com.org.gnos.db.dao.FixedCostDAO;
 import com.org.gnos.db.dao.GradeConstraintDAO;
+import com.org.gnos.db.dao.GradeDAO;
 import com.org.gnos.db.dao.ModelDAO;
 import com.org.gnos.db.dao.OpexDAO;
 import com.org.gnos.db.dao.PitDependencyDAO;
@@ -97,6 +98,7 @@ public class ExecutionContext {
 	private List<ProcessJoin> processJoinList;
 	private List<ProductJoin> productJoinList;
 	private List<Product> productList;
+	private List<Grade> gradeList;
 	private List<CycleTimeFieldMapping> cycleTimeFieldMappings;
 	private List<TruckParameterCycleTime> truckParameterCycleTimeList;
 	private BigDecimal fixedTime;
@@ -139,6 +141,7 @@ public class ExecutionContext {
 		loadProducts();
 		loadProcessJoins();
 		loadProductJoins();
+		//loadGrades();
 		loadPitGroups();
 		loadStockpiles();
 		loadDumps();
@@ -225,6 +228,9 @@ public class ExecutionContext {
 		productList = new ProductDAO().getAll(projectId);
 	}
 
+	private void loadGrades() {
+		
+	}
 	private void loadProcessJoins() {
 		processJoinList = new ProcessJoinDAO().getAll(projectId);
 	}
@@ -232,7 +238,7 @@ public class ExecutionContext {
 	private void loadProductJoins() {
 		productJoinList = new ProductJoinDAO().getAll(projectId);
 	}
-
+	
 	private void loadPitGroups() {
 		pitGroups = new PitGroupDAO().getAll(projectId);
 	}
@@ -503,6 +509,18 @@ public class ExecutionContext {
 		return null;
 	}
 
+	public Process getProcessByNumber(int processNumber) {
+		if (processList == null)
+			return null;
+		for (Process process : processList) {
+			if (process.getProcessNo() == processNumber) {
+				return process;
+			}
+		}
+		return null;
+	}
+
+	
 	public Model getModelById(int id) {
 		if (models == null)
 			return null;
@@ -572,6 +590,16 @@ public class ExecutionContext {
 		return null;
 	}
 
+	public Dump getDumpfromNo(int dumpNo) {
+		;
+		for (Dump dump : dumps) {
+			if (dump.getDumpNumber() == dumpNo) {
+				return dump;
+			}
+		}
+		return null;
+	}
+	
 	public Dump getDumpfromDumpName(String name) {
 		for (Dump dump : dumps) {
 			if (dump.getName().equals(name)) {
@@ -663,10 +691,10 @@ public class ExecutionContext {
 		if(unitType == 1) { // 1- Field, 2 - Expression
 			Field field = getFieldById(unitId);
 			try {
-				BigDecimal value = new BigDecimal(b.getField(field.getName()));
-				BigDecimal tonnesWtvalue = new BigDecimal(b.getField(tonnesWtFieldName));
-				if(tonnesWtvalue.doubleValue() == 0) return new BigDecimal(0);
-				return value.divide(tonnesWtvalue);
+				double value = Double.valueOf(b.getField(field.getName()));
+				double tonnesWtvalue = Double.valueOf(b.getField(tonnesWtFieldName));
+				if(tonnesWtvalue == 0) return new BigDecimal(0);
+				return new BigDecimal(value/tonnesWtvalue);
 			} catch(Exception e) {
 				return null;
 			}
