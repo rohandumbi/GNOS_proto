@@ -55,8 +55,8 @@ public class ProductEndpoint {
 			@Override
 			public Object handle(Request req, Response res) throws Exception {
 				JsonElement requestObject = new JsonParser().parse(req.body());
-				if(requestObject == null) {
-					controller.deleteProduct(req.params(":id"), req.params(":name"));
+				if(requestObject.isJsonNull()) {
+					return controller.deleteProduct(req.params(":id"), req.params(":name"));
 				} else if(requestObject.isJsonObject()) {
 					JsonObject jsonObject = requestObject.getAsJsonObject();
 					try {
