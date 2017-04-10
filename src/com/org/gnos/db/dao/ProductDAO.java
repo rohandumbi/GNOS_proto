@@ -21,6 +21,7 @@ public class ProductDAO {
 	private static final String SQL_GET_PRODUCT_BY_NAME = "select name, associated_model_id, child_unit_type, child_unit_id from product_defn where project_id = ? and name = ?";
 	private static final String SQL_INSERT = "insert into product_defn (project_id, name, associated_model_id, child_unit_type, child_unit_id) values (?, ?, ?, ?, ?)";
 	private static final String SQL_DELETE = "delete from product_defn where project_id = ?";
+	private static final String SQL_DELETE_PRODUCT = "delete from product_defn where project_id = ? and name = ?";
 	private static final String SQL_DELETE_UNIT = "delete from product_defn where project_id = ? and name = ? and child_unit_type = ? , child_unit_id = ?";
 	
 	public List<Product> getAll(int projectId) {
@@ -128,6 +129,23 @@ public class ProductDAO {
 		}
 	}
 
+	public void deleteProduct(int projectId, String productName){
+
+		Object[] values = { 
+				projectId,
+				productName
+		};
+
+		try (
+			Connection connection = DBManager.getConnection();
+			PreparedStatement statement = prepareStatement(connection, SQL_DELETE_PRODUCT, false, values);
+		) {
+			statement.executeUpdate();
+		} catch (SQLException e) {
+			//throw new DAOException(e);
+		}
+	}
+	
 	public void deleteUnit(int projectId, String productName, short unitType, int unitId){
 
 		Object[] values = { 

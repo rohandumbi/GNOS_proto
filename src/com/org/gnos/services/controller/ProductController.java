@@ -117,6 +117,11 @@ public class ProductController {
 		return true;
 	}
 	
+	public boolean deleteProduct(String projectId, String productName) {
+		dao.deleteProduct(Integer.parseInt(projectId), productName);
+		return true;
+	}
+	
 	public boolean deleteUnit(JsonObject jsonObject, String projectId, String productName) {
 		short unitType = jsonObject.get("unitType").getAsShort();
 		int unitId =  jsonObject.get("unitId").getAsInt();
