@@ -27,12 +27,14 @@ public class ExpressionController {
 		boolean isComplex = jsonObject.get("isComplex").getAsBoolean();
 		String exprvalue = jsonObject.get("exprvalue").getAsString();
 		String weightedField = null;
+		short weightedFieldType = Expression.UNIT_NONE;
 		String filter = null;
 		if(jsonObject.get("filter") != null){
 			filter = jsonObject.get("filter").getAsString();
 		}
 		if(jsonObject.get("weightedField") != null){
-			filter = jsonObject.get("weightedField").getAsString();
+			weightedField = jsonObject.get("weightedField").getAsString();
+			weightedFieldType = jsonObject.get("weightedFieldType").getAsShort();
 		}
 		Expression obj = new Expression();
 		obj.setName(name);
@@ -41,6 +43,7 @@ public class ExpressionController {
 		obj.setExprvalue(exprvalue);
 		obj.setFilter(filter);
 		obj.setWeightedField(weightedField);
+		obj.setWeightedFieldType(weightedFieldType);
 		boolean created = dao.create(obj, Integer.parseInt(pid));
 		if(created){
 			List<Expression> expressions = new ArrayList<Expression>();
@@ -60,12 +63,14 @@ public class ExpressionController {
 		boolean isComplex = jsonObject.get("isComplex").getAsBoolean();
 		String exprvalue = jsonObject.get("exprvalue").getAsString();
 		String weightedField = null;
+		short weightedFieldType = Expression.UNIT_NONE;
 		String filter = null;
 		if(jsonObject.get("filter") != null){
 			filter = jsonObject.get("filter").getAsString();
 		}
 		if(jsonObject.get("weightedField") != null){
 			weightedField = jsonObject.get("weightedField").getAsString();
+			weightedFieldType = jsonObject.get("weightedFieldType").getAsShort();
 		}
 		int id = Integer.parseInt(eid);
 		Expression obj = new Expression();
@@ -76,6 +81,7 @@ public class ExpressionController {
 		obj.setExprvalue(exprvalue);
 		obj.setFilter(filter);
 		obj.setWeightedField(weightedField);
+		obj.setWeightedFieldType(weightedFieldType);
 		boolean updated = dao.update(obj);
 		if(updated){
 			List<Expression> expressions = new ArrayList<Expression>();

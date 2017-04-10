@@ -73,6 +73,7 @@ CREATE TABLE expressions (
    is_complex TINYINT(1),
    expr_value VARCHAR(200) NOT NULL,
    filter VARCHAR(400),
+   weighted_field_type TINYINT(1),
    weighted_field VARCHAR(100),
    PRIMARY KEY ( id, project_id ),
    UNIQUE (project_id, name)

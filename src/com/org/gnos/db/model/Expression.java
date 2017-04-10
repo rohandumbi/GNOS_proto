@@ -3,6 +3,10 @@ package com.org.gnos.db.model;
 
 public class Expression {
 	
+	public static final short UNIT_NONE = 0;
+	public static final short UNIT_FIELD = 1;
+	public static final short UNIT_EXPRESSION = 2;
+	
 	private int id;
 	private String name;
 	private boolean isGrade;
@@ -10,6 +14,7 @@ public class Expression {
 	private String exprvalue;
 	private String filter;
 	private String weightedField;
+	private short weightedFieldType;
 	
 	public Expression() {
 		super();
@@ -76,6 +81,14 @@ public class Expression {
 
 	public void setWeightedField(String weightedField) {
 		this.weightedField = weightedField;
+	}
+
+	public short getWeightedFieldType() {
+		return weightedFieldType;
+	}
+
+	public void setWeightedFieldType(short weightedFieldType) {
+		this.weightedFieldType = weightedFieldType;
 	}
 
 	@Override

@@ -14,12 +14,12 @@ import com.org.gnos.db.model.Expression;
 
 public class ExpressionDAO {
 
-	private static final String SQL_LIST_ORDER_BY_ID = "select id, name, is_grade, is_complex, expr_value, filter, weighted_field from  expressions where project_id = ? order by id";
-	private static final String SQL_LIST_BY_WEIGHTED_FIELD = "select id, name, is_grade, is_complex, expr_value, filter, weighted_field from  expressions"
+	private static final String SQL_LIST_ORDER_BY_ID = "select id, name, is_grade, is_complex, expr_value, filter, weighted_field, weighted_field_type from  expressions where project_id = ? order by id";
+	private static final String SQL_LIST_BY_WEIGHTED_FIELD = "select id, name, is_grade, is_complex, expr_value, filter, weighted_field, weighted_field_type from  expressions"
 			+ " where project_id = ? and is_grade = true and weighted_field = ?  order by id";
-	private static final String SQL_INSERT = "insert into expressions (project_id, name, is_grade, is_complex, expr_value, filter, weighted_field) values (?, ?, ?, ?, ?,?, ?)";
+	private static final String SQL_INSERT = "insert into expressions (project_id, name, is_grade, is_complex, expr_value, filter, weighted_field, weighted_field_type) values (?, ?, ?, ?, ?, ?, ?, ?)";
 	private static final String SQL_DELETE = "delete from expressions where id = ?";
-	private static final String SQL_UPDATE = "update expressions set is_grade = ?, is_complex = ?, expr_value = ?, filter = ?, weighted_field = ? where id = ?";
+	private static final String SQL_UPDATE = "update expressions set is_grade = ?, is_complex = ?, expr_value = ?, filter = ?, weighted_field = ?, weighted_field_type = ? where id = ?";
 	
 	public List<Expression> getAll(int projectId) {
 		
@@ -80,7 +80,8 @@ public class ExpressionDAO {
 				expression.isComplex(),
 				expression.getExprvalue(),
 				expression.getFilter(),
-				expression.getWeightedField()
+				expression.getWeightedField(),
+				expression.getWeightedFieldType()
 	   };
 
 		try ( Connection connection = DBManager.getConnection();
@@ -118,6 +119,7 @@ public class ExpressionDAO {
 				expression.getExprvalue(),
 				expression.getFilter(),
 				expression.getWeightedField(),
+				expression.getWeightedFieldType(),
 				expression.getId()
 	   };
 
@@ -163,6 +165,7 @@ public class ExpressionDAO {
 		expression.setExprvalue(rs.getString("expr_value"));
 		expression.setFilter(rs.getString("filter"));
 		expression.setWeightedField(rs.getString("weighted_field"));
+		expression.setWeightedFieldType(rs.getShort("weighted_field_type"));
 
 		return expression;
 	}
