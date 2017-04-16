@@ -735,15 +735,26 @@ public class ExecutionContext {
 			return b.getComputedField(unitName);
 		}
 	}
-/*	public BigDecimal getExpressionValueforBlock(Block b, Expression expr) {
-		String expressionName = expr.getName().replaceAll("\\s+", "_");
-		return b.getComputedField(expressionName);
+	
+	public BigDecimal getProductValueForBlock(Block b, Product product) {
+		BigDecimal value =  new BigDecimal(0);
+		for(Integer eid : product.getExpressionIdList()){
+			value = value.add(getUnitValueforBlock(b, eid, Product.UNIT_EXPRESSION));
+		}
+		for(Integer fid : product.getFieldIdList()){
+			value = value.add(getUnitValueforBlock(b, fid, Product.UNIT_FIELD));
+		}
+		return value;	
 	}
 
-	public BigDecimal getExpressionValueforBlock(Block b, String exprName) {
-		String expressionName = exprName.replaceAll("\\s+", "_");
-		return b.getComputedField(expressionName);
-	}*/
+	public BigDecimal getProductJoinValueForBlock(Block b, ProductJoin productJoin) {
+		BigDecimal value =  new BigDecimal(0);
+		for(String productName :productJoin.getProductList()) {
+			Product p = getProductFromName(productName);
+			value = value.add(getProductValueForBlock(b, p));
+		}		
+		return value;
+	}
 
 	public int getStartYear() {
 		return startYear;

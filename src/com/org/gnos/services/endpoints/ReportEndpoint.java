@@ -20,7 +20,7 @@ public class ReportEndpoint {
 		public ReportEndpoint() {
 			controller = new ReportController();
 
-			post("/project/:id/report/expit", new Route() {
+			post("/project/:id/report", new Route() {
 				
 				@Override
 				public Object handle(Request req, Response res) throws Exception {
@@ -28,7 +28,7 @@ public class ReportEndpoint {
 					if(requestObject.isJsonObject()) {
 						JsonObject jsonObject = requestObject.getAsJsonObject();
 						try {
-							return controller.getExpitReport(jsonObject, req.params(":id"));
+							return controller.getReport(jsonObject, req.params(":id"));
 						} catch (Exception e) {
 							res.status(400);
 							return new ResponseError("Field creation failed. "+e.getMessage());
@@ -38,25 +38,6 @@ public class ReportEndpoint {
 					return new ResponseError("Field creation failed due to improper input");
 				}
 			}, json());
-			
-			/*post("/project/:id/report/grade", new Route() {
-				
-				@Override
-				public Object handle(Request req, Response res) throws Exception {
-					JsonElement requestObject = new JsonParser().parse(req.body());
-					if(requestObject.isJsonObject()) {
-						JsonObject jsonObject = requestObject.getAsJsonObject();
-						try {
-							return controller.getGradeReport(jsonObject, req.params(":id"));
-						} catch (Exception e) {
-							res.status(400);
-							return new ResponseError("Field creation failed. "+e.getMessage());
-						}					
-					}
-					res.status(400);				
-					return new ResponseError("Field creation failed due to improper input");
-				}
-			}, json());*/
 		}
 		
 }

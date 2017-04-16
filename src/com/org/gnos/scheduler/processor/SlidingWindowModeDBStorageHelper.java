@@ -13,7 +13,11 @@ import com.org.gnos.core.Block;
 import com.org.gnos.db.model.Dump;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Field;
+import com.org.gnos.db.model.PitGroup;
 import com.org.gnos.db.model.Process;
+import com.org.gnos.db.model.ProcessJoin;
+import com.org.gnos.db.model.Product;
+import com.org.gnos.db.model.ProductJoin;
 import com.org.gnos.db.model.Stockpile;
 import com.org.gnos.scheduler.equation.SPBlock;
 import com.org.gnos.scheduler.equation.SlidingWindowExecutionContext;
@@ -47,37 +51,39 @@ public class SlidingWindowModeDBStorageHelper extends DBStorageHelper {
 		Map<Integer, PreparedStatement> stmts = new HashMap<Integer, PreparedStatement>();
 		List<Field> fields = context.getFields();
 		List<Expression> expressions = context.getExpressions();
+		List<Product> productList = context.getProductList();
+		List<ProductJoin> productJoinList = context.getProductJoinList();
 		try ( PreparedStatement ips = conn.prepareStatement(report_insert_sql); ){
 			boolean autoCommit = conn.getAutoCommit();
 			conn.setAutoCommit(false);
 			for(Record record:records){
 				try {
-					
-					ips.setString(1, context.getScenario().getName());
-					ips.setInt(2, record.getOriginType());
-					ips.setInt(3, record.getPitNo());
-					ips.setInt(4, record.getOriginSpNo());
-					ips.setInt(5, record.getBlockNo());
-					ips.setInt(6, record.getDestinationType());
+					int index = 1;
+					ips.setString(index++, context.getScenario().getName());
+					ips.setInt(index++, 2); // 1- Global mode, 2 - SW mode
+					ips.setInt(index++, record.getOriginType());
+					ips.setInt(index++, record.getPitNo());
+					ips.setInt(index++, record.getOriginSpNo());
+					ips.setInt(index++, record.getBlockNo());
+					ips.setInt(index++, record.getDestinationType());
 					if(record.getDestinationType() == Record.DESTINATION_PROCESS) {
 						Process process = context.getProcessByNumber(record.getProcessNo());
-						ips.setString(7, process.getModel().getName());
+						ips.setString(index++, process.getModel().getName());
 					} else if(record.getDestinationType() == Record.DESTINATION_SP) {
 						Stockpile sp = context.getStockpileFromNo(record.getDestSpNo());
-						ips.setString(7, sp.getName());
+						ips.setString(index++, sp.getName());
 					} else if(record.getDestinationType() == Record.DESTINATION_WASTE) {
 						Dump dump = context.getDumpfromNo(record.getWasteNo());
-						ips.setString(7, dump.getName());
+						ips.setString(index++, dump.getName());
 					}
-					ips.setInt(8, record.getTimePeriod());
+					ips.setInt(index++, record.getTimePeriod());
 					if(record.getOriginType() == Record.ORIGIN_PIT) {
 						Block b = context.getBlocks().get(record.getBlockNo());
 						double tonnesWt = Double.valueOf(b.getField(context.getTonnesWtFieldName()));
 						double ratio = record.getValue()/tonnesWt;
-						ips.setDouble(9, record.getValue());
-						ips.setDouble(10, ratio);
-						
-						int index = 11;
+						ips.setDouble(index++, record.getValue());
+						ips.setDouble(index++, ratio);
+						ips.setDouble(index++, 0); // total truck hour ... need to calculate this
 											
 						for(Field f: fields) {
 							if(f.getDataType() == Field.TYPE_GRADE) {
@@ -108,6 +114,29 @@ public class SlidingWindowModeDBStorageHelper extends DBStorageHelper {
 							}				
 							
 							index ++;
+						} 
+						
+						for(Product product: productList) {
+							ips.setDouble(index, 0);
+							
+							index ++;
+						}
+						
+						for(ProductJoin productJoin: productJoinList) {
+							ips.setDouble(index, 0);
+							
+							index ++;
+						}
+						
+						for(ProcessJoin processJoin : context.getProcessJoinList()){
+							ips.setInt(index, 0);
+							
+							index ++;
+						}
+						for(PitGroup pitGroup : context.getPitGroups()){
+							ips.setInt(index, 0);
+							
+							index ++;
 						}
 					} else {
 						SPBlock spb = swctx.getSPBlock(record.getOriginSpNo());
@@ -115,11 +144,10 @@ public class SlidingWindowModeDBStorageHelper extends DBStorageHelper {
 						if(spb.getLasttonnesWt() > 0) {
 							ratio = record.getValue()/spb.getLasttonnesWt();
 						}
-						ips.setDouble(9, record.getValue());
-						ips.setDouble(10, ratio);
+						ips.setDouble(index++, record.getValue());
+						ips.setDouble(index++, ratio);
+						ips.setDouble(index++, 0); // total truck hour ... need to calculate this
 						
-						int index = 11;
-											
 						for(Field f: fields) {
 							if(f.getDataType() == Field.TYPE_GRADE) {
 								String associatedFieldName = f.getWeightedUnit();
@@ -147,6 +175,29 @@ public class SlidingWindowModeDBStorageHelper extends DBStorageHelper {
 								value = value.multiply(new BigDecimal(ratio));
 								ips.setString(index, value.toString());
 							}				
+							
+							index ++;
+						}
+						
+						for(Product product: productList) {
+							ips.setDouble(index, 0);
+							
+							index ++;
+						}
+						
+						for(ProductJoin productJoin: productJoinList) {
+							ips.setDouble(index, 0);
+							
+							index ++;
+						}
+						
+						for(ProcessJoin processJoin : context.getProcessJoinList()){
+							ips.setInt(index, 0);
+							
+							index ++;
+						}
+						for(PitGroup pitGroup : context.getPitGroups()){
+							ips.setInt(index, 0);
 							
 							index ++;
 						}

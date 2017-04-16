@@ -11,11 +11,16 @@ import java.util.Map;
 import java.util.Set;
 
 import com.org.gnos.core.Block;
+import com.org.gnos.core.Pit;
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.model.Dump;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Field;
+import com.org.gnos.db.model.PitGroup;
 import com.org.gnos.db.model.Process;
+import com.org.gnos.db.model.ProcessJoin;
+import com.org.gnos.db.model.Product;
+import com.org.gnos.db.model.ProductJoin;
 import com.org.gnos.db.model.Stockpile;
 import com.org.gnos.scheduler.equation.ExecutionContext;
 
@@ -115,6 +120,8 @@ public class DBStorageHelper implements IStorageHelper {
 		Map<Integer, PreparedStatement> stmts = new HashMap<Integer, PreparedStatement>();
 		List<Field> fields = context.getFields();
 		List<Expression> expressions = context.getExpressions();
+		List<Product> productList = context.getProductList();
+		List<ProductJoin> productJoinList = context.getProductJoinList();
 		try ( PreparedStatement ips = conn.prepareStatement(report_insert_sql); ){
 			boolean autoCommit = conn.getAutoCommit();
 			conn.setAutoCommit(false);
@@ -123,26 +130,28 @@ public class DBStorageHelper implements IStorageHelper {
 					Block b = context.getBlocks().get(record.getBlockNo());
 					double tonnesWt = context.getTonnesWtForBlock(b);
 					double ratio = record.getValue()/tonnesWt;
-					ips.setString(1, context.getScenario().getName());
-					ips.setInt(2, record.getOriginType());
-					ips.setInt(3, record.getPitNo());
-					ips.setInt(4, record.getOriginSpNo());
-					ips.setInt(5, record.getBlockNo());
-					ips.setInt(6, record.getDestinationType());
+					int index = 1;
+					ips.setString(index++, context.getScenario().getName());
+					ips.setInt(index++, 1); // 1- Global mode, 2 - SW mode
+					ips.setInt(index++, record.getOriginType());
+					ips.setInt(index++, record.getPitNo());
+					ips.setInt(index++, record.getOriginSpNo());
+					ips.setInt(index++, record.getBlockNo());
+					ips.setInt(index++, record.getDestinationType());
 					if(record.getDestinationType() == Record.DESTINATION_PROCESS) {
 						Process process = context.getProcessByNumber(record.getProcessNo());
-						ips.setString(7, process.getModel().getName());
+						ips.setString(index++, process.getModel().getName());
 					} else if(record.getDestinationType() == Record.DESTINATION_SP) {
 						Stockpile sp = context.getStockpileFromNo(record.getDestSpNo());
-						ips.setString(7, sp.getName());
+						ips.setString(index++, sp.getName());
 					} else if(record.getDestinationType() == Record.DESTINATION_WASTE) {
 						Dump dump = context.getDumpfromNo(record.getWasteNo());
-						ips.setString(7, dump.getName());
+						ips.setString(index++, dump.getName());
 					}
-					ips.setDouble(8, record.getTimePeriod());
-					ips.setDouble(9, record.getValue());
-					ips.setDouble(10, ratio);
-					int index = 11;
+					ips.setDouble(index++, record.getTimePeriod());
+					ips.setDouble(index++, record.getValue());
+					ips.setDouble(index++, ratio);
+					ips.setDouble(index++, 0); // total truck hour ... need to calculate this
 					for(Field f: fields) {
 						if(f.getDataType() == Field.TYPE_GRADE) {
 							String associatedFieldName = f.getWeightedUnit();
@@ -171,6 +180,57 @@ public class DBStorageHelper implements IStorageHelper {
 							ips.setString(index, value.toString());
 						}				
 						
+						index ++;
+					}
+					for(Product product: productList) {
+						BigDecimal value = context.getProductValueForBlock(b, product);
+						value = value.multiply(new BigDecimal(ratio));
+						ips.setBigDecimal(index, value);
+						
+						index ++;
+					}
+					
+					for(ProductJoin productJoin: productJoinList) {
+						BigDecimal value = context.getProductJoinValueForBlock(b, productJoin);
+						value = value.multiply(new BigDecimal(ratio));
+						ips.setBigDecimal(index, value);					
+						index ++;
+					}				
+					for(ProcessJoin processJoin : context.getProcessJoinList()){
+						boolean present = false;
+						if(record.getDestinationType() == Record.DESTINATION_PROCESS) {
+							Process process = context.getProcessByNumber(record.getProcessNo());
+							for(int processNo :processJoin.getChildProcessList()) {
+								
+								if(processNo == process.getModel().getId()) {
+									present = true;
+									break;
+								}
+							}							
+						} 
+						if(present) {
+							ips.setInt(index, 1);
+						} else {
+							ips.setInt(index, 0);
+						}
+						index ++;
+					}
+					for(PitGroup pitGroup : context.getPitGroups()){
+						boolean present = false;
+						if(record.getOriginType() == Record.ORIGIN_PIT) {
+							Pit pit = context.getPits().get(record.getPitNo());
+							for(String pitName :pitGroup.getListChildPits()) {							
+								if(pitName.equals(pit.getPitName())) {
+									present = true;
+									break;
+								}
+							}
+						}
+						if(present) {
+							ips.setInt(index, 1);
+						} else {
+							ips.setInt(index, 0);
+						}
 						index ++;
 					}
 					ips.executeUpdate();
@@ -235,10 +295,11 @@ public class DBStorageHelper implements IStorageHelper {
 		int projectId = context.getProjectId();
 		dropReportTable(projectId);
 		
-		StringBuffer sbuff_sql = new StringBuffer("insert into gnos_report_"+projectId+" (scenario_name, origin_type, pit_no, sp_no, block_no, destination_type, destination, period, quantity_mined, ratio ");
-		StringBuffer sbuff = new StringBuffer(" ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ");
+		StringBuffer sbuff_sql = new StringBuffer("insert into gnos_report_"+projectId+" (scenario_name, mode, origin_type, pit_no, sp_no, block_no, destination_type, destination, period, quantity_mined, ratio, total_th ");
+		StringBuffer sbuff = new StringBuffer(" ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ");
 		String  data_sql = "CREATE TABLE gnos_report_"+projectId+" ( " +
 				"scenario_name VARCHAR(50), " +
+				" mode TINYINT NOT NULL, " +
 				" origin_type TINYINT NOT NULL, " +			
 				" pit_no INT NOT NULL default -1," +
 				" sp_no INT NOT NULL default -1," +
@@ -247,7 +308,8 @@ public class DBStorageHelper implements IStorageHelper {
 				" destination VARCHAR(50), " + 
 				" period INT, " + 
 				" quantity_mined VARCHAR(50) ," +
-				" ratio double ";
+				" ratio double,  " +
+				" total_th double ";
 		
 		
 		for(Field f : context.getFields()){
@@ -266,7 +328,7 @@ public class DBStorageHelper implements IStorageHelper {
 		}
 		
 		for(Expression expression : context.getExpressions()){
-			String name = expression.getName();
+			String name = expression.getName().replaceAll("\\s+", "_");
 			if(expression.isGrade()) {
 				name = name+"_u";
 			}
@@ -275,8 +337,36 @@ public class DBStorageHelper implements IStorageHelper {
 			sbuff.append(", ?");
 		}
 		
+		for(Product product : context.getProductList()){
+			String name = product.getName().replaceAll("\\s+", "_");
+			data_sql +=  ","+ name +" double ";			
+			sbuff_sql.append("," + name);
+			sbuff.append(", ?");
+		}
+		
+		for(ProductJoin productJoin : context.getProductJoinList()){
+			String name = productJoin.getName().replaceAll("\\s+", "_");
+			data_sql +=  ","+ name +" double ";			
+			sbuff_sql.append("," + name);
+			sbuff.append(", ?");
+		}
+		
+		for(ProcessJoin processJoin : context.getProcessJoinList()){
+			String name = processJoin.getName().replaceAll("\\s+", "_");
+			data_sql +=  ","+ name +" tinyint ";			
+			sbuff_sql.append("," + name);
+			sbuff.append(", ?");
+		}
+		
+		for(PitGroup pitGroup : context.getPitGroups()){
+			String name = pitGroup.getName().replaceAll("\\s+", "_");
+			data_sql +=  ","+ name +" tinyint ";			
+			sbuff_sql.append("," + name);
+			sbuff.append(", ?");
+		}
+		
 		data_sql += " ); ";
-		//data_sql += "  UNIQUE KEY (scenario_name, origin_type, pit_no, block_no, destination_type, destination) );";
+		
 		sbuff_sql.append(")");
 		sbuff.append(")");
 		report_insert_sql = sbuff_sql.toString() + " values " + sbuff.toString();

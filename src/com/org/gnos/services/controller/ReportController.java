@@ -11,73 +11,83 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.org.gnos.db.DBManager;
-import com.org.gnos.db.dao.RequiredFieldDAO;
-import com.org.gnos.db.model.RequiredField;
+import com.org.gnos.db.dao.ExpressionDAO;
+import com.org.gnos.db.dao.FieldDAO;
+import com.org.gnos.db.model.Expression;
+import com.org.gnos.db.model.Field;
+
 
 public class ReportController {
 
-	private RequiredFieldDAO rdao;
+	//Report Types
+	public final static short TYPE_EXPIT 			= 1;
+	public final static short TYPE_RECLAIM 			= 2;
+	public final static short TYPE_PROCESS			= 3;
+	public final static short TYPE_TOTAL_MOVEMENT 	= 4;
 	
-	public ReportController() {
-		rdao = new RequiredFieldDAO();
-		
-	}
-	public Map<Integer, ? > getExpitReport(JsonObject jsonObject, String projectIdStr) {
-		
-		Map<Integer, ?> expitDataMap = null;
-		StringBuilder sqlbuilder = new StringBuilder("");
-		String groupByClause = "";
-		String pitFieldName = "pit_name";
-		short groupbytype;
-		
+	//Data types
+	public final static short DATA_UNIT_FIELD 		= 1;
+	public final static short DATA_EXPRESSION 		= 2;
+	public final static short DATA_PRODUCT 			= 3;
+	public final static short DATA_PRODUCT_JOIN 	= 4;
+	public final static short DATA_TOTAL_TH 		= 5;
+	public final static short DATA_GRADE 			= 6;
+	
+	public Map<Integer, ? > getReport(JsonObject jsonObject, String projectIdStr)  {
 		String scenarioName = jsonObject.get("scenario_name").getAsString();
-		String groupBy = null;
-		JsonElement groupByElement = jsonObject.get("group_by");
-		JsonElement filtersElement = jsonObject.get("filters");
-		if(groupByElement != null) {
-			groupBy = groupByElement.getAsString();
-		}
-			
-		if(groupBy == null) {			
-			expitDataMap = new HashMap<Integer, Double>();
-			groupbytype = 1;
-			sqlbuilder.append("select period,  sum(quantity_mined) as quantity ");
-			groupByClause = "group by period";
-		} else if(groupBy.equalsIgnoreCase("PIT")){
-			expitDataMap = new HashMap<Integer, List<ExpitReportData>>();
-			groupbytype = 2;
-			List<RequiredField> rFields = rdao.getAll(Integer.parseInt(projectIdStr));
-			for(RequiredField rField : rFields) {
-				if(rField.getFieldName().equalsIgnoreCase("pit_name")) {
-					pitFieldName = rField.getMappedFieldname();
-				}
-			}
-			sqlbuilder.append("select period, "+ pitFieldName+ " as group_by_name, sum(quantity_mined) as quantity ");
-			groupByClause = "group by period, "+ pitFieldName;
-		} else if( groupBy.equalsIgnoreCase("DESTINATION_TYPE")) {
-			expitDataMap = new HashMap<Integer, List<ExpitReportData>>();
-			groupbytype = 3;
-			sqlbuilder.append("select period, destination_type as group_by_name, sum(quantity_mined) as quantity ");
-			groupByClause = "group by period, destination_type";
-		} else {
-			return null;
-		}
-		sqlbuilder.append(" from gnos_report_"+projectIdStr +" where scenario_name = ? ");
+		short reportType =  jsonObject.get("report_type").getAsShort();
+		short dataType = jsonObject.get("data_type").getAsShort();
+		String dataName = jsonObject.get("data_name") == null ? null :  jsonObject.get("data_name").getAsString().replaceAll("\\s+", "_");
+		String groupBy = jsonObject.get("group_by") == null ? null : jsonObject.get("group_by").getAsString().replaceAll("\\s+", "_");
+		int projectId = Integer.parseInt(projectIdStr);
 		
-		if(filtersElement != null) {
-			JsonArray filterdArr = jsonObject.get("filters").getAsJsonArray();
-			if(filterdArr != null) {
-				for( JsonElement elm : filterdArr) {
-					sqlbuilder.append(" AND "+ elm.getAsString());
+		
+		Map<Integer, ?> reportData = new HashMap<Integer, Double>();
+		
+		if(dataName == null) return reportData;
+		
+		StringBuilder sqlbuilder = new StringBuilder("");
+		String groupByClause = "group by period";
+		if(dataType == DATA_GRADE) {
+			short gradeType = jsonObject.get("grade_type").getAsShort();
+			if(gradeType == 1) { //1 = Unit field
+				FieldDAO fdao = new FieldDAO();
+				List<Field> fields = fdao.getAllByType(projectId, Field.TYPE_GRADE);
+				for(Field f: fields) {
+					if(f.getName().equals(dataName)) {
+						sqlbuilder.append("select period,  sum("+dataName+"_u)/sum("+f.getWeightedUnit()+") as value ");
+					}
 				}
+				
+			} else {
+				ExpressionDAO edao = new ExpressionDAO();
+				List<Expression> expressions = edao.getAll(projectId);
+				for(Expression e: expressions) {				
+					if(e.isGrade() && e.getName().equals(dataName)) {
+						sqlbuilder.append("select period,  sum("+dataName+"_u)/sum("+e.getWeightedField()+") as value ");
+					}
+				}				
 			}
+		} else {
+			sqlbuilder.append("select period,  sum("+dataName+") as value ");
 		}
-		if(groupbytype == 2) {
-			sqlbuilder.append(" AND origin_type = 1 ");
+		
+		
+		if(groupBy != null) {
+			sqlbuilder.append(", "+groupBy);
+			groupByClause += ", "+groupBy;
+			
+			reportData = new HashMap<Integer, List<ReportData>>();
+		}
+
+		sqlbuilder.append(" from gnos_report_"+projectId +" where scenario_name = ? ");
+		
+		switch(reportType) {
+			case TYPE_EXPIT: sqlbuilder.append(" AND origin_type = 1 "); break;
+			case TYPE_RECLAIM: sqlbuilder.append(" AND origin_type = 2 "); break;
+			case TYPE_PROCESS: sqlbuilder.append(" AND destination_type = 1 "); break;
 		}
 		
 		sqlbuilder.append(groupByClause);
@@ -90,18 +100,18 @@ public class ReportController {
 			){
 			while(resultSet.next()) {
 				int period = resultSet.getInt("period");
-				if(groupbytype == 1) {
-					double quantity = resultSet.getDouble("quantity");
-					((HashMap<Integer, Double>)expitDataMap).put(period, quantity);
+				if(groupBy == null) {
+					double quantity = resultSet.getDouble("value");
+					((HashMap<Integer, Double>)reportData).put(period, quantity);				
 				} else {
-					List<ExpitReportData> expitData = (List<ExpitReportData>)expitDataMap.get(period);
+					List<ReportData> expitData = (List<ReportData>)reportData.get(period);
 					if(expitData == null) {
-						expitData = new ArrayList<ExpitReportData>();
-						((HashMap<Integer, List<ExpitReportData>>)expitDataMap).put(period, expitData);
+						expitData = new ArrayList<ReportData>();
+						((HashMap<Integer, List<ReportData>>)reportData).put(period, expitData);
 					}
-					ExpitReportData expitReportData = new ExpitReportData();
-					expitReportData.name = resultSet.getString("group_by_name");
-					expitReportData.quantity = resultSet.getDouble("quantity");
+					ReportData expitReportData = new ReportData();
+					expitReportData.name = resultSet.getString(groupBy);
+					expitReportData.value = resultSet.getDouble("value");
 					expitData.add(expitReportData);
 				}
 				
@@ -111,12 +121,12 @@ public class ReportController {
 			e.printStackTrace();
 		}
 		
-		return expitDataMap;
+		return reportData;
 	}
-	
-	class ExpitReportData {
+
+	class ReportData {
 		String name;
-		double quantity;
+		double value;
 		
 	}
 }
