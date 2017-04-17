@@ -22,6 +22,7 @@ import com.org.gnos.db.model.ProcessJoin;
 import com.org.gnos.db.model.Product;
 import com.org.gnos.db.model.ProductJoin;
 import com.org.gnos.db.model.Stockpile;
+import com.org.gnos.db.model.TruckParameterCycleTime;
 import com.org.gnos.scheduler.equation.ExecutionContext;
 
 public class DBStorageHelper implements IStorageHelper {
@@ -130,6 +131,7 @@ public class DBStorageHelper implements IStorageHelper {
 					Block b = context.getBlocks().get(record.getBlockNo());
 					double tonnesWt = context.getTonnesWtForBlock(b);
 					double ratio = record.getValue()/tonnesWt;
+					BigDecimal total_TH = new BigDecimal(0);
 					int index = 1;
 					ips.setString(index++, context.getScenario().getName());
 					ips.setInt(index++, 1); // 1- Global mode, 2 - SW mode
@@ -140,18 +142,41 @@ public class DBStorageHelper implements IStorageHelper {
 					ips.setInt(index++, record.getDestinationType());
 					if(record.getDestinationType() == Record.DESTINATION_PROCESS) {
 						Process process = context.getProcessByNumber(record.getProcessNo());
+						total_TH = total_TH.add(context.getTruckHourRatio(b, process.getModel().getName()));
 						ips.setString(index++, process.getModel().getName());
 					} else if(record.getDestinationType() == Record.DESTINATION_SP) {
 						Stockpile sp = context.getStockpileFromNo(record.getDestSpNo());
+						total_TH = total_TH.add(context.getTruckHourRatio(b, sp.getName()));
 						ips.setString(index++, sp.getName());
 					} else if(record.getDestinationType() == Record.DESTINATION_WASTE) {
 						Dump dump = context.getDumpfromNo(record.getWasteNo());
+						total_TH = total_TH.add(context.getTruckHourRatio(b, dump.getName()));
 						ips.setString(index++, dump.getName());
 					}
 					ips.setDouble(index++, record.getTimePeriod());
 					ips.setDouble(index++, record.getValue());
 					ips.setDouble(index++, ratio);
-					ips.setDouble(index++, 0); // total truck hour ... need to calculate this
+					if(record.getOriginType() == Record.ORIGIN_SP && record.getDestinationType() == Record.DESTINATION_PROCESS) {
+						Stockpile sp = context.getStockpileFromNo(record.getOriginSpNo());
+						Process process = context.getProcessByNumber(record.getProcessNo());
+						TruckParameterCycleTime cycleTime =  context.getTruckParamCycleTimeByStockpileName(sp.getName());
+						int payload = context. getBlockPayloadMapping().get(b.getId());
+						if(payload > 0) {
+							BigDecimal ct = new BigDecimal(0);
+							if(cycleTime.getProcessData() != null){
+								ct = cycleTime.getProcessData().get(process.getModel().getName()).add(context.getFixedTime());
+							} 
+							if(ct != null) {
+								double th_ratio_val =  ct.doubleValue() /( payload* 60);
+								total_TH = total_TH.add(new BigDecimal(th_ratio_val));
+							}
+						}
+						 
+						
+					}
+					total_TH  = total_TH.multiply(new BigDecimal(ratio));
+					
+					ips.setBigDecimal(index++, total_TH);
 					for(Field f: fields) {
 						if(f.getDataType() == Field.TYPE_GRADE) {
 							String associatedFieldName = f.getWeightedUnit();
