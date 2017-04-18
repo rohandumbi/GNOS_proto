@@ -24,6 +24,9 @@ public class DumpDependencyController {
 		if(jsonObject.get("firstPitName") != null){
 			obj.setFirstPitName(jsonObject.get("firstPitName").getAsString());
 		}
+		if(jsonObject.get("firstPitGroupName") != null){
+			obj.setFirstPitGroupName(jsonObject.get("firstPitGroupName").getAsString());
+		}
 		if(jsonObject.get("firstDumpName") !=null){
 			obj.setFirstDumpName(jsonObject.get("firstDumpName").getAsString());
 		}
@@ -41,6 +44,9 @@ public class DumpDependencyController {
 		obj.setId(Integer.parseInt(id));
 		if(jsonObject.get("firstPitName") != null){
 			obj.setFirstPitName(jsonObject.get("firstPitName").getAsString());
+		}
+		if(jsonObject.get("firstPitGroupName") != null){
+			obj.setFirstPitGroupName(jsonObject.get("firstPitGroupName").getAsString());
 		}
 		if(jsonObject.get("firstDumpName") !=null){
 			obj.setFirstDumpName(jsonObject.get("firstDumpName").getAsString());

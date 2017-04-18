@@ -32,12 +32,15 @@ public class PitGroupDAO {
 	            PreparedStatement statement = prepareStatement(connection, SQL_LIST_ORDER_BY_ID, false, values);
 	            ResultSet resultSet = statement.executeQuery();
 	        ){
+			int count = 1;
 			while(resultSet.next()){
 				PitGroup pitGroup = pitGroupMap.get(resultSet.getString("name"));
 				if(pitGroup == null) {
 					pitGroup = map(resultSet, pitGroup);
 					pitGroupMap.put(pitGroup.getName(), pitGroup);
 					pitGroups.add(pitGroup);
+					pitGroup.setPitGroupNumber(count);
+					count++;
 				} else {
 					map(resultSet, pitGroup);
 				}

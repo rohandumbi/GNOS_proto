@@ -15,10 +15,10 @@ import com.org.gnos.db.model.DumpDependencyData;
 public class DumpDependencyDAO {
 
 
-	private static final String SQL_LIST_ORDER_BY_ID = "select id, in_use, first_pit_name, first_dump_name, dependent_dump_name from dump_dependency_defn where scenario_id = ? order by id asc ";
-	private static final String SQL_INSERT = "insert into dump_dependency_defn ( scenario_id , first_pit_name, first_dump_name, dependent_dump_name, in_use) values (?, ?, ?, ?, ?)";
+	private static final String SQL_LIST_ORDER_BY_ID = "select id, in_use, first_pit_name, first_pitgroup_name, first_dump_name,  dependent_dump_name from dump_dependency_defn where scenario_id = ? order by id asc ";
+	private static final String SQL_INSERT = "insert into dump_dependency_defn ( scenario_id , first_pit_name, first_pitgroup_name, first_dump_name, dependent_dump_name, in_use) values (?, ?, ?, ?, ?, ?)";
 	private static final String SQL_DELETE = "delete from dump_dependency_defn where id = ?";
-	private static final String SQL_UPDATE = "update dump_dependency_defn set first_pit_name = ? , first_dump_name = ?, dependent_dump_name = ?, in_use = ? where id = ?";
+	private static final String SQL_UPDATE = "update dump_dependency_defn set first_pit_name = ? , first_pitgroup_name = ?, first_dump_name = ?, dependent_dump_name = ?, in_use = ? where id = ?";
 	
 	public List<DumpDependencyData> getAll(int scenarioId) {
 
@@ -51,6 +51,7 @@ public class DumpDependencyDAO {
 		Object[] values = {
 				scenarioId,
 				dumpDependencyData.getFirstPitName(),
+				dumpDependencyData.getFirstPitGroupName(),
 				dumpDependencyData.getFirstDumpName(),
 				dumpDependencyData.getDependentDumpName(),
 				dumpDependencyData.isInUse()
@@ -88,6 +89,7 @@ public class DumpDependencyDAO {
 
 		Object[] values = {
 				dumpDependencyData.getFirstPitName(),
+				dumpDependencyData.getFirstPitGroupName(),
 				dumpDependencyData.getFirstDumpName(),
 				dumpDependencyData.getDependentDumpName(),
 				dumpDependencyData.isInUse(),
@@ -131,7 +133,9 @@ public class DumpDependencyDAO {
 		DumpDependencyData dumpDependencyData = new DumpDependencyData();
 		dumpDependencyData.setId(rs.getInt("id"));
 		dumpDependencyData.setFirstPitName(rs.getString("first_pit_name"));
+		dumpDependencyData.setFirstPitGroupName(rs.getString("first_pitgroup_name"));
 		dumpDependencyData.setFirstDumpName(rs.getString("first_dump_name"));
+		
 		dumpDependencyData.setDependentDumpName(rs.getString("dependent_dump_name"));
 		dumpDependencyData.setInUse(rs.getBoolean("in_use"));
 

@@ -315,6 +315,7 @@ CREATE TABLE dump_dependency_defn(
    scenario_id INT NOT NULL,
    in_use TINYINT NOT NULL default 1,
    first_pit_name  VARCHAR(50),
+   first_pitgroup_name  VARCHAR(50),
    first_dump_name  VARCHAR(50),
    dependent_dump_name  VARCHAR(50) NOT NULL,
    PRIMARY KEY ( id ),

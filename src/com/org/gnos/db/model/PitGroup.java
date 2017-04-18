@@ -11,6 +11,7 @@ public class PitGroup {
 	private String name;
 	private Set<String> listChildPits;
 	private Set<String> listChildPitGroups;
+	private int pitGroupNumber;
 	
 	public PitGroup(){
 		this.listChildPits = new HashSet<String>();
@@ -42,4 +43,13 @@ public class PitGroup {
 	public Set<String> getListChildPitGroups() {
 		return listChildPitGroups;
 	}
+
+	public int getPitGroupNumber() {
+		return pitGroupNumber;
+	}
+
+	public void setPitGroupNumber(int pitGroupNumber) {
+		this.pitGroupNumber = pitGroupNumber;
+	}
+	
 }
