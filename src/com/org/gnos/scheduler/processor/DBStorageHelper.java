@@ -180,9 +180,14 @@ public class DBStorageHelper implements IStorageHelper {
 					for(Field f: fields) {
 						if(f.getDataType() == Field.TYPE_GRADE) {
 							String associatedFieldName = f.getWeightedUnit();
-							BigDecimal value = new BigDecimal(b.getField(f.getName())).multiply(new BigDecimal(b.getField(associatedFieldName)));
-							value = value.multiply(new BigDecimal(ratio));
-							ips.setString(index, value.toString());
+							if(associatedFieldName == null || associatedFieldName.trim().length() == 0) {
+								ips.setString(index, "0");
+							} else {
+								BigDecimal value = new BigDecimal(b.getField(f.getName())).multiply(new BigDecimal(b.getField(associatedFieldName)));
+								value = value.multiply(new BigDecimal(ratio));
+								ips.setString(index, value.toString());
+							}
+							
 						} else if(f.getDataType() == Field.TYPE_UNIT){
 							BigDecimal value = new BigDecimal(b.getField(f.getName()));
 							value = value.multiply(new BigDecimal(ratio));

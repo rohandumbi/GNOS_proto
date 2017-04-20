@@ -30,7 +30,6 @@ import com.org.gnos.db.dao.ExpressionDAO;
 import com.org.gnos.db.dao.FieldDAO;
 import com.org.gnos.db.dao.FixedCostDAO;
 import com.org.gnos.db.dao.GradeConstraintDAO;
-import com.org.gnos.db.dao.GradeDAO;
 import com.org.gnos.db.dao.ModelDAO;
 import com.org.gnos.db.dao.OpexDAO;
 import com.org.gnos.db.dao.PitDependencyDAO;
@@ -256,12 +255,13 @@ public class ExecutionContext {
 		for (TruckParameterPayload truckParameterPayload : truckParameterPayloads) {
 			String exprname = truckParameterPayload.getMaterialName();
 			Expression expr = getExpressionByName(exprname);
-			if (expr != null) {
-				String condition = expr.getFilter();
-				List<Block> blocks = findBlocks(condition);
-				for (Block b : blocks) {
-					blockPayloadMapping.put(b.getId(), truckParameterPayload.getPayload());
-				}
+			String condition = null;
+			if (expr != null) { // Consider that csv field is used as material name
+				condition = expr.getFilter();			
+			}
+			List<Block> blocks = findBlocks(condition);
+			for (Block b : blocks) {
+				blockPayloadMapping.put(b.getId(), truckParameterPayload.getPayload());
 			}
 		}
 	}
