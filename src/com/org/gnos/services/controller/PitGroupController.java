@@ -48,8 +48,13 @@ public class PitGroupController {
 		return true;
 	}
 	
-	public boolean deletePitGroup(String projectId, String name, String pitGroupname) {
-		dao.deletePitGroup(Integer.parseInt(projectId), name, pitGroupname);
+	public boolean deletePitGroup(String projectId, String name) {
+		dao.deletePitGroup(Integer.parseInt(projectId), name);
+		return true;
+	}
+	
+	public boolean deleteChildPitGroup(String projectId, String name, String pitGroupname) {
+		dao.deleteChildPitGroup(Integer.parseInt(projectId), name, pitGroupname);
 		return true;
 	}
 }

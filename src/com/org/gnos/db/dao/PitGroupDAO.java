@@ -21,6 +21,7 @@ public class PitGroupDAO {
 	private static final String SQL_INSERT_NEW = "insert into pitgroup_pit_mapping ( project_id , name ) values ( ? , ?) ";
 	private static final String SQL_DELETE_ALL = "delete from pitgroup_pit_mapping where project_id = ?";
 	private static final String SQL_DELETE = "delete from pitgroup_pit_mapping where project_id = ? and name = ? and child_type = ? and child = ? ";
+	private static final String SQL_DELETE_GROUP = "delete from pitgroup_pit_mapping where project_id = ? and name = ? ";
 	
 	public List<PitGroup> getAll(int projectId) {
 		
@@ -147,7 +148,7 @@ public class PitGroupDAO {
         }
 	}
 	
-	public void deletePitGroup(int projectId, String name, String pitGroupName){
+	public void deleteChildPitGroup(int projectId, String name, String pitGroupName){
 		
 		Object[] values = { 
 				projectId,
@@ -165,6 +166,25 @@ public class PitGroupDAO {
             //throw new DAOException(e);
         }
 	}
+	
+	public void deletePitGroup(int projectId, String name){
+		
+		Object[] values = { 
+				projectId,
+				name
+		};
+
+        try (
+            Connection connection = DBManager.getConnection();
+            PreparedStatement statement = prepareStatement(connection, SQL_DELETE_GROUP, false, values);
+        ) {
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            //throw new DAOException(e);
+        }
+	}
+	
+	
 	
 	private PitGroup map(ResultSet rs, PitGroup pitGroup) throws SQLException {
 		if(pitGroup == null){

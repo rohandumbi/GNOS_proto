@@ -49,8 +49,11 @@ public class PitGroupEndpoint {
 		delete("/project/:id/pitgroup/:pgname/pit/:pname", 
 				(req, res) -> controller.deletePit(req.params(":id"),req.params(":pgname"), req.params(":pname")), json());
 		
+		delete("/project/:id/pitgroup/:pgname", 
+				(req, res) -> controller.deletePitGroup(req.params(":id"),req.params(":pgname")), json());
+		
 		delete("/project/:id/pitgroup/:pgname/cpitgroup/:cpgname", 
-				(req, res) -> controller.deletePitGroup(req.params(":id"),req.params(":pgname"), req.params(":cpgname")), json());
+				(req, res) -> controller.deleteChildPitGroup(req.params(":id"),req.params(":pgname"), req.params(":cpgname")), json());
 	}
 	
 	
