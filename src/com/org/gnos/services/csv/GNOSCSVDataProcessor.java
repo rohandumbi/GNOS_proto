@@ -17,7 +17,6 @@ import com.org.gnos.db.model.RequiredField;
 
 public class GNOSCSVDataProcessor {
 
-	private final static GNOSCSVDataProcessor instance = new GNOSCSVDataProcessor();
 	private String[] columns = null;
 	private List<String[]> data = new ArrayList<String[]>();
 	
@@ -270,9 +269,4 @@ public class GNOSCSVDataProcessor {
 	public List<String[]> getData() {
 		return data;
 	}
-
-	public static GNOSCSVDataProcessor getInstance() {
-		return instance;
-	}
-	
 }

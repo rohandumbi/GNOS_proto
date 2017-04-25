@@ -49,7 +49,7 @@ public class ProjectController {
 	
 	
 	private void loadCSVFile(String fileName, int projectId ) {
-		GNOSCSVDataProcessor gnosCsvDataProcessor = GNOSCSVDataProcessor.getInstance();
+		GNOSCSVDataProcessor gnosCsvDataProcessor = new GNOSCSVDataProcessor();
 		gnosCsvDataProcessor.processCsv(fileName);
 		gnosCsvDataProcessor.storeFields(projectId);
 		gnosCsvDataProcessor.dumpToDB(projectId);
