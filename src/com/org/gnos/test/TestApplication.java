@@ -30,19 +30,21 @@ public class TestApplication {
 	}
 	
 	private void loadData(int projectId) {
-		GNOSCSVDataProcessor.getInstance().processCsv("D:\\proj-workspace\\GitRepository\\PersonalWork\\GNOS_proto\\data\\GNOS_data_micro.csv");
-		GNOSCSVDataProcessor.getInstance().dumpToDB(projectId);
+		GNOSCSVDataProcessor processor = new GNOSCSVDataProcessor();
+		processor.processCsv("D:\\proj-workspace\\GitRepository\\PersonalWork\\GNOS_proto\\data\\GNOS_data_micro.csv");
+		processor.dumpToDB(projectId);
 	}
 	
 	public void reloadData(int projectId) {
-		GNOSCSVDataProcessor.getInstance().processCsv("C:\\Arpan\\Workspace\\personal\\GNOS\\data\\electron_test_data_v2.csv");
-		GNOSCSVDataProcessor.getInstance().reImportToDB(projectId);
+		GNOSCSVDataProcessor processor = new GNOSCSVDataProcessor();
+		processor.processCsv("C:\\Arpan\\Workspace\\personal\\GNOS\\data\\electron_test_data_v2.csv");
+		processor.reImportToDB(projectId);
 		new PitBenchProcessor().updatePitBenchData(projectId);
 		
 		List<Expression> expressions = new ExpressionDAO().getAll(projectId);
-		ExpressionProcessor processor = new ExpressionProcessor();
-		processor.setExpressions(expressions);
-		processor.store(projectId);
+		ExpressionProcessor expprocessor = new ExpressionProcessor();
+		expprocessor.setExpressions(expressions);
+		expprocessor.store(projectId);
 	}
 	
 	public boolean test() {

@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.Set;
 
 import com.org.gnos.db.DBManager;
-import com.org.gnos.services.csv.GNOSCSVDataProcessor;
 
 
 public class PitBenchProcessor {
@@ -25,7 +24,7 @@ public class PitBenchProcessor {
 	
 	public void updatePitBenchData(int projectId){
 		loadRequiredFieldMapping(projectId);
-		parsePitAndBenchData();
+		parsePitAndBenchData(projectId);
 		updateDB(projectId);
 	}
 	
@@ -45,15 +44,12 @@ public class PitBenchProcessor {
 		
 	}
 
-	private void parsePitAndBenchData() {
+	private void parsePitAndBenchData(int projectId) {
 
-		//Map<String, String> requiredFieldMap = ProjectConfigutration.getInstance().getRequiredFieldMapping();
 		pitBenchMapping = new HashMap<String, PitBenchMappingData>();
-		String[] columns = GNOSCSVDataProcessor.getInstance().getHeaderColumns();
-		List<String[]> data = GNOSCSVDataProcessor.getInstance().getData();
 		String pitNameAlias = requiredFieldMap.get("pit_name");
 		String benchNameAlias = requiredFieldMap.get("bench_rl");
-		int pitNameColIdx = -1;
+		/*int pitNameColIdx = -1;
 		int benchColIdx = -1;
 		for(int j=0; j < columns.length;j++){
 			if(columns[j].equalsIgnoreCase(pitNameAlias)){
@@ -64,23 +60,32 @@ public class PitBenchProcessor {
 			if( pitNameColIdx >= 0 && benchColIdx >= 0 ){
 				break;
 			}
-		}
+		}*/
 
-		for(int i=0; i < data.size(); i++) {
-			String[] rowValues = data.get(i);
+		String sql = "select "+pitNameAlias +","+ benchNameAlias +" from gnos_data_"+projectId;
+		try (
+				Connection connection = DBManager.getConnection();
+	            Statement statement = connection.createStatement();
+	            ResultSet resultSet = statement.executeQuery(sql);
+			) {
 			int pitNo = -1;
-			String pitName = rowValues[pitNameColIdx];
-			Integer bench_rl = Integer.parseInt(rowValues[benchColIdx]);
-			PitBenchMappingData mappingData = pitBenchMapping.get(pitName);
-			if(mappingData != null){
-				mappingData.addBenchData(bench_rl);
-				pitNo = mappingData.pitNo;
-			} else {
-				pitNo = pitBenchMapping.size()+1;
-				mappingData = new PitBenchMappingData(pitNo);
-				mappingData.addBenchData(bench_rl);
-				pitBenchMapping.put(pitName, mappingData);
+			while(resultSet.next()){
+				String pitName = resultSet.getString(pitNameAlias);
+				Integer bench_rl = resultSet.getInt(benchNameAlias);
+				PitBenchMappingData mappingData = pitBenchMapping.get(pitName);
+				if(mappingData != null){
+					mappingData.addBenchData(bench_rl);
+					pitNo = mappingData.pitNo;
+				} else {
+					pitNo = pitBenchMapping.size()+1;
+					mappingData = new PitBenchMappingData(pitNo);
+					mappingData.addBenchData(bench_rl);
+					pitBenchMapping.put(pitName, mappingData);
+				}
 			}
+			
+		} catch(SQLException e){
+			e.printStackTrace();
 		}
 	}
 	
