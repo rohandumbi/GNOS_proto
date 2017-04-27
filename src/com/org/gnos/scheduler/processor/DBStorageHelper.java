@@ -129,8 +129,9 @@ public class DBStorageHelper implements IStorageHelper {
 			for(Record record:records){
 				try {
 					Block b = context.getBlocks().get(record.getBlockNo());
-					double tonnesWt = context.getTonnesWtForBlock(b);
-					double ratio = record.getValue()/tonnesWt;
+					double tonnesWt = context.getTonnesWtForBlock(b);				
+					double quantityMined = record.getValue();
+					double ratio = quantityMined/tonnesWt;
 					BigDecimal total_TH = new BigDecimal(0);
 					int index = 1;
 					ips.setString(index++, context.getScenario().getName());
@@ -154,7 +155,7 @@ public class DBStorageHelper implements IStorageHelper {
 						ips.setString(index++, dump.getName());
 					}
 					ips.setDouble(index++, record.getTimePeriod());
-					ips.setDouble(index++, record.getValue());
+					ips.setDouble(index++, quantityMined);
 					ips.setDouble(index++, ratio);
 					if(record.getOriginType() == Record.ORIGIN_SP && record.getDestinationType() == Record.DESTINATION_PROCESS) {
 						Stockpile sp = context.getStockpileFromNo(record.getOriginSpNo());
@@ -201,12 +202,18 @@ public class DBStorageHelper implements IStorageHelper {
 					for(Expression expression: expressions) {
 						if(expression.isGrade()) {
 							String associatedFieldName = expression.getWeightedField();
-							BigDecimal value = b.getComputedField(expression.getName()).multiply(new BigDecimal(b.getField(associatedFieldName)));
-							value = value.multiply(new BigDecimal(ratio));
+							BigDecimal value = b.getComputedField(expression.getName());
+							if(expression.getWeightedFieldType() == Expression.UNIT_EXPRESSION) {
+								value = value.multiply(b.getComputedField(associatedFieldName));
+							} else {
+								value = value.multiply(new BigDecimal(b.getField(associatedFieldName)));
+							}
+							
+							value = value.multiply(new BigDecimal(quantityMined));
 							ips.setString(index, value.toString());
 						} else {
 							BigDecimal value = b.getComputedField(expression.getName());
-							value = value.multiply(new BigDecimal(ratio));
+							value = value.multiply(new BigDecimal(quantityMined));
 							ips.setString(index, value.toString());
 						}				
 						
@@ -214,7 +221,7 @@ public class DBStorageHelper implements IStorageHelper {
 					}
 					for(Product product: productList) {
 						BigDecimal value = context.getProductValueForBlock(b, product);
-						value = value.multiply(new BigDecimal(ratio));
+						value = value.multiply(new BigDecimal(quantityMined));
 						ips.setBigDecimal(index, value);
 						
 						index ++;
@@ -222,7 +229,7 @@ public class DBStorageHelper implements IStorageHelper {
 					
 					for(ProductJoin productJoin: productJoinList) {
 						BigDecimal value = context.getProductJoinValueForBlock(b, productJoin);
-						value = value.multiply(new BigDecimal(ratio));
+						value = value.multiply(new BigDecimal(quantityMined));
 						ips.setBigDecimal(index, value);					
 						index ++;
 					}				
