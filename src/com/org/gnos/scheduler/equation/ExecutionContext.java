@@ -130,7 +130,7 @@ public class ExecutionContext {
 		loadRequiredFields();
 		loadBlocks();
 		loadProject();
-		loadScenario();
+		loadScenario();		
 	}
 
 	private void loadProject() {
@@ -770,7 +770,7 @@ public class ExecutionContext {
 		return th_ratio;
 		
 	}
-	
+
 	public int getStartYear() {
 		return startYear;
 	}
