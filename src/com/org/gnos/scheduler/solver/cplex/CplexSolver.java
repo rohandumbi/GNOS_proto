@@ -16,17 +16,22 @@ import com.org.gnos.scheduler.solver.ISolver;
 public class CplexSolver implements ISolver {
 	
 	private IStorageHelper helper;
+	private IloCplex cplex1;
 
+	public CplexSolver() {
+		try {
+			cplex1 = new IloCplex();
+		} catch (IloException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	public void solve(String fileName, int timePeiod) {
-              
+         test();     
         try {
-			IloCplex cplex = new IloCplex();
+        	IloCplex cplex = new IloCplex();
 			cplex.tuneParam();
 			cplex.setParam(IloCplex.Param.MIP.Tolerances.MIPGap, 0.1);
-			//cplex.setParam(IloCplex.IntParam.BrDir,1); // 1=up branch first, 0= automatic, -1=down branch selected first
-			//cplex.setParam(IloCplex.Param.MIP.Cuts.MIRCut,2); // set to aggressive cut
-			//cplex.setParam(IloCplex.Param.Emphasis.MIP,1);
-			//cplex.setParam(IloCplex.Param.MIP.Strategy.Probe,3); //-1 no probing, 0=default,1=moderate,2=aggressive,3=very aggressive
 			cplex.setParam(IloCplex.Param.Read.Scale,1); // decides how to scale the problem matrix -1=no scaling, 0=equilibrium (default), 1=aggressive
 			   
 			System.out.println("cplex version: " +cplex.getVersion());
@@ -70,8 +75,7 @@ public class CplexSolver implements ISolver {
         	exc.printStackTrace();
         } // catch cplex
 	} // public static void
-	
-	
+
 	public static Record parse(String x, int timePeiod){
 		
 		Record rec = new Record();
@@ -180,5 +184,11 @@ public class CplexSolver implements ISolver {
 	@Override
 	public void setStorageHelper(IStorageHelper helper) {
 		this.helper = helper;		
+	}
+	public IloCplex getCplex() {
+		return cplex1;
+	}
+	public void setCplex(IloCplex cplex) {
+		this.cplex1 = cplex;
 	}
 }

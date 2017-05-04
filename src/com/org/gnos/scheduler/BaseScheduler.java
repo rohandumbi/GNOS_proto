@@ -25,51 +25,51 @@ public abstract class BaseScheduler {
 			
 			writer = new BufferedOutputStream(new FileOutputStream("gtp_dump_"+period+".lp"), bufferSize);
 			write("maximize");
-			EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.OBJECTIVE_FUNCTION, context, writer).generate();
+			EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.OBJECTIVE_FUNCTION, context, writer, solver).generate();
 			write("\r\nSubject To");
 			if(context.getEquationEnableMap().get("BOUNDARY_VARIABLES")) {
 				write("\\ reserve constraints - boundary variable");
-				EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.BOUNDARY_VARIABLE, context, writer).generate();
+				EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.BOUNDARY_VARIABLE, context, writer, solver).generate();
 			}
 			if(context.getEquationEnableMap().get("PROCESS_CONSTRAINT")) {
 				write("\\ process constraints");
-				EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.PROCESS_CONSTRAINT, context, writer).generate();
+				EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.PROCESS_CONSTRAINT, context, writer, solver).generate();
 			}			
 			if(context.getEquationEnableMap().get("BENCH_CONSTRAINT")) {
 				write("\\ bench constraints");
-				EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.BENCH_CONSTRAINT, context, writer).generate();				
+				EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.BENCH_CONSTRAINT, context, writer, solver).generate();				
 			}
 			if(context.getEquationEnableMap().get("BENCH_PROPORTION")) {
 				write("\\ bench proportions");
-				EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.BENCH_PROPORTIONS, context, writer).generate();	
+				EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.BENCH_PROPORTIONS, context, writer, solver).generate();	
 			}
 			if(context.getEquationEnableMap().get("DUMP_CAPACITIES")) {
 				write("\\ Dump capacities");
-				EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.DUMP_CAPACITY, context, writer).generate();
+				EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.DUMP_CAPACITY, context, writer, solver).generate();
 			}
 			write("\\ SP Reclaim");					
-			EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.SP_RECLAIM, context, writer).generate();
+			EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.SP_RECLAIM, context, writer, solver).generate();
 			
 			if(context.getEquationEnableMap().get("CAPEX")) {
 				write("\\ Capex");	
-				EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.CAPEX, context, writer).generate();
+				EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.CAPEX, context, writer, solver).generate();
 			}
 			if(context.getEquationEnableMap().get("DUMP_DEPENDENCY")) {
 				write("\\ Dump Dependency");	
-				EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.DUMP_DEPENDENCY, context, writer).generate();
+				EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.DUMP_DEPENDENCY, context, writer, solver).generate();
 			}
 			if(context.getEquationEnableMap().get("PIT_DEPENDENCY")) {
 				write("\\ pit dependency");
-				EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.PIT_DEPENDENCY, context, writer).generate();
+				EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.PIT_DEPENDENCY, context, writer, solver).generate();
 			}
 			if(context.getEquationEnableMap().get("GRADE_CONSTRAINT")) {
 				write("\\ grade constraints");
-				EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.GRADE_CONSTRAINT, context, writer).generate();
+				EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.GRADE_CONSTRAINT, context, writer, solver).generate();
 			}
 			
 		
 			write("Binaries");
-			EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.BINARY_VARIABLE, context, writer).generate();		
+			EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.BINARY_VARIABLE, context, writer, solver).generate();		
 			write("\r\nend");
 			writer.flush();
 			writer.close();

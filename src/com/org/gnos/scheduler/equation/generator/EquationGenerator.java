@@ -1,5 +1,6 @@
 package com.org.gnos.scheduler.equation.generator;
 
+import ilog.concert.IloException;
 import ilog.concert.IloNumVar;
 
 import java.io.BufferedOutputStream;
@@ -14,12 +15,14 @@ import com.org.gnos.db.model.PitGroup;
 import com.org.gnos.db.model.Product;
 import com.org.gnos.db.model.ProductJoin;
 import com.org.gnos.scheduler.equation.ExecutionContext;
+import com.org.gnos.scheduler.solver.ISolver;
 
 public abstract class EquationGenerator {
 	
 	static final int BYTES_PER_LINE = 256;
 	private static int DECIMAL_POINT = 6;
 	
+	protected ISolver solver;
 	protected BufferedOutputStream output;
 	protected ExecutionContext context = null;
 	protected IloNumVar[][][][] processVariables;
@@ -111,8 +114,13 @@ public abstract class EquationGenerator {
 	}	
 	
 	// functions related to solver
-	protected void addProcessVariable() {
-		
+	protected void addProcessVariable(int pitNo, int blockNo, int processNo, int timePriod, BigDecimal coeff) {
+		try {
+			processVariables[pitNo][blockNo][processNo][timePriod] = solver.getCplex().numVar(coeff.doubleValue(), Double.MAX_VALUE, "p" + pitNo + "x" + blockNo + "p" +processNo+ "t"+timePriod);
+		} catch (IloException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	protected void addStockpileVariable() {
@@ -122,17 +130,24 @@ public abstract class EquationGenerator {
 	protected void addWasteVariable() {
 		
 	}
-	
+
+	public ISolver getSolver() {
+		return solver;
+	}
+
+	public void setSolver(ISolver solver) {
+		this.solver = solver;
+	}
+
 	public BufferedOutputStream getOutput() {
 		return output;
 	}
-
 
 	public void setOutput(BufferedOutputStream output) {
 		this.output = output;
 	}
 
 
-	// Abstract class
+	// Abstract method generate
 	public abstract void generate();
 }

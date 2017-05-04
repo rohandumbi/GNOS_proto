@@ -15,6 +15,7 @@ import com.org.gnos.scheduler.equation.generator.ObjectiveFunctionEquationGenera
 import com.org.gnos.scheduler.equation.generator.PitDependencyEquationGenerator;
 import com.org.gnos.scheduler.equation.generator.ProcessConstraintEquationGenerator;
 import com.org.gnos.scheduler.equation.generator.SPReclaimEquationGenerator;
+import com.org.gnos.scheduler.solver.ISolver;
 
 
 public class EquationGeneratorFactory {
@@ -33,7 +34,7 @@ public class EquationGeneratorFactory {
 	public final static short SP_RECLAIM = 12;
 	
 	
-	public static EquationGenerator getGenerator(short type, ExecutionContext context, BufferedOutputStream writer) {
+	public static EquationGenerator getGenerator(short type, ExecutionContext context, BufferedOutputStream writer, ISolver solver) {
 		EquationGenerator generator = null;
 		
 		switch (type) {
@@ -79,6 +80,7 @@ public class EquationGeneratorFactory {
 				break;
 		}
 		generator.setOutput(writer);
+		generator.setSolver(solver);
 		return generator;
 	}
 
