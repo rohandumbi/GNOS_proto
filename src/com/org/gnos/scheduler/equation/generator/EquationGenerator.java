@@ -116,7 +116,7 @@ public abstract class EquationGenerator {
 	// functions related to solver
 	protected void addProcessVariable(int pitNo, int blockNo, int processNo, int timePriod, BigDecimal coeff) {
 		try {
-			processVariables[pitNo][blockNo][processNo][timePriod] = solver.getCplex().numVar(coeff.doubleValue(), Double.MAX_VALUE, "p" + pitNo + "x" + blockNo + "p" +processNo+ "t"+timePriod);
+			processVariables[pitNo][blockNo][processNo][timePriod] = solver.getAPI().intVar(0, Integer.MAX_VALUE, "p" + pitNo + "x" + blockNo + "p" +processNo+ "t"+timePriod);
 		} catch (IloException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

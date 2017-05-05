@@ -13,23 +13,22 @@ import com.org.gnos.scheduler.processor.IStorageHelper;
 import com.org.gnos.scheduler.processor.Record;
 import com.org.gnos.scheduler.solver.ISolver;
 
-public class CplexSolver implements ISolver {
+public class CplexSolver implements ISolver{
 	
 	private IStorageHelper helper;
-	private IloCplex cplex1;
-
+	private IloCplex cplex;
+	
 	public CplexSolver() {
 		try {
-			cplex1 = new IloCplex();
+			cplex = new IloCplex();
+			
 		} catch (IloException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	public void solve(String fileName, int timePeiod) {
-         test();     
+	public void solve(String fileName, int timePeiod) {  
         try {
-        	IloCplex cplex = new IloCplex();
 			cplex.tuneParam();
 			cplex.setParam(IloCplex.Param.MIP.Tolerances.MIPGap, 0.1);
 			cplex.setParam(IloCplex.Param.Read.Scale,1); // decides how to scale the problem matrix -1=no scaling, 0=equilibrium (default), 1=aggressive
@@ -181,14 +180,13 @@ public class CplexSolver implements ISolver {
 		solver.solve("gtp_dump_1.lp", -1);
 	}
 
-	@Override
 	public void setStorageHelper(IStorageHelper helper) {
 		this.helper = helper;		
 	}
-	public IloCplex getCplex() {
-		return cplex1;
+	@Override
+	public IloCplex getAPI() {
+
+		return cplex;
 	}
-	public void setCplex(IloCplex cplex) {
-		this.cplex1 = cplex;
-	}
+
 }

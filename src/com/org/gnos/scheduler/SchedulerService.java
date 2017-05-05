@@ -9,6 +9,8 @@ public class SchedulerService implements Runnable {
 
 	private BaseScheduler scheduler;
 	private RunConfig runconfig;
+
+
 	
 	public void execute() {		
 		ISolver solver = new CplexSolver();

@@ -1,5 +1,7 @@
 package com.org.gnos.scheduler.solver;
 
+import ilog.cplex.IloCplex;
+
 import com.org.gnos.scheduler.processor.IStorageHelper;
 
 
@@ -10,7 +12,6 @@ public interface ISolver {
 	
 	public void setStorageHelper(IStorageHelper helper);
 	
-	public void addVariable(short type);
-	
-	public void addConstraint(short type);
+	public IloCplex getAPI();
+
 }
