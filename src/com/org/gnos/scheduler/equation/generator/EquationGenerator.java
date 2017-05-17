@@ -1,8 +1,5 @@
 package com.org.gnos.scheduler.equation.generator;
 
-import ilog.concert.IloException;
-import ilog.concert.IloNumVar;
-
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -25,9 +22,6 @@ public abstract class EquationGenerator {
 	protected ISolver solver;
 	protected BufferedOutputStream output;
 	protected ExecutionContext context = null;
-	protected IloNumVar[][][][] processVariables;
-	protected IloNumVar[][][][] spVariables;
-	protected IloNumVar[][][][] wasteVariables;
 	
 	protected int bytesWritten = 0;
 	
@@ -41,17 +35,6 @@ public abstract class EquationGenerator {
 	
 	public EquationGenerator(ExecutionContext data) {
 		this.context = data;
-		
-		// Initialize variables required for solver
-		int noOfPits = context.getPits().size();
-		int noOfBlocks = context.getBlocks().size();
-		int noOfProcesses = context.getProcessList().size();
-		int noOfSps = context.getStockpiles().size();
-		int noOfDumps = context.getDumps().size();
-		int timePeriods = context.getTimePeriodEnd() - context.getTimePeriodStart();
-		processVariables = new IloNumVar[noOfPits][noOfBlocks][noOfProcesses][timePeriods];
-		spVariables = new IloNumVar[noOfPits][noOfBlocks][noOfSps][timePeriods];
-		wasteVariables = new IloNumVar[noOfPits][noOfBlocks][noOfDumps][timePeriods];
 	}
 
 
@@ -111,24 +94,6 @@ public abstract class EquationGenerator {
 			e.printStackTrace();
 		}
 
-	}	
-	
-	// functions related to solver
-	protected void addProcessVariable(int pitNo, int blockNo, int processNo, int timePriod, BigDecimal coeff) {
-		try {
-			processVariables[pitNo][blockNo][processNo][timePriod] = solver.getAPI().intVar(0, Integer.MAX_VALUE, "p" + pitNo + "x" + blockNo + "p" +processNo+ "t"+timePriod);
-		} catch (IloException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	protected void addStockpileVariable() {
-		
-	}
-	
-	protected void addWasteVariable() {
-		
 	}
 
 	public ISolver getSolver() {

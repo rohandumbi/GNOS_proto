@@ -17,10 +17,6 @@ public class SlidingWindowModeScheduler extends BaseScheduler{
 		helper = new SlidingWindowModeDBStorageHelper();
 		helper.setContext(context);
 	}
-	
-	private void loadData() {
-		
-	}
 
 	
 	@Override
@@ -46,7 +42,6 @@ public class SlidingWindowModeScheduler extends BaseScheduler{
 			swcontext.setTimePeriodStart(timePeriodStart);
 			swcontext.setTimePeriodEnd(timePeriodEnd);
 			swcontext.setCurrPeriod((short)i);
-			loadData();
 			generateEquations(i);
 			runSolver(i);
 		}

@@ -78,6 +78,7 @@ public class ExecutionContext {
 	private Map<Integer, Pit> pits = new LinkedHashMap<Integer, Pit>();
 	private Map<String, Pit> pitNameMap = new LinkedHashMap<String, Pit>();
 	private Map<Integer, List<String>> blockVariableMapping = new HashMap<Integer, List<String>>();
+	private Map<String, BigDecimal> variables = new HashMap<String, BigDecimal>();
 	private Map<Integer, Integer> blockPayloadMapping = new HashMap<Integer, Integer>();
 	private Map<String, BigDecimal> cycleTimeDataMapping = new HashMap<String, BigDecimal>();
 	private String pitFieldName;
@@ -860,6 +861,14 @@ public class ExecutionContext {
 		variables.add(variable);
 	}
 
+	public void addVariable(String variable, BigDecimal value) {
+		BigDecimal coeff = variables.get(variable);
+		if (coeff != null) {
+			value = value.add(coeff);
+		} 
+		variables.put(variable, value);
+	}
+	
 	public void addWasteBlock(Block b) {
 		wasteBlocks.add(b);
 	}
@@ -1070,5 +1079,9 @@ public class ExecutionContext {
 
 	public int getScenarioId() {
 		return scenarioId;
+	}
+
+	public Map<String, BigDecimal> getVariables() {
+		return variables;
 	}
 }

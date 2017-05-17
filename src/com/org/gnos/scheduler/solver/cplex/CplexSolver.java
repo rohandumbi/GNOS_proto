@@ -1,34 +1,39 @@
 package com.org.gnos.scheduler.solver.cplex;
 
-import ilog.concert.IloException;
-import ilog.concert.IloLPMatrix;
-import ilog.concert.IloNumVar;
-import ilog.cplex.IloCplex;
-
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import com.org.gnos.scheduler.equation.ExecutionContext;
 import com.org.gnos.scheduler.processor.FileStorageHelper;
 import com.org.gnos.scheduler.processor.IStorageHelper;
 import com.org.gnos.scheduler.processor.Record;
 import com.org.gnos.scheduler.solver.ISolver;
 
+import ilog.concert.IloException;
+import ilog.concert.IloLPMatrix;
+import ilog.concert.IloLinearNumExpr;
+import ilog.concert.IloNumVar;
+import ilog.cplex.IloCplex;
+
 public class CplexSolver implements ISolver{
 	
 	private IStorageHelper helper;
-	private IloCplex cplex;
+	private ExecutionContext context;
 	
-	public CplexSolver() {
-		try {
-			cplex = new IloCplex();
-			
-		} catch (IloException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+	protected Map<String, IloNumVar> processVariables;
+	protected IloNumVar[][][][] spVariables;
+	protected IloNumVar[][][][] wasteVariables;
+	
+	
 	public void solve(String fileName, int timePeiod) {  
+		
+		
         try {
+        	test();
+        	IloCplex cplex = new IloCplex();
 			cplex.tuneParam();
 			cplex.setParam(IloCplex.Param.MIP.Tolerances.MIPGap, 0.1);
 			cplex.setParam(IloCplex.Param.Read.Scale,1); // decides how to scale the problem matrix -1=no scaling, 0=equilibrium (default), 1=aggressive
@@ -73,7 +78,23 @@ public class CplexSolver implements ISolver{
         catch (IloException exc) {
         	exc.printStackTrace();
         } // catch cplex
-	} // public static void
+	} 
+
+	private void test() throws IloException {
+		 Map<String, BigDecimal> variables = context.getVariables();
+		 Set<String> keys = variables.keySet();
+		 IloCplex cplex = new IloCplex();
+		 IloLinearNumExpr expr = cplex.linearNumExpr();
+		 for(String key: keys) {
+			 IloNumVar var = cplex.numVar(0, Double.MAX_VALUE, key);
+			 expr.addTerm(variables.get(key).doubleValue(), var);
+			 cplex.addGe(var, 0);
+		 }
+		 
+		 
+		 cplex.addMaximize(expr);
+		 cplex.exportModel("test.lp");
+	}
 
 	public static Record parse(String x, int timePeiod){
 		
@@ -180,13 +201,14 @@ public class CplexSolver implements ISolver{
 		solver.solve("gtp_dump_1.lp", -1);
 	}
 
+	@Override
 	public void setStorageHelper(IStorageHelper helper) {
 		this.helper = helper;		
 	}
+	
 	@Override
-	public IloCplex getAPI() {
-
-		return cplex;
+	public void setContext(ExecutionContext context) {
+		this.context = context;
 	}
 
 }

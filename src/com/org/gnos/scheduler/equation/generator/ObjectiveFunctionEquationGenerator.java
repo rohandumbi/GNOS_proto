@@ -108,13 +108,13 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 				BigDecimal value = processValue.subtract(cost);
 				value = (value.multiply(new BigDecimal(1 / Math.pow ((1 + discount_rate), i))));
 				String variable = "p"+block.getPitNo()+"x"+block.getBlockNo()+"p"+processNumber+"t"+i;
-				addProcessVariable(block.getPitNo(), block.getBlockNo(), processNumber, i, value);
+				
 				String eq = " "+formatDecimalValue(value)+variable;
 				if(value.doubleValue() > 0){
 					eq = " +"+eq;
 				} 
 				write(eq);
-				
+				context.addVariable(variable, value);
 				context.addVariable(block, variable);
 			}
 		}
@@ -182,7 +182,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 					write(eq);
 					
 					context.addVariable(block, variable);
-					
+					context.addVariable(variable, cost.negate());
 					// Build reeclaim variable
 					
 					if(reclaimEnabled && (year > startYear)) {
@@ -261,7 +261,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 					write(eq);
 					
 					context.addVariable(block, variable);
-					
+					context.addVariable(variable, cost.negate());
 				}
 			}
 		}
@@ -284,6 +284,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 					String cv = "c"+capexCount+"i"+capexInstanceCount+"t"+i;
 					BigDecimal value = new BigDecimal(ci.getCapexAmount() * (1 / Math.pow ((1 + discount_rate), i)));
 					write(" -"+formatDecimalValue(value)+cv);
+					context.addVariable(cv, value.negate());
 				}
 			}
 		}
@@ -330,6 +331,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 			} 
 			write(eq);
 			context.addVariable(b, variable);
+			context.addVariable(variable, value);
 		}	
 	}
 	private void buildSWSPReclaimVariable(Stockpile sp, int year) {
@@ -375,6 +377,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 			} 
 			write(eq);
 			((SlidingWindowExecutionContext)context).addVariable(sp.getStockpileNumber(), variable);
+			context.addVariable(variable, value);
 		}
 	}
 

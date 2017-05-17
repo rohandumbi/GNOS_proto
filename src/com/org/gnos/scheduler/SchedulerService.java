@@ -17,6 +17,7 @@ public class SchedulerService implements Runnable {
 		createScheduler(runconfig);
 		scheduler.getContext().setEquationEnableMap(runconfig.getEqnenablestate());
 		scheduler.setSolver(solver);
+		solver.setContext(scheduler.getContext());
 		scheduler.execute();
 	}
 	
