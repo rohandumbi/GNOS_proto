@@ -35,6 +35,21 @@ public class ProjectController {
 			throw new Exception();
 	}
 	
+	public Project update(JsonObject jsonObject, String projectId) throws Exception {
+		String name = jsonObject.get("name").getAsString();
+		String desc = jsonObject.get("desc").getAsString();
+		String fileName = jsonObject.get("fileName").getAsString();
+		Project obj = new Project();
+		obj.setId(Integer.parseInt(projectId));
+		obj.setName(name);
+		obj.setDesc(desc);
+		obj.setFileName(fileName);
+
+		boolean created = dao.update(obj);
+		//loadCSVFile(fileName, newProject.getId());
+		if(created) return obj;
+		throw new Exception();
+	}
 
 	public boolean delete(String projectId) {
 		if((projectId == null) || (projectId.isEmpty())){
