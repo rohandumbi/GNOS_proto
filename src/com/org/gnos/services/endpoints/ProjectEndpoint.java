@@ -4,6 +4,7 @@ import static com.org.gnos.services.JsonUtil.json;
 import static spark.Spark.delete;
 import static spark.Spark.get;
 import static spark.Spark.post;
+import static spark.Spark.put;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -40,6 +41,26 @@ public class ProjectEndpoint {
 				}
 				res.status(400);				
 				return new ResponseError("Project creation failed due to improper input");
+			}
+		}, json());
+		
+		/* Create new project */
+		put("/projects/:id", new Route() {
+			
+			@Override
+			public Object handle(Request req, Response res) throws Exception {
+				JsonElement requestObject = new JsonParser().parse(req.body());
+				if(requestObject.isJsonObject()) {
+					JsonObject jsonObject = requestObject.getAsJsonObject();
+					try {
+						return controller.update(jsonObject, req.params(":id"));
+					} catch (Exception e) {
+						res.status(400);
+						return new ResponseError("Project update failed. "+e.getMessage());
+					}					
+				}
+				res.status(400);				
+				return new ResponseError("Project update failed due to improper input");
 			}
 		}, json());
 		
