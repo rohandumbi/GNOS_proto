@@ -78,13 +78,16 @@ public class ExecutionContext {
 	private Map<Integer, Pit> pits = new LinkedHashMap<Integer, Pit>();
 	private Map<String, Pit> pitNameMap = new LinkedHashMap<String, Pit>();
 	private Map<Integer, List<String>> blockVariableMapping = new HashMap<Integer, List<String>>();
-	private Map<String, BigDecimal> variables = new HashMap<String, BigDecimal>();
 	private Map<Integer, Integer> blockPayloadMapping = new HashMap<Integer, Integer>();
 	private Map<String, BigDecimal> cycleTimeDataMapping = new HashMap<String, BigDecimal>();
 	private String pitFieldName;
 	private String benchFieldName;
 	protected String tonnesWtFieldName;
 
+	private Map<String, BigDecimal> variables = new HashMap<String, BigDecimal>();
+	private List<Constraint> constraints = new ArrayList<Constraint>();
+	private List<String> binaries = new ArrayList<String>();
+	
 	/* Data */
 
 	private List<Field> fields;
@@ -1084,4 +1087,15 @@ public class ExecutionContext {
 	public Map<String, BigDecimal> getVariables() {
 		return variables;
 	}
+
+	public List<Constraint> getConstraints() {
+		return constraints;
+	}
+
+	public List<String> getBinaries() {
+		return binaries;
+	}
+	
+	
+	
 }

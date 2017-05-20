@@ -35,6 +35,7 @@ public class BinaryVariableGenerator extends EquationGenerator{
 			for(Bench b: benches){
 				for(int i=timePeriodStart; i<= timePeriodEnd;i++){
 					String eq = "p"+pitNo+"b"+b.getBenchNo()+"t"+i+" ";
+					context.getBinaries().add("p"+pitNo+"b"+b.getBenchNo()+"t"+i);
 					write(eq);
 				}
 			}
@@ -53,6 +54,7 @@ public class BinaryVariableGenerator extends EquationGenerator{
 			for (int j = 1; j <= capexInstanceList.size(); j++) {
 				for(int i= timePeriodStart; i <= timePeriodEnd ; i++){
 					String cv = " c"+capexCount+"i"+j+"t"+i;
+					context.getBinaries().add("c"+capexCount+"i"+j+"t"+i);
 					write(cv);
 				}
 			}

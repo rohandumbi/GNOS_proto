@@ -14,6 +14,7 @@ import com.org.gnos.core.Pit;
 import com.org.gnos.db.model.Dump;
 import com.org.gnos.db.model.DumpDependencyData;
 import com.org.gnos.db.model.PitGroup;
+import com.org.gnos.scheduler.equation.Constraint;
 import com.org.gnos.scheduler.equation.ExecutionContext;
 
 public class DumpDependencyEquationGenerator extends EquationGenerator{
@@ -68,14 +69,20 @@ public class DumpDependencyEquationGenerator extends EquationGenerator{
 		int timePeriodEnd = context.getTimePeriodEnd();
 		Set<Block> blocks = d1.getBlocks();
 		for(int i=timePeriodStart; i<= timePeriodEnd; i++){
+			Constraint c = new Constraint();
 			StringBuilder sb = new StringBuilder();
 			sb.append(d1.getCapacity()+"d"+d1.getDumpNumber()+"t"+i);
+			c.addVariable("d"+d1.getDumpNumber()+"t"+i, new BigDecimal(d1.getCapacity()));
 			for(Block block: blocks){
 				for(int j=timePeriodStart; j<=i; j++){
 					sb.append(" - p"+block.getPitNo()+"x"+block.getBlockNo()+"w"+d1.getDumpNumber()+"t"+j);
+					c.addVariable("p"+block.getPitNo()+"x"+block.getBlockNo()+"w"+d1.getDumpNumber()+"t"+j, new BigDecimal(1).negate());
 				}
 			}
 			sb.append(" <= 0");
+			c.setType(Constraint.LESS_EQUAL);
+			c.setValue(new BigDecimal(0));
+			context.getConstraints().add(c);
 			write(sb.toString());
 		}
 		
@@ -87,14 +94,20 @@ public class DumpDependencyEquationGenerator extends EquationGenerator{
 		int timePeriodEnd = context.getTimePeriodEnd();
 		Set<Block> blocks = d2.getBlocks();
 		for(int i=timePeriodStart; i<= timePeriodEnd; i++){
+			Constraint c = new Constraint();
 			StringBuilder sb = new StringBuilder();
 			for(Block block: blocks){
 				for(int j=timePeriodStart; j<=i; j++){
 					sb.append("+p"+block.getPitNo()+"x"+block.getBlockNo()+"w"+d2.getDumpNumber()+"t"+j);
+					c.addVariable("p"+block.getPitNo()+"x"+block.getBlockNo()+"w"+d2.getDumpNumber()+"t"+j, new BigDecimal(1));
 				}
 			}
 			sb.append(" - "+d2.getCapacity()+"d"+d1.getDumpNumber()+"t"+i);
+			c.addVariable("d"+d1.getDumpNumber()+"t"+i, new BigDecimal(d2.getCapacity()).negate());
 			sb.append(" <= 0");
+			c.setType(Constraint.LESS_EQUAL);
+			c.setValue(new BigDecimal(0));
+			context.getConstraints().add(c);
 			write(sb.toString());
 		}
 		
@@ -107,14 +120,20 @@ public class DumpDependencyEquationGenerator extends EquationGenerator{
 		Bench lastBench = p.getBench(p.getBenches().size() - 1);
 		Set<Block> blocks = d2.getBlocks();
 		for(int i=timePeriodStart; i<= timePeriodEnd; i++){
+			Constraint c = new Constraint();
 			StringBuilder sb = new StringBuilder();
 			for(Block block: blocks){
 				for(int j=timePeriodStart; j<=i; j++){
 					sb.append("+p"+block.getPitNo()+"x"+block.getBlockNo()+"w"+d2.getDumpNumber()+"t"+j);
+					c.addVariable("p"+block.getPitNo()+"x"+block.getBlockNo()+"w"+d2.getDumpNumber()+"t"+j, new BigDecimal(1));
 				}
 			}
 			sb.append(" - "+d2.getCapacity()+"p"+p.getPitNo()+"b"+lastBench.getBenchNo()+"t"+i);
+			c.addVariable("p"+p.getPitNo()+"b"+lastBench.getBenchNo()+"t"+i, new BigDecimal(d2.getCapacity()).negate());
 			sb.append(" <= 0");
+			c.setType(Constraint.LESS_EQUAL);
+			c.setValue(new BigDecimal(0));
+			context.getConstraints().add(c);
 			write(sb.toString());
 		}
 		
@@ -134,6 +153,7 @@ public class DumpDependencyEquationGenerator extends EquationGenerator{
 			benches.add(lastBench);
 		}
 		for(int i=timePeriodStart; i<= timePeriodEnd; i++){
+			Constraint c = new Constraint();
 			StringBuilder sb = new StringBuilder();
 			for(Bench bench: benches){
 				List<String> variables = getAllVariablesForBench(bench);
@@ -146,11 +166,16 @@ public class DumpDependencyEquationGenerator extends EquationGenerator{
 				          int year = Integer.parseInt(someNumberStr);
 				          if(year > i) continue;
 				          sb.append(" -"+variable);
+				          c.addVariable(variable, new BigDecimal(1).negate());
 				      }						
 				}
 			}
 			sb.append(" <= 0");
-			String eq = formatDecimalValue(totalTonnage)+"pbr"+pitGroup.getPitGroupNumber()+"t"+i + sb.toString(); 
+			String eq = formatDecimalValue(totalTonnage)+"pbr"+pitGroup.getPitGroupNumber()+"t"+i + sb.toString();
+			c.addVariable("pbr"+pitGroup.getPitGroupNumber()+"t"+i, totalTonnage);
+			c.setType(Constraint.LESS_EQUAL);
+			c.setValue(new BigDecimal(0));
+			context.getConstraints().add(c);
 			write(eq);
 		}
 	}
@@ -162,13 +187,19 @@ public class DumpDependencyEquationGenerator extends EquationGenerator{
 		Set<Block> blocks = d2.getBlocks();
 		for(int i=timePeriodStart; i<= timePeriodEnd; i++){
 			StringBuilder sb = new StringBuilder();
+			Constraint c = new Constraint();
 			for(Block block: blocks){
 				for(int j=timePeriodStart; j<=i; j++){
 					sb.append("+p"+block.getPitNo()+"x"+block.getBlockNo()+"w"+d2.getDumpNumber()+"t"+j);
+					c.addVariable("p"+block.getPitNo()+"x"+block.getBlockNo()+"w"+d2.getDumpNumber()+"t"+j, new BigDecimal(1));
 				}
 			}
 			sb.append(" - "+d2.getCapacity()+"pbr"+pitGroup.getPitGroupNumber()+"t"+i);
+			c.addVariable("pbr"+pitGroup.getPitGroupNumber()+"t"+i, new BigDecimal(d2.getCapacity()).negate());
 			sb.append(" <= 0");
+			c.setType(Constraint.LESS_EQUAL);
+			c.setValue(new BigDecimal(0));
+			context.getConstraints().add(c);
 			write(sb.toString());
 		}
 		

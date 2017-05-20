@@ -12,6 +12,7 @@ import com.org.gnos.core.Bench;
 import com.org.gnos.core.Block;
 import com.org.gnos.core.Pit;
 import com.org.gnos.db.model.PitBenchConstraintData;
+import com.org.gnos.scheduler.equation.Constraint;
 import com.org.gnos.scheduler.equation.ExecutionContext;
 
 public class BenchConstraintEquationGenerator extends EquationGenerator{
@@ -37,6 +38,7 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 	}
 	
 	public void buildBenchConstraintVariables() {
+		
 		Map<Integer, Pit> pits = context.getPits();
 		int timePeriodStart = context.getTimePeriodStart();
 		int timePeriodEnd = context.getTimePeriodEnd();
@@ -50,10 +52,13 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 				BigDecimal tonnesWt = getBenchTonnesWt(bench);
 				if(variables.size() == 0) continue;
 				for(int i=timePeriodStart; i<= timePeriodEnd; i++){
+					Constraint c1 = new Constraint();
+					Constraint c2 = new Constraint();
 					StringBuffer sb1= new StringBuffer();
 					StringBuffer sb2= new StringBuffer();
 					String benchVariable = "p"+pitNo+"b"+bench.getBenchNo()+"t"+i;
 					sb1.append(formatDecimalValue(tonnesWt)+benchVariable);
+					c1.addVariable(benchVariable, tonnesWt);
 					for(String variable: variables){
 						if(variable.startsWith("sp")) continue;
 						Matcher matcher = lastIntPattern.matcher(variable);
@@ -62,8 +67,10 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 					          int year = Integer.parseInt(someNumberStr);
 					          if(year > i) continue;
 					          sb1.append(" -"+variable);
+					          c1.addVariable(variable, new BigDecimal(-1));
 					          if(lastBench != null){
 					        	  sb2.append(" +"+variable);
+					        	  c1.addVariable(variable, new BigDecimal(1));
 					          }
 					      }						
 					}
@@ -71,12 +78,19 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 						//float lastBenchTonnesWeight = getBenchTonnesWt(lastBench);
 						String lastBenchVariable = "p"+pitNo+"b"+lastBench.getBenchNo()+"t"+i;
 						sb2.append("-"+ formatDecimalValue(tonnesWt)+lastBenchVariable +" <= 0 ");
+						c2.addVariable(lastBenchVariable, tonnesWt.negate());
+						c2.setValue(new BigDecimal(0));
+						c2.setType(Constraint.LESS_EQUAL);
 					}
 					sb1.append(" <= 0 ");
+					c1.setValue(new BigDecimal(0));
+					c1.setType(Constraint.LESS_EQUAL);
 					write(sb1.toString());
 					if(lastBench != null){
 						write(sb2.toString().substring(2));
 					}
+					context.getConstraints().add(c1);
+					context.getConstraints().add(c2);
 				}		
 				lastBench = bench;				
 			}
@@ -129,14 +143,19 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 		StringBuilder sb2 = new StringBuilder();
 		Set<Bench> benches = pit.getBenches();
 		int timePeriodStart = context.getTimePeriodStart();
-		
+		Constraint constraint = new Constraint();
 		for(Bench bench:benches){
 			sb1.append("+"+"p"+pit.getPitNo()+"b"+bench.getBenchNo()+"t"+timeperiod);
+			constraint.addVariable("p"+pit.getPitNo()+"b"+bench.getBenchNo()+"t"+timeperiod, new BigDecimal(1));
 			if(timeperiod > timePeriodStart){
 				sb2.append("-"+"p"+pit.getPitNo()+"b"+bench.getBenchNo()+"t"+(timeperiod-1));
+				constraint.addVariable("p"+pit.getPitNo()+"b"+bench.getBenchNo()+"t"+(timeperiod-1), new BigDecimal(-1));
 			}			
 		}
 		String eq = sb1.toString().substring(1) + sb2.toString() + " <= "+ (yearvalue-1);
+		constraint.setType(Constraint.LESS_EQUAL);
+		constraint.setValue(new BigDecimal(yearvalue-1));
+		context.getConstraints().add(constraint);
 		write(eq);
 		
 	}

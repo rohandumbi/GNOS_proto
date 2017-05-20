@@ -1,11 +1,13 @@
 package com.org.gnos.scheduler.equation.generator;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.org.gnos.core.Block;
 import com.org.gnos.db.model.Stockpile;
+import com.org.gnos.scheduler.equation.Constraint;
 import com.org.gnos.scheduler.equation.ExecutionContext;
 import com.org.gnos.scheduler.equation.SPBlock;
 import com.org.gnos.scheduler.equation.SlidingWindowExecutionContext;
@@ -36,6 +38,7 @@ public class BoundaryVariableGenerator extends EquationGenerator{
 		Map<Integer, List<String>> blockVariableMapping = context.getBlockVariableMapping();
 		Set<Integer> blockIds = blockVariableMapping.keySet();
 		for(int blockId: blockIds){
+			Constraint c = new Constraint();
 			List<String> variables = blockVariableMapping.get(blockId);
 			Block b = allBlocks.get(blockId);
 			StringBuilder sb = new StringBuilder("");
@@ -43,9 +46,14 @@ public class BoundaryVariableGenerator extends EquationGenerator{
 				write(variable + " >= 0" );
 				if(!variable.startsWith("sp")){
 					sb.append(variable +"+");
+					c.addVariable(variable, new BigDecimal(1));
 				}					
 			}
 			String eq = sb.toString().substring(0,sb.length() -1) +" <= "+context.getTonnesWtForBlock(b);
+			
+			c.setType(Constraint.LESS_EQUAL);
+			c.setValue(new BigDecimal(context.getTonnesWtForBlock(b)));
+			context.getConstraints().add(c);
 			write(eq);
 		}
 	}
@@ -57,7 +65,7 @@ public class BoundaryVariableGenerator extends EquationGenerator{
 		for(int spNo: spNos){
 			Stockpile sp = context.getStockpileFromNo(spNo);			
 			if(sp == null) continue;
-			
+			Constraint c = new Constraint();
 			SPBlock spb = swctx.getSPBlock(spNo);
 			if(spb == null || spb.getTonnesWt() == 0) continue;
 			double capacity = spb.getTonnesWt();
@@ -65,9 +73,13 @@ public class BoundaryVariableGenerator extends EquationGenerator{
 			StringBuilder sb = new StringBuilder("");
 			for(String variable: variables){
 				write(variable + " >= 0" );
-				sb.append(variable +"+");								
+				sb.append(variable +"+");
+				c.addVariable(variable, new BigDecimal(1));
 			}
 			String eq = sb.toString().substring(0,sb.length() -1) +" <= "+capacity ;
+			c.setType(Constraint.LESS_EQUAL);
+			c.setValue(new BigDecimal(capacity));
+			context.getConstraints().add(c);
 			write(eq);
 		}
 	}

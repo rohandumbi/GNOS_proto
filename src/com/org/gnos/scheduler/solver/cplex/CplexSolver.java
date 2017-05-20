@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.org.gnos.scheduler.equation.Constraint;
 import com.org.gnos.scheduler.equation.ExecutionContext;
 import com.org.gnos.scheduler.processor.FileStorageHelper;
 import com.org.gnos.scheduler.processor.IStorageHelper;
@@ -91,8 +92,41 @@ public class CplexSolver implements ISolver{
 			 cplex.addGe(var, 0);
 		 }
 		 
-		 
 		 cplex.addMaximize(expr);
+		 
+		 List<Constraint> constraints = context.getConstraints();
+		 
+		 for(Constraint constraint: constraints) {
+			 List<String> vars = constraint.getVariables();
+			 List<BigDecimal> coefficients = constraint.getCoefficients();
+			 IloLinearNumExpr constraint_expr = cplex.linearNumExpr();
+			 for(int i = 0; i< vars.size(); i++) {
+				 IloNumVar var = cplex.numVar(0, Double.MAX_VALUE, vars.get(i));
+				 constraint_expr.addTerm(coefficients.get(i).doubleValue(), var);
+			 }
+			 
+			 switch (constraint.getType()) {
+				case Constraint.GREATER_EQUAL:
+					cplex.addGe(constraint_expr, constraint.getValue().doubleValue());
+					break;
+				case Constraint.LESS_EQUAL:
+					cplex.addLe(constraint_expr, constraint.getValue().doubleValue());
+					break;
+				case Constraint.EQUAL:
+					cplex.addEq(constraint_expr, constraint.getValue().doubleValue());
+					break;
+				
+				}
+			 	
+		 }
+		 
+		 List<String> binaries = context.getBinaries();
+		 
+		 for(String binary: binaries) {
+			 IloNumVar var =  cplex.boolVar(binary);
+			 cplex.addGe(var, 0);
+		 }
+		 
 		 cplex.exportModel("test.lp");
 	}
 

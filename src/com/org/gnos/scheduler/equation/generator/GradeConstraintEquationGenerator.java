@@ -20,9 +20,12 @@ import com.org.gnos.db.model.ProcessJoin;
 import com.org.gnos.db.model.Product;
 import com.org.gnos.db.model.ProductJoin;
 import com.org.gnos.db.model.Stockpile;
+import com.org.gnos.scheduler.equation.Constraint;
 import com.org.gnos.scheduler.equation.ExecutionContext;
 import com.org.gnos.scheduler.equation.SPBlock;
 import com.org.gnos.scheduler.equation.SlidingWindowExecutionContext;
+
+import oracle.jrockit.jfr.tools.ConCatRepository;
 
 public class GradeConstraintEquationGenerator extends EquationGenerator{
 
@@ -100,6 +103,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 			}
 			
 			for(int i=timePeriodStart; i<= timePeriodEnd; i++){
+				Constraint c = new Constraint();
 				String eq = "";
 				BigDecimal targetGrade = new BigDecimal(gradeConstraintData.getConstraintData().get(startYear+i -1));
 				if(selectorType == GradeConstraintData.SELECTION_PROCESS_JOIN) {
@@ -114,7 +118,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 									List<Object> coefficients = processExprMap.get(processName);
 									List<Grade> grades = processGradeMap.get(processName);
 									for(Grade grade: grades){
-										eq += buildGradeConstraintVariables(p.getProcessNo(), coefficients, grade, p.getBlocks(), i, targetGrade);
+										eq += buildGradeConstraintVariables(p.getProcessNo(), coefficients, grade, p.getBlocks(), i, targetGrade, c);
 									}
 									
 									break;
@@ -129,7 +133,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 							List<Object> coefficients = processExprMap.get(processName);
 							List<Grade> grades = processGradeMap.get(processName);
 							for(Grade grade: grades){
-								eq += buildGradeConstraintVariables(p.getProcessNo(), coefficients, grade, p.getBlocks(), i, targetGrade);
+								eq += buildGradeConstraintVariables(p.getProcessNo(), coefficients, grade, p.getBlocks(), i, targetGrade, c);
 							}
 							break;
 						}
@@ -149,7 +153,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 								}
 							}
 							for(Grade grade: grades){
-								eq += buildGradeConstraintVariables(p.getProcessNo(), coefficients, grade, blocks, i, targetGrade);
+								eq += buildGradeConstraintVariables(p.getProcessNo(), coefficients, grade, blocks, i, targetGrade, c);
 							}
 						}
 					}
@@ -170,7 +174,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 							}
 						}
 						for(Grade grade: grades){
-							eq += buildGradeConstraintVariables(p.getProcessNo(), coefficients, grade, blocks, i, targetGrade);
+							eq += buildGradeConstraintVariables(p.getProcessNo(), coefficients, grade, blocks, i, targetGrade, c);
 						}
 					}
 				} else {
@@ -179,7 +183,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 						List<Object> coefficients = processExprMap.get(processName);
 						List<Grade> grades = processGradeMap.get(processName);
 						for(Grade grade: grades){
-							eq += buildGradeConstraintVariables(p.getProcessNo(), coefficients, grade, p.getBlocks(), i, targetGrade);
+							eq += buildGradeConstraintVariables(p.getProcessNo(), coefficients, grade, p.getBlocks(), i, targetGrade, c);
 						}
 					}
 				}
@@ -188,9 +192,13 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 					eq = eq.substring(1);
 					if(!gradeConstraintData.isMax()){
 						eq = eq + " <= 0 ";
+						c.setType(Constraint.LESS_EQUAL);
 					} else {
 						eq = eq + " >= 0 ";
+						c.setType(Constraint.GREATER_EQUAL);
 					}
+					c.setValue(new BigDecimal(0));
+					context.getConstraints().add(c);
 					write(eq);
 				}
 			}
@@ -200,7 +208,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 	}
 
 	
-	public String buildGradeConstraintVariables(int processNumber, List<Object> coefficients, Grade grade, List<Block> blocks, int period, BigDecimal targetGrade) {
+	public String buildGradeConstraintVariables(int processNumber, List<Object> coefficients, Grade grade, List<Block> blocks, int period, BigDecimal targetGrade, Constraint c) {
 		
 		String eq = "";
 		for(Block block: blocks){		
@@ -227,7 +235,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 				eq +=  "+ ";
 			}
 			eq +=   formatDecimalValue(coeff)+"p"+block.getPitNo()+"x"+block.getBlockNo()+"p"+processNumber+"t"+period;
-			
+			c.addVariable("p"+block.getPitNo()+"x"+block.getBlockNo()+"p"+processNumber+"t"+period, coeff);
 			if(context.isSpReclaimEnabled() && period > 1 && context.isGlobalMode()) {
 				int stockpileNo = getStockpileNo(block);
 				if(stockpileNo > 0) {
@@ -235,6 +243,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 						eq +=   "+ ";
 					}
 					eq +=  formatDecimalValue(coeff)+"sp"+stockpileNo+"x"+block.getBlockNo()+"p"+processNumber+"t"+period;
+					c.addVariable("sp"+stockpileNo+"x"+block.getBlockNo()+"p"+processNumber+"t"+period, coeff);
 				}			
 			}
 		}
@@ -274,6 +283,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 							eq +=   "+ ";
 						}
 						eq +=  formatDecimalValue(coeff)+"sp"+spNo+"x0p"+processNumber+"t"+period;
+						c.addVariable("sp"+spNo+"x0p"+processNumber+"t"+period, coeff);
 					}
 				}
 			}

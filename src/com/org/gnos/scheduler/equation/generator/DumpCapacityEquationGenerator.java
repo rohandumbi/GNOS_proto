@@ -1,5 +1,6 @@
 package com.org.gnos.scheduler.equation.generator;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,7 @@ import com.org.gnos.core.Block;
 import com.org.gnos.core.Pit;
 import com.org.gnos.db.model.Dump;
 import com.org.gnos.db.model.PitGroup;
+import com.org.gnos.scheduler.equation.Constraint;
 import com.org.gnos.scheduler.equation.ExecutionContext;
 
 public class DumpCapacityEquationGenerator extends EquationGenerator{
@@ -31,6 +33,7 @@ public class DumpCapacityEquationGenerator extends EquationGenerator{
 		for(Dump d:dumpList){
 			if(!d.isHasCapacity()) continue;
 			StringBuilder sb= new StringBuilder("");
+			Constraint constraint  = new Constraint();
 			Set<Block> dumpblocks = d.getBlocks();
 			List<Pit> pits = new ArrayList<Pit>();
 			if(d.getMappingType() == 0){
@@ -51,12 +54,16 @@ public class DumpCapacityEquationGenerator extends EquationGenerator{
 						if(!dumpblocks.contains(block)) continue;
 						for(int i= timePeriodStart; i<=timePeriodEnd; i++){
 							sb.append(" +p"+block.getPitNo()+"x"+block.getBlockNo()+"w"+d.getDumpNumber()+"t"+i);
+							constraint.addVariable("p"+block.getPitNo()+"x"+block.getBlockNo()+"w"+d.getDumpNumber()+"t"+i, new BigDecimal(1));
 						}
 					}
 				}
 			}
 			if(sb.length() > 0){
 				sb.append(" <=  "+d.getCapacity());
+				constraint.setType(Constraint.LESS_EQUAL);
+				constraint.setValue(new BigDecimal(d.getCapacity()));
+				context.getConstraints().add(constraint);
 				write(sb.toString());
 			}
 			
