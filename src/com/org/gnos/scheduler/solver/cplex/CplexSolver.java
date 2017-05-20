@@ -33,24 +33,71 @@ public class CplexSolver implements ISolver{
 		
 		
         try {
-        	test();
         	IloCplex cplex = new IloCplex();
 			cplex.tuneParam();
 			cplex.setParam(IloCplex.Param.MIP.Tolerances.MIPGap, 0.1);
 			cplex.setParam(IloCplex.Param.Read.Scale,1); // decides how to scale the problem matrix -1=no scaling, 0=equilibrium (default), 1=aggressive
-			   
+			
 			System.out.println("cplex version: " +cplex.getVersion());
 			   
-			   
-			// variables
+			
+/*			// variables
 			IloNumVar[] _vars;                    
 			System.out.println("Optimising " + fileName);
-            cplex.importModel(fileName);
+            cplex.importModel(fileName);*/
            
+	   		 Map<String, BigDecimal> variables = context.getVariables();
+	   		 Set<String> keys = variables.keySet();
+	   		 
+	   		 IloLinearNumExpr expr = cplex.linearNumExpr();
+	   		 for(String key: keys) {
+	   			 IloNumVar var = cplex.numVar(0, Double.MAX_VALUE, key);
+	   			 expr.addTerm(variables.get(key).doubleValue(), var);
+	   			 cplex.addGe(var, 0);
+	   		 }
+	   		 
+	   		 cplex.addMaximize(expr);
+	   		 
+	   		 List<Constraint> constraints = context.getConstraints();
+	   		 
+	   		 for(Constraint constraint: constraints) {
+	   			 List<String> vars = constraint.getVariables();
+	   			 List<BigDecimal> coefficients = constraint.getCoefficients();
+	   			 IloLinearNumExpr constraint_expr = cplex.linearNumExpr();
+	   			 for(int i = 0; i< vars.size(); i++) {
+	   				 IloNumVar var = cplex.numVar(0, Double.MAX_VALUE, vars.get(i));
+	   				 constraint_expr.addTerm(coefficients.get(i).doubleValue(), var);
+	   			 }
+	   			 
+	   			 switch (constraint.getType()) {
+	   				case Constraint.GREATER_EQUAL:
+	   					cplex.addGe(constraint_expr, constraint.getValue().doubleValue());
+	   					break;
+	   				case Constraint.LESS_EQUAL:
+	   					cplex.addLe(constraint_expr, constraint.getValue().doubleValue());
+	   					break;
+	   				case Constraint.EQUAL:
+	   					cplex.addEq(constraint_expr, constraint.getValue().doubleValue());
+	   					break;
+	   				
+	   				}
+	   			 	
+	   		 }
+	   		 
+	   		 List<String> binaries = context.getBinaries();
+	   		 
+	   		 for(String binary: binaries) {
+	   			 IloNumVar var =  cplex.boolVar(binary);
+	   			 cplex.addGe(var, 0);
+	   		 }
+	   		 
+	   		 cplex.exportModel(fileName);
+
            
+/*			IloNumVar[] _vars;
             IloLPMatrix lp = (IloLPMatrix)cplex.LPMatrixIterator().next();
   
-            _vars=lp.getNumVars();
+            _vars=lp.getNumVars();*/
 
             // solve
 			   
@@ -58,7 +105,7 @@ public class CplexSolver implements ISolver{
 				System.out.println("Obj = "+cplex.getObjValue());
 				cplex.writeSolution("temp_"+timePeiod+".sol");
 				List<Record> records = new ArrayList<Record>();
-				for (int i=0; i<_vars.length; i++) {
+				/*for (int i=0; i<_vars.length; i++) {
 					String ccc=String.valueOf(_vars[i]);
 					if(ccc.indexOf("x")!=-1 && cplex.getValue(_vars[i])> 0){
 						Record record = parse(ccc, timePeiod);
@@ -66,69 +113,20 @@ public class CplexSolver implements ISolver{
 						record.setValue(cplex.getValue(_vars[i]));
 						records.add(record);
 					}
-				} //for int
+				}*/ //for int
 				helper.store(records);
 			} //if solve
 			else {
 			    System.out.println("Model not solved");
 			}
 			   
-			//cplex.exportModel("test.lp");
+
                        
         }
         catch (IloException exc) {
         	exc.printStackTrace();
         } // catch cplex
 	} 
-
-	private void test() throws IloException {
-		 Map<String, BigDecimal> variables = context.getVariables();
-		 Set<String> keys = variables.keySet();
-		 IloCplex cplex = new IloCplex();
-		 IloLinearNumExpr expr = cplex.linearNumExpr();
-		 for(String key: keys) {
-			 IloNumVar var = cplex.numVar(0, Double.MAX_VALUE, key);
-			 expr.addTerm(variables.get(key).doubleValue(), var);
-			 cplex.addGe(var, 0);
-		 }
-		 
-		 cplex.addMaximize(expr);
-		 
-		 List<Constraint> constraints = context.getConstraints();
-		 
-		 for(Constraint constraint: constraints) {
-			 List<String> vars = constraint.getVariables();
-			 List<BigDecimal> coefficients = constraint.getCoefficients();
-			 IloLinearNumExpr constraint_expr = cplex.linearNumExpr();
-			 for(int i = 0; i< vars.size(); i++) {
-				 IloNumVar var = cplex.numVar(0, Double.MAX_VALUE, vars.get(i));
-				 constraint_expr.addTerm(coefficients.get(i).doubleValue(), var);
-			 }
-			 
-			 switch (constraint.getType()) {
-				case Constraint.GREATER_EQUAL:
-					cplex.addGe(constraint_expr, constraint.getValue().doubleValue());
-					break;
-				case Constraint.LESS_EQUAL:
-					cplex.addLe(constraint_expr, constraint.getValue().doubleValue());
-					break;
-				case Constraint.EQUAL:
-					cplex.addEq(constraint_expr, constraint.getValue().doubleValue());
-					break;
-				
-				}
-			 	
-		 }
-		 
-		 List<String> binaries = context.getBinaries();
-		 
-		 for(String binary: binaries) {
-			 IloNumVar var =  cplex.boolVar(binary);
-			 cplex.addGe(var, 0);
-		 }
-		 
-		 cplex.exportModel("test.lp");
-	}
 
 	public static Record parse(String x, int timePeiod){
 		
