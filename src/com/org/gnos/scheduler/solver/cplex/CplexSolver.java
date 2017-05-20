@@ -14,7 +14,6 @@ import com.org.gnos.scheduler.processor.Record;
 import com.org.gnos.scheduler.solver.ISolver;
 
 import ilog.concert.IloException;
-import ilog.concert.IloLPMatrix;
 import ilog.concert.IloLinearNumExpr;
 import ilog.concert.IloNumVar;
 import ilog.cplex.IloCplex;
@@ -48,10 +47,11 @@ public class CplexSolver implements ISolver{
            
 	   		 Map<String, BigDecimal> variables = context.getVariables();
 	   		 Set<String> keys = variables.keySet();
-	   		 
+	   		 List<IloNumVar> _vars = new ArrayList<IloNumVar>();
 	   		 IloLinearNumExpr expr = cplex.linearNumExpr();
 	   		 for(String key: keys) {
 	   			 IloNumVar var = cplex.numVar(0, Double.MAX_VALUE, key);
+	   			_vars.add(var);
 	   			 expr.addTerm(variables.get(key).doubleValue(), var);
 	   			 cplex.addGe(var, 0);
 	   		 }
@@ -93,27 +93,21 @@ public class CplexSolver implements ISolver{
 	   		 
 	   		 cplex.exportModel(fileName);
 
-           
-/*			IloNumVar[] _vars;
-            IloLPMatrix lp = (IloLPMatrix)cplex.LPMatrixIterator().next();
-  
-            _vars=lp.getNumVars();*/
-
             // solve
 			   
 			if(cplex.solve()){
 				System.out.println("Obj = "+cplex.getObjValue());
 				cplex.writeSolution("temp_"+timePeiod+".sol");
 				List<Record> records = new ArrayList<Record>();
-				/*for (int i=0; i<_vars.length; i++) {
-					String ccc=String.valueOf(_vars[i]);
-					if(ccc.indexOf("x")!=-1 && cplex.getValue(_vars[i])> 0){
+				for (int i=0; i<_vars.size(); i++) {
+					String ccc=String.valueOf(_vars.get(i));
+					if(ccc.indexOf("x")!=-1 && cplex.getValue(_vars.get(i))> 0){
 						Record record = parse(ccc, timePeiod);
 						if(record == null) continue;
-						record.setValue(cplex.getValue(_vars[i]));
+						record.setValue(cplex.getValue(_vars.get(i)));
 						records.add(record);
 					}
-				}*/ //for int
+				} //for int
 				helper.store(records);
 			} //if solve
 			else {
