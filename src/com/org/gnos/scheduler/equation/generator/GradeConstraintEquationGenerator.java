@@ -118,7 +118,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 									List<Object> coefficients = processExprMap.get(processName);
 									List<Grade> grades = processGradeMap.get(processName);
 									for(Grade grade: grades){
-										eq += buildGradeConstraintVariables(p.getProcessNo(), coefficients, grade, p.getBlocks(), i, targetGrade, c);
+										buildGradeConstraintVariables(p.getProcessNo(), coefficients, grade, p.getBlocks(), i, targetGrade, c);
 									}
 									
 									break;
@@ -133,7 +133,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 							List<Object> coefficients = processExprMap.get(processName);
 							List<Grade> grades = processGradeMap.get(processName);
 							for(Grade grade: grades){
-								eq += buildGradeConstraintVariables(p.getProcessNo(), coefficients, grade, p.getBlocks(), i, targetGrade, c);
+								buildGradeConstraintVariables(p.getProcessNo(), coefficients, grade, p.getBlocks(), i, targetGrade, c);
 							}
 							break;
 						}
@@ -153,7 +153,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 								}
 							}
 							for(Grade grade: grades){
-								eq += buildGradeConstraintVariables(p.getProcessNo(), coefficients, grade, blocks, i, targetGrade, c);
+								buildGradeConstraintVariables(p.getProcessNo(), coefficients, grade, blocks, i, targetGrade, c);
 							}
 						}
 					}
@@ -174,7 +174,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 							}
 						}
 						for(Grade grade: grades){
-							eq += buildGradeConstraintVariables(p.getProcessNo(), coefficients, grade, blocks, i, targetGrade, c);
+							buildGradeConstraintVariables(p.getProcessNo(), coefficients, grade, blocks, i, targetGrade, c);
 						}
 					}
 				} else {
@@ -183,7 +183,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 						List<Object> coefficients = processExprMap.get(processName);
 						List<Grade> grades = processGradeMap.get(processName);
 						for(Grade grade: grades){
-							eq += buildGradeConstraintVariables(p.getProcessNo(), coefficients, grade, p.getBlocks(), i, targetGrade, c);
+							buildGradeConstraintVariables(p.getProcessNo(), coefficients, grade, p.getBlocks(), i, targetGrade, c);
 						}
 					}
 				}
@@ -191,15 +191,12 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 				if(eq.length() > 0) {
 					eq = eq.substring(1);
 					if(!gradeConstraintData.isMax()){
-						eq = eq + " <= 0 ";
 						c.setType(Constraint.LESS_EQUAL);
 					} else {
-						eq = eq + " >= 0 ";
 						c.setType(Constraint.GREATER_EQUAL);
 					}
 					c.setValue(new BigDecimal(0));
 					context.getConstraints().add(c);
-					write(eq);
 				}
 			}
 			//
@@ -208,7 +205,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 	}
 
 	
-	public String buildGradeConstraintVariables(int processNumber, List<Object> coefficients, Grade grade, List<Block> blocks, int period, BigDecimal targetGrade, Constraint c) {
+	public void buildGradeConstraintVariables(int processNumber, List<Object> coefficients, Grade grade, List<Block> blocks, int period, BigDecimal targetGrade, Constraint c) {
 		
 		String eq = "";
 		for(Block block: blocks){		
@@ -239,10 +236,9 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 			if(context.isSpReclaimEnabled() && period > 1 && context.isGlobalMode()) {
 				int stockpileNo = getStockpileNo(block);
 				if(stockpileNo > 0) {
-					if(coeff.doubleValue() > 0) {
-						eq +=   "+ ";
+					if(!(coeff.doubleValue() > 0)) {
+						coeff = coeff.negate();
 					}
-					eq +=  formatDecimalValue(coeff)+"sp"+stockpileNo+"x"+block.getBlockNo()+"p"+processNumber+"t"+period;
 					c.addVariable("sp"+stockpileNo+"x"+block.getBlockNo()+"p"+processNumber+"t"+period, coeff);
 				}			
 			}
@@ -279,16 +275,15 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 				Set<Process> processes = spb.getProcesses();
 				for(Process process: processes){
 					if(process.getProcessNo() == processNumber) {
-						if(coeff.doubleValue() > 0) {
-							eq +=   "+ ";
+						if(!(coeff.doubleValue() > 0)) {
+							coeff = coeff.negate();
 						}
-						eq +=  formatDecimalValue(coeff)+"sp"+spNo+"x0p"+processNumber+"t"+period;
 						c.addVariable("sp"+spNo+"x0p"+processNumber+"t"+period, coeff);
 					}
 				}
 			}
 		}
-		return eq;
+		
 	}
 	
 	private int getStockpileNo(Block b){

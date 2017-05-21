@@ -72,8 +72,8 @@ public class TestApplication {
 		
 		RunConfig runconfig = new RunConfig();
 		runconfig.setMode(RunConfig.GLOBAL_MODE);
-		runconfig.setProjectId(2);
-		runconfig.setScenarioId(3);
+		runconfig.setProjectId(3);
+		runconfig.setScenarioId(4);
 		SchedulerService service = new SchedulerService();
 		service.setRunconfig(runconfig);
 		service.execute();

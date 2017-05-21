@@ -64,7 +64,6 @@ public class DumpCapacityEquationGenerator extends EquationGenerator{
 				constraint.setType(Constraint.LESS_EQUAL);
 				constraint.setValue(new BigDecimal(d.getCapacity()));
 				context.getConstraints().add(constraint);
-				write(sb.toString());
 			}
 			
 		}

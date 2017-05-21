@@ -28,7 +28,6 @@ public class BenchProportionEquationGenerator extends EquationGenerator{
 	public void generate() {
 		try {
 			buildBenchProportionEquations();
-			output.flush();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -87,7 +86,6 @@ public class BenchProportionEquationGenerator extends EquationGenerator{
 								constraint.setType(Constraint.EQUAL);
 								constraint.setValue(new BigDecimal(0));
 								context.getConstraints().add(constraint);
-								write(sb.toString());
 							}
 						}
 					}

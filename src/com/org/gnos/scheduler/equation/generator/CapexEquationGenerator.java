@@ -35,7 +35,6 @@ public class CapexEquationGenerator extends EquationGenerator{
 
 		try {
 			buildCapexEquations();
-			output.flush();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -121,7 +120,6 @@ public class CapexEquationGenerator extends EquationGenerator{
 				c.setType(Constraint.GREATER_EQUAL);
 				c.setValue(new BigDecimal(0));
 				context.getConstraints().add(c);
-				write(sb.toString());
 			}			
 		}
 	}
@@ -144,7 +142,6 @@ public class CapexEquationGenerator extends EquationGenerator{
 			c.setType(Constraint.LESS_EQUAL);
 			c.setValue(new BigDecimal(1));
 			context.getConstraints().add(c);
-			write(sb.toString());
 		}
 	}
 	
@@ -226,7 +223,6 @@ public class CapexEquationGenerator extends EquationGenerator{
 			}
 			c.setType(Constraint.LESS_EQUAL);
 			context.getConstraints().add(c);
-			write(sb.toString());
 		}
 	}
 	
@@ -299,7 +295,6 @@ public class CapexEquationGenerator extends EquationGenerator{
 			}
 			c.setType(Constraint.LESS_EQUAL);
 			context.getConstraints().add(c);
-			write(sb.toString());
 		}
 	}
 	

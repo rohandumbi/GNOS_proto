@@ -29,7 +29,6 @@ public class SPReclaimEquationGenerator extends EquationGenerator{
 			} else {
 				buildSWStockpileEquations();
 			}
-			output.flush();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -64,7 +63,6 @@ public class SPReclaimEquationGenerator extends EquationGenerator{
 						}						
 					}
 					if(sb_sp.length() > 0 || sb_spr.length() > 0){
-						write(sb_sp.toString()+sb_spr.toString()+" >= 0");
 						c2.setType(Constraint.GREATER_EQUAL);
 						c2.setValue(new BigDecimal(0));
 						context.getConstraints().add(c2);
@@ -73,7 +71,6 @@ public class SPReclaimEquationGenerator extends EquationGenerator{
 					sbc_spr.append(sb_spr);
 				}
 				if(sp.getCapacity() > 0 && (sbc_sp.length() > 0 || sbc_spr.length() > 0)){
-					write(sbc_sp.toString()+sbc_spr.toString()+" <= "+sp.getCapacity());
 					c1.setType(Constraint.LESS_EQUAL);
 					c1.setValue(new BigDecimal(sp.getCapacity()));
 					context.getConstraints().add(c1);
@@ -124,7 +121,6 @@ public class SPReclaimEquationGenerator extends EquationGenerator{
 				}
 				 
 				if(capacity > 0 && (sbc_sp.length() > 0 || sbc_spr.length() > 0)){
-					write(sbc_sp.toString()+sbc_spr.toString()+" <= "+capacity);
 					c.setType(Constraint.LESS_EQUAL);
 					c.setValue(new BigDecimal(capacity));
 					context.getConstraints().add(c);

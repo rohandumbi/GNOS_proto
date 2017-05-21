@@ -36,7 +36,6 @@ public class BinaryVariableGenerator extends EquationGenerator{
 				for(int i=timePeriodStart; i<= timePeriodEnd;i++){
 					String eq = "p"+pitNo+"b"+b.getBenchNo()+"t"+i+" ";
 					context.getBinaries().add("p"+pitNo+"b"+b.getBenchNo()+"t"+i);
-					write(eq);
 				}
 			}
 		}
@@ -55,28 +54,8 @@ public class BinaryVariableGenerator extends EquationGenerator{
 				for(int i= timePeriodStart; i <= timePeriodEnd ; i++){
 					String cv = " c"+capexCount+"i"+j+"t"+i;
 					context.getBinaries().add("c"+capexCount+"i"+j+"t"+i);
-					write(cv);
 				}
 			}
 		}
 	}
-
-	@Override
-	protected void write(String s) {
-
-		try {
-			byte[] bytes = s.getBytes();
-			if(bytes.length + bytesWritten > BYTES_PER_LINE){
-				output.write("\r\n".getBytes());
-				output.flush();
-				bytesWritten = 0;
-			}
-			output.write(bytes);
-			bytesWritten = bytesWritten + bytes.length;
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-	}	
 }

@@ -30,7 +30,6 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 		try {
 			buildBenchConstraintVariables();
 			buildBenchUserConstraintVariables();
-			output.flush();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -85,9 +84,8 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 					sb1.append(" <= 0 ");
 					c1.setValue(new BigDecimal(0));
 					c1.setType(Constraint.LESS_EQUAL);
-					write(sb1.toString());
 					if(lastBench != null){
-						write(sb2.toString().substring(2));
+						//write(sb2.toString().substring(2));
 					}
 					context.getConstraints().add(c1);
 					context.getConstraints().add(c2);
@@ -155,9 +153,7 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 		String eq = sb1.toString().substring(1) + sb2.toString() + " <= "+ (yearvalue-1);
 		constraint.setType(Constraint.LESS_EQUAL);
 		constraint.setValue(new BigDecimal(yearvalue-1));
-		context.getConstraints().add(constraint);
-		write(eq);
-		
+		context.getConstraints().add(constraint);		
 	}
 	
 	private List<String> getAllVariablesForBench(Bench bench){

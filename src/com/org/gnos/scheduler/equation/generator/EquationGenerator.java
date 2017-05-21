@@ -1,7 +1,5 @@
 package com.org.gnos.scheduler.equation.generator;
 
-import java.io.BufferedOutputStream;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
@@ -12,15 +10,12 @@ import com.org.gnos.db.model.PitGroup;
 import com.org.gnos.db.model.Product;
 import com.org.gnos.db.model.ProductJoin;
 import com.org.gnos.scheduler.equation.ExecutionContext;
-import com.org.gnos.scheduler.solver.ISolver;
 
 public abstract class EquationGenerator {
 	
 	static final int BYTES_PER_LINE = 256;
 	private static int DECIMAL_POINT = 6;
-	
-	protected ISolver solver;
-	protected BufferedOutputStream output;
+
 	protected ExecutionContext context = null;
 	
 	protected int bytesWritten = 0;
@@ -81,35 +76,6 @@ public abstract class EquationGenerator {
 	protected String formatDecimalValue(BigDecimal bd) {
 		BigDecimal a =  bd.setScale(DECIMAL_POINT , BigDecimal.ROUND_HALF_EVEN);
 		return a.stripTrailingZeros().toString();
-	}
-	
-	protected void write(String s) {
-
-		try {
-			s = s +"\r\n";
-			byte[] bytes = s.getBytes();
-			output.write(bytes);
-			output.flush();			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-	}
-
-	public ISolver getSolver() {
-		return solver;
-	}
-
-	public void setSolver(ISolver solver) {
-		this.solver = solver;
-	}
-
-	public BufferedOutputStream getOutput() {
-		return output;
-	}
-
-	public void setOutput(BufferedOutputStream output) {
-		this.output = output;
 	}
 
 

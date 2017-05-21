@@ -30,7 +30,6 @@ public class DumpDependencyEquationGenerator extends EquationGenerator{
 
 		try {
 			buildDependencyEquations();
-			output.flush();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -83,7 +82,6 @@ public class DumpDependencyEquationGenerator extends EquationGenerator{
 			c.setType(Constraint.LESS_EQUAL);
 			c.setValue(new BigDecimal(0));
 			context.getConstraints().add(c);
-			write(sb.toString());
 		}
 		
 	}
@@ -108,7 +106,6 @@ public class DumpDependencyEquationGenerator extends EquationGenerator{
 			c.setType(Constraint.LESS_EQUAL);
 			c.setValue(new BigDecimal(0));
 			context.getConstraints().add(c);
-			write(sb.toString());
 		}
 		
 	}
@@ -134,7 +131,6 @@ public class DumpDependencyEquationGenerator extends EquationGenerator{
 			c.setType(Constraint.LESS_EQUAL);
 			c.setValue(new BigDecimal(0));
 			context.getConstraints().add(c);
-			write(sb.toString());
 		}
 		
 	}
@@ -176,7 +172,6 @@ public class DumpDependencyEquationGenerator extends EquationGenerator{
 			c.setType(Constraint.LESS_EQUAL);
 			c.setValue(new BigDecimal(0));
 			context.getConstraints().add(c);
-			write(eq);
 		}
 	}
 	
@@ -200,7 +195,6 @@ public class DumpDependencyEquationGenerator extends EquationGenerator{
 			c.setType(Constraint.LESS_EQUAL);
 			c.setValue(new BigDecimal(0));
 			context.getConstraints().add(c);
-			write(sb.toString());
 		}
 		
 	}

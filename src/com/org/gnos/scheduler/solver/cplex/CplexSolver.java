@@ -36,6 +36,7 @@ public class CplexSolver implements ISolver{
 			cplex.tuneParam();
 			cplex.setParam(IloCplex.Param.MIP.Tolerances.MIPGap, 0.1);
 			cplex.setParam(IloCplex.Param.Read.Scale,1); // decides how to scale the problem matrix -1=no scaling, 0=equilibrium (default), 1=aggressive
+			cplex.setParam(IloCplex.Param.Preprocessing.Presolve, false);
 			
 			System.out.println("cplex version: " +cplex.getVersion());
 			   
@@ -115,7 +116,7 @@ public class CplexSolver implements ISolver{
 			}
 			   
 
-                       
+			cplex.end();        
         }
         catch (IloException exc) {
         	exc.printStackTrace();
