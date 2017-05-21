@@ -1,10 +1,5 @@
 package com.org.gnos.scheduler;
 
-import java.io.BufferedOutputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
 import com.org.gnos.scheduler.equation.EquationGeneratorFactory;
 import com.org.gnos.scheduler.equation.ExecutionContext;
 import com.org.gnos.scheduler.processor.IStorageHelper;
@@ -50,7 +45,7 @@ public abstract class BaseScheduler {
 			EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.GRADE_CONSTRAINT, context).generate();
 		}
 		
-		EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.BINARY_VARIABLE, context).generate();		
+		//EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.BINARY_VARIABLE, context).generate();		
 		
 	}
 

@@ -40,15 +40,11 @@ public class BoundaryVariableGenerator extends EquationGenerator{
 			Constraint c = new Constraint();
 			List<String> variables = blockVariableMapping.get(blockId);
 			Block b = allBlocks.get(blockId);
-			StringBuilder sb = new StringBuilder("");
 			for(String variable: variables){
 				if(!variable.startsWith("sp")){
-					sb.append(variable +"+");
 					c.addVariable(variable, new BigDecimal(1));
 				}					
-			}
-			String eq = sb.toString().substring(0,sb.length() -1) +" <= "+context.getTonnesWtForBlock(b);
-			
+			}			
 			c.setType(Constraint.LESS_EQUAL);
 			c.setValue(new BigDecimal(context.getTonnesWtForBlock(b)));
 			context.getConstraints().add(c);
@@ -67,12 +63,9 @@ public class BoundaryVariableGenerator extends EquationGenerator{
 			if(spb == null || spb.getTonnesWt() == 0) continue;
 			double capacity = spb.getTonnesWt();
 			List<String> variables = spblockVariableMapping.get(spNo);
-			StringBuilder sb = new StringBuilder("");
 			for(String variable: variables){
-				sb.append(variable +"+");
 				c.addVariable(variable, new BigDecimal(1));
 			}
-			String eq = sb.toString().substring(0,sb.length() -1) +" <= "+capacity ;
 			c.setType(Constraint.LESS_EQUAL);
 			c.setValue(new BigDecimal(capacity));
 			context.getConstraints().add(c);

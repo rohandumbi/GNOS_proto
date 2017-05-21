@@ -43,34 +43,26 @@ public class SPReclaimEquationGenerator extends EquationGenerator{
 			if(!sp.isReclaim()) continue;
 			Set<Block> blocks = sp.getBlocks();
 			for(int i= timePeriodStart; i <= timePeriodEnd; i++) {
-				StringBuilder sbc_sp = new StringBuilder("");
-				StringBuilder sbc_spr = new StringBuilder("");
 				Constraint c1 = new Constraint();
 				for(Block b: blocks){
 					Constraint c2 = new Constraint();
-					StringBuilder sb_sp = new StringBuilder("");
-					StringBuilder sb_spr = new StringBuilder("");
-					sbc_sp.append(" + p"+b.getPitNo()+"x"+b.getBlockNo()+"s"+sp.getStockpileNumber()+"t1");
+					c1.addVariable("p"+b.getPitNo()+"x"+b.getBlockNo()+"s"+sp.getStockpileNumber()+"t1", new BigDecimal(1));
 					for(int j=2; j<=i; j++){
-						sb_sp.append(" + p"+b.getPitNo()+"x"+b.getBlockNo()+"s"+sp.getStockpileNumber()+"t"+(j-1));
 						c1.addVariable("p"+b.getPitNo()+"x"+b.getBlockNo()+"s"+sp.getStockpileNumber()+"t"+(j-1), new BigDecimal(1));
 						c2.addVariable("p"+b.getPitNo()+"x"+b.getBlockNo()+"s"+sp.getStockpileNumber()+"t"+(j-1), new BigDecimal(1));
 						Set<Process> processes = b.getProcesses();
 						for(Process p: processes) {
-							sb_spr.append(" - sp"+sp.getStockpileNumber()+"x"+b.getBlockNo()+"p"+p.getProcessNo()+"t"+j);
 							c1.addVariable("sp"+sp.getStockpileNumber()+"x"+b.getBlockNo()+"p"+p.getProcessNo()+"t"+j, new BigDecimal(1).negate());
 							c2.addVariable("sp"+sp.getStockpileNumber()+"x"+b.getBlockNo()+"p"+p.getProcessNo()+"t"+j, new BigDecimal(1).negate());
 						}						
 					}
-					if(sb_sp.length() > 0 || sb_spr.length() > 0){
+					if(c2.getVariables().size() > 0){
 						c2.setType(Constraint.GREATER_EQUAL);
 						c2.setValue(new BigDecimal(0));
 						context.getConstraints().add(c2);
 					}
-					sbc_sp.append(sb_sp);
-					sbc_spr.append(sb_spr);
 				}
-				if(sp.getCapacity() > 0 && (sbc_sp.length() > 0 || sbc_spr.length() > 0)){
+				if(sp.getCapacity() > 0 && c1.getVariables().size() > 0){
 					c1.setType(Constraint.LESS_EQUAL);
 					c1.setValue(new BigDecimal(sp.getCapacity()));
 					context.getConstraints().add(c1);
