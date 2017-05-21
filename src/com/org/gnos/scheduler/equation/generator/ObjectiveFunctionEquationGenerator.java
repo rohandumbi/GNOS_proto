@@ -104,10 +104,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 				BigDecimal processValue = getProcessValue(block, process.getModel(), year);
 				BigDecimal value = processValue.subtract(cost);
 				value = (value.multiply(new BigDecimal(1 / Math.pow ((1 + discount_rate), i))));
-				String variable = "p"+block.getPitNo()+"x"+block.getBlockNo()+"p"+processNumber+"t"+i;
-				if(value.doubleValue() > 0){
-					context.addVariable(variable, value);
-				} 
+				String variable = "p"+block.getPitNo()+"x"+block.getBlockNo()+"p"+processNumber+"t"+i; 
 				context.addVariable(variable, value);
 				context.addVariable(block, variable);
 			}

@@ -45,7 +45,7 @@ public abstract class BaseScheduler {
 			EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.GRADE_CONSTRAINT, context).generate();
 		}
 		
-		//EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.BINARY_VARIABLE, context).generate();		
+		EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.BINARY_VARIABLE, context).generate();		
 		
 	}
 
