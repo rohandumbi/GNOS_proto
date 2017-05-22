@@ -103,7 +103,6 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 			
 			for(int i=timePeriodStart; i<= timePeriodEnd; i++){
 				Constraint constraint = new Constraint();
-				String eq = "";
 				if(selectorType == ProcessConstraintData.SELECTION_PROCESS_JOIN) {
 					ProcessJoin processJoin = context.getProcessJoinByName(processConstraintData.getSelector_name());
 					if(processJoin != null) {
@@ -192,7 +191,7 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 								if(pit.getPitNo() != b.getPitNo()) continue;
 								blocks.add(b);								
 							}
-							eq += buildStockpileConstraintVariables(coefficients,usetruckHourCoeffcient, blocks, i, constraint);
+							buildStockpileConstraintVariables(coefficients,usetruckHourCoeffcient, blocks, i, constraint);
 							blocks = new ArrayList<Block>();
 							for(Block b: context.getWasteBlocks()){
 								if(pit.getPitNo() != b.getPitNo()) continue;
@@ -243,7 +242,7 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 							if(!pitNumbers.contains(b.getPitNo())) continue;
 							blocks.add(b);								
 						}
-						eq += buildStockpileConstraintVariables(coefficients, usetruckHourCoeffcient, blocks, i, constraint);
+						buildStockpileConstraintVariables(coefficients, usetruckHourCoeffcient, blocks, i, constraint);
 						blocks = new ArrayList<Block>();
 						for(Block b: context.getWasteBlocks()){
 							if(!pitNumbers.contains(b.getPitNo())) continue;
@@ -279,15 +278,14 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 						}
 						List<Block> blocks = new ArrayList<Block>();
 						blocks.addAll(context.getProcessBlocks());
-						eq += buildStockpileConstraintVariables(coefficients, usetruckHourCoeffcient, blocks, i, constraint);
+						buildStockpileConstraintVariables(coefficients, usetruckHourCoeffcient, blocks, i, constraint);
 						blocks = new ArrayList<Block>();
 						blocks.addAll(context.getWasteBlocks());
 						buildWasteConstraintVariables(coefficients, usetruckHourCoeffcient, blocks, i, constraint);
 					}
 				}
 				
-				if(eq.length() > 0) {
-					eq = eq.substring(1);
+				if(constraint.getVariables().size() > 0) {
 					if(processConstraintData.isMax()){
 						constraint.setType(Constraint.LESS_EQUAL);
 						constraint.setValue(new BigDecimal(processConstraintData.getConstraintData().get(startYear+i -1)));
@@ -332,9 +330,6 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 			if(context.isSpReclaimEnabled() && period > 1 && context.isGlobalMode()) {
 				int stockpileNo = getStockpileNo(block);
 				if(stockpileNo > 0) {
-					if(coefficientRatio.doubleValue() < 0) {
-						coefficientRatio = coefficientRatio.negate();
-					}
 					constraint.addVariable("sp"+stockpileNo+"x"+block.getBlockNo()+"p"+processNumber+"t"+period, coefficientRatio);
 				}			
 			}
@@ -382,9 +377,6 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 						
 						if(coefficientRatio.doubleValue() == 0) continue;
 						
-						if(coefficientRatio.doubleValue() < 0) {
-							coefficientRatio = coefficientRatio.negate();
-						}
 						constraint.addVariable("sp"+spNo+"x0p"+processNumber+"t"+period, coefficientRatio);
 					}
 				}
@@ -392,9 +384,8 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 		}
 	}
 	
-	private String buildStockpileConstraintVariables(List<Object> coefficients, boolean useTruckHour, List<Block> blocks, int period, Constraint constraint) {
+	private void buildStockpileConstraintVariables(List<Object> coefficients, boolean useTruckHour, List<Block> blocks, int period, Constraint constraint) {
 		
-		String eq = "";
 		for(Block block: blocks){
 			Stockpile sp = getStockpile(block);
 			if(sp == null) continue;
@@ -418,11 +409,8 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 			}
 			
 			if(coefficientRatio.doubleValue() == 0) continue;
-			
-			eq +=  "+ "+formatDecimalValue(coefficientRatio)+ variable;
 			constraint.addVariable(variable, coefficientRatio);
 		}			
-		return eq;
 	}
 
 	private void buildWasteConstraintVariables(List<Object> coefficients, boolean useTruckHour, List<Block> blocks, int period, Constraint constraint) {
