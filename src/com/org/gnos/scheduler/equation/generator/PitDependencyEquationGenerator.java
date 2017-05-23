@@ -112,7 +112,7 @@ public class PitDependencyEquationGenerator extends EquationGenerator{
 			
 			for(String variable: variables){
 				if(variable.startsWith("sp")) continue;
-				if(!variable.endsWith(String.valueOf(i))) continue;
+				if(!variable.endsWith(String.valueOf("t"+i))) continue;
 				c.addVariable(variable, new BigDecimal(1));
 			}
 			c.addVariable("p"+p1.getPitNo()+"b"+b1.getBenchNo()+"t"+i, new BigDecimal(benchTonnesWt).negate());
