@@ -112,7 +112,7 @@ public class PitDependencyEquationGenerator extends EquationGenerator{
 			
 			for(String variable: variables){
 				if(variable.startsWith("sp")) continue;
-				if(!variable.endsWith(String.valueOf(i))) continue;
+				if(!variable.endsWith(String.valueOf("t"+i))) continue;
 				if(count > 0) sb.append(" + ");						
 				sb.append(variable);
 				count++;

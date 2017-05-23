@@ -185,7 +185,6 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 				}
 				
 				if(eq.length() > 0) {
-					eq = eq.substring(1);
 					if(!gradeConstraintData.isMax()){
 						eq = eq + " <= 0 ";
 					} else {
