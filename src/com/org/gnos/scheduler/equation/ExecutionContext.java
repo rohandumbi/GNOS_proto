@@ -468,6 +468,18 @@ public class ExecutionContext {
 
 	// Helper methods
 
+	public Block getBlockByNumber(int blockNo) {
+		if(blocks == null) return null;
+		Set<Integer> ids = blocks.keySet();
+		for(int id: ids) {
+			Block b = blocks.get(id);
+			if(b.getBlockNo() == blockNo) {
+				return b;
+			}
+		}
+		
+		return null;
+	}
 	public Field getFieldById(int id) {
 		if (fields == null)
 			return null;

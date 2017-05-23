@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.org.gnos.core.GNOSConfig;
 import com.org.gnos.scheduler.equation.Constraint;
 import com.org.gnos.scheduler.equation.ExecutionContext;
 import com.org.gnos.scheduler.processor.FileStorageHelper;
@@ -28,6 +29,16 @@ public class CplexSolver implements ISolver {
 	protected IloNumVar[][][][] spVariables;
 	protected IloNumVar[][][][] wasteVariables;
 
+	private static int DECIMAL_POINT = 6;
+	
+	static {
+		String dp_format = GNOSConfig.get("format.dp");
+		if(dp_format!= null && dp_format.trim().length()>0){
+			DECIMAL_POINT = Integer.parseInt(dp_format);
+		}
+		System.out.println("DP value is "+DECIMAL_POINT);
+	}
+	
 	public void solve(String fileName, int timePeiod) {
 
 		try {
@@ -58,7 +69,8 @@ public class CplexSolver implements ISolver {
 				IloNumVar var = cplex.numVar(0, Double.MAX_VALUE, key);
 				_vars.add(var);
 				numvariablemap.put(key, var);
-				expr.addTerm(variables.get(key).doubleValue(), var);
+				BigDecimal coeff = formatDecimalValue(variables.get(key));
+				expr.addTerm(coeff.doubleValue(), var);
 				cplex.addGe(var, 0);
 			}
 			List<String> binaries = context.getBinaries();
@@ -82,7 +94,8 @@ public class CplexSolver implements ISolver {
 					if(var == null) {
 						continue;
 					}
-					constraint_expr.addTerm(coefficients.get(i).doubleValue(), var);
+					BigDecimal coeff = formatDecimalValue(coefficients.get(i));
+					constraint_expr.addTerm(coeff.doubleValue(), var);
 				}
 
 				switch (constraint.getType()) {
@@ -224,6 +237,14 @@ public class CplexSolver implements ISolver {
 		return rec;
 	}
 
+	protected BigDecimal formatDecimalValue(BigDecimal bd) {
+		if(bd == null){
+			return new BigDecimal(0);
+		}
+		BigDecimal a =  bd.setScale(DECIMAL_POINT , BigDecimal.ROUND_HALF_EVEN);
+		return a;
+	}
+	
 	public static void main(String[] args) {
 		// new
 		// CplexSolver().solve("C:\\Users\\abandyopadhy\\Downloads\\gnos\\merged_maximixe\\merged_maximixe.lp",

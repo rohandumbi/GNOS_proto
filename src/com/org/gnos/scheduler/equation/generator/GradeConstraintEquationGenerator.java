@@ -25,8 +25,6 @@ import com.org.gnos.scheduler.equation.ExecutionContext;
 import com.org.gnos.scheduler.equation.SPBlock;
 import com.org.gnos.scheduler.equation.SlidingWindowExecutionContext;
 
-import oracle.jrockit.jfr.tools.ConCatRepository;
-
 public class GradeConstraintEquationGenerator extends EquationGenerator{
 
 	private List<GradeConstraintData> gradeConstraintDataList;
@@ -104,7 +102,6 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 			
 			for(int i=timePeriodStart; i<= timePeriodEnd; i++){
 				Constraint c = new Constraint();
-				String eq = "";
 				BigDecimal targetGrade = new BigDecimal(gradeConstraintData.getConstraintData().get(startYear+i -1));
 				if(selectorType == GradeConstraintData.SELECTION_PROCESS_JOIN) {
 					ProcessJoin processJoin = context.getProcessJoinByName(gradeConstraintData.getSelectorName());
@@ -188,8 +185,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 					}
 				}
 				
-				if(eq.length() > 0) {
-					eq = eq.substring(1);
+				if(c.getVariables().size() > 0) {
 					if(!gradeConstraintData.isMax()){
 						c.setType(Constraint.LESS_EQUAL);
 					} else {
@@ -207,7 +203,6 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 	
 	public void buildGradeConstraintVariables(int processNumber, List<Object> coefficients, Grade grade, List<Block> blocks, int period, BigDecimal targetGrade, Constraint c) {
 		
-		String eq = "";
 		for(Block block: blocks){		
 			BigDecimal processRatio = new BigDecimal(0);
 			for(Object coefficient: coefficients){
@@ -228,17 +223,10 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 			BigDecimal blockGrade = context.getGradeValueforBlock(block, grade.getMappedName(), grade.getType());
 			BigDecimal coeff = processRatio.multiply(targetGrade.subtract(blockGrade));
 			if(coeff.doubleValue() == 0) continue;
-			if(targetGrade.compareTo(blockGrade) == 1) {
-				eq +=  "+ ";
-			}
-			eq +=   formatDecimalValue(coeff)+"p"+block.getPitNo()+"x"+block.getBlockNo()+"p"+processNumber+"t"+period;
 			c.addVariable("p"+block.getPitNo()+"x"+block.getBlockNo()+"p"+processNumber+"t"+period, coeff);
 			if(context.isSpReclaimEnabled() && period > 1 && context.isGlobalMode()) {
 				int stockpileNo = getStockpileNo(block);
 				if(stockpileNo > 0) {
-					if(!(coeff.doubleValue() > 0)) {
-						coeff = coeff.negate();
-					}
 					c.addVariable("sp"+stockpileNo+"x"+block.getBlockNo()+"p"+processNumber+"t"+period, coeff);
 				}			
 			}
