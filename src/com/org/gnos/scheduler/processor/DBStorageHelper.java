@@ -128,7 +128,8 @@ public class DBStorageHelper implements IStorageHelper {
 			conn.setAutoCommit(false);
 			for(Record record:records){
 				try {
-					Block b = context.getBlocks().get(record.getBlockNo());
+					Block b = context.getBlockByNumber(record.getBlockNo());
+					if(b == null) continue;
 					double tonnesWt = context.getTonnesWtForBlock(b);				
 					double quantityMined = record.getValue();
 					double ratio = quantityMined/tonnesWt;
