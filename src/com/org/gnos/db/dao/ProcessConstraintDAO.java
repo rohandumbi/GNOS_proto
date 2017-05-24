@@ -21,8 +21,10 @@ public class ProcessConstraintDAO {
 			" where b.process_constraint_id = a.id and scenario_id = ? order by id, year";
 	private static final String SQL_INSERT = "insert into process_constraint_defn (scenario_id, selector_name, selector_type, coefficient_name, coefficient_type,  in_use, is_max) values (?, ?, ?, ?, ?, ?, ?)";
 	private static final String SQL_INSERT_MAPPING = "insert into process_constraint_year_mapping (process_constraint_id, year, value) values (?, ?, ?)";
-	private static final String SQL_DELETE_MAPPING = "delete from process_constraint_year_mapping where process_constraint_id = ?";
-	private static final String SQL_DELETE = "delete from process_constraint_defn where id = ?";
+	private static final String SQL_DELETE_BY_ID = "delete from process_constraint_defn where id = ?";
+	private static final String SQL_DELETE_MAPPING_BY_ID = "delete from process_constraint_year_mapping where process_constraint_id = ?";
+	private static final String SQL_DELETE_BY_SCENARIOID = "delete from process_constraint_defn where scenario_id = ?";
+	private static final String SQL_DELETE_MAPPING_BY_SCENARIOID = "delete from process_constraint_year_mapping where process_constraint_id in (select process_constraint_id from process_constraint_defn where scenario_id = ? )";
 	private static final String SQL_UPDATE = "update process_constraint_defn set selector_name = ?, selector_type = ?, coefficient_name = ?, coefficient_type = ?, in_use= ?, is_max = ? where id = ?";
 	private static final String SQL_UPDATE_MAPPING = "update process_constraint_year_mapping set value = ? where process_constraint_id = ? and year = ? ";
 	
@@ -174,8 +176,8 @@ public class ProcessConstraintDAO {
 
 	        try (
 	            Connection connection = DBManager.getConnection();
-	            PreparedStatement statement = prepareStatement(connection, SQL_DELETE, false, values);
-	        	PreparedStatement mappingstatement = prepareStatement(connection, SQL_DELETE_MAPPING, false, values);
+	            PreparedStatement statement = prepareStatement(connection, SQL_DELETE_BY_ID, false, values);
+	        	PreparedStatement mappingstatement = prepareStatement(connection, SQL_DELETE_MAPPING_BY_ID, false, values);
 	        ) {
 	        	mappingstatement.executeUpdate();
 	        	statement.executeUpdate();	           
@@ -185,6 +187,22 @@ public class ProcessConstraintDAO {
 	        }
 	}
 	
+	public void delete(int scenarioId){
+		
+			Object[] values = { scenarioId };
+
+	        try (
+	            Connection connection = DBManager.getConnection();
+	            PreparedStatement statement = prepareStatement(connection, SQL_DELETE_BY_SCENARIOID, false, values);
+	        	PreparedStatement mappingstatement = prepareStatement(connection, SQL_DELETE_MAPPING_BY_SCENARIOID, false, values);
+	        ) {
+	        	mappingstatement.executeUpdate();
+	        	statement.executeUpdate();	           
+	        } catch (SQLException e) {
+	            //throw new DAOException(e);
+	        }
+	}
+
 	private ProcessConstraintData map(ResultSet rs, ProcessConstraintData pcd) throws SQLException {
 		
 		if(pcd == null) {

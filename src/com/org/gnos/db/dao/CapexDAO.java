@@ -26,6 +26,8 @@ public class CapexDAO {
 	private static final String SQL_INSERT_INSTANCE = "insert into capex_instance (capex_id, name, group_name, group_type, capex, expansion_capacity) values (?, ?, ?, ?, ?, ?)";
 	private static final String SQL_DELETE = "delete from capex_data where id = ?";
 	private static final String SQL_DELETE_INSTANCE_ALL = "delete from capex_instance where capex_id = ?";
+	private static final String SQL_DELETE_BY_SCENARIOID = "delete from capex_data where scenario_id = ?";
+	private static final String SQL_DELETE_INSTANCE_ALL_BY_SCENARIOID = "delete from capex_instance where capex_id in (select id from capex_data where scenario_id = ? )";
 	private static final String SQL_DELETE_INSTANCE = "delete from capex_instance where id = ? ";
 	private static final String SQL_UPDATE = "update capex_instance set group_name = ? , group_type = ?, capex = ?, expansion_capacity = ?  where id = ?";
 	
@@ -188,6 +190,24 @@ public class CapexDAO {
 		}
 	}
 
+	public void delete(int scenarioId){
+
+		Object[] values = { scenarioId };
+
+		try (
+				Connection connection = DBManager.getConnection();
+				PreparedStatement statement = prepareStatement(connection, SQL_DELETE_BY_SCENARIOID, false, values);
+				PreparedStatement statement1 = prepareStatement(connection, SQL_DELETE_INSTANCE_ALL_BY_SCENARIOID, false, values);
+				) {
+			
+			statement1.executeUpdate();
+			statement.executeUpdate();
+
+		} catch (SQLException e) {
+			//throw new DAOException(e);
+		}
+	}
+	
 	public void deleteCapexInstance(int capexInstanceId){
 
 		Object[] values = { 

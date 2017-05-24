@@ -144,9 +144,35 @@ public class ScenarioController {
 		if((id == null) || (id.isEmpty())){
 			return false;
 		}else{
+			int scenarioId = Integer.parseInt(id);
 			Scenario obj = new Scenario();
-			obj.setId(Integer.parseInt(id));
+			obj.setId(scenarioId);
 			dao.delete(obj);
+			// Delete all realted config
+			//Opex
+			OpexDAO opexDao = new OpexDAO();
+			opexDao.delete(scenarioId);
+			//FixedCost 
+			FixedCostDAO fixedCostDao = new FixedCostDAO();
+			fixedCostDao.delete(scenarioId);
+			//Process Constraints 
+			ProcessConstraintDAO processConstraintDao = new ProcessConstraintDAO();
+			processConstraintDao.delete(scenarioId);
+			//Bench Cobstraints
+			BenchConstraintDAO benchConstraintDao = new BenchConstraintDAO();
+			benchConstraintDao.delete(scenarioId);		
+			//Grade Cobstraints
+			GradeConstraintDAO gradeConstraintDao = new GradeConstraintDAO();
+			gradeConstraintDao.delete(scenarioId);
+			//Pit dependency
+			PitDependencyDAO pitDependencyDao = new PitDependencyDAO();
+			pitDependencyDao.delete(scenarioId);		
+			//Dump dependency
+			DumpDependencyDAO dumpDependencyDao = new DumpDependencyDAO();
+			dumpDependencyDao.delete(scenarioId);
+			//Capex
+			CapexDAO capexDao = new CapexDAO();
+			capexDao.delete(scenarioId);
 			return true;
 		}	
 	}

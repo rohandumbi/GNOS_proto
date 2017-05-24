@@ -22,6 +22,8 @@ public class BenchConstraintDAO {
 	private static final String SQL_INSERT_MAPPING = "insert into bench_constraint_year_mapping (bench_constraint_id, year, value) values (?, ?, ?)";
 	private static final String SQL_DELETE_MAPPING = "delete from bench_constraint_year_mapping where bench_constraint_id = ?";
 	private static final String SQL_DELETE = "delete from bench_constraint_defn where id = ?";
+	private static final String SQL_DELETE_MAPPING_BY_SCENARIONID = "delete from bench_constraint_year_mapping where bench_constraint_id in ( select id from bench_constraint_defn where scenario_id = ? )";
+	private static final String SQL_DELETE_BY_SCENARIONID = "delete from bench_constraint_defn where scenario_id = ?";
 	private static final String SQL_UPDATE = "update bench_constraint_defn set pit_name = ?, in_use= ? where id = ?";
 	private static final String SQL_UPDATE_MAPPING = "update bench_constraint_year_mapping set value = ? where bench_constraint_id = ? and year = ? ";
 	
@@ -173,6 +175,23 @@ public class BenchConstraintDAO {
 	        	mappingstatement.executeUpdate();
 	        	statement.executeUpdate();	           
 	            pcd.setId(-1);
+	        } catch (SQLException e) {
+	            //throw new DAOException(e);
+	        }
+	}
+	
+	
+	public void delete(int scenarioId){
+		
+		Object[] values = { scenarioId };
+
+	        try (
+	            Connection connection = DBManager.getConnection();
+	            PreparedStatement statement = prepareStatement(connection, SQL_DELETE_BY_SCENARIONID, false, values);
+	        	PreparedStatement mappingstatement = prepareStatement(connection, SQL_DELETE_MAPPING_BY_SCENARIONID, false, values);
+	        ) {
+	        	mappingstatement.executeUpdate();
+	        	statement.executeUpdate();	           
 	        } catch (SQLException e) {
 	            //throw new DAOException(e);
 	        }

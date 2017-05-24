@@ -24,7 +24,9 @@ public class OpexDAO {
 	private static final String SQL_INSERT_OPEX_DEFN = "insert into opex_defn (scenario_id, model_id, unit_type, unit_id, in_use, is_revenue) values ( ?, ?, ?, ?, ?, ?)";
 	private static final String SQL_INSERT_OPEX_MAPPING = "insert into model_year_mapping (opex_id, year, value) values (?, ?, ?)";
 	private static final String SQL_DELETE_OPEX_DEFN = "delete from opex_defn where id = ?";
-	private static final String SQL_DELETE_OPEX_MAPPING = "delete from model_year_mapping where opex_id in (select id from  opex_defn where id = ? )";
+	private static final String SQL_DELETE_OPEX_MAPPING = "delete from model_year_mapping where opex_id  = ? ";
+	private static final String SQL_DELETE_OPEX_DEFN_BY_SCENARIOID = "delete from opex_defn where scenario_id = ?";
+	private static final String SQL_DELETE_OPEX_MAPPING_BY_SCENARIOID = "delete from model_year_mapping where opex_id in (select id from  opex_defn where scenario_id = ? )";
 	private static final String SQL_UPDATE_OPEX_DEFN = "update opex_defn set model_id = ? , unit_type = ? , unit_id = ?, in_use = ?, is_revenue = ? where id = ?";
 	private static final String SQL_UPDATE_OPEX_MAPPING = "update model_year_mapping set value = ?  where opex_id = ? and year = ? ";
 	
@@ -186,6 +188,22 @@ public class OpexDAO {
 		}
 	}
 
+	public void delete(int scenarioId){
+
+		Object[] values = { scenarioId };
+
+		try (
+				Connection connection = DBManager.getConnection();
+				PreparedStatement statement = prepareStatement(connection, SQL_DELETE_OPEX_DEFN_BY_SCENARIOID, false, values);
+				PreparedStatement statement1 = prepareStatement(connection, SQL_DELETE_OPEX_MAPPING_BY_SCENARIOID, false, values);
+				) {
+			statement1.executeLargeUpdate();
+			statement.executeUpdate();
+		} catch (SQLException e) {
+			//throw new DAOException(e);
+		}
+	}
+	
 	private OpexData map(ResultSet rs, OpexData od) throws SQLException {
 		if (od == null) {
 			od = new OpexData();

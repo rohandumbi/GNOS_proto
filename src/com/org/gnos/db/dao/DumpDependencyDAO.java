@@ -18,6 +18,7 @@ public class DumpDependencyDAO {
 	private static final String SQL_LIST_ORDER_BY_ID = "select id, in_use, first_pit_name, first_pitgroup_name, first_dump_name,  dependent_dump_name from dump_dependency_defn where scenario_id = ? order by id asc ";
 	private static final String SQL_INSERT = "insert into dump_dependency_defn ( scenario_id , first_pit_name, first_pitgroup_name, first_dump_name, dependent_dump_name, in_use) values (?, ?, ?, ?, ?, ?)";
 	private static final String SQL_DELETE = "delete from dump_dependency_defn where id = ?";
+	private static final String SQL_DELETE_BY_SCENARIOID = "delete from dump_dependency_defn where scenario_id = ?";
 	private static final String SQL_UPDATE = "update dump_dependency_defn set first_pit_name = ? , first_pitgroup_name = ?, first_dump_name = ?, dependent_dump_name = ?, in_use = ? where id = ?";
 	
 	public List<DumpDependencyData> getAll(int scenarioId) {
@@ -129,6 +130,21 @@ public class DumpDependencyDAO {
 		}
 	}
 
+	public void delete(int scenarioId){
+
+		Object[] values = { scenarioId };
+
+		try (
+				Connection connection = DBManager.getConnection();
+				PreparedStatement statement = prepareStatement(connection, SQL_DELETE_BY_SCENARIOID, false, values);
+				) {
+			statement.executeUpdate();
+			
+		} catch (SQLException e) {
+			//throw new DAOException(e);
+		}
+	}
+	
 	private DumpDependencyData map(ResultSet rs) throws SQLException {
 		DumpDependencyData dumpDependencyData = new DumpDependencyData();
 		dumpDependencyData.setId(rs.getInt("id"));
