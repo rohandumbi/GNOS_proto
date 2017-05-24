@@ -74,7 +74,6 @@ public class FixedCostDAO {
 				setValues(statement, values);
 				statement.executeUpdate();
 			}
-			statement.executeUpdate();
 		} catch(SQLException e){
 			e.printStackTrace();
 		}

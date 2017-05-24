@@ -44,6 +44,19 @@ public class ScenarioEndpoint {
 			}
 		}, json());
 		
+        post("/project/:pid/scenarios/:sid/copy", new Route() {
+			
+			@Override
+			public Object handle(Request req, Response res) throws Exception {		
+				try {
+					return controller.copy(req.params(":pid"), req.params(":sid"));
+				} catch (Exception e) {
+					res.status(400);
+					return new ResponseError(e.getMessage());
+				}					
+			}
+		}, json());
+
         put("/scenarios/:id", new Route() {
 			
 			@Override
