@@ -240,7 +240,8 @@ public class CapexDAO {
 		capexInstance.setGroupingType(rs.getInt("group_type"));
 		capexInstance.setCapexAmount(rs.getLong("capex"));
 		capexInstance.setExpansionCapacity(rs.getLong("expansion_capacity"));
-		cd.addCapexInstance(capexInstance);
+		if(capexInstance.getId() > 0)
+			cd.addCapexInstance(capexInstance);
 		return cd;
 	}
 }
