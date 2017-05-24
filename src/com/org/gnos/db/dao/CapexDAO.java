@@ -20,8 +20,8 @@ import com.org.gnos.db.model.CapexInstance;
 public class CapexDAO {
 
 
-	private static final String SQL_LIST_ORDER_BY_ID = "select a.id as id, a.scenario_id, a.name as name, b.id as instance_id, b.name as instance_name, b.capex_id, b.group_name, b.group_type, b.capex, b.expansion_capacity from capex_data a, capex_instance b "
-			+ "where b.capex_id = a.id and scenario_id= ? ";
+	private static final String SQL_LIST_ORDER_BY_ID = "select a.id as id, a.scenario_id, a.name as name, b.id as instance_id, b.name as instance_name, b.capex_id, b.group_name, b.group_type, b.capex, b.expansion_capacity "
+			+ "from capex_data a left join capex_instance b on  a.id = b.capex_id where a.scenario_id= ? ";
 	private static final String SQL_INSERT = "insert into capex_data (scenario_id, name) values (?, ?)";
 	private static final String SQL_INSERT_INSTANCE = "insert into capex_instance (capex_id, name, group_name, group_type, capex, expansion_capacity) values (?, ?, ?, ?, ?, ?)";
 	private static final String SQL_DELETE = "delete from capex_data where id = ?";
