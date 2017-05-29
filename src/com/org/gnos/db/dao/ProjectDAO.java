@@ -1,6 +1,7 @@
 package com.org.gnos.db.dao;
 
 import static com.org.gnos.db.dao.util.DAOUtil.prepareStatement;
+import static com.org.gnos.db.dao.util.DAOUtil.setValues;
 import static com.org.gnos.db.dao.util.DAOUtil.toSqlTimeStamp;
 
 import java.sql.Connection;
@@ -17,10 +18,12 @@ import com.org.gnos.db.model.Project;
 
 public class ProjectDAO {
 
-	private static final String SQL_LIST_ORDER_BY_MODIFIED_DATE = "select id, name, description, fileName, created_date, modified_date from  project order by modified_date";
-	private static final String SQL_INSERT = "insert into project (name, description, fileName, created_date, modified_date) values (?, ?, ?, ?,?)";
+	private static final String SQL_LIST_ORDER_BY_MODIFIED_DATE = "select id, name, description, created_date, modified_date from  project order by modified_date";
+	private static final String SQL_INSERT = "insert into project (name, description, created_date, modified_date) values (?, ?, ?, ?)";
+	private static final String SQL_INSERT_DATA_FILE = "insert into project_data_files (project_id, file_name) values (?, ?)";
 	private static final String SQL_DELETE = "delete from project where id = ?";
-	private static final String SQL_UPDATE = "update project set description = ?, fileName = ?, modified_date = ? where id = ?";
+	private static final String SQL_DELETE_DATA_FILE = "delete from project_data_files where project_id = ?";
+	private static final String SQL_UPDATE = "update project set description = ?, modified_date = ? where id = ?";
 	
 	public List<Project> getAll() {
 		
@@ -51,26 +54,31 @@ public class ProjectDAO {
 		Object[] values = {
 				project.getName(),
 				project.getDesc(),
-	            project.getFileName(),
 	            toSqlTimeStamp(project.getCreatedDate()),
 	            toSqlTimeStamp(project.getModifiedDate())
 	   };
 
 		try ( Connection connection = DBManager.getConnection();
 	            PreparedStatement statement = prepareStatement(connection, SQL_INSERT, true, values);
+				PreparedStatement statement1 = connection.prepareStatement(SQL_INSERT_DATA_FILE);
 			){
 			
-			int affectedRows = statement.executeUpdate();
-            if (affectedRows == 0) {
-                //throw new DAOException("Creating user failed, no rows affected.");
-            }
+			statement.executeUpdate();
             
             try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     project.setId(generatedKeys.getInt(1));
-                } else {
-                    //throw new DAOException("Creating user failed, no generated key obtained.");
                 }
+            }
+            if(project.getId() != -1) {
+            	for(String fileName: project.getFiles()) {
+					Object[] dataFiles = {
+							project.getId(),
+							fileName					
+					};
+					setValues(statement1, dataFiles);
+					statement1.executeUpdate();
+				}
             }
 		} catch(SQLException e){
 			e.printStackTrace();
@@ -80,7 +88,7 @@ public class ProjectDAO {
 	}
 	
 	
-	public boolean update(Project project){
+	public boolean update(Project project, boolean append){
 		
 		if (project.getId() == -1) {
             throw new IllegalArgumentException("Project is not created.");
@@ -88,16 +96,33 @@ public class ProjectDAO {
 		
 		Object[] values = {
 				project.getDesc(),
-	            project.getFileName(),
 	            toSqlTimeStamp(project.getModifiedDate()),
 	            project.getId()
 	   };
 
 		try ( Connection connection = DBManager.getConnection();
 	            PreparedStatement statement = prepareStatement(connection, SQL_UPDATE, true, values);
+				PreparedStatement statement1 =connection.prepareStatement(SQL_DELETE_DATA_FILE);
+				PreparedStatement statement2 = connection.prepareStatement(SQL_INSERT_DATA_FILE);
 			){
 			
-			statement.executeUpdate();        
+			statement.executeUpdate();  
+			
+			if(!append) {
+				Object[] deletevalues = {
+						project.getId()
+				};
+				setValues(statement1, deletevalues);
+				statement1.executeUpdate();
+			}
+			for(String fileName: project.getFiles()) {
+				Object[] dataFiles = {
+						project.getId(),
+						fileName					
+				};
+				setValues(statement2, dataFiles);
+				statement2.executeUpdate();
+			}
           
 		} catch(SQLException e){
 			e.printStackTrace();
@@ -114,7 +139,9 @@ public class ProjectDAO {
 	        try (
 	            Connection connection = DBManager.getConnection();
 	            PreparedStatement statement = prepareStatement(connection, SQL_DELETE, false, values);
+	        	PreparedStatement statement1 = prepareStatement(connection, SQL_DELETE_DATA_FILE, false, values);
 	        ) {
+	        	statement1.executeUpdate();
 	            int affectedRows = statement.executeUpdate();
 	            if (affectedRows == 0) {
 	                //throw new DAOException("Deleting user failed, no rows affected.");
@@ -131,7 +158,6 @@ public class ProjectDAO {
 		project.setId(rs.getInt("id"));
 		project.setName(rs.getString("name"));
 		project.setDesc(rs.getString("description"));
-		project.setFileName(rs.getString("fileName"));
 		project.setCreatedDate((Date)rs.getTimestamp("created_date"));
 		project.setModifiedDate((Date)rs.getTimestamp("modified_date"));
 

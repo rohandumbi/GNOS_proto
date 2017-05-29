@@ -2,6 +2,8 @@ package com.org.gnos.services.controller;
 
 import java.util.List;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.org.gnos.db.dao.ProjectDAO;
 import com.org.gnos.db.model.Project;
@@ -23,29 +25,37 @@ public class ProjectController {
 	public Project create(JsonObject jsonObject) throws Exception {
 			String name = jsonObject.get("name").getAsString();
 			String desc = jsonObject.get("desc").getAsString();
-			String fileName = jsonObject.get("fileName").getAsString();
-			Project newProject = new Project();
-			newProject.setName(name);
-			newProject.setDesc(desc);
-			newProject.setFileName(fileName);
-
-			boolean created = dao.create(newProject);
-			loadCSVFile(fileName, newProject.getId());
-			if(created) return newProject;
+			JsonArray files = jsonObject.get("files").getAsJsonArray();
+			Project obj = new Project();
+			obj.setName(name);
+			obj.setDesc(desc);
+			
+			for(JsonElement file: files) {
+				obj.addFile(file.getAsString());
+			}
+			
+			boolean created = dao.create(obj);
+			//loadCSVFile(fileName, newProject.getId());
+			if(created) return obj;
 			throw new Exception();
 	}
 	
 	public Project update(JsonObject jsonObject, String projectId) throws Exception {
 		String name = jsonObject.get("name").getAsString();
 		String desc = jsonObject.get("desc").getAsString();
-		String fileName = jsonObject.get("fileName").getAsString();
+		boolean append = jsonObject.get("append").getAsBoolean();
+		JsonArray files = jsonObject.get("files").getAsJsonArray();
+
 		Project obj = new Project();
 		obj.setId(Integer.parseInt(projectId));
 		obj.setName(name);
 		obj.setDesc(desc);
-		obj.setFileName(fileName);
 
-		boolean created = dao.update(obj);
+		for(JsonElement file: files) {
+			obj.addFile(file.getAsString());
+		}
+		
+		boolean created = dao.update(obj, append);
 		//loadCSVFile(fileName, newProject.getId());
 		if(created) return obj;
 		throw new Exception();

@@ -11,6 +11,14 @@ CREATE TABLE project (
    UNIQUE (name)
 );
 
+DROP TABLE IF EXISTS project_data_files;
+
+CREATE TABLE project_data_files (
+   project_id INT NOT NULL,
+   file_name VARCHAR(200) NOT NULL,
+   PRIMARY KEY ( project_id, file_name )
+);
+
 DROP TABLE IF EXISTS scenario; 
 
 CREATE TABLE scenario (
