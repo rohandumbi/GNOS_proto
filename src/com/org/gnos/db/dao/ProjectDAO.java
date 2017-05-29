@@ -10,7 +10,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.model.Project;
@@ -18,7 +20,7 @@ import com.org.gnos.db.model.Project;
 
 public class ProjectDAO {
 
-	private static final String SQL_LIST_ORDER_BY_MODIFIED_DATE = "select id, name, description, created_date, modified_date from  project order by modified_date";
+	private static final String SQL_LIST_ORDER_BY_MODIFIED_DATE = "select id, name, description, created_date, modified_date, file_name from  project left join project_data_files on project_id = id order by modified_date";
 	private static final String SQL_INSERT = "insert into project (name, description, created_date, modified_date) values (?, ?, ?, ?)";
 	private static final String SQL_INSERT_DATA_FILE = "insert into project_data_files (project_id, file_name) values (?, ?)";
 	private static final String SQL_DELETE = "delete from project where id = ?";
@@ -28,14 +30,22 @@ public class ProjectDAO {
 	public List<Project> getAll() {
 		
 		List<Project> projects = new ArrayList<Project>();
-		
+		Map<Integer, Project> projectMap = new HashMap<Integer, Project>();
 		try (
 	            Connection connection = DBManager.getConnection();
 	            PreparedStatement statement = connection.prepareStatement(SQL_LIST_ORDER_BY_MODIFIED_DATE);
 	            ResultSet resultSet = statement.executeQuery();
 	        ){
 			while(resultSet.next()){
-				projects.add(map(resultSet));				
+				int id = resultSet.getInt("id");
+				Project project = projectMap.get(id);
+				if(project == null){
+					project = map(resultSet, project);
+					projectMap.put(id, project);
+					projects.add(project);
+				} else {
+					map(resultSet, project);
+				}			
 			}
 			
 		} catch(SQLException e){
@@ -153,14 +163,17 @@ public class ProjectDAO {
 	        }
 	}
 	
-	private Project map(ResultSet rs) throws SQLException {
-		Project project = new Project();
-		project.setId(rs.getInt("id"));
-		project.setName(rs.getString("name"));
-		project.setDesc(rs.getString("description"));
-		project.setCreatedDate((Date)rs.getTimestamp("created_date"));
-		project.setModifiedDate((Date)rs.getTimestamp("modified_date"));
-
+	private Project map(ResultSet rs, Project project) throws SQLException {
+		if(project == null) {
+			project = new Project();
+			project.setId(rs.getInt("id"));
+			project.setName(rs.getString("name"));
+			project.setDesc(rs.getString("description"));
+			project.setCreatedDate((Date)rs.getTimestamp("created_date"));
+			project.setModifiedDate((Date)rs.getTimestamp("modified_date"));
+		}
+		project.addFile(rs.getString("file_name"));
+		
 		return project;
 	}
 }
