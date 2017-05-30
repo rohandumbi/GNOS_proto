@@ -23,7 +23,13 @@ public class OpexController {
 	}
 	
 	public OpexData create(JsonObject jsonObject, String scenarioIdStr) throws Exception {
-		int modelId = jsonObject.get("modelId").getAsInt();
+		int modelId = -1;
+		String productJoinName = "";
+		if(!jsonObject.get("modelId").isJsonNull()) {
+			modelId = jsonObject.get("modelId").getAsInt();
+		} else if(!jsonObject.get("productJoinName").isJsonNull()) {
+			productJoinName = jsonObject.get("productJoinName").getAsString();
+		}
 		short unitType = jsonObject.get("unitType").getAsShort();
 		int unitId = jsonObject.get("unitId").getAsInt();
 		boolean inUse = jsonObject.get("inUse").getAsBoolean();
@@ -31,6 +37,7 @@ public class OpexController {
 		JsonObject costDataObj = jsonObject.get("costData").getAsJsonObject();
 		OpexData obj = new OpexData();
 		obj.setModelId(modelId);
+		obj.setProductJoinName(productJoinName);
 		obj.setInUse(inUse);
 		obj.setRevenue(isRevenue);
 		//obj.setUnitType(unitType);
@@ -51,7 +58,13 @@ public class OpexController {
 	
 	
 	public OpexData update(JsonObject jsonObject, String id) throws Exception {		
-		int modelId = jsonObject.get("modelId").getAsInt();
+		int modelId = -1;
+		String productJoinName = "";
+		if(!jsonObject.get("modelId").isJsonNull()) {
+			modelId = jsonObject.get("modelId").getAsInt();
+		} else if(!jsonObject.get("productJoinName").isJsonNull()) {
+			productJoinName = jsonObject.get("productJoinName").getAsString();
+		}
 		short unitType = jsonObject.get("unitType").getAsShort();
 		int unitId = jsonObject.get("unitId").getAsInt();
 		boolean inUse = jsonObject.get("inUse").getAsBoolean();
@@ -60,6 +73,7 @@ public class OpexController {
 		OpexData obj = new OpexData();
 		obj.setId(Integer.parseInt(id));
 		obj.setModelId(modelId);
+		obj.setProductJoinName(productJoinName);
 		obj.setInUse(inUse);
 		obj.setRevenue(isRevenue);
 		obj.setUnitType(unitType);

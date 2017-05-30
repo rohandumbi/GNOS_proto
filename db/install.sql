@@ -122,6 +122,7 @@ CREATE TABLE opex_defn(
    id INT NOT NULL AUTO_INCREMENT,
    scenario_id INT NOT NULL,
    model_id INT NOT NULL,
+   product_join_name VARCHAR(50) ,
    unit_type TINYINT,
    unit_id INT,
    in_use TINYINT NOT NULL default 1,
