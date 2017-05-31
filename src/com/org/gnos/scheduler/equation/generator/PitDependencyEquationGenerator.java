@@ -1,5 +1,6 @@
 package com.org.gnos.scheduler.equation.generator;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,7 @@ import com.org.gnos.core.Bench;
 import com.org.gnos.core.Block;
 import com.org.gnos.core.Pit;
 import com.org.gnos.db.model.PitDependencyData;
+import com.org.gnos.scheduler.equation.Constraint;
 import com.org.gnos.scheduler.equation.ExecutionContext;
 
 public class PitDependencyEquationGenerator extends EquationGenerator{
@@ -24,7 +26,6 @@ public class PitDependencyEquationGenerator extends EquationGenerator{
 	public void generate() {
 		try {
 			buildDependencyEquations();
-			output.flush();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -107,20 +108,17 @@ public class PitDependencyEquationGenerator extends EquationGenerator{
 		Double benchTonnesWt = getBenchTonnesWt(b2);
 		if(benchTonnesWt <= 0 || variables.size() == 0) return;
 		for(int i=timePeriodStart; i<= timePeriodEnd; i++){
-			StringBuilder sb = new StringBuilder();
-			int count = 0;
+			Constraint c = new Constraint();
 			
 			for(String variable: variables){
 				if(variable.startsWith("sp")) continue;
 				if(!variable.endsWith(String.valueOf("t"+i))) continue;
-				if(count > 0) sb.append(" + ");						
-				sb.append(variable);
-				count++;
+				c.addVariable(variable, new BigDecimal(1));
 			}
-			sb.append(" - ");
-			sb.append(benchTonnesWt+"p"+p1.getPitNo()+"b"+b1.getBenchNo()+"t"+i);
-			sb.append(" <= 0");
-			write(sb.toString());
+			c.addVariable("p"+p1.getPitNo()+"b"+b1.getBenchNo()+"t"+i, new BigDecimal(benchTonnesWt).negate());
+			c.setType(Constraint.LESS_EQUAL);
+			c.setValue(new BigDecimal(0));
+			context.getConstraints().add(c);
 		}
 		
 	}

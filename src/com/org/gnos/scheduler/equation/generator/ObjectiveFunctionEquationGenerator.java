@@ -32,7 +32,6 @@ import com.org.gnos.scheduler.equation.SlidingWindowExecutionContext;
 
 public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 	
-	private int bytesWritten = 0;
 	private float discount_rate = 0; //this has to be made an input variable later
 	
 	private Set<Integer> processedBlocks;
@@ -47,12 +46,10 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		try {
 			discount_rate = context.getScenario().getDiscount()/100;
 			System.out.println("Discount :"+discount_rate);
-			bytesWritten = 0;
 			buildProcessBlockVariables();
 			buildStockpileVariables();
 			buildWasteBlockVariables();
 			buildCapexVariables();
-			output.flush();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -107,13 +104,8 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 				BigDecimal processValue = getProcessValue(block, process.getModel(), year);
 				BigDecimal value = processValue.subtract(cost);
 				value = (value.multiply(new BigDecimal(1 / Math.pow ((1 + discount_rate), i))));
-				String variable = "p"+block.getPitNo()+"x"+block.getBlockNo()+"p"+processNumber+"t"+i;
-				String eq = " "+formatDecimalValue(value)+variable;
-				if(value.doubleValue() > 0){
-					eq = " +"+eq;
-				} 
-				write(eq);
-				
+				String variable = "p"+block.getPitNo()+"x"+block.getBlockNo()+"p"+processNumber+"t"+i; 
+				context.addVariable(variable, value);
 				context.addVariable(block, variable);
 			}
 		}
@@ -177,11 +169,9 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 					if(sp.getStockpileNumber() == 0) continue;
 					cost = (cost.multiply(new BigDecimal(1 / Math.pow ((1 + discount_rate), i))));
 					String variable = "p"+block.getPitNo()+"x"+block.getBlockNo()+"s"+sp.getStockpileNumber()+"t"+i;
-					String eq = " -"+formatDecimalValue(cost)+ variable;
-					write(eq);
-					
+										
 					context.addVariable(block, variable);
-					
+					context.addVariable(variable, cost.negate());
 					// Build reeclaim variable
 					
 					if(reclaimEnabled && (year > startYear)) {
@@ -256,11 +246,9 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 					dump.addBlock(block);
 					cost = (cost.multiply(new BigDecimal(1 / Math.pow ((1 + discount_rate), i))));
 					String variable = "p"+block.getPitNo()+"x"+block.getBlockNo()+"w"+dump.getDumpNumber()+"t"+i;
-					String eq = " -"+formatDecimalValue(cost)+variable;
-					write(eq);
 					
 					context.addVariable(block, variable);
-					
+					context.addVariable(variable, cost.negate());
 				}
 			}
 		}
@@ -282,7 +270,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 				for(int i= timePeriodStart; i <= timePeriodEnd ; i++){
 					String cv = "c"+capexCount+"i"+capexInstanceCount+"t"+i;
 					BigDecimal value = new BigDecimal(ci.getCapexAmount() * (1 / Math.pow ((1 + discount_rate), i)));
-					write(" -"+formatDecimalValue(value)+cv);
+					context.addVariable(cv, value.negate());
 				}
 			}
 		}
@@ -323,12 +311,8 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 			BigDecimal value = processValue.subtract(totalCost);
 			value = (value.multiply(new BigDecimal(1 / Math.pow ((1 + discount_rate), timeperiod))));
 			String variable = "sp"+sp.getStockpileNumber()+"x"+b.getBlockNo()+"p"+p.getProcessNo()+"t"+timeperiod;
-			String eq = formatDecimalValue(value)+ variable;
-			if(value.doubleValue() > 0) {
-				eq =  " + " + eq;
-			} 
-			write(eq);
 			context.addVariable(b, variable);
+			context.addVariable(variable, value);
 		}	
 	}
 	private void buildSWSPReclaimVariable(Stockpile sp, int year) {
@@ -368,12 +352,8 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 			BigDecimal value = processValue.subtract(totalCost);
 			value = (value.multiply(new BigDecimal(1 / Math.pow ((1 + discount_rate), timeperiod))));
 			String variable = "sp"+sp.getStockpileNumber()+"x0p"+p.getProcessNo()+"t"+timeperiod;
-			String eq = formatDecimalValue(value)+ variable;
-			if(value.doubleValue() > 0) {
-				eq =  " + " + eq;
-			} 
-			write(eq);
 			((SlidingWindowExecutionContext)context).addVariable(sp.getStockpileNumber(), variable);
+			context.addVariable(variable, value);
 		}
 	}
 
@@ -512,24 +492,5 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 	private boolean hasValue(String s) {
 		return (s !=null && s.trim().length() >0);
 	}
-	
-	@Override
-	protected void write(String s) {
-
-		try {
-			byte[] bytes = s.getBytes();
-			if(bytes.length + bytesWritten > BYTES_PER_LINE){
-				output.write("\r\n".getBytes());
-				output.flush();
-				bytesWritten = 0;
-			}
-			output.write(bytes);
-			bytesWritten = bytesWritten + bytes.length;
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-	}	
 	
 }

@@ -23,6 +23,8 @@ public class GradeConstraintDAO {
 	private static final String SQL_INSERT_MAPPING = "insert into grade_constraint_year_mapping (grade_constraint_id, year, value) values (?, ?, ?)";
 	private static final String SQL_DELETE_MAPPING = "delete from grade_constraint_year_mapping where grade_constraint_id = ?";
 	private static final String SQL_DELETE = "delete from grade_constraint_defn where id = ?";
+	private static final String SQL_DELETE_MAPPING_BY_SCENARIOID = "delete from grade_constraint_year_mapping where grade_constraint_id in ( select grade_constraint_id from grade_constraint_defn where scenario_id = ? )";
+	private static final String SQL_DELETE_BY_SCENARIOID = "delete from grade_constraint_defn where scenario_id = ?";
 	private static final String SQL_UPDATE = "update grade_constraint_defn set selector_name = ?, selector_type = ?, grade = ?, product_join_name = ?, in_use= ?, is_max = ? where id = ?";
 	private static final String SQL_UPDATE_MAPPING = "update grade_constraint_year_mapping set value = ? where grade_constraint_id = ? and year = ? ";
 	
@@ -170,21 +172,38 @@ public class GradeConstraintDAO {
 	public void delete(GradeConstraintData gcd){
 		
 		Object[] values = { 
-				gcd.getId()
-	        };
+			gcd.getId()
+        };
 
-	        try (
-	            Connection connection = DBManager.getConnection();
-	            PreparedStatement statement = prepareStatement(connection, SQL_DELETE, false, values);
-	        	PreparedStatement mappingstatement = prepareStatement(connection, SQL_DELETE_MAPPING, false, values);
-	        ) {
-	        	mappingstatement.executeUpdate();
-	        	statement.executeUpdate();	           
-	        	gcd.setId(-1);
-	        } catch (SQLException e) {
-	            //throw new DAOException(e);
-	        }
+        try (
+            Connection connection = DBManager.getConnection();
+            PreparedStatement statement = prepareStatement(connection, SQL_DELETE, false, values);
+        	PreparedStatement mappingstatement = prepareStatement(connection, SQL_DELETE_MAPPING, false, values);
+        ) {
+        	mappingstatement.executeUpdate();
+        	statement.executeUpdate();	           
+        	gcd.setId(-1);
+        } catch (SQLException e) {
+            //throw new DAOException(e);
+        }
 	}
+	
+	public void delete(int scenarioId){
+		
+		Object[] values = { scenarioId };
+
+        try (
+            Connection connection = DBManager.getConnection();
+            PreparedStatement statement = prepareStatement(connection, SQL_DELETE_BY_SCENARIOID, false, values);
+        	PreparedStatement mappingstatement = prepareStatement(connection, SQL_DELETE_MAPPING_BY_SCENARIOID, false, values);
+        ) {
+        	mappingstatement.executeUpdate();
+        	statement.executeUpdate();	           
+        } catch (SQLException e) {
+            //throw new DAOException(e);
+        }
+	}
+	
 	
 	private GradeConstraintData map(ResultSet rs, GradeConstraintData gcd) throws SQLException {
 		

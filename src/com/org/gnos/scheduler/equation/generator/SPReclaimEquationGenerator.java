@@ -1,5 +1,6 @@
 package com.org.gnos.scheduler.equation.generator;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -7,6 +8,7 @@ import java.util.Set;
 import com.org.gnos.core.Block;
 import com.org.gnos.db.model.Process;
 import com.org.gnos.db.model.Stockpile;
+import com.org.gnos.scheduler.equation.Constraint;
 import com.org.gnos.scheduler.equation.ExecutionContext;
 import com.org.gnos.scheduler.equation.SPBlock;
 import com.org.gnos.scheduler.equation.SlidingWindowExecutionContext;
@@ -27,7 +29,6 @@ public class SPReclaimEquationGenerator extends EquationGenerator{
 			} else {
 				buildSWStockpileEquations();
 			}
-			output.flush();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -42,27 +43,29 @@ public class SPReclaimEquationGenerator extends EquationGenerator{
 			if(!sp.isReclaim()) continue;
 			Set<Block> blocks = sp.getBlocks();
 			for(int i= timePeriodStart; i <= timePeriodEnd; i++) {
-				StringBuilder sbc_sp = new StringBuilder("");
-				StringBuilder sbc_spr = new StringBuilder("");
+				Constraint c1 = new Constraint();
 				for(Block b: blocks){
-					StringBuilder sb_sp = new StringBuilder("");
-					StringBuilder sb_spr = new StringBuilder("");
-					sbc_sp.append(" + p"+b.getPitNo()+"x"+b.getBlockNo()+"s"+sp.getStockpileNumber()+"t1");
+					Constraint c2 = new Constraint();
+					c1.addVariable("p"+b.getPitNo()+"x"+b.getBlockNo()+"s"+sp.getStockpileNumber()+"t1", new BigDecimal(1));
 					for(int j=2; j<=i; j++){
-						sb_sp.append(" + p"+b.getPitNo()+"x"+b.getBlockNo()+"s"+sp.getStockpileNumber()+"t"+(j-1));
+						c1.addVariable("p"+b.getPitNo()+"x"+b.getBlockNo()+"s"+sp.getStockpileNumber()+"t"+(j-1), new BigDecimal(1));
+						c2.addVariable("p"+b.getPitNo()+"x"+b.getBlockNo()+"s"+sp.getStockpileNumber()+"t"+(j-1), new BigDecimal(1));
 						Set<Process> processes = b.getProcesses();
 						for(Process p: processes) {
-							sb_spr.append(" - sp"+sp.getStockpileNumber()+"x"+b.getBlockNo()+"p"+p.getProcessNo()+"t"+j);
+							c1.addVariable("sp"+sp.getStockpileNumber()+"x"+b.getBlockNo()+"p"+p.getProcessNo()+"t"+j, new BigDecimal(1).negate());
+							c2.addVariable("sp"+sp.getStockpileNumber()+"x"+b.getBlockNo()+"p"+p.getProcessNo()+"t"+j, new BigDecimal(1).negate());
 						}						
 					}
-					if(sb_sp.length() > 0 || sb_spr.length() > 0){
-						write(sb_sp.toString()+sb_spr.toString()+" >= 0");
+					if(c2.getVariables().size() > 0){
+						c2.setType(Constraint.GREATER_EQUAL);
+						c2.setValue(new BigDecimal(0));
+						context.getConstraints().add(c2);
 					}
-					sbc_sp.append(sb_sp);
-					sbc_spr.append(sb_spr);
 				}
-				if(sp.getCapacity() > 0 && (sbc_sp.length() > 0 || sbc_spr.length() > 0)){
-					write(sbc_sp.toString()+sbc_spr.toString()+" <= "+sp.getCapacity());
+				if(sp.getCapacity() > 0 && c1.getVariables().size() > 0){
+					c1.setType(Constraint.LESS_EQUAL);
+					c1.setValue(new BigDecimal(sp.getCapacity()));
+					context.getConstraints().add(c1);
 				}
 			}
 			
@@ -89,10 +92,14 @@ public class SPReclaimEquationGenerator extends EquationGenerator{
 			for(int i= timePeriodStart; i <= timePeriodEnd; i++) {
 				StringBuilder sbc_sp = new StringBuilder("");
 				StringBuilder sbc_spr = new StringBuilder("");
+				
+				Constraint c = new Constraint();
+				
 				for(Block b: blocks){
 					StringBuilder sb_sp = new StringBuilder("");					
 					for(int j=timePeriodStart; j<=i; j++){
-						sb_sp.append(" + p"+b.getPitNo()+"x"+b.getBlockNo()+"s"+sp.getStockpileNumber()+"t"+j);						
+						sb_sp.append(" + p"+b.getPitNo()+"x"+b.getBlockNo()+"s"+sp.getStockpileNumber()+"t"+j);	
+						c.addVariable("p"+b.getPitNo()+"x"+b.getBlockNo()+"s"+sp.getStockpileNumber()+"t"+j, new BigDecimal(1));
 					}
 					sbc_sp.append(sb_sp);
 				}
@@ -101,11 +108,14 @@ public class SPReclaimEquationGenerator extends EquationGenerator{
 					if(j == 1) continue;
 					for(Process p: processes) {
 						sbc_spr.append(" - sp"+sp.getStockpileNumber()+"x0p"+p.getProcessNo()+"t"+j);
+						c.addVariable("sp"+sp.getStockpileNumber()+"x0p"+p.getProcessNo()+"t"+j, new BigDecimal(1).negate());
 					}
 				}
 				 
 				if(capacity > 0 && (sbc_sp.length() > 0 || sbc_spr.length() > 0)){
-					write(sbc_sp.toString()+sbc_spr.toString()+" <= "+capacity);
+					c.setType(Constraint.LESS_EQUAL);
+					c.setValue(new BigDecimal(capacity));
+					context.getConstraints().add(c);
 				}
 			}
 		}

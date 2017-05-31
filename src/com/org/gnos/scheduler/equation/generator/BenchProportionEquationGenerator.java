@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 import com.org.gnos.core.Bench;
 import com.org.gnos.core.Block;
 import com.org.gnos.core.Pit;
+import com.org.gnos.scheduler.equation.Constraint;
 import com.org.gnos.scheduler.equation.ExecutionContext;
 
 public class BenchProportionEquationGenerator extends EquationGenerator{
@@ -27,7 +28,6 @@ public class BenchProportionEquationGenerator extends EquationGenerator{
 	public void generate() {
 		try {
 			buildBenchProportionEquations();
-			output.flush();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -55,6 +55,7 @@ public class BenchProportionEquationGenerator extends EquationGenerator{
 						String tonnage2 = ""+context.getTonnesWtForBlock(block);
 						for(int i=timePeriodStart; i<= timePeriodEnd; i++){
 							StringBuilder sb = new StringBuilder("");
+							Constraint constraint = new Constraint();
 							for(String variable : blockvariables1) {
 								if(variable.startsWith("sp")) continue;
 								Matcher matcher = lastIntPattern.matcher(variable);
@@ -66,6 +67,7 @@ public class BenchProportionEquationGenerator extends EquationGenerator{
 											sb.append(" + ");
 								      }
 									  sb.append(tonnage2+variable);
+									  constraint.addVariable(variable, new BigDecimal(tonnage2));
 								}								
 							}
 							for(String variable : blockvariables2) {
@@ -76,11 +78,14 @@ public class BenchProportionEquationGenerator extends EquationGenerator{
 								      int year = Integer.parseInt(yearStr);
 								      if(year != i ) continue;
 								      sb.append(" - "+tonnage1+variable);
+								      constraint.addVariable(variable, new BigDecimal(tonnage1).negate());
 								}
 							}
 							if(sb.length() > 0){
 								sb.append(" = 0");
-								write(sb.toString());
+								constraint.setType(Constraint.EQUAL);
+								constraint.setValue(new BigDecimal(0));
+								context.getConstraints().add(constraint);
 							}
 						}
 					}

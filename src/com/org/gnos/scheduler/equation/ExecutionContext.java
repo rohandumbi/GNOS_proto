@@ -84,6 +84,10 @@ public class ExecutionContext {
 	private String benchFieldName;
 	protected String tonnesWtFieldName;
 
+	private Map<String, BigDecimal> variables = new HashMap<String, BigDecimal>();
+	private List<Constraint> constraints = new ArrayList<Constraint>();
+	private List<String> binaries = new ArrayList<String>();
+	
 	/* Data */
 
 	private List<Field> fields;
@@ -874,6 +878,14 @@ public class ExecutionContext {
 		variables.add(variable);
 	}
 
+	public void addVariable(String variable, BigDecimal value) {
+		BigDecimal coeff = variables.get(variable);
+		if (coeff != null) {
+			value = value.add(coeff);
+		} 
+		variables.put(variable, value);
+	}
+	
 	public void addWasteBlock(Block b) {
 		wasteBlocks.add(b);
 	}
@@ -1085,4 +1097,19 @@ public class ExecutionContext {
 	public int getScenarioId() {
 		return scenarioId;
 	}
+
+	public Map<String, BigDecimal> getVariables() {
+		return variables;
+	}
+
+	public List<Constraint> getConstraints() {
+		return constraints;
+	}
+
+	public List<String> getBinaries() {
+		return binaries;
+	}
+	
+	
+	
 }

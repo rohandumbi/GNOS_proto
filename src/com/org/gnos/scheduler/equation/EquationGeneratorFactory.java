@@ -33,7 +33,7 @@ public class EquationGeneratorFactory {
 	public final static short SP_RECLAIM = 12;
 	
 	
-	public static EquationGenerator getGenerator(short type, ExecutionContext context, BufferedOutputStream writer) {
+	public static EquationGenerator getGenerator(short type, ExecutionContext context) {
 		EquationGenerator generator = null;
 		
 		switch (type) {
@@ -78,7 +78,6 @@ public class EquationGeneratorFactory {
 				}				
 				break;
 		}
-		generator.setOutput(writer);
 		return generator;
 	}
 

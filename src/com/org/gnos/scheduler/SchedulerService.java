@@ -7,14 +7,9 @@ import com.org.gnos.scheduler.solver.cplex.CplexSolver;
 
 public class SchedulerService implements Runnable {
 
-	final static SchedulerService instance = new SchedulerService();
 	private BaseScheduler scheduler;
 	private RunConfig runconfig;
-	
 
-	public static SchedulerService getInstance(){
-		return instance;
-	}
 
 	
 	public void execute() {		
@@ -22,6 +17,7 @@ public class SchedulerService implements Runnable {
 		createScheduler(runconfig);
 		scheduler.getContext().setEquationEnableMap(runconfig.getEqnenablestate());
 		scheduler.setSolver(solver);
+		solver.setContext(scheduler.getContext());
 		scheduler.execute();
 	}
 	
