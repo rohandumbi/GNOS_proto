@@ -49,7 +49,7 @@ public class ProcessJoinEndpoint {
 		delete("/project/:id/processjoins/:name", (req, res) -> controller.deleteAll(req.params(":id"), req.params(":name")), json());
 		
 		delete("/project/:id/processjoins/:name/process/:pid", 
-				(req, res) -> controller.deleteProcess(req.params(":id"), req.params(":pname"),  Integer.parseInt(req.params(":pid"))), json());
+				(req, res) -> controller.deleteProcess(req.params(":id"), req.params(":name"),  Integer.parseInt(req.params(":pid"))), json());
 
 	}
 
