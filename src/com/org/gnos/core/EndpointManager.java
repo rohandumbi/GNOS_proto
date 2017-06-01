@@ -1,5 +1,6 @@
 package com.org.gnos.core;
 
+import com.org.gnos.licensing.GNOSLicense;
 import com.org.gnos.services.endpoints.BenchConstraintEndpoint;
 import com.org.gnos.services.endpoints.CapexEndpoint;
 import com.org.gnos.services.endpoints.CycleTimeEndpoint;
@@ -30,6 +31,9 @@ import com.org.gnos.services.endpoints.StockpileEndpoint;
 import com.org.gnos.services.endpoints.TruckParameterCycleTimeEndpoint;
 import com.org.gnos.services.endpoints.TruckParameterPayloadEndpoint;
 
+import static spark.Spark.before;
+import static spark.Spark.halt;
+
 public class EndpointManager {
 
 	public static void start() {
@@ -53,7 +57,7 @@ public class EndpointManager {
 		new CycleTimeEndpoint();
 		new ScenarioEndpoint();
 		new OpexEndpoint();
-		new FixedCostEndpoint();
+		new FixedCostEndpoint();;
 		new ProcessConstraintEndpoint();
 		new BenchConstraintEndpoint();
 		new GradeConstraintEndpoint();
@@ -64,5 +68,13 @@ public class EndpointManager {
 		new RequiredFieldEndpoint();
 		new TruckParameterPayloadEndpoint();
 		new ReportEndpoint();
+		
+		before((request, response) -> {
+		    System.out.println("URI :"+ request.url());
+		    if(!GNOSLicense.isValid()) {
+		    	System.out.println("License has expired");
+		    	halt(401, "Your license has expired.");
+		    }
+		});
 	}
 }
