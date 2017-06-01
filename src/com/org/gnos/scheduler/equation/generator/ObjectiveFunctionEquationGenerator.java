@@ -446,6 +446,8 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		List<OpexData> opexDataList = context.getOpexDataList();
 
 		for(OpexData opexData: opexDataList) {
+			if(!opexData.isInUse()) continue;
+			
 			if(opexData.isRevenue()){
 				if(opexData.getModelId() != -1 && (opexData.getModelId() != model.getId())) {
 					continue;
@@ -488,6 +490,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		}
 		List<OpexData> opexDataList = context.getOpexDataList();
 		for(OpexData opexData: opexDataList) {
+			if(!opexData.isInUse()) continue;
 			if(opexData.isRevenue()){
 				if(opexData.getModelId() != -1 && (opexData.getModelId() != model.getId())) {
 					continue;
@@ -500,7 +503,9 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 				BigDecimal expr_value = ((SlidingWindowExecutionContext)context).getUnitValueforBlock(b, unitId, model.getUnitType());
 				revenue = revenue.add(expr_value.multiply(opexData.getCostData().get(year)));
 			} else {
-				pcost = pcost.add(opexData.getCostData().get(year));
+				 if(opexData.getModelId() == model.getId() || isChild(opexData.getModelId(), model)) {
+					 pcost = pcost.add(opexData.getCostData().get(year));
+				 }
 			}
 		}
 		value = revenue.subtract(pcost);
