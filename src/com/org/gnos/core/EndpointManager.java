@@ -70,10 +70,13 @@ public class EndpointManager {
 		new ReportEndpoint();
 		
 		before((request, response) -> {
-		    System.out.println("URI :"+ request.url());
-		    if(!GNOSLicense.isValid()) {
-		    	System.out.println("License has expired");
-		    	halt(401, "Your license has expired.");
+		    try {
+		    	boolean isValid = GNOSLicense.isValid();
+		    	if(!isValid) {
+		    		halt(401, "License has expired");
+		    	}
+		    } catch(Exception e) {
+		    	halt(401, e.getMessage());
 		    }
 		});
 	}

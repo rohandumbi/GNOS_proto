@@ -5,11 +5,12 @@
 
 package com.org.gnos.licensing;
 
+import com.sun.jna.Native;
 import java.io.DataInputStream;
+//import java.lang.annotation.*;
 import java.util.HashMap;
 
 import com.sun.jna.Library;
-import com.sun.jna.Native;
 import com.sun.jna.Platform;
 
 public class Keylok {
@@ -282,11 +283,35 @@ public class Keylok {
           }
             catch (Throwable t) {
             System.out.println("Library " + libName + " not found.  Application ending.") ;
-            //System.exit(1);
+            System.exit(1);
           }
           return RetVal32;
      }
 
+    ///////////////////////////////////////////////////////////////////////
+    //
+    //   ReadAuth()
+    //
+    //       Read Authorization
+    ////
+    public void ReadAuth()
+    {
+    	KTASK(READAUTH, ReadCode1, ReadCode2, ReadCode3);
+    	System.out.println("Read Authorization sequence has been sent.");
+    }
+    
+    ///////////////////////////////////////////////////////////////////////
+    //
+    //   WriteAuth()
+    //
+    //       Write Authorization
+    ////
+    public void WriteAuth()
+    {
+    	KTASK(WRITEAUTH, WriteCode1, WriteCode2, WriteCode3);
+        System.out.println("Write Authorization sequence has been sent.");
+    }
+    
     public void GetGlobalID()
     {
           byte buffer[] = new byte[8];
@@ -317,11 +342,10 @@ public class Keylok {
           }
             catch (Throwable t) {
             System.out.println("Library " + libName + " not found.  Application ending.") ;
-            //System.exit(1);
+            System.exit(1);
           }
           return;
      }
-
 
 
     ////////////////////////////////////////////////////////////////////////
@@ -358,7 +382,7 @@ public class Keylok {
     {
       int Month = 0, Day = 0, Year = 0, chResponse;
       int WriteDate;
-
+//      WriteAuth();
       //Get the desired lease expiration date
       System.out.println("Please input the lease expiration date to be programmed into the KEYLOK");
       while ((Month < 1) | (Month > 12)) {
@@ -375,14 +399,14 @@ public class Keylok {
       }
 
       //Confirm proper lease expiration date entered
-//      ClearScreen();
+      ClearScreen();
       System.out.println("You have entered a lease expiration date of: " + Month + "/" + Day + "/" + Year);
       System.out.println ("Is this correct? (Y or N)");
 
       chResponse = GetResponse();
       if ( chResponse == 'Y') {
 
-//        ClearScreen();
+        ClearScreen();
         //Convert the input expiration date into the proper storage format
         //Date will be stored in YYYYYYYMMMMDDDDD format with YYYYYY being the
         //number of years after BASEYEAR (e.g. YYYYYYY = 3 for 1993 with base 1990)
@@ -404,7 +428,7 @@ public class Keylok {
       int chResponse;
 
       //Confirm proper lease expiration date entered
-//      ClearScreen();
+      ClearScreen();
 
       System.out.println ("Are you sure you want to clear the expiration date? (Y or N)");
 
@@ -413,7 +437,7 @@ public class Keylok {
         KTASK(SETEXPDATE, 0, 0, 0);
         }
 
-//      ClearScreen();
+      ClearScreen();
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -422,15 +446,14 @@ public class Keylok {
     //
     //
     ////
-    public boolean CkLeaseExpiration()
+    public void CkLeaseExpiration()
     {
-      boolean valid = false;
       int DateRead;
       int SystemYear, SystemMonth, SystemDay;
       int ExpYear, ExpMonth, ExpDay;
       int RetVal1, RetVal2;
 
-//      ClearScreen();
+      ClearScreen();
       // Check for expiration of lease for product whose expiration date is stored
       // within the KEYLOK device.
       RetVal1 = KTASK(CKLEASEDATE, 0, 0, 0);
@@ -481,10 +504,49 @@ public class Keylok {
           ExpMonth = (DateRead & 0X1E0) / 32;
           ExpDay = (DateRead & 0X1F);
           System.out.println("The lease is set to expire on : " + ExpMonth + "/" + ExpDay + "/" + ExpYear);
-          valid = true;
           break;
       }
-      return valid;
+    }
+    
+    ////////////////////////////////////////////////////////////////////////
+    //
+    //    CkLeaseExpiration() - custom
+    //
+    //
+    ////
+    public boolean CkLeaseExpiration_Custom() throws Exception
+    {
+      boolean isValid = false;
+      int DateRead;
+      int SystemYear, SystemMonth, SystemDay;
+      int ExpYear, ExpMonth, ExpDay;
+      int RetVal1, RetVal2;
+
+      ClearScreen();
+      // Check for expiration of lease for product whose expiration date is stored
+      // within the KEYLOK device.
+      RetVal1 = KTASK(CKLEASEDATE, 0, 0, 0);
+      RetVal2 = (RetVal1 >> 16) & 0xffff;
+      RetVal1 = RetVal1 & 0xffff;
+      switch(RetVal2) {
+        case LEASEEXPIRED: // Lease has expired
+          // Display Message Indicating Lease has Expired
+        	throw new Exception("The lease associated with the use of this software has expired.");
+        case SYSDATESETBACK: // The system date is earlier than one saved in KEYLOK
+        	throw new Exception("WARNING: The system clock has been set back to an earlier date.");
+        case NOLEASEDATE: // No lease date has been programmed
+        	throw new Exception("The KEYLOK has not been programmed with a lease expiration date.");
+        case LEASEDATEBAD: // An invalid lease date exists
+        	throw new Exception("The programmed lease expiration date is in the past.Please reprogram with a future date.");
+        case LASTSYSDATECORRUPT: // Last system date corrupt as stored in device
+        	throw new Exception("The 'last system date' as stored in KEYLOK is corrupt.");
+        default: 
+        	
+          // Lease has not expired
+          isValid = true;
+      }
+      
+      return isValid;
     }
 
         ////////////////////////////////////////////////////////////////////////
@@ -530,7 +592,7 @@ public class Keylok {
     public void SetMaxNetworkCount()
     {
       int MaxCount=128;
-
+//      WriteAuth();
       while (MaxCount < 1 || MaxCount > 127) {
         System.out.println("How many simultaneous network users do you wish to authorize (1-127): ");
         MaxCount = GetInt();
@@ -549,7 +611,7 @@ public class Keylok {
     public void GetMaxNetworkCount()
     {
       int RetVal1;
-
+//      ReadAuth();
       RetVal1 = KTASK(GETMAXUSERS, 0, 0, 0);
       RetVal1 = RetVal1 & 0xffff;
       System.out.println(RetVal1 + " simultaneous network users are authorized.");
@@ -576,7 +638,6 @@ public class Keylok {
       DisplayValue2 = 0;
       DisplayValue3 = 0;
 
-//      ClearScreen();
       RetVal1 = KTASK(REMOTEUPDUPT1,0,0,0); // Remote Update User Part 1
       RetVal2 = (RetVal1 >> 16) & 0xffff;
       RetVal1 = RetVal1 & 0xffff;
@@ -603,7 +664,6 @@ public class Keylok {
       System.out.println("Once you confirm that your software supplier has input the");
       System.out.println("codes correctly you can proceed with the remote task.");
       GetKey();
-//      ClearScreen();
       System.out.println("Please input the 4 codes provided by your software supplier, (one per line).");
       Checksum = GetInt();
       Code1 = GetInt();
@@ -626,7 +686,6 @@ public class Keylok {
           SendValue1 = RetVal1 ^ XorValue;
           SendValue2 = RetVal2 ^ XorValue;
           Checksum = (SendValue1 + SendValue2 + XorValue) % 65536;
-//          ClearScreen();
           System.out.println("END USER - REMOTE TASK SIMULATION");
           System.out.println("Please read the following 3 codes to the developer");
           System.out.println( Checksum);
@@ -691,7 +750,6 @@ public class Keylok {
           System.out.println("      X = Exit - Return to Main Menu.");
           Response = GetResponse();
           Address = 0;
-//          ClearScreen();
           switch(Response)
           {
             case 'A': // Add to memory
@@ -911,7 +969,6 @@ public class Keylok {
     public void ClockMenuOptions(int ClockTask)
 
     {
-//            ClearScreen();
             switch (ClockTask)
             {
               case 'a':               // Set Expiration Date
@@ -933,8 +990,8 @@ public class Keylok {
               case 'D':
                  ClearLeaseExpirationDate();
                  break;
-
-                default:
+                 
+              default:
                  return;
 
             }
@@ -943,12 +1000,12 @@ public class Keylok {
 
     ////////////////////////////////////////////////////////////////////////
     //
-    //    KLCHECK()
+    //    KLCheck()
     //
-    //        A = Perform check for proper device.
+    //        Perform check for proper device.
     //
     ////
-    public boolean KLCHECK()
+    public boolean KLCheck()
     {
         int RetVal1;
         int RetVal2;
@@ -994,279 +1051,281 @@ public class Keylok {
         return lock;
     }
 
-//
-//    ////////////////////////////////////////////////////////////////////////
-//    //
-//    //    Menu_D()
-//    //
-//    //        D = Read Variable Memory.
-//    //
-//    ////
-//    private void Menu_D()
-//    {
-//        int Address;
-//        int RetVal1;
-//
-//        System.out.println();
-//        System.out.println("Which address (0-55) would you like to retrieve?");
-//        Address = GetInt();
-//
-//        RetVal1 = KTASK(GETVARWORD, Address, 0, 0);
-//        RetVal1 = RetVal1 & 0xffff;
-//        System.out.println("Address: " + Address + " contains: " + RetVal1);
-//    }
-//
-//
-//    ////////////////////////////////////////////////////////////////////////
-//    //
-//    //    Menu_F()
-//    //
-//    //        F = Write Variable Memory.
-//    //
-//    ////
-//    private void Menu_F()
-//    {
-//        int Address;
-//        int Value;
-//
-//        System.out.println();
-//        System.out.println("Which address (0-55) would you like to write to?");
-//        Address = GetInt();
-//
-//        System.out.println();
-//        System.out.println("What value (0-65535) would you like to write to this address?");
-//        Value = GetInt();
-//
-//        KTASK(WRITEVARWORD, Address, Value, 0);
-//    }
-//
-//
-//    ////////////////////////////////////////////////////////////////////////
-//    //
-//    //    Menu_G()
-//    //
-//    //        G = Decrement Counter
-//    //
-//    ////
-//    private void Menu_G()
-//    {
-//        int Address;
-//        int RetVal1;
-//        int RetVal2;
-//
-//        System.out.println();
-//        System.out.println("Which counter address (0-55) would you like to decrement?");
-//        Address = GetInt();
-//
-//        RetVal1 = KTASK(DECREMENTMEM, Address, 0, 0);
-//        RetVal2 = (RetVal1 >> 16) & 0xffff;
-//        RetVal1 = RetVal1 & 0xffff;
-//        switch(RetVal2) {
-//          case VALIDCOUNT:                  /* No error encountered */
-//            switch(RetVal1) {
-//              case 0:
-//                System.out.println("CAUTION: This counter is fully counted down to zero.");
-//                break;
-//              default:
-//                System.out.println("NOTE: There are " + RetVal1 + " counts remaining for this usage.");
-//                break;
-//            }
-//            break;
-//          case NOWRITEAUTH:
-//            System.out.println("ERROR: Memory write has not been authorized.");
-//            break;
-//          case INVALIDADDRESS:
-//            System.out.println("ERROR: Address is out of range.");
-//            break;
-//          case NOCOUNTSLEFT:
-//            System.out.println("ERROR: This counter is already fully counted down to zero.");
-//            break;
-//          default:
-//            System.out.println("ERROR: Unrecognized counter decrement error.");
-//            break;
-//        }
-//    }
-//
-//
-//    ////////////////////////////////////////////////////////////////////////
-//    //
-//    //    Menu_H()
-//    //
-//    //        H = Expiration Date Functions
-//    //
-//    ////
-//    private void Menu_H()
-//    {
-//      int task;
-//
-//      task = 0;
-//      while( task != 'x' && task != 'X' ) {
-//        try
-//        {
-//          byte bArray[] = new byte[128];
-//
-//          Keylok jm = new Keylok() ;
-//
-//          System.out.println("          KEYLOK SECURITY SYSTEM DEMONSTRATION") ;
-//          System.out.println("          (C) Copyright 1982 - 2014 - All Rights Reserved");
-//          System.out.println("                By:   KEYLOK");
-//          System.out.println("                         (800) 453-9565");
-//          System.out.println();
-//          System.out.println("   EXPIRATION DATE OPERATIONS - Using Computer's System Clock:");
-//          System.out.println("   NOTE: Attempts to set back system clock are detected.");
-//          System.out.println();
-//          System.out.println("           A = Set Expiration Date.");
-//          System.out.println("               NOTE: Automatically initializes Last System Date ");
-//          System.out.println("                     and Time to the current system date and time ");
-//          System.out.println("                     any time this function is called.");
-//          System.out.println("           B = Check Expiration Date.");
-//          System.out.println("               NOTE: Last System Date & Time are refreshed.");
-//          System.out.println("           C = Check real time clock.");
-//          System.out.println("           D = Clear Expiration Date.");
-//          System.out.println("           X = Return to Main Menu.");
-//          System.out.println();
-//          System.out.println("           What would you like to do?");
-//
-//          System.in.read(bArray);
-//
-//          task = (int)bArray[0];
-//
-//          jm.ClockMenuOptions(task) ;
-//
-//        }
-//        catch (Exception e)
-//        {
-//          // message and stack trace in case we throw an exception
-//          System.out.println("Exception thrown while exercising methods") ;
-//          System.out.println(e.getMessage()) ;
-//          e.printStackTrace() ;
-//        }
-//      }
-//    }
-//
-//
-//    ////////////////////////////////////////////////////////////////////////
-//    //
-//    //    Menu_I()
-//    //
-//    //        I = Network Control Operations
-//    //
-//    ////
-//    private void Menu_I()
-//    {
-//      int task;
-//
-//      task = 0;
-//      while( task != 'x' && task != 'X' ) {
-//        try
-//        {
-//          byte bArray[] = new byte[128];
-//
-//          Keylok jm = new Keylok() ;
-//
-//          System.out.println("                 KEYLOK SECURITY SYSTEM DEMONSTRATION") ;
-//          System.out.println("          (C) Copyright 1982 - 2014 - All Rights Reserved");
-//          System.out.println("                          By:   KEYLOK");
-//          System.out.println("                         (800) 453-9565");
-//          System.out.println("                         (303) 801-0338");
-//          System.out.println();
-//          System.out.println("                    NETWORK SETUP OPERATIONS");
-//          System.out.println();
-//          System.out.println("             A = Set Maximum Simulataneous User Count.");
-//          System.out.println("             B = Get Maximum Simultaneous User Count.");
-//          System.out.println("             X = Return to Main Menu.");
-//          System.out.println();
-//          System.out.println("           What would you like to do?");
-//
-//          System.in.read(bArray);
-//
-//          task = (int)bArray[0];
-//
-//          jm.NetworkMenuOptions(task) ;
-//
-//        }
-//        catch (Exception e)
-//        {
-//          // message and stack trace in case we throw an exception
-//          System.out.println("Exception thrown while exercising methods") ;
-//          System.out.println(e.getMessage()) ;
-//          e.printStackTrace() ;
-//        }
-//      }
-//    }
-//
-//
-//    ////////////////////////////////////////////////////////////////////////
-//    //
-//    //    Menu_J()
-//    //
-//    //        J = Remote Memory Update
-//    //
-//    ////
-//    private void Menu_J()
-//    {
-//      int task;
-//
-//      task = 0;
-//      try
-//        {
-//          byte bArray[] = new byte[128];
-//
-//          Keylok jm = new Keylok() ;
-//
-//          System.out.println("                   KEYLOK SECURITY SYSTEM DEMONSTRATION") ;
-//          System.out.println("             (C) Copyright 1982 - 2014 - All Rights Reserved");
-//          System.out.println("                              By:   KEYLOK");
-//          System.out.println("                             (800) 453-9565");
-//          System.out.println("                             (303) 801-0338");
-//          System.out.println();
-//          System.out.println("              REMOTE KEYLOK MEMORY MODIFICATION OPERATIONS");
-//          System.out.println();
-//          System.out.println("This task is used to remotely extend counters, lease expiration dates,");
-//          System.out.println("simultaneous network users, to add additional software licences at a client");
-//          System.out.println("facility without having to exchange devices or physically obtain access to");
-//          System.out.println("their device.  It also allows you to obtain informaton about current settings");
-//          System.out.println("at the remote installation.");
-//          System.out.println("NOTICE: This function requires TWO computers to demonstrate the functionality.");
-//          System.out.println("        One computer must be used to simulate the software developer's facility");
-//          System.out.println("        The other computer is used to simulate the end user of your software.");
-//          System.out.println("        Both computer must be set to the same date.");
-//          System.out.println("                   Which platform is this computer simulating.");
-//          System.out.println("                   A = Software Developer.");
-//          System.out.println("                   B = End User.");
-//          System.out.println("                   X = Return to Main Menu.");
-//          System.out.println();
-//          System.out.println("           What would you like to do?");
-//
-//          System.in.read(bArray);
-//
-//          task = (int)bArray[0];
-//
-//          jm.RemoteUpdateMenuOptions(task) ;
-//
-//        }
-//      catch (Exception e)
-//        {
-//          // message and stack trace in case we throw an exception
-//          System.out.println("Exception thrown while exercising methods") ;
-//          System.out.println(e.getMessage()) ;
-//          e.printStackTrace() ;
-//        }
-//    }
-//
-//
-//    ////////////////////////////////////////////////////////////////////////
-//    //
-//    //    ClearScreen()
-//    //
-//    ////
-//    private void ClearScreen()
-//    {
-//      int i;
-//
-//      for (i=1; i<51; i++)
-//          System.out.println();
-//    }
+
+    ////////////////////////////////////////////////////////////////////////
+    //
+    //    ReadVarMem()
+    //
+    //        Read Variable Memory.
+    //
+    ////
+    public void ReadVarMem()
+    {
+        int Address;
+        int RetVal1;
+
+        System.out.println();
+        System.out.println("Which address (0-55) would you like to retrieve?");
+        Address = GetInt();
+
+        RetVal1 = KTASK(GETVARWORD, Address, 0, 0);
+        RetVal1 = RetVal1 & 0xffff;
+        System.out.println("Address: " + Address + " contains: " + RetVal1);
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////
+    //
+    //    WriteVarMem()
+    //
+    //        Write Variable Memory.
+    //
+    ////
+    public void WriteVarMem()
+    {
+        int Address;
+        int Value;
+
+        System.out.println();
+        System.out.println("Which address (0-55) would you like to write to?");
+        Address = GetInt();
+
+        System.out.println();
+        System.out.println("What value (0-65535) would you like to write to this address?");
+        Value = GetInt();
+
+        KTASK(WRITEVARWORD, Address, Value, 0);
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////
+    //
+    //    DecCounter()
+    //
+    //        Decrement Counter
+    //
+    ////
+    public void DecCounter()
+    {
+        int Address;
+        int RetVal1;
+        int RetVal2;
+
+        System.out.println();
+        System.out.println("Which counter address (0-55) would you like to decrement?");
+        Address = GetInt();
+
+        RetVal1 = KTASK(DECREMENTMEM, Address, 0, 0);
+        RetVal2 = (RetVal1 >> 16) & 0xffff;
+        RetVal1 = RetVal1 & 0xffff;
+        switch(RetVal2) {
+          case VALIDCOUNT:                  /* No error encountered */
+            switch(RetVal1) {
+              case 0:
+                System.out.println("CAUTION: This counter is fully counted down to zero.");
+                break;
+              default:
+                System.out.println("NOTE: There are " + RetVal1 + " counts remaining for this usage.");
+                break;
+            }
+            break;
+          case NOWRITEAUTH:
+            System.out.println("ERROR: Memory write has not been authorized.");
+            break;
+          case INVALIDADDRESS:
+            System.out.println("ERROR: Address is out of range.");
+            break;
+          case NOCOUNTSLEFT:
+            System.out.println("ERROR: This counter is already fully counted down to zero.");
+            break;
+          default:
+            System.out.println("ERROR: Unrecognized counter decrement error.");
+            break;
+        }
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////
+    //
+    //    ExpDate()
+    //
+    //        Expiration Date Functions
+    //
+    ////
+    public void ExpDate()
+    {
+      int task;
+//      ReadAuth();
+      task = 0;
+      while( task != 'x' && task != 'X' ) 
+      {
+        try
+        {
+          byte bArray[] = new byte[128];
+
+          Keylok jm = new Keylok() ;
+
+          System.out.println("          KEYLOK SECURITY SYSTEM DEMONSTRATION") ;
+          System.out.println("          (C) Copyright 1982 - 2014 - All Rights Reserved");
+          System.out.println("                By:   KEYLOK");
+          System.out.println("                         (800) 453-9565");
+          System.out.println();
+          System.out.println("   EXPIRATION DATE OPERATIONS - Using Computer's System Clock:");
+          System.out.println("   NOTE: Attempts to set back system clock are detected.");
+          System.out.println();
+          System.out.println("           A = Set Expiration Date.");
+          System.out.println("               NOTE: Automatically initializes Last System Date ");
+          System.out.println("                     and Time to the current system date and time ");
+          System.out.println("                     any time this function is called.");
+          System.out.println("           B = Check Expiration Date.");
+          System.out.println("               NOTE: Last System Date & Time are refreshed.");
+          System.out.println("           C = Check real time clock.");
+          System.out.println("           D = Clear Expiration Date.");
+          System.out.println("           X = Return to Main Menu.");
+          System.out.println();
+          System.out.println("           What would you like to do?");
+
+          System.in.read(bArray);
+
+          task = (int)bArray[0];
+
+          jm.ClockMenuOptions(task) ;
+
+        }
+        catch (Exception e)
+        {
+          // message and stack trace in case we throw an exception
+          System.out.println("Exception thrown while exercising methods") ;
+          System.out.println(e.getMessage()) ;
+          e.printStackTrace() ;
+        }
+      }
+      System.out.println("");
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////
+    //
+    //    NetworkOptions()
+    //
+    //        I = Network Control Operations
+    //
+    ////
+    public void NetworkOptions()
+    {
+      int task;
+
+      task = 0;
+      while( task != 'x' && task != 'X' ) {
+        try
+        {
+          byte bArray[] = new byte[128];
+
+          Keylok jm = new Keylok() ;
+
+          System.out.println("                 KEYLOK SECURITY SYSTEM DEMONSTRATION") ;
+          System.out.println("          (C) Copyright 1982 - 2014 - All Rights Reserved");
+          System.out.println("                          By:   KEYLOK");
+          System.out.println("                         (800) 453-9565");
+          System.out.println("                         (303) 801-0338");
+          System.out.println();
+          System.out.println("                    NETWORK SETUP OPERATIONS");
+          System.out.println();
+          System.out.println("             A = Set Maximum Simulataneous User Count.");
+          System.out.println("             B = Get Maximum Simultaneous User Count.");
+          System.out.println("             X = Return to Main Menu.");
+          System.out.println();
+          System.out.println("           What would you like to do?");
+
+          System.in.read(bArray);
+
+          task = (int)bArray[0];
+
+          jm.NetworkMenuOptions(task) ;
+
+        }
+        catch (Exception e)
+        {
+          // message and stack trace in case we throw an exception
+          System.out.println("Exception thrown while exercising methods") ;
+          System.out.println(e.getMessage()) ;
+          e.printStackTrace() ;
+        }
+      }
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////
+    //
+    //    RemoteUpdateOptions()
+    //
+    //        J = Remote Memory Update
+    //
+    ////
+    public void RemoteUpdateOptions()
+    {
+      int task;
+
+      task = 0;
+      try
+        {
+          byte bArray[] = new byte[128];
+
+          Keylok jm = new Keylok() ;
+
+          System.out.println("                   KEYLOK SECURITY SYSTEM DEMONSTRATION") ;
+          System.out.println("             (C) Copyright 1982 - 2014 - All Rights Reserved");
+          System.out.println("                              By:   KEYLOK");
+          System.out.println("                             (800) 453-9565");
+          System.out.println("                             (303) 801-0338");
+          System.out.println();
+          System.out.println("              REMOTE KEYLOK MEMORY MODIFICATION OPERATIONS");
+          System.out.println();
+          System.out.println("This task is used to remotely extend counters, lease expiration dates,");
+          System.out.println("simultaneous network users, to add additional software licences at a client");
+          System.out.println("facility without having to exchange devices or physically obtain access to");
+          System.out.println("their device.  It also allows you to obtain informaton about current settings");
+          System.out.println("at the remote installation.");
+          System.out.println("NOTICE: This function requires TWO computers to demonstrate the functionality.");
+          System.out.println("        One computer must be used to simulate the software developer's facility");
+          System.out.println("        The other computer is used to simulate the end user of your software.");
+          System.out.println("        Both computer must be set to the same date.");
+          System.out.println("                   Which platform is this computer simulating.");
+          System.out.println("                   A = Software Developer.");
+          System.out.println("                   B = End User.");
+          System.out.println("                   X = Return to Main Menu.");
+          System.out.println();
+          System.out.println("           What would you like to do?");
+
+          System.in.read(bArray);
+
+          task = (int)bArray[0];
+
+          jm.RemoteUpdateMenuOptions(task) ;
+
+        }
+      catch (Exception e)
+        {
+          // message and stack trace in case we throw an exception
+          System.out.println("Exception thrown while exercising methods") ;
+          System.out.println(e.getMessage()) ;
+          e.printStackTrace() ;
+        }
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////
+    //
+    //    ClearScreen()
+    //
+    ////
+    private void ClearScreen()
+    {
+      int i;
+
+      for (i=1; i<51; i++)
+          System.out.println();
+    }
 //
 //
 //
