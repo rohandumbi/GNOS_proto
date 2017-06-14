@@ -11,6 +11,14 @@ CREATE TABLE project (
    UNIQUE (name)
 );
 
+DROP TABLE IF EXISTS project_data_files;
+
+CREATE TABLE project_data_files (
+   project_id INT NOT NULL,
+   file_name VARCHAR(200) NOT NULL,
+   PRIMARY KEY ( project_id, file_name )
+);
+
 DROP TABLE IF EXISTS scenario; 
 
 CREATE TABLE scenario (
@@ -114,6 +122,7 @@ CREATE TABLE opex_defn(
    id INT NOT NULL AUTO_INCREMENT,
    scenario_id INT NOT NULL,
    model_id INT NOT NULL,
+   product_join_name VARCHAR(50) ,
    unit_type TINYINT,
    unit_id INT,
    in_use TINYINT NOT NULL default 1,
@@ -399,22 +408,4 @@ CREATE TABLE scenario_config(
    scenario_id INT NOT NULL,
    reclaim TINYINT,
    unique key(scenario_id)
-);
-
-DROP TABLE IF EXISTS report_defn; 
-
-CREATE TABLE report_defn(
-   id INT NOT NULL AUTO_INCREMENT,
-   project_id INT NOT NULL,
-   name VARCHAR(50),
-   type TINYINT,
-   unique key(project_id, name)
-);
-
-DROP TABLE IF EXISTS report_field_mapping; 
-
-CREATE TABLE report_field_mapping(
-   report_id INT,
-   v_field_name VARCHAR(50),
-   h_field_name VARCHAR(50)
 );

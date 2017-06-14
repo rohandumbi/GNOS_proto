@@ -75,6 +75,7 @@ public class CapexEquationGenerator extends EquationGenerator{
 			if(processJoin != null) {
 				for(Integer modelId: processJoin.getChildProcessList()){
 					Model model = context.getModelById(modelId);
+					if(model == null) continue;
 					for( Process p: processList){
 						if(p.getModel().getName().equals(model.getName())){
 							pList.add(p);

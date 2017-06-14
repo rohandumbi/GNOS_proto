@@ -1,6 +1,8 @@
 package com.org.gnos.db.model;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class Project {
 
@@ -9,7 +11,7 @@ public class Project {
 	private String desc;
 	private Date createdDate;
 	private Date modifiedDate;
-	private String fileName;
+	private List<String> files;
 	
 	public Project() {
 		super();
@@ -17,6 +19,7 @@ public class Project {
 		Date curr_date = new Date();
 		this.createdDate = curr_date;
 		this.modifiedDate = curr_date;
+		this.files = new ArrayList<String>();
 	}
 
 	public int getId() {
@@ -49,12 +52,15 @@ public class Project {
 	public void setModifiedDate(Date modifiedDate) {
 		this.modifiedDate = modifiedDate;
 	}
-	public String getFileName() {
-		return fileName;
+	public List<String> getFiles() {
+		return files;
 	}
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
+	public void setFiles(List<String> files) {
+		this.files = files;
 	}
-	
-	
+	public void addFile(String fileName) {
+		if(this.files != null) {
+			this.files.add(fileName);
+		}
+	}
 }

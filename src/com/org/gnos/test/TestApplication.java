@@ -2,7 +2,6 @@ package com.org.gnos.test;
 
 import java.util.List;
 
-import com.org.gnos.core.Application;
 import com.org.gnos.core.GNOSConfig;
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.dao.ExpressionDAO;
@@ -22,7 +21,6 @@ public class TestApplication {
 		Project project = new Project();
 		project.setName("test1");
 		project.setDesc("test1");
-		project.setFileName("test1");
 		new ProjectDAO().create(project);
 		
 		return project;

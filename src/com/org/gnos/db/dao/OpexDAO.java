@@ -20,14 +20,14 @@ import com.org.gnos.db.model.OpexData;
 public class OpexDAO {
 
 
-	private static final String SQL_LIST_ORDER_BY_ID = "select id, model_id, unit_type, unit_id, in_use, is_revenue, year, value from opex_defn, model_year_mapping where id= opex_id and scenario_id = ? order by id, year asc ";
-	private static final String SQL_INSERT_OPEX_DEFN = "insert into opex_defn (scenario_id, model_id, unit_type, unit_id, in_use, is_revenue) values ( ?, ?, ?, ?, ?, ?)";
+	private static final String SQL_LIST_ORDER_BY_ID = "select id, model_id, product_join_name, unit_type, unit_id, in_use, is_revenue, year, value from opex_defn, model_year_mapping where id= opex_id and scenario_id = ? order by id, year asc ";
+	private static final String SQL_INSERT_OPEX_DEFN = "insert into opex_defn (scenario_id, model_id, product_join_name, unit_type, unit_id, in_use, is_revenue) values ( ?, ?, ?, ?, ?, ?, ?)";
 	private static final String SQL_INSERT_OPEX_MAPPING = "insert into model_year_mapping (opex_id, year, value) values (?, ?, ?)";
 	private static final String SQL_DELETE_OPEX_DEFN = "delete from opex_defn where id = ?";
 	private static final String SQL_DELETE_OPEX_MAPPING = "delete from model_year_mapping where opex_id  = ? ";
 	private static final String SQL_DELETE_OPEX_DEFN_BY_SCENARIOID = "delete from opex_defn where scenario_id = ?";
 	private static final String SQL_DELETE_OPEX_MAPPING_BY_SCENARIOID = "delete from model_year_mapping where opex_id in (select id from  opex_defn where scenario_id = ? )";
-	private static final String SQL_UPDATE_OPEX_DEFN = "update opex_defn set model_id = ? , unit_type = ? , unit_id = ?, in_use = ?, is_revenue = ? where id = ?";
+	private static final String SQL_UPDATE_OPEX_DEFN = "update opex_defn set model_id = ? , product_join_name = ? , unit_type = ? , unit_id = ?, in_use = ?, is_revenue = ? where id = ?";
 	private static final String SQL_UPDATE_OPEX_MAPPING = "update model_year_mapping set value = ?  where opex_id = ? and year = ? ";
 	
 	public List<OpexData> getAll(int scenarioId) {
@@ -74,6 +74,7 @@ public class OpexDAO {
 		Object[] values = {
 				scenarioId,
 				opexData.getModelId(),
+				opexData.getProductJoinName(),
 				opexData.getUnitType(),
 				unitId,
 				opexData.isInUse(),
@@ -132,6 +133,7 @@ public class OpexDAO {
 		}
 		Object[] values = {
 				opexData.getModelId(),
+				opexData.getProductJoinName(),
 				opexData.getUnitType(),
 				unitId,
 				opexData.isInUse(),
@@ -209,6 +211,7 @@ public class OpexDAO {
 			od = new OpexData();
 			od.setId(rs.getInt("id"));
 			od.setModelId(rs.getInt("model_id"));
+			od.setProductJoinName(rs.getString("product_join_name"));
 			od.setInUse(rs.getBoolean("in_use"));
 			od.setRevenue(rs.getBoolean("is_revenue"));
 			

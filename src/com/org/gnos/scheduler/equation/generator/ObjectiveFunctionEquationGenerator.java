@@ -15,6 +15,7 @@ import java.util.Set;
 import com.org.gnos.core.Block;
 import com.org.gnos.core.Node;
 import com.org.gnos.core.Pit;
+import com.org.gnos.core.Tree;
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.model.CapexData;
 import com.org.gnos.db.model.CapexInstance;
@@ -24,6 +25,8 @@ import com.org.gnos.db.model.FixedOpexCost;
 import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.OpexData;
 import com.org.gnos.db.model.Process;
+import com.org.gnos.db.model.Product;
+import com.org.gnos.db.model.ProductJoin;
 import com.org.gnos.db.model.Stockpile;
 import com.org.gnos.db.model.TruckParameterCycleTime;
 import com.org.gnos.scheduler.equation.ExecutionContext;
@@ -443,26 +446,37 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		List<OpexData> opexDataList = context.getOpexDataList();
 
 		for(OpexData opexData: opexDataList) {
-			if(opexData.getModelId() == model.getId()){
-				if(opexData.isRevenue()){
-					int unitId;
-					if(opexData.getUnitType() == OpexData.UNIT_FIELD) {
-						unitId = opexData.getFieldId();
-					} else {
-						unitId = opexData.getExpressionId();
+			if(!opexData.isInUse()) continue;
+			
+			if(opexData.isRevenue()){
+				if(opexData.getModelId() != -1 && (opexData.getModelId() != model.getId())) {
+					continue;
+
+				} else if(opexData.getProductJoinName() != null  && opexData.getProductJoinName().trim().length() > 0) {
+					if(!isProcessAssociatedToProductJoin(model, opexData.getProductJoinName())){
+						continue;
 					}
-					BigDecimal expr_value = context.getUnitValueforBlock(b, unitId, opexData.getUnitType());
-					revenue = revenue.add(expr_value.multiply(opexData.getCostData().get(year)));
-				} else {
-					pcost = pcost.add(opexData.getCostData().get(year));
 				}
+				int unitId;
+				if(opexData.getUnitType() == OpexData.UNIT_FIELD) {
+					unitId = opexData.getFieldId();
+				} else {
+					unitId = opexData.getExpressionId();
+				}
+				BigDecimal expr_value = context.getUnitValueforBlock(b, unitId, opexData.getUnitType());
+				revenue = revenue.add(expr_value.multiply(opexData.getCostData().get(year)));
+			} else {
+				 if(opexData.getModelId() == model.getId() || isChild(opexData.getModelId(), model)) {
+					 pcost = pcost.add(opexData.getCostData().get(year));
+				 } 
+				
 			}
+
 		}
 		value = revenue.subtract(pcost);
 		return value;
 	}
 
-	
 	private BigDecimal getProcessValueForSPBlock(SPBlock b, Model model, int year) {
 		BigDecimal value = new BigDecimal(0);
 		if(model == null) return value;
@@ -476,17 +490,62 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		}
 		List<OpexData> opexDataList = context.getOpexDataList();
 		for(OpexData opexData: opexDataList) {
-			if(opexData.getModelId() == model.getId()){
-				if(opexData.isRevenue()){
-					BigDecimal expr_value = ((SlidingWindowExecutionContext)context).getUnitValueforBlock(b, unitId, model.getUnitType());
-					revenue = revenue.add(expr_value.multiply(opexData.getCostData().get(year)));
-				} else {
-					pcost = pcost.add(opexData.getCostData().get(year));
+			if(!opexData.isInUse()) continue;
+			if(opexData.isRevenue()){
+				if(opexData.getModelId() != -1 && (opexData.getModelId() != model.getId())) {
+					continue;
+
+				} else if(opexData.getProductJoinName() != null  && opexData.getProductJoinName().trim().length() > 0) {
+					if(!isProcessAssociatedToProductJoin(model, opexData.getProductJoinName())){
+						continue;
+					}
 				}
+				BigDecimal expr_value = ((SlidingWindowExecutionContext)context).getUnitValueforBlock(b, unitId, model.getUnitType());
+				revenue = revenue.add(expr_value.multiply(opexData.getCostData().get(year)));
+			} else {
+				 if(opexData.getModelId() == model.getId() || isChild(opexData.getModelId(), model)) {
+					 pcost = pcost.add(opexData.getCostData().get(year));
+				 }
 			}
 		}
 		value = revenue.subtract(pcost);
 		return value;
+	}
+	
+	
+	private boolean isProcessAssociatedToProductJoin(Model model, String productJoinName) {
+		ProductJoin pj = context.getProductJoinFromName(productJoinName);
+		Set<String> products = pj.getProductList();
+		for(String productName: products) {
+			Product p = context.getProductFromName(productName);
+			if(p.getModelId() == model.getId()) {
+				return true;
+			}
+		}
+		Set<String> productJoins = pj.getProductJoinList();
+		for(String pjName: productJoins) {
+			if(isProcessAssociatedToProductJoin(model, pjName)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private boolean isChild(int modelId, Model model) {
+		Tree processTree = context.getProcessTree();
+		Node processNode = processTree.getNodeByName(model.getName());
+		
+		return isChild(modelId, processNode);
+	}
+	
+	private boolean isChild(int modelId, Node node) {
+		Node parent = node.getParent();
+		if(parent == null) return false;
+		if(parent.getData().getId() == modelId) {
+			return true;
+		}
+		
+		return isChild(modelId, parent);
 	}
 	
 	private boolean hasValue(String s) {

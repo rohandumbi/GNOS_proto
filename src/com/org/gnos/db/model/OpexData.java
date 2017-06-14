@@ -11,6 +11,7 @@ public class OpexData {
 	
 	private int id;
 	private int modelId;
+	private String productJoinName;
 	private short unitType;
 	private int fieldId;
 	private int expressionId;
@@ -37,6 +38,14 @@ public class OpexData {
 
 	public void setModelId(int modelId) {
 		this.modelId = modelId;
+	}
+
+	public String getProductJoinName() {
+		return productJoinName;
+	}
+
+	public void setProductJoinName(String productJoinName) {
+		this.productJoinName = productJoinName;
 	}
 
 	public int getExpressionId() {
