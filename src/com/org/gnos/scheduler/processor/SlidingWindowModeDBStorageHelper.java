@@ -28,13 +28,14 @@ public class SlidingWindowModeDBStorageHelper extends DBStorageHelper {
 	@Override
 	public void processRecord(Record record){
 		SlidingWindowExecutionContext swctx = (SlidingWindowExecutionContext)context;
+		double tonnesWt = context.getUnScaledValue(record.getValue());
 		if(record.getOriginType() == Record.ORIGIN_PIT) {
-			swctx.addMinedTonnesWeightForBlock(record.getBlockNo(), record.getValue());
+			swctx.addMinedTonnesWeightForBlock(record.getBlockNo(), tonnesWt);
 		} else {
-			swctx.reclaimTonnesWeightForStockpile(record.getOriginSpNo(), record.getValue());
+			swctx.reclaimTonnesWeightForStockpile(record.getOriginSpNo(), tonnesWt);
 		}
 		if(record.getDestinationType() == Record.DESTINATION_SP) {
-			swctx.addTonnesWeightForStockpile(record.getDestSpNo(), record.getBlockNo(), record.getValue());
+			swctx.addTonnesWeightForStockpile(record.getDestSpNo(), record.getBlockNo(), tonnesWt);
 		}
 	}
 	
@@ -80,8 +81,9 @@ public class SlidingWindowModeDBStorageHelper extends DBStorageHelper {
 					if(record.getOriginType() == Record.ORIGIN_PIT) {
 						Block b = context.getBlocks().get(record.getBlockNo());
 						double tonnesWt = Double.valueOf(b.getField(context.getTonnesWtFieldName()));
-						double ratio = record.getValue()/tonnesWt;
-						ips.setDouble(index++, record.getValue());
+						double quantityMined = context.getUnScaledValue(record.getValue());
+						double ratio = quantityMined/tonnesWt;
+						ips.setDouble(index++, quantityMined);
 						ips.setDouble(index++, ratio);
 						ips.setDouble(index++, 0); // total truck hour ... need to calculate this
 											
@@ -141,10 +143,11 @@ public class SlidingWindowModeDBStorageHelper extends DBStorageHelper {
 					} else {
 						SPBlock spb = swctx.getSPBlock(record.getOriginSpNo());
 						double ratio = 0;
+						double quantityMined = context.getUnScaledValue(record.getValue());
 						if(spb.getLasttonnesWt() > 0) {
-							ratio = record.getValue()/spb.getLasttonnesWt();
+							ratio = quantityMined/spb.getLasttonnesWt();
 						}
-						ips.setDouble(index++, record.getValue());
+						ips.setDouble(index++, quantityMined);
 						ips.setDouble(index++, ratio);
 						ips.setDouble(index++, 0); // total truck hour ... need to calculate this
 						

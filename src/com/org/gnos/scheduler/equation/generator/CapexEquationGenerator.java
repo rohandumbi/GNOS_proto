@@ -153,9 +153,7 @@ public class CapexEquationGenerator extends EquationGenerator{
 		int startyear = context.getStartYear();
 		
 		for(int i= timePeriodStart; i <= timePeriodEnd; i++ ){
-			StringBuffer sb = new StringBuffer("");
 			Constraint c = new Constraint();
-			int count = 0;
 			for(Process p: processList){
 				List<Block> blocks = p.getBlocks();
 				int unitId;
@@ -165,21 +163,11 @@ public class CapexEquationGenerator extends EquationGenerator{
 					unitId = p.getModel().getExpressionId();
 				}
 				for(Block b: blocks){
-					if(count > 0){
-						sb.append(" + ");
-					}
-					sb.append(context.getUnitValueforBlock(b, unitId, p.getModel().getUnitType())+"p"+b.getPitNo()+"x"+b.getBlockNo()+"p"+p.getProcessNo()+"t"+i);
 					c.addVariable("p"+b.getPitNo()+"x"+b.getBlockNo()+"p"+p.getProcessNo()+"t"+i, context.getUnitValueforBlock(b, unitId, p.getModel().getUnitType()));
-					count ++;
 					if(context.isSpReclaimEnabled() && context.isGlobalMode() && timePeriodStart > 1) {
 						int stockpileNo = getStockpileNoForReclaim(b);
 						if(stockpileNo > 0) {
-							if(count > 0){
-								sb.append(" + ");
-							}
-							sb.append(context.getUnitValueforBlock(b, unitId, p.getModel().getUnitType())+"sp"+stockpileNo+"x"+b.getBlockNo()+"p"+p.getProcessNo()+"t"+i);
 							c.addVariable("sp"+stockpileNo+"x"+b.getBlockNo()+"p"+p.getProcessNo()+"t"+i, context.getUnitValueforBlock(b, unitId, p.getModel().getUnitType()));
-							count ++;
 						}					
 					}
 					
@@ -195,12 +183,7 @@ public class CapexEquationGenerator extends EquationGenerator{
 						Set<Process> processes = spb.getProcesses();
 						for(Process process: processes){
 							if(process.getProcessNo() == p.getProcessNo()) {
-								if(count > 0){
-									sb.append(" + ");
-								}
-								sb.append(swctx.getUnitValueforBlock(spb, unitId, p.getModel().getUnitType())+"sp"+spNo+"x0p"+p.getProcessNo()+"t"+i);
 								c.addVariable("sp"+spNo+"x0p"+p.getProcessNo()+"t"+i, swctx.getUnitValueforBlock(spb, unitId, p.getModel().getUnitType()));
-								count ++;
 							}
 						}
 					}
@@ -211,15 +194,12 @@ public class CapexEquationGenerator extends EquationGenerator{
 			for(CapexInstance ci: capexInstanceList){
 				instanceNumber++;
 				for(int ii=timePeriodStart; ii<=i; ii++){
-					sb.append(" - "+ci.getExpansionCapacity()+"c"+capexNumber+"i"+instanceNumber+"t"+ii);
-					c.addVariable("c"+capexNumber+"i"+instanceNumber+"t"+ii, new BigDecimal(ci.getExpansionCapacity()).negate());
+					c.addVariable("c"+capexNumber+"i"+instanceNumber+"t"+ii, context.getScaledValue(new BigDecimal(ci.getExpansionCapacity())).negate());
 				}				
 			}
 			if(processConstraintData != null){
-				sb.append(" <= "+processConstraintData.get(startyear + i -1));
-				c.setValue(new BigDecimal(processConstraintData.get(startyear + i -1)));
+				c.setValue(context.getScaledValue(new BigDecimal(processConstraintData.get(startyear + i -1))));
 			} else {
-				sb.append(" <= 0 ");
 				c.setValue(new BigDecimal(0));
 			}
 			c.setType(Constraint.LESS_EQUAL);
@@ -235,9 +215,7 @@ public class CapexEquationGenerator extends EquationGenerator{
 		int startyear = context.getStartYear();
 		
 		for(int i= timePeriodStart; i <= timePeriodEnd; i++ ){
-			StringBuffer sb = new StringBuffer("");
 			Constraint c = new Constraint();
-			int count = 0;
 			for( Process p: processList){
 				List<Block> blocks = p.getBlocks();
 				int unitId;
@@ -248,34 +226,19 @@ public class CapexEquationGenerator extends EquationGenerator{
 				}
 				for(Block b: blocks){
 					if(!pitnumberList.contains(b.getPitNo())) continue;
-					if(count > 0){
-						sb.append(" + ");
-					}
-					sb.append(context.getUnitValueforBlock(b, unitId, p.getModel().getUnitType())+"p"+b.getPitNo()+"x"+b.getBlockNo()+"p"+p.getProcessNo()+"t"+i);
 					c.addVariable("x"+b.getBlockNo()+"p"+p.getProcessNo()+"t"+i, context.getUnitValueforBlock(b, unitId, p.getModel().getUnitType()));
-					count ++;
 				}
 			}
 			for(Block b: context.getProcessBlocks()){
 				if(!pitnumberList.contains(b.getPitNo())) continue;
-				if(count > 0){
-					sb.append(" + ");
-				}
-				sb.append("p"+b.getPitNo()+"x"+b.getBlockNo()+"s"+getStockpileNo(b)+"t"+i);
 				c.addVariable("p"+b.getPitNo()+"x"+b.getBlockNo()+"s"+getStockpileNo(b)+"t"+i, new BigDecimal(1));
-				count ++;
 			}
 			for(Block b: context.getWasteBlocks()){
 				if(!pitnumberList.contains(b.getPitNo())) continue;
 				List<Dump> dumps = getDump(b);
 				if(dumps == null) continue;
 				for(Dump dump: dumps){
-					if(count > 0){
-						sb.append(" + ");
-					}
-					sb.append("p"+b.getPitNo()+"x"+b.getBlockNo()+"w"+dump.getDumpNumber()+"t"+i);
 					c.addVariable("p"+b.getPitNo()+"x"+b.getBlockNo()+"w"+dump.getDumpNumber()+"t"+i, new BigDecimal(1));
-					count ++;
 				}			
 				
 			}
@@ -283,15 +246,12 @@ public class CapexEquationGenerator extends EquationGenerator{
 			for(CapexInstance ci: capexInstanceList){
 				instanceNumber++;
 				for(int ii=timePeriodStart; ii<=i; ii++){
-					sb.append(" - "+ci.getExpansionCapacity()+"c"+capexNumber+"i"+instanceNumber+"t"+ii);
-					c.addVariable("c"+capexNumber+"i"+instanceNumber+"t"+ii, new BigDecimal(ci.getExpansionCapacity()).negate());
+					c.addVariable("c"+capexNumber+"i"+instanceNumber+"t"+ii, context.getScaledValue(new BigDecimal(ci.getExpansionCapacity())).negate());
 				}				
 			}
 			if(processConstraintData != null){
-				sb.append(" <= "+processConstraintData.get(startyear + i -1));
-				c.setValue(new BigDecimal(processConstraintData.get(startyear + i -1)));
+				c.setValue(context.getScaledValue(new BigDecimal(processConstraintData.get(startyear + i -1))));
 			} else {
-				sb.append(" <= 0 ");
 				c.setValue(new BigDecimal(0));
 			}
 			c.setType(Constraint.LESS_EQUAL);

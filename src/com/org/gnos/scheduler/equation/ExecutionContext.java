@@ -72,6 +72,7 @@ import com.org.gnos.db.model.TruckParameterPayload;
 
 public class ExecutionContext {
 
+	private final BigDecimal scale = new BigDecimal(1000000);
 	private Set<Block> wasteBlocks = new HashSet<Block>();
 	private Set<Block> processBlocks = new HashSet<Block>();
 	private Map<Integer, Block> blocks = new LinkedHashMap<Integer, Block>();
@@ -1109,7 +1110,11 @@ public class ExecutionContext {
 	public List<String> getBinaries() {
 		return binaries;
 	}
-	
-	
-	
+
+	public BigDecimal getScaledValue(BigDecimal val) {
+		return val.divide(scale);
+	}
+	public double getUnScaledValue(double val) {
+		return val*scale.intValue();
+	}
 }

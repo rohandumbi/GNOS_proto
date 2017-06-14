@@ -64,7 +64,7 @@ public class SPReclaimEquationGenerator extends EquationGenerator{
 				}
 				if(sp.getCapacity() > 0 && c1.getVariables().size() > 0){
 					c1.setType(Constraint.LESS_EQUAL);
-					c1.setValue(new BigDecimal(sp.getCapacity()));
+					c1.setValue(context.getScaledValue(new BigDecimal(sp.getCapacity())));
 					context.getConstraints().add(c1);
 				}
 			}
@@ -114,7 +114,7 @@ public class SPReclaimEquationGenerator extends EquationGenerator{
 				 
 				if(capacity > 0 && (sbc_sp.length() > 0 || sbc_spr.length() > 0)){
 					c.setType(Constraint.LESS_EQUAL);
-					c.setValue(new BigDecimal(capacity));
+					c.setValue(context.getScaledValue(new BigDecimal(capacity)));
 					context.getConstraints().add(c);
 				}
 			}

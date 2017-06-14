@@ -75,7 +75,7 @@ public class DBStorageHelper implements IStorageHelper {
 					ps = getUpdateStatement(record.getTimePeriod());
 					stmts.put(record.getTimePeriod(), ps);
 				}
-				ps.setString(1, String.valueOf(record.getValue()));
+				ps.setString(1, String.valueOf(context.getUnScaledValue(record.getValue())));
 				if(record.getOriginType() == Record.ORIGIN_PIT) {
 					ps.setInt(2, record.getPitNo());
 					ps.setInt(3, record.getBlockNo());
@@ -131,7 +131,7 @@ public class DBStorageHelper implements IStorageHelper {
 					Block b = context.getBlockByNumber(record.getBlockNo());
 					if(b == null) continue;
 					double tonnesWt = context.getTonnesWtForBlock(b);				
-					double quantityMined = record.getValue();
+					double quantityMined = context.getUnScaledValue(record.getValue());
 					double ratio = quantityMined/tonnesWt;
 					BigDecimal total_TH = new BigDecimal(0);
 					int index = 1;

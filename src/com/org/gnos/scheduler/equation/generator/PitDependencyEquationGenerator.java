@@ -105,8 +105,8 @@ public class PitDependencyEquationGenerator extends EquationGenerator{
 		int timePeriodStart = context.getTimePeriodStart();
 		int timePeriodEnd = context.getTimePeriodEnd();
 		List<String> variables = getAllVariablesForBench(b2);
-		Double benchTonnesWt = getBenchTonnesWt(b2);
-		if(benchTonnesWt <= 0 || variables.size() == 0) return;
+		BigDecimal benchTonnesWt = getBenchTonnesWt(b2);
+		if(benchTonnesWt.doubleValue() <= 0 || variables.size() == 0) return;
 		for(int i=timePeriodStart; i<= timePeriodEnd; i++){
 			Constraint c = new Constraint();
 			
@@ -115,7 +115,7 @@ public class PitDependencyEquationGenerator extends EquationGenerator{
 				if(!variable.endsWith(String.valueOf("t"+i))) continue;
 				c.addVariable(variable, new BigDecimal(1));
 			}
-			c.addVariable("p"+p1.getPitNo()+"b"+b1.getBenchNo()+"t"+i, new BigDecimal(benchTonnesWt).negate());
+			c.addVariable("p"+p1.getPitNo()+"b"+b1.getBenchNo()+"t"+i, benchTonnesWt.negate());
 			c.setType(Constraint.LESS_EQUAL);
 			c.setValue(new BigDecimal(0));
 			context.getConstraints().add(c);
@@ -160,7 +160,7 @@ public class PitDependencyEquationGenerator extends EquationGenerator{
 		return variables;
 	}
 	
-	private double getBenchTonnesWt(Bench bench){
+	private BigDecimal getBenchTonnesWt(Bench bench){
 		Double tonnesWt = 0.0;
 		for(Block block:bench.getBlocks()){
 			try{
@@ -171,6 +171,6 @@ public class PitDependencyEquationGenerator extends EquationGenerator{
 			
 		}
 		
-		return tonnesWt;
+		return context.getScaledValue(new BigDecimal(tonnesWt));
 	}
 }

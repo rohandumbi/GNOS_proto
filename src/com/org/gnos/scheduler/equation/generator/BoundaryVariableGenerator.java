@@ -46,7 +46,7 @@ public class BoundaryVariableGenerator extends EquationGenerator{
 				}					
 			}			
 			c.setType(Constraint.LESS_EQUAL);
-			c.setValue(new BigDecimal(context.getTonnesWtForBlock(b)));
+			c.setValue(context.getScaledValue(new BigDecimal(context.getTonnesWtForBlock(b))));
 			context.getConstraints().add(c);
 		}
 	}

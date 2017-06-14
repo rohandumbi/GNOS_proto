@@ -168,7 +168,7 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 			
 		}
 		
-		return tonnesWt;
+		return context.getScaledValue(tonnesWt);
 	}
 	
 /*	@Override

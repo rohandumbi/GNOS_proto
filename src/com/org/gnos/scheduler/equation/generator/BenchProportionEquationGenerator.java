@@ -51,10 +51,9 @@ public class BenchProportionEquationGenerator extends EquationGenerator{
 						List<String> blockvariables2 = this.blockVariableMapping.get(block.getId());
 						blockvariables1 = blockvariables1 == null ? new ArrayList<String>() : blockvariables1;
 						blockvariables2 = blockvariables2 == null ? new ArrayList<String>() : blockvariables2;
-						String tonnage1 = ""+context.getTonnesWtForBlock(lastBlock);
-						String tonnage2 = ""+context.getTonnesWtForBlock(block);
+						double tonnage1 = context.getTonnesWtForBlock(lastBlock);
+						double tonnage2 = context.getTonnesWtForBlock(block);
 						for(int i=timePeriodStart; i<= timePeriodEnd; i++){
-							StringBuilder sb = new StringBuilder("");
 							Constraint constraint = new Constraint();
 							for(String variable : blockvariables1) {
 								if(variable.startsWith("sp")) continue;
@@ -63,11 +62,7 @@ public class BenchProportionEquationGenerator extends EquationGenerator{
 								      String yearStr = matcher.group(1);
 								      int year = Integer.parseInt(yearStr);
 								      if(year != i ) continue;
-								      if(sb.length() > 0) {
-											sb.append(" + ");
-								      }
-									  sb.append(tonnage2+variable);
-									  constraint.addVariable(variable, new BigDecimal(tonnage2));
+									  constraint.addVariable(variable, context.getScaledValue(new BigDecimal(tonnage2)));
 								}								
 							}
 							for(String variable : blockvariables2) {
@@ -77,12 +72,10 @@ public class BenchProportionEquationGenerator extends EquationGenerator{
 								      String yearStr = matcher.group(1);
 								      int year = Integer.parseInt(yearStr);
 								      if(year != i ) continue;
-								      sb.append(" - "+tonnage1+variable);
-								      constraint.addVariable(variable, new BigDecimal(tonnage1).negate());
+								      constraint.addVariable(variable, context.getScaledValue(new BigDecimal(tonnage1)).negate());
 								}
 							}
-							if(sb.length() > 0){
-								sb.append(" = 0");
+							if(constraint.getVariables().size() > 0){
 								constraint.setType(Constraint.EQUAL);
 								constraint.setValue(new BigDecimal(0));
 								context.getConstraints().add(constraint);

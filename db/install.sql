@@ -4,7 +4,6 @@ CREATE TABLE project (
    id INT NOT NULL AUTO_INCREMENT,
    name VARCHAR(100) NOT NULL,
    description VARCHAR(400),
-   fileName VARCHAR(200) NOT NULL,
    created_date	DATETIME,
    modified_date DATETIME,
    PRIMARY KEY ( id ),

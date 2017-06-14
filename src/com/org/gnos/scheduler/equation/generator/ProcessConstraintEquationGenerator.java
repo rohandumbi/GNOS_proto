@@ -288,10 +288,10 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 				if(constraint.getVariables().size() > 0) {
 					if(processConstraintData.isMax()){
 						constraint.setType(Constraint.LESS_EQUAL);
-						constraint.setValue(new BigDecimal(processConstraintData.getConstraintData().get(startYear+i -1)));
+						constraint.setValue(context.getScaledValue(new BigDecimal(processConstraintData.getConstraintData().get(startYear+i -1))));
 					} else {
 						constraint.setType(Constraint.GREATER_EQUAL);
-						constraint.setValue(new BigDecimal(processConstraintData.getConstraintData().get(startYear+i -1)));
+						constraint.setValue(context.getScaledValue(new BigDecimal(processConstraintData.getConstraintData().get(startYear+i -1))));
 					}
 				}
 				context.getConstraints().add(constraint);
