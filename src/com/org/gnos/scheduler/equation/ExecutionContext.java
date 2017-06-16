@@ -1114,6 +1114,11 @@ public class ExecutionContext {
 	public BigDecimal getScaledValue(BigDecimal val) {
 		return val.divide(scale);
 	}
+	
+	public long getScaledValue(long val) {
+		return val/scale.longValue();
+	}
+	
 	public double getUnScaledValue(double val) {
 		return val*scale.intValue();
 	}
