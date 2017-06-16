@@ -8,10 +8,13 @@ import java.util.List;
 
 import com.org.gnos.core.GNOSConfig;
 import com.org.gnos.db.DBManager;
+import com.org.gnos.db.dao.ExpressionDAO;
 import com.org.gnos.db.dao.FieldDAO;
 import com.org.gnos.db.dao.RequiredFieldDAO;
+import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Field;
 import com.org.gnos.db.model.RequiredField;
+import com.org.gnos.services.ExpressionProcessor;
 import com.org.gnos.services.csv.CSVDataProcessor;
 
 public class FileUploadHelper {
@@ -86,6 +89,8 @@ public class FileUploadHelper {
 			for(CSVDataProcessor processor: processors) {
 				processor.dumpToDB(projectId);
 			}
+			updateExpressions(projectId, append);
+			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -95,6 +100,19 @@ public class FileUploadHelper {
 		return true;
 	}
 
+	private void updateExpressions(int projectId, boolean append) {
+		List<Expression> expressions = new ExpressionDAO().getAll(projectId);
+		ExpressionProcessor processor = new ExpressionProcessor();
+		processor.setExpressions(expressions);
+		
+		if(!append) {
+			processor.store(projectId);
+		} else {
+			processor.processExpressions(projectId);
+		}
+		
+	}
+	
 	private void dropTable(int projectId, Connection conn) throws SQLException {
 		String  data_table_sql = "DROP TABLE IF EXISTS gnos_data_"+projectId+"; ";
 		String  computed_data_table_sql = "DROP TABLE IF EXISTS gnos_computed_data_"+projectId+"; ";

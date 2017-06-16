@@ -56,7 +56,7 @@ public class ExpressionProcessor {
 		
 	}
 	
-	private void processExpressions (int projectId) {
+	public void processExpressions (int projectId) {
 		
 		RequiredFieldDAO rdo = new RequiredFieldDAO();
 		List<RequiredField> requiredFields = rdo.getAll(projectId);
