@@ -56,8 +56,21 @@ public class ScenarioController {
 		int startYear = jsonObject.get("start_year").getAsInt();
 		int timePeriod = jsonObject.get("time_period").getAsInt();
 		float discount = jsonObject.get("discount").getAsFloat();
-		Scenario obj = new Scenario();
-		obj.setId(Integer.parseInt(id));
+		
+		Scenario obj = dao.get(Integer.parseInt(id));
+		if(obj == null) {
+			throw new Exception("Nothing to update");
+		} else {
+			if(timePeriod > obj.getTimePeriod()) {
+				int nstartYear = obj.getStartYear() + obj.getTimePeriod();
+				int nendYear =  obj.getStartYear() + timePeriod -1;
+				createEntries(obj.getId(), nstartYear, nendYear);
+			} else {
+				int endYear =  obj.getStartYear() + timePeriod -1;
+				removeEntries(obj.getId(), endYear);
+			}
+		}
+		
 		obj.setName(name);
 		obj.setStartYear(startYear);
 		obj.setTimePeriod(timePeriod);
@@ -67,6 +80,7 @@ public class ScenarioController {
 		throw new Exception();
 	}
 	
+
 	public Scenario copy(String pid, String sid) throws Exception{
 		if((sid == null) || (sid.isEmpty())){
 			throw new Exception("Please select a scenario");
@@ -175,5 +189,72 @@ public class ScenarioController {
 			capexDao.delete(scenarioId);
 			return true;
 		}	
+	}
+	
+	private void removeEntries(int scenarioId, int endYear) {
+		//Opex
+		OpexDAO opexDao = new OpexDAO();
+		List<OpexData> opexDataList = opexDao.getAll(scenarioId);
+		for(OpexData od: opexDataList) {
+			opexDao.deleteYears(od.getId(), endYear);
+		}
+		//FixedCost 
+		FixedCostDAO fixedCostDao = new FixedCostDAO();
+		List<FixedOpexCost> fixedCostList = fixedCostDao.getAll(scenarioId);
+		for(FixedOpexCost foc : fixedCostList) {
+			fixedCostDao.deleteYears(scenarioId, endYear);
+		}
+		//Process Constraints 
+		ProcessConstraintDAO processConstraintDao = new ProcessConstraintDAO();
+		List<ProcessConstraintData> processConstraintList = processConstraintDao.getAll(scenarioId);
+		for(ProcessConstraintData pcd: processConstraintList) {
+			processConstraintDao.deleteYears(pcd.getId(), endYear);
+		}
+		//Bench Cobstraints
+		BenchConstraintDAO benchConstraintDao = new BenchConstraintDAO();
+		List<PitBenchConstraintData> benchConstraintList = benchConstraintDao.getAll(scenarioId);
+		for(PitBenchConstraintData pbcd: benchConstraintList) {
+			benchConstraintDao.deleteYears(pbcd.getId(), endYear);
+		}			
+		//Grade Cobstraints
+		GradeConstraintDAO gradeConstraintDao = new GradeConstraintDAO();
+		List<GradeConstraintData> gradeConstraintList = gradeConstraintDao.getAll(scenarioId);
+		for(GradeConstraintData gcd: gradeConstraintList) {
+			gradeConstraintDao.deleteYears(gcd.getId(), endYear);
+		}
+
+		
+	}
+	private void createEntries(int scenarioId, int startYear, int endYear) {
+		//Opex
+		OpexDAO opexDao = new OpexDAO();
+		List<OpexData> opexDataList = opexDao.getAll(scenarioId);
+		for(OpexData od: opexDataList) {
+			opexDao.addYears(od.getId(), startYear, endYear);
+		}
+		//FixedCost 
+		FixedCostDAO fixedCostDao = new FixedCostDAO();
+		List<FixedOpexCost> fixedCostList = fixedCostDao.getAll(scenarioId);
+		for(FixedOpexCost foc : fixedCostList) {
+			fixedCostDao.addYears(foc, scenarioId, startYear, endYear);
+		}
+		//Process Constraints 
+		ProcessConstraintDAO processConstraintDao = new ProcessConstraintDAO();
+		List<ProcessConstraintData> processConstraintList = processConstraintDao.getAll(scenarioId);
+		for(ProcessConstraintData pcd: processConstraintList) {
+			processConstraintDao.addYears(pcd.getId(), startYear, endYear);
+		}
+		//Bench Cobstraints
+		BenchConstraintDAO benchConstraintDao = new BenchConstraintDAO();
+		List<PitBenchConstraintData> benchConstraintList = benchConstraintDao.getAll(scenarioId);
+		for(PitBenchConstraintData pbcd: benchConstraintList) {
+			benchConstraintDao.addYears(pbcd.getId(), startYear, endYear);
+		}			
+		//Grade Cobstraints
+		GradeConstraintDAO gradeConstraintDao = new GradeConstraintDAO();
+		List<GradeConstraintData> gradeConstraintList = gradeConstraintDao.getAll(scenarioId);
+		for(GradeConstraintData gcd: gradeConstraintList) {
+			gradeConstraintDao.addYears(gcd.getId(), startYear, endYear);
+		}
 	}
 }

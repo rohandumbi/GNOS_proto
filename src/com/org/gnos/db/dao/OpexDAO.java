@@ -25,6 +25,7 @@ public class OpexDAO {
 	private static final String SQL_INSERT_OPEX_MAPPING = "insert into model_year_mapping (opex_id, year, value) values (?, ?, ?)";
 	private static final String SQL_DELETE_OPEX_DEFN = "delete from opex_defn where id = ?";
 	private static final String SQL_DELETE_OPEX_MAPPING = "delete from model_year_mapping where opex_id  = ? ";
+	private static final String SQL_DELETE_OPEX_MAPPING_YEAR = "delete from model_year_mapping where opex_id  = ? and year > ?";
 	private static final String SQL_DELETE_OPEX_DEFN_BY_SCENARIOID = "delete from opex_defn where scenario_id = ?";
 	private static final String SQL_DELETE_OPEX_MAPPING_BY_SCENARIOID = "delete from model_year_mapping where opex_id in (select id from  opex_defn where scenario_id = ? )";
 	private static final String SQL_UPDATE_OPEX_DEFN = "update opex_defn set model_id = ? , product_join_name = ? , unit_type = ? , unit_id = ?, in_use = ?, is_revenue = ? where id = ?";
@@ -120,6 +121,26 @@ public class OpexDAO {
 	}
 
 
+	public boolean addYears(int opexId, int startYear, int endYear){
+
+		try ( Connection connection = DBManager.getConnection();
+				PreparedStatement statement = connection.prepareStatement(SQL_INSERT_OPEX_MAPPING);
+				){
+
+			if(opexId != -1) {
+				for(int i=startYear; i<= endYear; i++) {
+					Object[] costValues = { opexId, i, 0 };
+					setValues(statement, costValues);
+					statement.executeUpdate();
+				}
+			}
+		} catch(SQLException e){
+			e.printStackTrace();
+		}
+		
+		return true;
+	}
+	
 	public boolean update(OpexData opexData){
 
 		if (opexData.getId() == -1) {
@@ -190,6 +211,24 @@ public class OpexDAO {
 		}
 	}
 
+	public boolean deleteYears(int opexId, int endYear){
+
+		Object[] values = {
+				opexId,
+				endYear
+		};
+		try ( Connection connection = DBManager.getConnection();
+				PreparedStatement statement = prepareStatement(connection, SQL_DELETE_OPEX_MAPPING_YEAR, true, values);
+				){
+
+				statement.executeUpdate();
+		} catch(SQLException e){
+			e.printStackTrace();
+		}
+		
+		return true;
+	}
+	
 	public void delete(int scenarioId){
 
 		Object[] values = { scenarioId };

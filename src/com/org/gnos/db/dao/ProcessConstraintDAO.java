@@ -23,6 +23,7 @@ public class ProcessConstraintDAO {
 	private static final String SQL_INSERT_MAPPING = "insert into process_constraint_year_mapping (process_constraint_id, year, value) values (?, ?, ?)";
 	private static final String SQL_DELETE_BY_ID = "delete from process_constraint_defn where id = ?";
 	private static final String SQL_DELETE_MAPPING_BY_ID = "delete from process_constraint_year_mapping where process_constraint_id = ?";
+	private static final String SQL_DELETE_MAPPING_BY_ID_YEAR = "delete from process_constraint_year_mapping where process_constraint_id = ? and year > ? ";
 	private static final String SQL_DELETE_BY_SCENARIOID = "delete from process_constraint_defn where scenario_id = ?";
 	private static final String SQL_DELETE_MAPPING_BY_SCENARIOID = "delete from process_constraint_year_mapping where process_constraint_id in (select process_constraint_id from process_constraint_defn where scenario_id = ? )";
 	private static final String SQL_UPDATE = "update process_constraint_defn set selector_name = ?, selector_type = ?, coefficient_name = ?, coefficient_type = ?, in_use= ?, is_max = ? where id = ?";
@@ -111,6 +112,26 @@ public class ProcessConstraintDAO {
 		} catch(SQLException e){
 			e.printStackTrace();
 		}
+		return true;
+	}
+	
+	public boolean addYears(int id, int startYear, int endYear){
+
+		try ( Connection connection = DBManager.getConnection();
+				PreparedStatement statement = connection.prepareStatement(SQL_INSERT_MAPPING);
+				){
+
+			if(id != -1) {
+				for(int i=startYear; i<= endYear; i++) {
+					Object[] costValues = { id, i, 0 };
+					setValues(statement, costValues);
+					statement.executeUpdate();
+				}
+			}
+		} catch(SQLException e){
+			e.printStackTrace();
+		}
+		
 		return true;
 	}
 	
@@ -203,6 +224,25 @@ public class ProcessConstraintDAO {
 	        }
 	}
 
+
+	public boolean deleteYears(int id, int endYear){
+
+		Object[] values = {
+				id,
+				endYear
+		};
+		try ( Connection connection = DBManager.getConnection();
+				PreparedStatement statement = prepareStatement(connection, SQL_DELETE_MAPPING_BY_ID_YEAR, true, values);
+				){
+
+				statement.executeUpdate();
+		} catch(SQLException e){
+			e.printStackTrace();
+		}
+		
+		return true;
+	}
+	
 	private ProcessConstraintData map(ResultSet rs, ProcessConstraintData pcd) throws SQLException {
 		
 		if(pcd == null) {

@@ -21,6 +21,7 @@ public class BenchConstraintDAO {
 	private static final String SQL_INSERT = "insert into bench_constraint_defn (scenario_id, pit_name, in_use ) values (?, ?, ?)";
 	private static final String SQL_INSERT_MAPPING = "insert into bench_constraint_year_mapping (bench_constraint_id, year, value) values (?, ?, ?)";
 	private static final String SQL_DELETE_MAPPING = "delete from bench_constraint_year_mapping where bench_constraint_id = ?";
+	private static final String SQL_DELETE_MAPPING_BY_ID_YEAR = "delete from bench_constraint_year_mapping where bench_constraint_id = ? and year > ? ";
 	private static final String SQL_DELETE = "delete from bench_constraint_defn where id = ?";
 	private static final String SQL_DELETE_MAPPING_BY_SCENARIONID = "delete from bench_constraint_year_mapping where bench_constraint_id in ( select id from bench_constraint_defn where scenario_id = ? )";
 	private static final String SQL_DELETE_BY_SCENARIONID = "delete from bench_constraint_defn where scenario_id = ?";
@@ -110,6 +111,26 @@ public class BenchConstraintDAO {
 		return true;
 	}
 	
+	public boolean addYears(int id, int startYear, int endYear){
+
+		try ( Connection connection = DBManager.getConnection();
+				PreparedStatement statement = connection.prepareStatement(SQL_INSERT_MAPPING);
+				){
+
+			if(id != -1) {
+				for(int i=startYear; i<= endYear; i++) {
+					Object[] costValues = { id, i, 0 };
+					setValues(statement, costValues);
+					statement.executeUpdate();
+				}
+			}
+		} catch(SQLException e){
+			e.printStackTrace();
+		}
+		
+		return true;
+	}
+	
 	
 	public boolean update(PitBenchConstraintData pcd){
 		
@@ -180,6 +201,24 @@ public class BenchConstraintDAO {
 	        }
 	}
 	
+
+	public boolean deleteYears(int id, int endYear){
+
+		Object[] values = {
+				id,
+				endYear
+		};
+		try ( Connection connection = DBManager.getConnection();
+				PreparedStatement statement = prepareStatement(connection, SQL_DELETE_MAPPING_BY_ID_YEAR, true, values);
+				){
+
+				statement.executeUpdate();
+		} catch(SQLException e){
+			e.printStackTrace();
+		}
+		
+		return true;
+	}
 	
 	public void delete(int scenarioId){
 		

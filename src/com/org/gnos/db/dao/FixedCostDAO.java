@@ -22,6 +22,7 @@ public class FixedCostDAO {
 	private static final String SQL_LIST_ORDER_BY_ID = "select cost_head, year, value from fixedcost_year_mapping where scenario_id = ? order by cost_head asc";
 	private static final String SQL_INSERT = "insert into fixedcost_year_mapping (scenario_id, cost_head, year, value) values (?, ?, ?, ?)";
 	private static final String SQL_DELETE = "delete from fixedcost_year_mapping where scenario_id = ?";
+	private static final String SQL_DELETE_YEAR = "delete from fixedcost_year_mapping where scenario_id = ? and year > ?";
 	private static final String SQL_UPDATE = "update fixedcost_year_mapping set value = ? where scenario_id = ? and cost_head = ? and year = ? ";
 	
 	public List<FixedOpexCost> getAll(int scenarioId) {
@@ -80,6 +81,28 @@ public class FixedCostDAO {
 		return true;
 	}
 
+	public boolean addYears(FixedOpexCost fixedOpexCost, int scenarioId, int startYear, int endYear){
+
+		try ( Connection connection = DBManager.getConnection();
+				PreparedStatement statement = connection.prepareStatement(SQL_INSERT);
+				){
+				for(int i=startYear; i<= endYear; i++) {
+					Object[] values = {
+							scenarioId,
+							fixedOpexCost.getCostHead(),
+							i,
+							0
+					};
+					setValues(statement, values);
+					statement.executeUpdate();
+				}
+			
+		} catch(SQLException e){
+			e.printStackTrace();
+		}
+		
+		return true;
+	}
 
 	public boolean update(FixedOpexCost fixedOpexCost, int scenarioId){
 
@@ -121,6 +144,24 @@ public class FixedCostDAO {
 		}
 	}
 
+	public boolean deleteYears(int scenarioId, int endYear){
+
+		Object[] values = {
+				scenarioId,
+				endYear
+		};
+		try ( Connection connection = DBManager.getConnection();
+				PreparedStatement statement = prepareStatement(connection, SQL_DELETE_YEAR, true, values);
+				){
+
+				statement.executeUpdate();
+		} catch(SQLException e){
+			e.printStackTrace();
+		}
+		
+		return true;
+	}
+	
 	private FixedOpexCost map(ResultSet rs, FixedOpexCost fixedOpexCost) throws SQLException {
 		if (fixedOpexCost == null) {
 			fixedOpexCost = new FixedOpexCost();
