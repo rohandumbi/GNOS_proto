@@ -102,7 +102,6 @@ public class ExecutionContext {
 	private List<ProcessJoin> processJoinList;
 	private List<ProductJoin> productJoinList;
 	private List<Product> productList;
-	private List<Grade> gradeList;
 	private List<CycleTimeFieldMapping> cycleTimeFieldMappings;
 	private List<TruckParameterCycleTime> truckParameterCycleTimeList;
 	private BigDecimal fixedTime;
@@ -232,9 +231,6 @@ public class ExecutionContext {
 		productList = new ProductDAO().getAll(projectId);
 	}
 
-	private void loadGrades() {
-		
-	}
 	private void loadProcessJoins() {
 		processJoinList = new ProcessJoinDAO().getAll(projectId);
 	}

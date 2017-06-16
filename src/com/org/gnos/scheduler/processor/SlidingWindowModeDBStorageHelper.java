@@ -79,7 +79,8 @@ public class SlidingWindowModeDBStorageHelper extends DBStorageHelper {
 					}
 					ips.setInt(index++, record.getTimePeriod());
 					if(record.getOriginType() == Record.ORIGIN_PIT) {
-						Block b = context.getBlocks().get(record.getBlockNo());
+						System.out.println("Block No"+record.getBlockNo());
+						Block b = context.getBlockByNumber(record.getBlockNo());
 						double tonnesWt = Double.valueOf(b.getField(context.getTonnesWtFieldName()));
 						double quantityMined = context.getUnScaledValue(record.getValue());
 						double ratio = quantityMined/tonnesWt;

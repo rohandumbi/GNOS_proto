@@ -258,7 +258,7 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 			Set<Integer> blockNos = blockTonnage.keySet();
 			Set<String> gradeExprs = new HashSet<String>();
 			for(int blockNo: blockNos){
-				Block b = getBlocks().get(blockNo);
+				Block b = getBlockByNumber(blockNo);
 				int payload = getBlockPayloadMapping().get(b.getId());
 				spb.setPayload(payload);
 				double blockTonnesWt = blockTonnage.get(blockNo);
