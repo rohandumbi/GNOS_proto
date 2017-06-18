@@ -53,8 +53,8 @@ public class ScenarioController {
 	
 	public Scenario update(JsonObject jsonObject, String id) throws Exception {		
 		String name = jsonObject.get("name").getAsString();
-		int startYear = jsonObject.get("start_year").getAsInt();
-		int timePeriod = jsonObject.get("time_period").getAsInt();
+		int startYear = jsonObject.get("startYear").getAsInt();
+		int timePeriod = jsonObject.get("timePeriod").getAsInt();
 		float discount = jsonObject.get("discount").getAsFloat();
 		
 		Scenario obj = dao.get(Integer.parseInt(id));

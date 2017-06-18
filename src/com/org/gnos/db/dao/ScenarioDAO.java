@@ -19,7 +19,7 @@ public class ScenarioDAO {
 	private static final String SQL_LIST_ORDER_BY_ID = "select id, name, project_id, start_year, time_period, discount from  scenario where project_id = ? order by id";
 	private static final String SQL_INSERT = "insert into scenario (project_id, name, start_year, time_period, discount) values (?, ?, ?, ?, ?)";
 	private static final String SQL_DELETE = "delete from scenario where id = ?";
-	private static final String SQL_UPDATE = "update scenario set start_year = ?, time_period = ?, discount = ? where id = ?";
+	private static final String SQL_UPDATE = "update scenario set name = ?, start_year = ?, time_period = ?, discount = ? where id = ?";
 
 	public List<Scenario> getAll(int projectId) {
 
