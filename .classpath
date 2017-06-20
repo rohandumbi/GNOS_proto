@@ -21,5 +21,6 @@
 	<classpathentry kind="lib" path="lib/slf4j-jdk14-1.7.17.jar"/>
 	<classpathentry kind="lib" path="lib/spark-core-2.3.jar"/>
 	<classpathentry kind="lib" path="lib/gson-2.4.jar"/>
+	<classpathentry kind="lib" path="lib/jna.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
