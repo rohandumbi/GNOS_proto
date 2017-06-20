@@ -5,29 +5,29 @@
 
 package com.org.gnos.licensing;
 
-import com.sun.jna.Native;
 import java.io.DataInputStream;
 //import java.lang.annotation.*;
 import java.util.HashMap;
 
 import com.sun.jna.Library;
+import com.sun.jna.Native;
 import com.sun.jna.Platform;
 
 public class Keylok {
 
     // UNIQUE TO DEVICE DATA: The below codes are for the demonstration device only.
     // Unique codes will be assigned to your company when you purchase devices.
-    static final int ValidateCode1 = 0X488B; // Codes used as part of active algorithm to
-    static final int ValidateCode2 = 0XFEE2; // check for installation of proper device
-    static final int ValidateCode3 = 0XEF90;
-    static final int ClientIDCode1 = 0XD882;
-    static final int ClientIDCode2 = 0X5E01;
-    static final int ReadCode1     = 0X1772; // Codes used to authorize read operations
-    static final int ReadCode2     = 0XC4E6;
-    static final int ReadCode3     = 0XBCF8;
-    static final int WriteCode1    = 0X30A0; // Codes used to authorize write operations
-    static final int WriteCode2    = 0X3C89;
-    static final int WriteCode3    = 0X0A2B;
+    static final int ValidateCode1 = 0X619A; // Codes used as part of active algorithm to   
+    static final int ValidateCode2 = 0XE852; // check for installation of proper device 
+    static final int ValidateCode3 = 0X98C2;                                             
+    static final int ClientIDCode1 = 0X6894;                                            
+    static final int ClientIDCode2 = 0X4F28;                                            
+    static final int ReadCode1     = 0X65B;  // Codes used to authorize read operations  
+    static final int ReadCode2     = 0X74F0;                                            
+    static final int ReadCode3     = 0XEE8F;                                             
+    static final int WriteCode1    = 0X80B6;  // Codes used to authorize write operations
+    static final int WriteCode2    = 0X2DA0;                                            
+    static final int WriteCode3    = 0X585C;     
 
     
     // COMMAND CODES for KFUNC operations:

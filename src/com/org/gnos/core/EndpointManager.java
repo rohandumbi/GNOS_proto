@@ -36,6 +36,8 @@ import static spark.Spark.halt;
 
 public class EndpointManager {
 
+	public static final boolean DEV_MODE = false;
+	
 	public static void start() {
 		new ProjectEndpoint();
 		new FieldEndpoint();
@@ -70,6 +72,7 @@ public class EndpointManager {
 		new ReportEndpoint();
 		
 		before((request, response) -> {
+			if(DEV_MODE) return;
 		    try {
 		    	boolean isValid = GNOSLicense.isValid();
 		    	if(!isValid) {
