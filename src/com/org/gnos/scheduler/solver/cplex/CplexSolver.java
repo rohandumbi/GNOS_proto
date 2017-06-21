@@ -100,13 +100,13 @@ public class CplexSolver implements ISolver {
 
 				switch (constraint.getType()) {
 				case Constraint.GREATER_EQUAL:
-					cplex.addGe(constraint_expr, constraint.getValue().doubleValue());
+					cplex.addGe(constraint_expr, formatDecimalValue(constraint.getValue()).doubleValue());
 					break;
 				case Constraint.LESS_EQUAL:
-					cplex.addLe(constraint_expr, constraint.getValue().doubleValue());
+					cplex.addLe(constraint_expr, formatDecimalValue(constraint.getValue()).doubleValue());
 					break;
 				case Constraint.EQUAL:
-					cplex.addEq(constraint_expr, constraint.getValue().doubleValue());
+					cplex.addEq(constraint_expr, formatDecimalValue(constraint.getValue()).doubleValue());
 					break;
 
 				}
