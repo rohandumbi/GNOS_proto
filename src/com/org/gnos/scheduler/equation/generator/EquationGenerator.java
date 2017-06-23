@@ -73,9 +73,12 @@ public abstract class EquationGenerator {
 		 return processes;
 	}
 	
-	protected String formatDecimalValue(BigDecimal bd) {
+	protected BigDecimal formatDecimalValue(BigDecimal bd) {
+		if(bd == null){
+			return new BigDecimal(0);
+		}
 		BigDecimal a =  bd.setScale(DECIMAL_POINT , BigDecimal.ROUND_HALF_EVEN);
-		return a.stripTrailingZeros().toString();
+		return a;
 	}
 
 

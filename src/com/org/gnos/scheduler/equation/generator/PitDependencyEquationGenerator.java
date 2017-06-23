@@ -161,16 +161,17 @@ public class PitDependencyEquationGenerator extends EquationGenerator{
 	}
 	
 	private BigDecimal getBenchTonnesWt(Bench bench){
-		Double tonnesWt = 0.0;
+		BigDecimal tonnesWt = new BigDecimal(0);
 		for(Block block:bench.getBlocks()){
 			try{
-				tonnesWt += context.getTonnesWtForBlock(block);
+				BigDecimal blockTonnesWt = new BigDecimal(context.getTonnesWtForBlock(block));
+				blockTonnesWt = context.getScaledValue(blockTonnesWt);
+				blockTonnesWt = formatDecimalValue(blockTonnesWt);
+				tonnesWt = tonnesWt.add(blockTonnesWt);
 			} catch(NumberFormatException nfe){
 				System.err.println("Could not parse to float :"+nfe.getMessage());
-			}
-			
-		}
-		
-		return context.getScaledValue(new BigDecimal(tonnesWt));
+			}			
+		}	
+		return tonnesWt;
 	}
 }

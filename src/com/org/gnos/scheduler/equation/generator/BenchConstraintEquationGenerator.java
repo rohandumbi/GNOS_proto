@@ -161,14 +161,17 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 		BigDecimal tonnesWt = new BigDecimal(0);
 		for(Block block:bench.getBlocks()){
 			try{
-				tonnesWt = tonnesWt.add(new BigDecimal(context.getTonnesWtForBlock(block)));
+				BigDecimal blockTonnesWt = new BigDecimal(context.getTonnesWtForBlock(block));
+				blockTonnesWt = context.getScaledValue(blockTonnesWt);
+				blockTonnesWt = formatDecimalValue(blockTonnesWt);
+				tonnesWt = tonnesWt.add(blockTonnesWt);
 			} catch(NumberFormatException nfe){
 				System.err.println("Could not parse to float :"+nfe.getMessage());
 			}
 			
 		}
 		
-		return context.getScaledValue(tonnesWt);
+		return tonnesWt;
 	}
 	
 /*	@Override
