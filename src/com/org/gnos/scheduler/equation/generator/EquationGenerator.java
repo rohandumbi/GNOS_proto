@@ -77,7 +77,7 @@ public abstract class EquationGenerator {
 		if(bd == null){
 			return new BigDecimal(0);
 		}
-		BigDecimal a =  bd.setScale(DECIMAL_POINT , BigDecimal.ROUND_HALF_EVEN);
+		BigDecimal a =  bd.setScale(DECIMAL_POINT , BigDecimal.ROUND_FLOOR);
 		return a;
 	}
 
