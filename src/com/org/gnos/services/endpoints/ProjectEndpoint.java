@@ -24,6 +24,22 @@ public class ProjectEndpoint {
 		controller = new ProjectController();	
 		/* GET all projects */
 		get("/projects", (req, res) -> controller.getAll(), json());
+		
+		get("/projects/:id/export", new Route() {
+			
+			@Override
+			public Object handle(Request req, Response res) throws Exception {
+					try {
+						res.type("application/octet-stream");
+						res.header("Content-Disposition", "attachment; filename=\"project.data\"");
+						return controller.export(req.params(":id"));
+					} catch (Exception e) {
+						res.status(400);
+						return new ResponseError("Could not fetch report data. "+e.getMessage());
+					}					
+			}
+		});
+		
 		/* Create new project */
 		post("/projects", new Route() {
 			

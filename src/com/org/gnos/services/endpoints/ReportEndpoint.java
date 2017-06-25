@@ -27,6 +27,7 @@ public class ReportEndpoint {
 				public Object handle(Request req, Response res) throws Exception {
 						try {
 							res.type("text/csv");
+							res.header("Content-Disposition", "attachment; filename=\"report.csv\"");
 							return controller.getReportCSV(req.params(":id"), req.params(":sid"));
 						} catch (Exception e) {
 							res.status(400);

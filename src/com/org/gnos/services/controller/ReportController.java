@@ -52,8 +52,8 @@ public class ReportController {
 			int columnCount = md.getColumnCount();
 			for (int i = 1; i <= columnCount; i++) {
 				output.append(md.getColumnName(i));
-				if(i == columnCount -1) {
-					output.append("\n\r");
+				if(i == columnCount) {
+					output.append("\n");
 				} else {
 					output.append(",");
 				}
@@ -61,8 +61,8 @@ public class ReportController {
 			while(resultSet.next()) {
 				for (int i = 1; i <= columnCount; i++) {
 					output.append(resultSet.getString(i));
-					if(i == columnCount -1) {
-						output.append("\n\r");
+					if(i == columnCount) {
+						output.append("\n");
 					} else {
 						output.append(",");
 					}
