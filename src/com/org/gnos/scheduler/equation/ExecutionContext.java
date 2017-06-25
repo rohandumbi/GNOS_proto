@@ -753,6 +753,7 @@ public class ExecutionContext {
 	
 	public BigDecimal getProductValueForBlock(Block b, Product product) {
 		BigDecimal value =  new BigDecimal(0);
+		if(product == null) return value;
 		for(Integer eid : product.getExpressionIdList()){
 			value = value.add(getUnitValueforBlock(b, eid, Product.UNIT_EXPRESSION));
 		}

@@ -71,12 +71,12 @@ public class TestApplication {
 		short window = 2;
 		short stepsize = 1;
 		RunConfig runconfig = new RunConfig();
-		runconfig.setMode(RunConfig.SLIDING_WINDOW_MODE);
+		runconfig.setMode(RunConfig.GLOBAL_MODE);
 		runconfig.setPeriod(period);
 		runconfig.setWindow(window);
 		runconfig.setStepSize(stepsize);
-		runconfig.setProjectId(3);
-		runconfig.setScenarioId(4);
+		runconfig.setProjectId(2);
+		runconfig.setScenarioId(3);
 		SchedulerService service = new SchedulerService();
 		service.setRunconfig(runconfig);
 		service.execute();

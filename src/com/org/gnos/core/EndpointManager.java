@@ -1,5 +1,8 @@
 package com.org.gnos.core;
 
+import static spark.Spark.before;
+import static spark.Spark.halt;
+
 import com.org.gnos.licensing.GNOSLicense;
 import com.org.gnos.services.endpoints.BenchConstraintEndpoint;
 import com.org.gnos.services.endpoints.CapexEndpoint;
@@ -25,14 +28,12 @@ import com.org.gnos.services.endpoints.ProductJoinEndpoint;
 import com.org.gnos.services.endpoints.ProjectEndpoint;
 import com.org.gnos.services.endpoints.ReportEndpoint;
 import com.org.gnos.services.endpoints.RequiredFieldEndpoint;
+import com.org.gnos.services.endpoints.ReserveEndpoint;
 import com.org.gnos.services.endpoints.ScenarioEndpoint;
 import com.org.gnos.services.endpoints.SchedulerEndpoint;
 import com.org.gnos.services.endpoints.StockpileEndpoint;
 import com.org.gnos.services.endpoints.TruckParameterCycleTimeEndpoint;
 import com.org.gnos.services.endpoints.TruckParameterPayloadEndpoint;
-
-import static spark.Spark.before;
-import static spark.Spark.halt;
 
 public class EndpointManager {
 
@@ -70,6 +71,7 @@ public class EndpointManager {
 		new RequiredFieldEndpoint();
 		new TruckParameterPayloadEndpoint();
 		new ReportEndpoint();
+		new ReserveEndpoint();
 		
 		before((request, response) -> {
 			if(DEV_MODE) return;
