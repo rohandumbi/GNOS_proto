@@ -699,7 +699,9 @@ public class ExecutionContext {
 	}
 
 	public double getTonnesWtForBlock(Block b) {
-		return Double.valueOf(b.getField(tonnesWtFieldName));
+		BigDecimal bd = new BigDecimal(b.getField(tonnesWtFieldName));
+		bd = bd.setScale(3, BigDecimal.ROUND_HALF_EVEN);
+		return bd.doubleValue();
 	}
 	
 	public BigDecimal getUnitValueforBlock(Block b, int unitId, short unitType) {

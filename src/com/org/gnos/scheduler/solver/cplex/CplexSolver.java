@@ -1,13 +1,16 @@
 package com.org.gnos.scheduler.solver.cplex;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.org.gnos.core.GNOSConfig;
+import com.org.gnos.core.LogManager;
 import com.org.gnos.scheduler.equation.Constraint;
 import com.org.gnos.scheduler.equation.ExecutionContext;
 import com.org.gnos.scheduler.processor.FileStorageHelper;
@@ -28,7 +31,8 @@ public class CplexSolver implements ISolver {
 	protected Map<String, IloNumVar> processVariables;
 	protected IloNumVar[][][][] spVariables;
 	protected IloNumVar[][][][] wasteVariables;
-
+	
+	private SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");  
 	private static int DECIMAL_POINT = 6;
 	
 	static {
@@ -40,7 +44,9 @@ public class CplexSolver implements ISolver {
 	}
 	
 	public void solve(String fileName, int timePeiod) {
-
+		long startTime = 0;
+		long endTime = 0;
+		double npv = 0;
 		try {
 			IloCplex cplex = new IloCplex();
 			cplex.tuneParam();
@@ -116,8 +122,10 @@ public class CplexSolver implements ISolver {
 			cplex.exportModel(fileName);
 
 			// solve
-
+			startTime = System.currentTimeMillis();
 			if (cplex.solve()) {
+				endTime = System.currentTimeMillis();
+				npv = cplex.getObjValue();
 				System.out.println("Obj = " + cplex.getObjValue());
 				cplex.writeSolution("temp_" + timePeiod + ".sol");
 				List<Record> records = new ArrayList<Record>();
@@ -136,7 +144,7 @@ public class CplexSolver implements ISolver {
 			else {
 				System.out.println("Model not solved");
 			}
-
+			LogManager.logSchedule("Start Time :"+formatter.format(new Date(startTime))+", End Time : "+formatter.format(new Date(endTime))+", NPV : "+npv );
 			cplex.end();
 		} catch (IloException exc) {
 			exc.printStackTrace();
@@ -167,7 +175,7 @@ public class CplexSolver implements ISolver {
 
 			if (wpos != -1) {
 				// it's a waste variable
-				System.out.println("w: " + x);
+				//System.out.println("w: " + x);
 				block = x.substring(xpos + 1, wpos);
 				pit = x.substring(1, xpos);
 				process = x.substring(wpos + 1, tpos);
@@ -180,7 +188,7 @@ public class CplexSolver implements ISolver {
 				rec.setTimePeriod(period);
 			} else if (spos > 1) {
 				// it's a stockpile variable
-				System.out.println("sp: " + x);
+				//System.out.println("sp: " + x);
 				block = x.substring(xpos + 1, spos);
 				pit = x.substring(1, xpos);
 				process = x.substring(spos + 1, tpos);
@@ -193,7 +201,7 @@ public class CplexSolver implements ISolver {
 				rec.setTimePeriod(period);
 			} else if (rcpos == 0) {
 				// it's a reclaim variable for global mode
-				System.out.println("rc: " + x);
+				//System.out.println("rc: " + x);
 				// int prpos=x.indexOf("p", 2); //look for 2nd "p", first p is
 				// at 1.
 				block = x.substring(xpos + 1, prpos);
@@ -220,7 +228,7 @@ public class CplexSolver implements ISolver {
 				// it's a process variable - non waste and non stockpile
 				// int prpos=x.indexOf("p", 2); //look for 2nd "p", first p is
 				// at 0.
-				System.out.println("process: " + x);
+				//System.out.println("process: " + x);
 				block = x.substring(xpos + 1, prpos);
 				pit = x.substring(1, xpos);
 				process = x.substring(prpos + 1, tpos);

@@ -7,6 +7,7 @@ public class Application {
 	
 	public static void start() {
 		GNOSConfig.load();
+		LogManager.initialize();
 		DBManager.initializePool();
 		EndpointManager.start();
 	}

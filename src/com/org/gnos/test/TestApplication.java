@@ -3,6 +3,7 @@ package com.org.gnos.test;
 import java.util.List;
 
 import com.org.gnos.core.GNOSConfig;
+import com.org.gnos.core.LogManager;
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.dao.ExpressionDAO;
 import com.org.gnos.db.dao.ProjectDAO;
@@ -66,7 +67,9 @@ public class TestApplication {
 		//new TestApplication().reloadData(1);
 
 		GNOSConfig.load();
+		LogManager.initialize();
 		DBManager.initializePool();
+		LogManager.log("This is test");
 		short period = 3;
 		short window = 2;
 		short stepsize = 1;

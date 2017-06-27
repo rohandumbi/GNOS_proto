@@ -101,4 +101,12 @@ public class RunConfig {
 		this.stepSize = stepSize;
 	}
 
+	@Override
+	public String toString() {
+		return "RunConfig [mode=" + mode + ", projectId=" + projectId
+				+ ", scenarioId=" + scenarioId + ", isReclaim=" + isReclaim + ", period=" + period + ", window="
+				+ window + ", stepSize=" + stepSize + "]";
+	}
+
+	
 }
