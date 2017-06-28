@@ -142,7 +142,7 @@ public class CplexSolver implements ISolver {
 				helper.store(records);
 			} // if solve
 			else {
-				System.out.println("Model not solved");
+				LogManager.log("Model not solved");
 			}
 			LogManager.logSchedule("Start Time :"+formatter.format(new Date(startTime))+", End Time : "+formatter.format(new Date(endTime))+", NPV : "+npv );
 			cplex.end();
