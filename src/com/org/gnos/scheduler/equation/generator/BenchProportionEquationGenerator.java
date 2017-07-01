@@ -87,9 +87,4 @@ public class BenchProportionEquationGenerator extends EquationGenerator{
 			}
 		}
 	}
-	
-	@Override
-	protected String formatDecimalValue(BigDecimal bd) {
-		return bd.stripTrailingZeros().toString();
-	}
 }

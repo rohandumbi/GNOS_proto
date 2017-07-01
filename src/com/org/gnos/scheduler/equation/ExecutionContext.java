@@ -699,7 +699,9 @@ public class ExecutionContext {
 	}
 
 	public double getTonnesWtForBlock(Block b) {
-		return Double.valueOf(b.getField(tonnesWtFieldName));
+		BigDecimal bd = new BigDecimal(b.getField(tonnesWtFieldName));
+		bd = bd.setScale(3, BigDecimal.ROUND_HALF_EVEN);
+		return bd.doubleValue();
 	}
 	
 	public BigDecimal getUnitValueforBlock(Block b, int unitId, short unitType) {
@@ -707,7 +709,7 @@ public class ExecutionContext {
 			Field field = getFieldById(unitId);
 			try {
 				double value = Double.valueOf(b.getField(field.getName()));
-				double tonnesWtvalue = Double.valueOf(b.getField(tonnesWtFieldName));
+				double tonnesWtvalue = getTonnesWtForBlock(b);
 				if(tonnesWtvalue == 0) return new BigDecimal(0);
 				return new BigDecimal(value/tonnesWtvalue);
 			} catch(Exception e) {
@@ -727,7 +729,7 @@ public class ExecutionContext {
 		if(unitType == 1) { // 1- Field, 2 - Expression
 			try {
 				BigDecimal value = new BigDecimal(b.getField(unitName));
-				BigDecimal tonnesWtvalue = new BigDecimal(b.getField(tonnesWtFieldName));
+				BigDecimal tonnesWtvalue = new BigDecimal(getTonnesWtForBlock(b));
 				if(tonnesWtvalue.doubleValue() == 0) return new BigDecimal(0);
 				return value.divide(tonnesWtvalue);
 			} catch(Exception e) {
@@ -1083,9 +1085,9 @@ public class ExecutionContext {
 		return pitFieldName;
 	}
 
-	public String getTonnesWtFieldName() {
+/*	public String getTonnesWtFieldName() {
 		return tonnesWtFieldName;
-	}
+	}*/
 
 	public int getProjectId() {
 		return projectId;

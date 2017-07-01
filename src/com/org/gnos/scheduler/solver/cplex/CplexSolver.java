@@ -167,7 +167,7 @@ public class CplexSolver implements ISolver {
 
 			if (wpos != -1) {
 				// it's a waste variable
-				System.out.println("w: " + x);
+				//System.out.println("w: " + x);
 				block = x.substring(xpos + 1, wpos);
 				pit = x.substring(1, xpos);
 				process = x.substring(wpos + 1, tpos);
@@ -180,7 +180,7 @@ public class CplexSolver implements ISolver {
 				rec.setTimePeriod(period);
 			} else if (spos > 1) {
 				// it's a stockpile variable
-				System.out.println("sp: " + x);
+				//System.out.println("sp: " + x);
 				block = x.substring(xpos + 1, spos);
 				pit = x.substring(1, xpos);
 				process = x.substring(spos + 1, tpos);
@@ -193,7 +193,7 @@ public class CplexSolver implements ISolver {
 				rec.setTimePeriod(period);
 			} else if (rcpos == 0) {
 				// it's a reclaim variable for global mode
-				System.out.println("rc: " + x);
+				//System.out.println("rc: " + x);
 				// int prpos=x.indexOf("p", 2); //look for 2nd "p", first p is
 				// at 1.
 				block = x.substring(xpos + 1, prpos);
@@ -220,7 +220,7 @@ public class CplexSolver implements ISolver {
 				// it's a process variable - non waste and non stockpile
 				// int prpos=x.indexOf("p", 2); //look for 2nd "p", first p is
 				// at 0.
-				System.out.println("process: " + x);
+				//System.out.println("process: " + x);
 				block = x.substring(xpos + 1, prpos);
 				pit = x.substring(1, xpos);
 				process = x.substring(prpos + 1, tpos);
