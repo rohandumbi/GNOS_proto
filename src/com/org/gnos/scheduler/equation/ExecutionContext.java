@@ -1,5 +1,8 @@
 package com.org.gnos.scheduler.equation;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -1120,5 +1123,23 @@ public class ExecutionContext {
 	
 	public double getUnScaledValue(double val) {
 		return val*scale.intValue();
+	}
+	
+
+	public void writeCSV() {
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter("C:/blocktonnage.csv"));
+
+			Set<Integer> ids = blocks.keySet();
+			for(Integer id: ids) {
+				Block b = blocks.get(id);
+				bw.write(id+","+b.getField(tonnesWtFieldName)+","+getTonnesWtForBlock(b)+"\n");
+			}
+			bw.flush();
+			bw.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

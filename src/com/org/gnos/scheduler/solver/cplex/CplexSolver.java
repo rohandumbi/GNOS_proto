@@ -44,6 +44,7 @@ public class CplexSolver implements ISolver {
 	}
 	
 	public void solve(String fileName, int timePeiod) {
+		context.writeCSV();
 		long startTime = 0;
 		long endTime = 0;
 		double npv = 0;
@@ -126,7 +127,7 @@ public class CplexSolver implements ISolver {
 			if (cplex.solve()) {
 				endTime = System.currentTimeMillis();
 				npv = cplex.getObjValue();
-				System.out.println("Obj = " + cplex.getObjValue());
+				System.out.println("Obj = " + npv);
 				cplex.writeSolution("temp_" + timePeiod + ".sol");
 				List<Record> records = new ArrayList<Record>();
 				for (int i = 0; i < _vars.size(); i++) {
@@ -245,6 +246,7 @@ public class CplexSolver implements ISolver {
 		return rec;
 	}
 
+	
 	protected BigDecimal formatDecimalValue(BigDecimal bd) {
 		if(bd == null){
 			return new BigDecimal(0);
