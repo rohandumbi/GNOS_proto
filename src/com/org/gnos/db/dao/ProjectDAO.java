@@ -20,12 +20,35 @@ import com.org.gnos.db.model.Project;
 
 public class ProjectDAO {
 
+	private static final String SQL_GET_BY_ID = "select  id, name, description, created_date, modified_date, file_name from  project left join project_data_files on project_id = id where id = ? ";
 	private static final String SQL_LIST_ORDER_BY_MODIFIED_DATE = "select id, name, description, created_date, modified_date, file_name from  project left join project_data_files on project_id = id order by modified_date";
 	private static final String SQL_INSERT = "insert into project (name, description, created_date, modified_date) values (?, ?, ?, ?)";
 	private static final String SQL_INSERT_DATA_FILE = "insert into project_data_files (project_id, file_name) values (?, ?)";
 	private static final String SQL_DELETE = "delete from project where id = ?";
 	private static final String SQL_DELETE_DATA_FILE = "delete from project_data_files where project_id = ?";
 	private static final String SQL_UPDATE = "update project set description = ?, modified_date = ? where id = ?";
+	
+	public Project get(int id) {
+		
+		Project project = null;
+		Object[] values = { id };
+		try (
+	            Connection connection = DBManager.getConnection();
+	            PreparedStatement statement =  prepareStatement(connection, SQL_GET_BY_ID, false, values);
+	            ResultSet resultSet = statement.executeQuery();
+	        ){
+			while(resultSet.next()){
+
+				project = map(resultSet, project);
+					
+			}
+			
+		} catch(SQLException e){
+			e.printStackTrace();
+		}
+		
+		return project;
+	}
 	
 	public List<Project> getAll() {
 		

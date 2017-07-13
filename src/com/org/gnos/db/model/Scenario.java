@@ -38,6 +38,9 @@ public class Scenario {
 	public void setTimePeriod(int timePeriod) {
 		this.timePeriod = timePeriod;
 	}
-	
+	@Override
+	public String toString() {
+		return name + "|" + discount + "|" + startYear + "|" + timePeriod;
+	}
 	
 }

@@ -63,4 +63,15 @@ public class Project {
 			this.files.add(fileName);
 		}
 	}
+
+	@Override
+	public String toString() {
+		String str = name + "|" + desc + "|" + createdDate + "|" + modifiedDate + "|";
+		for(String fileName: files) {
+			str += fileName +"|";
+		}
+		return str;
+	}
+	
+	
 }
