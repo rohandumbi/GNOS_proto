@@ -5,6 +5,7 @@ import static com.org.gnos.db.dao.util.DAOUtil.prepareStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,8 +16,10 @@ import com.google.gson.JsonObject;
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.dao.ExpressionDAO;
 import com.org.gnos.db.dao.FieldDAO;
+import com.org.gnos.db.dao.ScenarioDAO;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Field;
+import com.org.gnos.db.model.Scenario;
 
 
 public class ReportController {
@@ -34,6 +37,43 @@ public class ReportController {
 	public final static short DATA_PRODUCT_JOIN 	= 4;
 	public final static short DATA_TOTAL_TH 		= 5;
 	public final static short DATA_GRADE 			= 6;
+	
+	public String getReportCSV(String projectId, String scenarioId) {
+		StringBuilder output = new StringBuilder("");
+		Scenario scenario = new ScenarioDAO().get(Integer.parseInt(scenarioId));
+		String sql = "select * from gnos_report_"+projectId +" where scenario_name = ? ";
+		Object[] values = { scenario.getName() };
+		try (
+				Connection connection = DBManager.getConnection();
+				PreparedStatement statement = prepareStatement(connection, sql, false, values);
+				ResultSet resultSet = statement.executeQuery();				
+			){
+			ResultSetMetaData md = resultSet.getMetaData();
+			int columnCount = md.getColumnCount();
+			for (int i = 1; i <= columnCount; i++) {
+				output.append(md.getColumnName(i));
+				if(i == columnCount) {
+					output.append("\n");
+				} else {
+					output.append(",");
+				}
+			}
+			while(resultSet.next()) {
+				for (int i = 1; i <= columnCount; i++) {
+					output.append(resultSet.getString(i));
+					if(i == columnCount) {
+						output.append("\n");
+					} else {
+						output.append(",");
+					}
+				}
+			}
+		} catch (SQLException e) {
+				e.printStackTrace();
+		}
+				
+		return output.toString();
+	}
 	
 	public Map<Integer, ? > getReport(JsonObject jsonObject, String projectIdStr)  {
 		String scenarioName = jsonObject.get("scenario_name").getAsString();

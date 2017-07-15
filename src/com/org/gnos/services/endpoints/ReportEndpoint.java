@@ -1,6 +1,7 @@
 package com.org.gnos.services.endpoints;
 
 import static com.org.gnos.services.JsonUtil.json;
+import static spark.Spark.get;
 import static spark.Spark.post;
 
 import com.google.gson.JsonElement;
@@ -20,6 +21,21 @@ public class ReportEndpoint {
 		public ReportEndpoint() {
 			controller = new ReportController();
 
+			get("/project/:id/scenario/:sid/report/csv", new Route() {
+				
+				@Override
+				public Object handle(Request req, Response res) throws Exception {
+						try {
+							res.type("text/csv");
+							res.header("Content-Disposition", "attachment; filename=\"report.csv\"");
+							return controller.getReportCSV(req.params(":id"), req.params(":sid"));
+						} catch (Exception e) {
+							res.status(400);
+							return new ResponseError("Could not fetch report data. "+e.getMessage());
+						}					
+				}
+			});
+			
 			post("/project/:id/report", new Route() {
 				
 				@Override
