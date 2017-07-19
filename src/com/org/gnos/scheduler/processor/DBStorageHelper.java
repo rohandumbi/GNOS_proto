@@ -331,11 +331,13 @@ public class DBStorageHelper implements IStorageHelper {
 	
 	private void createReportTable() throws SQLException {
 		int projectId = context.getProjectId();
-		dropReportTable(projectId);
+		int scenarioId = context.getScenarioId();
 		
-		StringBuffer sbuff_sql = new StringBuffer("insert into gnos_report_"+projectId+" (scenario_name, mode, origin_type, pit_no, sp_no, block_no, destination_type, destination, period, quantity_mined, ratio, total_th ");
+		dropReportTable(projectId, scenarioId);
+		
+		StringBuffer sbuff_sql = new StringBuffer("insert into gnos_report_"+projectId+"_"+scenarioId+" (scenario_name, mode, origin_type, pit_no, sp_no, block_no, destination_type, destination, period, quantity_mined, ratio, total_th ");
 		StringBuffer sbuff = new StringBuffer(" ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ");
-		String  data_sql = "CREATE TABLE gnos_report_"+projectId+" ( " +
+		String  data_sql = "CREATE TABLE gnos_report_"+projectId+"_"+scenarioId+" ( " +
 				"scenario_name VARCHAR(50), " +
 				" mode TINYINT NOT NULL, " +
 				" origin_type TINYINT NOT NULL, " +			
@@ -434,8 +436,8 @@ public class DBStorageHelper implements IStorageHelper {
 		
 	}
 
-	private void dropReportTable(int projectId) throws SQLException {
-		String  data_table_sql = "DROP TABLE IF EXISTS gnos_report_"+projectId+"; ";
+	private void dropReportTable(int projectId, int scenarioId) throws SQLException {
+		String  data_table_sql = "DROP TABLE IF EXISTS gnos_report_"+projectId+"_"+scenarioId+"; ";
 
 		try (
 				Statement stmt = conn.createStatement();

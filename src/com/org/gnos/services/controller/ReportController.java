@@ -41,7 +41,7 @@ public class ReportController {
 	public String getReportCSV(String projectId, String scenarioId) {
 		StringBuilder output = new StringBuilder("");
 		Scenario scenario = new ScenarioDAO().get(Integer.parseInt(scenarioId));
-		String sql = "select * from gnos_report_"+projectId +" where scenario_name = ? ";
+		String sql = "select * from gnos_report_"+projectId +"_"+scenarioId +" where scenario_name = ? ";
 		Object[] values = { scenario.getName() };
 		try (
 				Connection connection = DBManager.getConnection();
@@ -82,7 +82,14 @@ public class ReportController {
 		String dataName = jsonObject.get("data_name") == null ? null :  jsonObject.get("data_name").getAsString().replaceAll("\\s+", "_");
 		String groupBy = jsonObject.get("group_by") == null ? null : jsonObject.get("group_by").getAsString().replaceAll("\\s+", "_");
 		int projectId = Integer.parseInt(projectIdStr);
-		
+		Scenario  scenario = null;
+		List<Scenario> scenarios = new ScenarioDAO().getAll(Integer.parseInt(projectIdStr));
+		for(Scenario s: scenarios) {
+			if(s.getName().equals(scenarioName)){
+				scenario = s;
+				break;
+			}
+		}
 		
 		Map<Integer, ?> reportData = new HashMap<Integer, Double>();
 		
@@ -122,7 +129,7 @@ public class ReportController {
 			reportData = new HashMap<Integer, List<ReportData>>();
 		}
 
-		sqlbuilder.append(" from gnos_report_"+projectId +" where scenario_name = ? ");
+		sqlbuilder.append(" from gnos_report_"+projectId +"_"+scenario.getId()+" where scenario_name = ? ");
 		
 		switch(reportType) {
 			case TYPE_EXPIT: sqlbuilder.append(" AND origin_type = 1 "); break;
@@ -131,7 +138,7 @@ public class ReportController {
 		}
 		
 		sqlbuilder.append(groupByClause);
-
+		System.out.println("Report SQL :"+ sqlbuilder.toString());
 		Object[] values = { scenarioName };
 		try (
 				Connection connection = DBManager.getConnection();

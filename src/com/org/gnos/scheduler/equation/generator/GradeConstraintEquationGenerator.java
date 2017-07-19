@@ -75,6 +75,9 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 					}
 				}
 				Product p = context.getProductFromName(productName);
+				if(p == null) {
+					continue;
+				}
 				Integer processId = p.getModelId();
 				String processName = context.getModelById(processId).getName();
 				List<Object> coefficients = processExprMap.get(processName);
@@ -179,6 +182,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 						String processName = p.getModel().getName();
 						List<Object> coefficients = processExprMap.get(processName);
 						List<Grade> grades = processGradeMap.get(processName);
+						if(grades == null) continue;
 						for(Grade grade: grades){
 							buildGradeConstraintVariables(p.getProcessNo(), coefficients, grade, p.getBlocks(), i, targetGrade, c);
 						}

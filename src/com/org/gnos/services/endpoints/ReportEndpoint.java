@@ -46,8 +46,9 @@ public class ReportEndpoint {
 						try {
 							return controller.getReport(jsonObject, req.params(":id"));
 						} catch (Exception e) {
+							e.printStackTrace();
 							res.status(400);
-							return new ResponseError("Field creation failed. "+e.getMessage());
+							return new ResponseError("Could not fetch report data. "+e.getMessage());
 						}					
 					}
 					res.status(400);				
