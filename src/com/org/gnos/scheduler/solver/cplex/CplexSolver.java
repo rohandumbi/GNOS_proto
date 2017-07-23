@@ -241,7 +241,7 @@ public class CplexSolver implements ISolver {
 		if(bd == null){
 			return new BigDecimal(0);
 		}
-		BigDecimal a =  bd.setScale(DECIMAL_POINT , BigDecimal.ROUND_HALF_EVEN);
+		BigDecimal a =  bd.setScale(DECIMAL_POINT , BigDecimal.ROUND_DOWN);
 		return a;
 	}
 	
