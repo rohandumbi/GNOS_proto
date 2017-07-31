@@ -61,25 +61,34 @@ public class CplexSolver implements ISolver {
 			 */
 
 			Map<String, BigDecimal> variables = context.getVariables();
+			List<String> binaries = context.getBinaries();
+
 			Set<String> keys = variables.keySet();
 			List<IloNumVar> _vars = new ArrayList<IloNumVar>();
 			IloLinearNumExpr expr = cplex.linearNumExpr();
 			Map<String, IloNumVar> numvariablemap = new HashMap<String, IloNumVar>();
-			for (String key : keys) {
-				IloNumVar var = cplex.numVar(0, Double.MAX_VALUE, key);
-				_vars.add(var);
-				numvariablemap.put(key, var);
-				BigDecimal coeff = formatDecimalValue(variables.get(key));
-				expr.addTerm(coeff.doubleValue(), var);
-				cplex.addGe(var, 0);
-			}
-			List<String> binaries = context.getBinaries();
-
+			
 			for (String binary : binaries) {
 				IloNumVar var = cplex.boolVar(binary);
 				numvariablemap.put(binary, var);
-				cplex.addGe(var, 0);
 			}
+			for (String key : keys) {
+				IloNumVar var = null;
+				if(numvariablemap.get(key) != null) {
+					var = numvariablemap.get(key);
+				} else {
+					var = cplex.numVar(0, Double.MAX_VALUE, key);
+					numvariablemap.put(key, var);
+					cplex.addGe(var, 0);
+				}
+				_vars.add(var);			
+				BigDecimal coeff = formatDecimalValue(variables.get(key));
+				expr.addTerm(coeff.doubleValue(), var);
+				
+			}
+			
+
+			
 			cplex.addMaximize(expr);
 
 			List<Constraint> constraints = context.getConstraints();
@@ -89,7 +98,6 @@ public class CplexSolver implements ISolver {
 				List<BigDecimal> coefficients = constraint.getCoefficients();
 				IloLinearNumExpr constraint_expr = cplex.linearNumExpr();
 				for (int i = 0; i < vars.size(); i++) {
-					//IloNumVar var = cplex.numVar(0, Double.MAX_VALUE, vars.get(i));
 					IloNumVar var = numvariablemap.get(vars.get(i));
 					if(var == null) {
 						continue;

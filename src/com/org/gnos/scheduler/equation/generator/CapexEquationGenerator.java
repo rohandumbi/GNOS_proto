@@ -164,7 +164,7 @@ public class CapexEquationGenerator extends EquationGenerator{
 				}
 				for(Block b: blocks){
 					c.addVariable("p"+b.getPitNo()+"x"+b.getBlockNo()+"p"+p.getProcessNo()+"t"+i, context.getUnitValueforBlock(b, unitId, p.getModel().getUnitType()));
-					if(context.isSpReclaimEnabled() && context.isGlobalMode() && timePeriodStart > 1) {
+					if(context.isSpReclaimEnabled() && context.isGlobalMode() && i > timePeriodStart) {
 						int stockpileNo = getStockpileNoForReclaim(b);
 						if(stockpileNo > 0) {
 							c.addVariable("sp"+stockpileNo+"x"+b.getBlockNo()+"p"+p.getProcessNo()+"t"+i, context.getUnitValueforBlock(b, unitId, p.getModel().getUnitType()));
@@ -172,7 +172,7 @@ public class CapexEquationGenerator extends EquationGenerator{
 					}
 					
 				}
-				if(context.isSpReclaimEnabled() && !context.isGlobalMode() && timePeriodStart > 1) {
+				if(context.isSpReclaimEnabled() && !context.isGlobalMode() &&   i > timePeriodStart) {
 					SlidingWindowExecutionContext swctx = (SlidingWindowExecutionContext) context;
 					Map<Integer, SPBlock> spBlockMapping = swctx.getSpBlockMapping();
 					Set<Integer> spNos = spBlockMapping.keySet();			
@@ -227,8 +227,31 @@ public class CapexEquationGenerator extends EquationGenerator{
 				for(Block b: blocks){
 					if(!pitnumberList.contains(b.getPitNo())) continue;
 					c.addVariable("x"+b.getBlockNo()+"p"+p.getProcessNo()+"t"+i, context.getUnitValueforBlock(b, unitId, p.getModel().getUnitType()));
+					if(context.isSpReclaimEnabled() && context.isGlobalMode() &&  i > timePeriodStart) {
+						int stockpileNo = getStockpileNoForReclaim(b);
+						if(stockpileNo > 0) {
+							c.addVariable("sp"+stockpileNo+"x"+b.getBlockNo()+"p"+p.getProcessNo()+"t"+i, context.getUnitValueforBlock(b, unitId, p.getModel().getUnitType()));
+						}					
+					}
+				}
+				if(context.isSpReclaimEnabled() && !context.isGlobalMode() &&  i > timePeriodStart ) {
+					SlidingWindowExecutionContext swctx = (SlidingWindowExecutionContext) context;
+					Map<Integer, SPBlock> spBlockMapping = swctx.getSpBlockMapping();
+					Set<Integer> spNos = spBlockMapping.keySet();			
+					for(int spNo: spNos){
+						SPBlock spb = spBlockMapping.get(spNo);
+						if(spb == null) continue;
+
+						Set<Process> processes = spb.getProcesses();
+						for(Process process: processes){
+							if(process.getProcessNo() == p.getProcessNo()) {
+								c.addVariable("sp"+spNo+"x0p"+p.getProcessNo()+"t"+i, swctx.getUnitValueforBlock(spb, unitId, p.getModel().getUnitType()));
+							}
+						}
+					}
 				}
 			}
+			
 			for(Block b: context.getProcessBlocks()){
 				if(!pitnumberList.contains(b.getPitNo())) continue;
 				c.addVariable("p"+b.getPitNo()+"x"+b.getBlockNo()+"s"+getStockpileNo(b)+"t"+i, new BigDecimal(1));
