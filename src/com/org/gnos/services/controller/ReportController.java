@@ -20,6 +20,7 @@ import com.org.gnos.db.dao.ScenarioDAO;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Field;
 import com.org.gnos.db.model.Scenario;
+import com.org.gnos.scheduler.processor.Record;
 
 
 public class ReportController {
@@ -41,7 +42,12 @@ public class ReportController {
 	public String getReportCSV(String projectId, String scenarioId) {
 		StringBuilder output = new StringBuilder("");
 		Scenario scenario = new ScenarioDAO().get(Integer.parseInt(scenarioId));
+		int startYear = scenario.getStartYear();
+		int periodFieldIdx = -1;
+		int originTypeIdx = -1;
 		String sql = "select * from gnos_report_"+projectId +"_"+scenarioId +" where scenario_name = ? ";
+		List<Integer> exclusionIdxList = new ArrayList<Integer>();
+		
 		Object[] values = { scenario.getName() };
 		try (
 				Connection connection = DBManager.getConnection();
@@ -51,7 +57,17 @@ public class ReportController {
 			ResultSetMetaData md = resultSet.getMetaData();
 			int columnCount = md.getColumnCount();
 			for (int i = 1; i <= columnCount; i++) {
+				
+				if(md.getColumnName(i).equals("pit_no")|| md.getColumnName(i).equals("bench_no")) {
+					exclusionIdxList.add(i);
+					continue;
+				}
 				output.append(md.getColumnName(i));
+				if (md.getColumnName(i).equals("period")){
+					periodFieldIdx = i;
+				} else if (md.getColumnName(i).equals("origin_type")){
+					originTypeIdx = i;
+				}
 				if(i == columnCount) {
 					output.append("\n");
 				} else {
@@ -60,7 +76,23 @@ public class ReportController {
 			}
 			while(resultSet.next()) {
 				for (int i = 1; i <= columnCount; i++) {
-					output.append(resultSet.getString(i));
+					if(exclusionIdxList.contains(i)) {
+						continue;
+					}
+					if(i == periodFieldIdx){
+						output.append(resultSet.getInt(i)+startYear - 1);
+					} else if(i == originTypeIdx) {
+						int originType = resultSet.getInt(i);
+						if(originType == Record.ORIGIN_PIT) {
+							output.append("expit");
+						} else if(originType == Record.ORIGIN_SP) {
+							output.append("stockpile");
+						}
+						
+					} else {			
+						output.append(resultSet.getString(i));
+					}
+					
 					if(i == columnCount) {
 						output.append("\n");
 					} else {

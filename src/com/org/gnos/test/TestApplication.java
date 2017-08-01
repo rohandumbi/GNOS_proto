@@ -75,8 +75,8 @@ public class TestApplication {
 		runconfig.setPeriod(period);
 		runconfig.setWindow(window);
 		runconfig.setStepSize(stepsize);
-		runconfig.setProjectId(34);
-		runconfig.setScenarioId(12);
+		runconfig.setProjectId(37);
+		runconfig.setScenarioId(16);
 		SchedulerService service = new SchedulerService();
 		service.setRunconfig(runconfig);
 		service.execute();
