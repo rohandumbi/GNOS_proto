@@ -16,6 +16,7 @@ import com.org.gnos.db.DBManager;
 import com.org.gnos.db.model.Dump;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Field;
+import com.org.gnos.db.model.Grade;
 import com.org.gnos.db.model.PitGroup;
 import com.org.gnos.db.model.Process;
 import com.org.gnos.db.model.ProcessJoin;
@@ -403,6 +404,29 @@ public class DBStorageHelper implements IStorageHelper {
 			data_sql +=  ","+ name +" tinyint ";			
 			sbuff_sql.append("," + name);
 			sbuff.append(", ?");
+		}
+		
+		for(Product product : context.getProductList()){
+			String productName = product.getName().replaceAll("\\s+", "_");
+			List<Grade> grades = context.getGradesForProduct(productName);
+			for(Grade grade: grades ){
+				String name = productName +"::"+grade.getName();
+				data_sql +=  ","+ name +" double ";			
+				sbuff_sql.append("," + name);
+				sbuff.append(", ?");
+			}			
+		}
+		
+		for(ProductJoin productJoin : context.getProductJoinList()){
+			Set<String> products = productJoin.getProductList();
+			String productName = products.iterator().next().replaceAll("\\s+", "_");
+			List<Grade> grades = context.getGradesForProduct(productName);
+			for(Grade grade: grades ){
+				String name = productName +"::"+grade.getName();
+				data_sql +=  ","+ name +" double ";			
+				sbuff_sql.append("," + name);
+				sbuff.append(", ?");
+			}			
 		}
 		
 		data_sql += " ); ";
