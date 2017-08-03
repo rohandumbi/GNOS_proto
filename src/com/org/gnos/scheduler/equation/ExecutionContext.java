@@ -116,6 +116,8 @@ public class ExecutionContext {
 	private List<DumpDependencyData> dumpDependencyDataList;
 	private List<CapexData> capexDataList;
 
+	private Map<String, List<Grade>> productGradeMap;
+	
 	private int projectId;
 	private int scenarioId;
 
@@ -135,6 +137,7 @@ public class ExecutionContext {
 		loadBlocks();
 		loadProject();
 		loadScenario();
+		loadProductGradeMap();
 	}
 
 	private void loadProject() {
@@ -430,6 +433,50 @@ public class ExecutionContext {
 		}
 	}
 
+	private void loadProductGradeMap() {
+		productGradeMap = new HashMap<String, List<Grade>>();
+		for(Product product : productList) {
+			List<Grade> grades = new ArrayList<Grade>();
+			productGradeMap.put(product.getName(), grades);
+			Set<Integer> fieldIdList = product.getFieldIdList();
+			Set<Integer> expressionIdList = product.getExpressionIdList();
+			
+			if(fieldIdList != null && fieldIdList.size() > 0) {
+				for(Integer fieldId: fieldIdList) {
+					Field field = getFieldById(fieldId);
+					if(field != null) {
+						for(Field f: fields) {
+							if(f.getDataType() != Field.TYPE_GRADE || !f.getWeightedUnit().equals(field.getName())) continue;
+							Grade grade = new Grade();
+							grade.setName(f.getName());
+							grade.setProductName(product.getName());
+							grade.setType(Grade.GRADE_FIELD);
+							grade.setMappedName(f.getName());
+							grades.add(grade);
+						}
+					}
+				}
+			}
+			if(expressionIdList != null && expressionIdList.size() > 0) {
+				for(Integer expressionId: expressionIdList) {
+					Expression expression = getExpressionById(expressionId);
+					if(expression != null) {
+						for(Expression e: expressions) {
+							if(!e.isGrade() || !e.getWeightedField().equals(expression.getName())) continue;
+							Grade grade = new Grade();
+							grade.setName(e.getName());
+							grade.setProductName(product.getName());
+							grade.setType(Grade.GRADE_EXPRESSION);
+							grade.setMappedName(e.getName());
+							grades.add(grade);
+						}
+					}
+				}
+			}
+		}
+		
+	}
+	
 	public Set<String> flattenPitGroup(PitGroup pg) {
 		Set<String> pits = new HashSet<String>();
 		pits.addAll(pg.getListChildPits());
@@ -636,44 +683,8 @@ public class ExecutionContext {
 	}
 
 	public List<Grade> getGradesForProduct(String productName) {
-		List<Grade> grades = new ArrayList<Grade>();
-		Product product = getProductFromName(productName);
-		Set<Integer> fieldIdList = product.getFieldIdList();
-		Set<Integer> expressionIdList = product.getExpressionIdList();
 		
-		if(fieldIdList != null && fieldIdList.size() > 0) {
-			for(Integer fieldId: fieldIdList) {
-				Field field = getFieldById(fieldId);
-				if(field != null) {
-					for(Field f: fields) {
-						if(f.getDataType() != Field.TYPE_GRADE || !f.getWeightedUnit().equals(field.getName())) continue;
-						Grade grade = new Grade();
-						grade.setName(f.getName());
-						grade.setProductName(productName);
-						grade.setType(Grade.GRADE_FIELD);
-						grade.setMappedName(f.getName());
-						grades.add(grade);
-					}
-				}
-			}
-		}
-		if(expressionIdList != null && expressionIdList.size() > 0) {
-			for(Integer expressionId: expressionIdList) {
-				Expression expression = getExpressionById(expressionId);
-				if(expression != null) {
-					for(Expression e: expressions) {
-						if(!e.isGrade() || !e.getWeightedField().equals(expression.getName())) continue;
-						Grade grade = new Grade();
-						grade.setName(e.getName());
-						grade.setProductName(productName);
-						grade.setType(Grade.GRADE_EXPRESSION);
-						grade.setMappedName(e.getName());
-						grades.add(grade);
-					}
-				}
-			}
-		}
-		return grades;
+		return productGradeMap.get(productName);
 	}
 
 	public TruckParameterCycleTime getTruckParamCycleTimeByStockpileName(String stockpileName) {

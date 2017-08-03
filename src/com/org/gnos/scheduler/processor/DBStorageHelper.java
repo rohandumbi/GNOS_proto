@@ -5,7 +5,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -222,15 +224,38 @@ public class DBStorageHelper implements IStorageHelper {
 						index ++;
 					}
 					for(Product product: productList) {
-						BigDecimal value = context.getProductValueForBlock(b, product);
-						value = value.multiply(new BigDecimal(quantityMined));
-						ips.setBigDecimal(index, value);
+						boolean associatedToProcess = false;
+						if(record.getDestinationType() == Record.DESTINATION_PROCESS) {
+							Process process = context.getProcessByNumber(record.getProcessNo());
+							if(process.getModel().getId() == product.getModelId()) {
+								associatedToProcess = true;
+							}
+						}
+						if(associatedToProcess) {
+							BigDecimal value = context.getProductValueForBlock(b, product);
+							value = value.multiply(new BigDecimal(quantityMined));
+							ips.setBigDecimal(index, value);
+						} else {
+							ips.setBigDecimal(index, new BigDecimal(0));
+						}
+						
 						
 						index ++;
 					}
 					
 					for(ProductJoin productJoin: productJoinList) {
-						BigDecimal value = context.getProductJoinValueForBlock(b, productJoin);
+						Process process = null;
+						if(record.getDestinationType() == Record.DESTINATION_PROCESS) {
+							process = context.getProcessByNumber(record.getProcessNo());
+						}
+						BigDecimal value =  new BigDecimal(0);
+						for(String productName :productJoin.getProductList()) {
+							Product p = context.getProductFromName(productName);
+							if(process !=null && process.getModel().getId() == p.getModelId()) {
+								value = value.add(context.getProductValueForBlock(b, p));
+							}
+							
+						}
 						value = value.multiply(new BigDecimal(quantityMined));
 						ips.setBigDecimal(index, value);					
 						index ++;
@@ -272,6 +297,109 @@ public class DBStorageHelper implements IStorageHelper {
 						}
 						index ++;
 					}
+					
+					for(Product product : context.getProductList()){
+						List<Grade> grades = context.getGradesForProduct(product.getName());
+						for(Grade grade: grades) {
+							BigDecimal value = new BigDecimal(0);
+							boolean associatedToProcess = false;
+							if(record.getDestinationType() == Record.DESTINATION_PROCESS) {
+								Process process = context.getProcessByNumber(record.getProcessNo());
+								if(process.getModel().getId() == product.getModelId()) {
+									associatedToProcess = true;
+								}
+							}
+							if(associatedToProcess) {
+								if(grade.getType() == Grade.GRADE_FIELD) {
+									for(Field f: fields) {
+										if(f.getName().equals(grade.getMappedName())) {
+											value = new BigDecimal(b.getField(f.getName())).multiply(new BigDecimal(b.getField(f.getWeightedUnit())));
+											value = value.multiply(new BigDecimal(ratio));									
+											break;
+										}
+									}
+								} else if(grade.getType() == Grade.GRADE_EXPRESSION) {
+									for(Expression expression: expressions) {
+										if(expression.getName().equals(grade.getMappedName())) {
+											String associatedFieldName = expression.getWeightedField();
+											value = b.getComputedField(expression.getName());
+											if(expression.getWeightedFieldType() == Expression.UNIT_EXPRESSION) {
+												value = value.multiply(b.getComputedField(associatedFieldName));
+											} else {
+												value = value.multiply(new BigDecimal(b.getField(associatedFieldName)));
+											}
+											
+											value = value.multiply(new BigDecimal(quantityMined));
+											break;
+										}
+									}
+								}
+							}							
+							ips.setString(index, value.toString());
+							index ++;
+						}
+					}
+					
+					for(ProductJoin productJoin : context.getProductJoinList()){
+						List<Product> products = new ArrayList<Product>();
+						Set<String> productNames = productJoin.getProductList();
+						Iterator<String> it = productNames.iterator();
+						while(it.hasNext()) {
+							String productName = it.next();
+							products.add(context.getProductFromName(productName));
+						}
+						if(products.size() > 0) {
+							List<Grade> grades = context.getGradesForProduct(products.get(0).getName());
+							for(int i = 0; i < grades.size(); i++) {
+								BigDecimal gradevalue = new BigDecimal(0);
+								for(Product product: products) {
+									boolean associatedToProcess = false;
+									if(record.getDestinationType() == Record.DESTINATION_PROCESS) {
+										Process process = context.getProcessByNumber(record.getProcessNo());
+										if(process.getModel().getId() == product.getModelId()) {
+											associatedToProcess = true;
+										}
+									}
+									if(associatedToProcess) {
+										List<Grade> productGrades = context.getGradesForProduct(product.getName());
+										if(productGrades.size() < i+1 ) continue;
+										Grade grade = productGrades.get(i);
+										if(grade.getType() == Grade.GRADE_FIELD) {
+											for(Field f: fields) {
+												if(f.getName().equals(grade.getMappedName())) {
+													String associatedFieldName = f.getWeightedUnit();											
+													BigDecimal value = new BigDecimal(b.getField(f.getName())).multiply(new BigDecimal(b.getField(associatedFieldName)));
+													value = value.multiply(new BigDecimal(ratio));
+													gradevalue = gradevalue.add(value);									
+													break;
+												}
+											}
+										} else if(grade.getType() == Grade.GRADE_EXPRESSION) {
+											for(Expression expression: expressions) {
+												if(expression.getName().equals(grade.getMappedName())) {
+													String associatedFieldName = expression.getWeightedField();
+													BigDecimal value = b.getComputedField(expression.getName());
+													if(expression.getWeightedFieldType() == Expression.UNIT_EXPRESSION) {
+														value = value.multiply(b.getComputedField(associatedFieldName));
+													} else {
+														value = value.multiply(new BigDecimal(b.getField(associatedFieldName)));
+													}												
+													value = value.multiply(new BigDecimal(quantityMined));
+													gradevalue = gradevalue.add(value);									
+													break;
+												}
+											}
+										}
+									}									
+								}
+								
+								ips.setString(index, gradevalue.toString());
+								index ++;
+							}
+							
+						}
+					}
+					
 					ips.executeUpdate();
 				} catch (SQLException e) {
 					e.printStackTrace();
@@ -410,7 +538,7 @@ public class DBStorageHelper implements IStorageHelper {
 			String productName = product.getName().replaceAll("\\s+", "_");
 			List<Grade> grades = context.getGradesForProduct(productName);
 			for(Grade grade: grades ){
-				String name = productName +"::"+grade.getName();
+				String name = "`"+productName +"::"+grade.getName()+"`";
 				data_sql +=  ","+ name +" double ";			
 				sbuff_sql.append("," + name);
 				sbuff.append(", ?");
@@ -422,7 +550,7 @@ public class DBStorageHelper implements IStorageHelper {
 			String productName = products.iterator().next().replaceAll("\\s+", "_");
 			List<Grade> grades = context.getGradesForProduct(productName);
 			for(Grade grade: grades ){
-				String name = productName +"::"+grade.getName();
+				String name = "`"+productJoin.getName() +"::"+grade.getName()+"`";
 				data_sql +=  ","+ name +" double ";			
 				sbuff_sql.append("," + name);
 				sbuff.append(", ?");
