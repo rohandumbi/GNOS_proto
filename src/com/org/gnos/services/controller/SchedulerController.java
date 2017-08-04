@@ -18,9 +18,12 @@ public class SchedulerController {
 		if(jsonObject != null) {
 			short mode = jsonObject.get("mode").getAsShort();
 			boolean isReclaim = jsonObject.get("isReclaim").getAsBoolean();
-			
+			float gap = jsonObject.get("gap").getAsFloat();
 			runconfig.setMode(mode);
 			runconfig.setReclaim(isReclaim);
+			if(gap > 0 && gap <= 100) {
+				runconfig.setMIPGAP(gap/100);
+			}
 			if(mode == 2) {
 				short period = jsonObject.get("period").getAsShort();
 				short window = jsonObject.get("window").getAsShort();

@@ -228,6 +228,7 @@ public class ExecutionContext {
 			processList.add(process);
 			count++;
 		}
+		System.out.println("Levels :"+processTree.getLevels());
 	}
 
 	private void loadProducts() {
@@ -699,6 +700,10 @@ public class ExecutionContext {
 
 	public void reset() {
 		blockVariableMapping = new HashMap<Integer, List<String>>();
+		variables = new HashMap<String, BigDecimal>();
+		constraints = new ArrayList<Constraint>();
+		binaries = new ArrayList<String>();
+		
 	}
 
 	public boolean isGlobalMode() {

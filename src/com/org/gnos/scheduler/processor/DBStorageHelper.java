@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.org.gnos.core.Block;
+import com.org.gnos.core.Node;
 import com.org.gnos.core.Pit;
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.model.Dump;
@@ -179,7 +180,7 @@ public class DBStorageHelper implements IStorageHelper {
 						 
 						
 					}
-					total_TH  = total_TH.multiply(new BigDecimal(ratio));
+					total_TH  = total_TH.multiply(new BigDecimal(quantityMined));
 					
 					ips.setBigDecimal(index++, total_TH);
 					for(Field f: fields) {
@@ -400,6 +401,33 @@ public class DBStorageHelper implements IStorageHelper {
 						}
 					}
 					
+
+					String processName = "";
+					Process process = null;
+					if(record.getDestinationType() == Record.DESTINATION_PROCESS) {
+						process = context.getProcessByNumber(record.getProcessNo());
+					}
+					Node lastNode = null;
+					int levels = context.getProcessTree().getLevels();
+					for (int i = levels; i >= 1; i-- ) {
+						
+						if(process != null) {
+							Node node = null;
+							if(lastNode == null) {
+								node = context.getProcessTree().getNodeByName(process.getModel().getName());						
+							} else {
+								node = lastNode.getParent();
+							}
+							lastNode = node;
+							processName = node.getData().getName();
+							
+						}
+						
+						
+						ips.setString(index, processName);
+						index ++;
+					}
+					
 					ips.executeUpdate();
 				} catch (SQLException e) {
 					e.printStackTrace();
@@ -557,6 +585,12 @@ public class DBStorageHelper implements IStorageHelper {
 			}			
 		}
 		
+		for (int i = 1; i<= context.getProcessTree().getLevels(); i++) {
+			String name = "process_level_"+i;
+			data_sql +=  ","+ name +"  VARCHAR(50) ";			
+			sbuff_sql.append("," + name);
+			sbuff.append(", ?");
+		}
 		data_sql += " ); ";
 		
 		sbuff_sql.append(")");

@@ -11,6 +11,9 @@ import java.util.Set;
 import com.org.gnos.core.Block;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Field;
+import com.org.gnos.db.model.Product;
+import com.org.gnos.db.model.ProductJoin;
+import com.org.gnos.db.model.TruckParameterCycleTime;
 import com.org.gnos.scheduler.processor.SlidingWindowModeDBStorageHelper;
 
 public class SlidingWindowExecutionContext extends ExecutionContext {
@@ -412,5 +415,46 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 				}*/
 			}
 		}
+	}
+
+	public BigDecimal getProductValueForBlock(SPBlock b, Product product) {
+		BigDecimal value =  new BigDecimal(0);
+		if(product == null) return value;
+		for(Integer eid : product.getExpressionIdList()){
+			value = value.add(getUnitValueforBlock(b, eid, Product.UNIT_EXPRESSION));
+		}
+		for(Integer fid : product.getFieldIdList()){
+			value = value.add(getUnitValueforBlock(b, fid, Product.UNIT_FIELD));
+		}
+		return value;	
+	}
+
+	public BigDecimal getProductJoinValueForBlock(SPBlock b, ProductJoin productJoin) {
+		BigDecimal value =  new BigDecimal(0);
+		for(String productName :productJoin.getProductList()) {
+			Product p = getProductFromName(productName);
+			value = value.add(getProductValueForBlock(b, p));
+		}		
+		return value;
+	}
+	
+	public BigDecimal getTruckHourRatio(SPBlock b, String originSP, String contextName){
+		BigDecimal th_ratio = new BigDecimal(0);
+		int payload = b.getPayload();
+		if(payload > 0) {
+			
+			TruckParameterCycleTime cycleTime = getTruckParamCycleTimeByStockpileName(originSP);
+			BigDecimal ct = new BigDecimal(0);
+			if(cycleTime.getProcessData() != null){
+				ct = cycleTime.getProcessData().get(contextName).add(getFixedTime());
+			} 
+			if(ct != null) {
+				double th_ratio_val =  ct.doubleValue() /( payload* 60);
+				th_ratio = new BigDecimal(th_ratio_val);
+			}
+		}
+		
+		return th_ratio;
+		
 	}
 }

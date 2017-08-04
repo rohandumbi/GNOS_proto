@@ -14,6 +14,7 @@ public class SchedulerService implements Runnable {
 	
 	public void execute() {		
 		ISolver solver = new CplexSolver();
+		((CplexSolver)solver).setMIPGAP(runconfig.getMIPGAP());
 		createScheduler(runconfig);
 		scheduler.getContext().setEquationEnableMap(runconfig.getEqnenablestate());
 		scheduler.setSolver(solver);

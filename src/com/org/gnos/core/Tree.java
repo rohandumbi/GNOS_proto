@@ -11,6 +11,7 @@ public class Tree {
 	private Node root;
 	private List<Node> leafNodes = new ArrayList<Node>();
 	private HashMap<String, Node> nodes = new HashMap<String, Node>();
+	private int levels = 0;
 
 	public Tree () {
 		Model dummyModel = new Model("Block");
@@ -25,6 +26,9 @@ public class Tree {
 		node.setParent(parent);	
 		leafNodes.add(node);
 		nodes.put(node.getIdentifier(), node);
+		if(node.getLevel() > levels) {
+			levels = node.getLevel();
+		}
 	}
 	
 	public List<Node> getLeafNodes() {
@@ -41,5 +45,7 @@ public class Tree {
 	public Node getRoot() {
 		return root;
 	}
-
+	public int getLevels() {
+		return levels;
+	}
 }

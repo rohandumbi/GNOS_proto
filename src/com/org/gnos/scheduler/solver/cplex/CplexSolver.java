@@ -30,6 +30,7 @@ public class CplexSolver implements ISolver {
 	protected IloNumVar[][][][] wasteVariables;
 
 	private static int DECIMAL_POINT = 6;
+	private float mip_gap = 0.1f;
 	
 	static {
 		String dp_format = GNOSConfig.get("format.dp");
@@ -44,7 +45,7 @@ public class CplexSolver implements ISolver {
 		try {
 			IloCplex cplex = new IloCplex();
 			cplex.tuneParam();
-			cplex.setParam(IloCplex.Param.MIP.Tolerances.MIPGap, 0.1);
+			cplex.setParam(IloCplex.Param.MIP.Tolerances.MIPGap, mip_gap);
 			cplex.setParam(IloCplex.Param.Read.Scale, 1); // decides how to
 															// scale the problem
 															// matrix -1=no
@@ -53,7 +54,7 @@ public class CplexSolver implements ISolver {
 															// (default),
 															// 1=aggressive
 
-			System.out.println("cplex version: " + cplex.getVersion());
+			System.out.println("cplex version: " + cplex.getVersion()+" GAP:"+mip_gap);
 
 			/*
 			 * // variables IloNumVar[] _vars; System.out.println("Optimising "
@@ -272,4 +273,7 @@ public class CplexSolver implements ISolver {
 		this.context = context;
 	}
 
+	public void setMIPGAP(float gap) {
+		this.mip_gap = gap;
+	}
 }

@@ -11,6 +11,7 @@ public class Node {
 	private List<Node> childrens ;
 	private Model data ;
 	private boolean saved = false;
+	private int level = 0;
 	
 	public Node(Model data) {
 		this.data = data;
@@ -43,6 +44,7 @@ public class Node {
 	
 	public void addChildren(Node node){
 		this.childrens.add(node);
+		node.setLevel(this.getLevel()+1);
 	}
 
 	public boolean isSaved() {
@@ -52,4 +54,14 @@ public class Node {
 	public void setSaved(boolean saved) {
 		this.saved = saved;
 	}
+
+	public int getLevel() {
+		return level;
+	}
+
+	public void setLevel(int level) {
+		this.level = level;
+	}
+	
+	
 }
