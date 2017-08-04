@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.dao.ExpressionDAO;
@@ -39,13 +40,26 @@ public class ReportController {
 	public final static short DATA_TOTAL_TH 		= 5;
 	public final static short DATA_GRADE 			= 6;
 	
-	public String getReportCSV(String projectId, String scenarioId) {
+	public String getReportCSV(JsonObject jsonObject, String projectId) throws Exception {
+		
+		JsonArray array = jsonObject.get("scenarioIds").getAsJsonArray();
+		List<Scenario> scenarios = new ArrayList<Scenario>();
+		ScenarioDAO  dao = new ScenarioDAO();
+		for (int i = 0; i < array.size(); i++) {
+			Scenario scenario = dao.get(array.getAsInt());
+			if(scenario != null) {
+				scenarios.add(scenario);
+			}
+		}
+		if(scenarios.size() == 0) {
+			throw new Exception("Please select a scenario.");
+		}
 		StringBuilder output = new StringBuilder("");
-		Scenario scenario = new ScenarioDAO().get(Integer.parseInt(scenarioId));
+		Scenario scenario = scenarios.get(0);
 		int startYear = scenario.getStartYear();
 		int periodFieldIdx = -1;
 		int originTypeIdx = -1;
-		String sql = "select * from gnos_report_"+projectId +"_"+scenarioId +" where scenario_name = ? ";
+		String sql = "select * from gnos_report_"+projectId +"_"+scenario.getId() +" where scenario_name = ? ";
 		List<Integer> exclusionIdxList = new ArrayList<Integer>();
 		
 		Object[] values = { scenario.getName() };
