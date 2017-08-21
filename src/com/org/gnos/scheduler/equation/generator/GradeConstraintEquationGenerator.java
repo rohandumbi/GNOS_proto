@@ -75,7 +75,9 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 					}
 				}
 				Product p = context.getProductFromName(productName);
-				if(p == null) continue;
+				if(p == null) {
+					continue;
+				}
 				Integer processId = p.getModelId();
 				String processName = context.getModelById(processId).getName();
 				List<Object> coefficients = processExprMap.get(processName);

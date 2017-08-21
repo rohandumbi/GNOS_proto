@@ -17,6 +17,7 @@ public class RunConfig {
 	private short period;
 	private short window;
 	private short stepSize;
+	private float MIPGAP =  0.1f;
 	
 	public RunConfig() {
 		this.setMode(GLOBAL_MODE);
@@ -101,6 +102,15 @@ public class RunConfig {
 		this.stepSize = stepSize;
 	}
 
+	public float getMIPGAP() {
+		return MIPGAP;
+	}
+
+	public void setMIPGAP(float mIPGAP) {
+		MIPGAP = mIPGAP;
+	}
+
+	
 	@Override
 	public String toString() {
 		return "RunConfig [mode=" + mode + ", projectId=" + projectId

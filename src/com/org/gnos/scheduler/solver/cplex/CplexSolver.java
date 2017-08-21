@@ -31,9 +31,10 @@ public class CplexSolver implements ISolver {
 	protected Map<String, IloNumVar> processVariables;
 	protected IloNumVar[][][][] spVariables;
 	protected IloNumVar[][][][] wasteVariables;
-	
+
 	private SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");  
 	private static int DECIMAL_POINT = 6;
+	private float mip_gap = 0.1f;
 	
 	static {
 		String dp_format = GNOSConfig.get("format.dp");
@@ -51,7 +52,7 @@ public class CplexSolver implements ISolver {
 		try {
 			IloCplex cplex = new IloCplex();
 			cplex.tuneParam();
-			cplex.setParam(IloCplex.Param.MIP.Tolerances.MIPGap, 0.1);
+			cplex.setParam(IloCplex.Param.MIP.Tolerances.MIPGap, mip_gap);
 			cplex.setParam(IloCplex.Param.Read.Scale, 1); // decides how to
 															// scale the problem
 															// matrix -1=no
@@ -60,7 +61,7 @@ public class CplexSolver implements ISolver {
 															// (default),
 															// 1=aggressive
 
-			System.out.println("cplex version: " + cplex.getVersion());
+			System.out.println("cplex version: " + cplex.getVersion()+" GAP:"+mip_gap);
 
 			/*
 			 * // variables IloNumVar[] _vars; System.out.println("Optimising "
@@ -68,25 +69,34 @@ public class CplexSolver implements ISolver {
 			 */
 
 			Map<String, BigDecimal> variables = context.getVariables();
+			List<String> binaries = context.getBinaries();
+
 			Set<String> keys = variables.keySet();
 			List<IloNumVar> _vars = new ArrayList<IloNumVar>();
 			IloLinearNumExpr expr = cplex.linearNumExpr();
 			Map<String, IloNumVar> numvariablemap = new HashMap<String, IloNumVar>();
-			for (String key : keys) {
-				IloNumVar var = cplex.numVar(0, Double.MAX_VALUE, key);
-				_vars.add(var);
-				numvariablemap.put(key, var);
-				BigDecimal coeff = formatDecimalValue(variables.get(key));
-				expr.addTerm(coeff.doubleValue(), var);
-				cplex.addGe(var, 0);
-			}
-			List<String> binaries = context.getBinaries();
-
+			
 			for (String binary : binaries) {
 				IloNumVar var = cplex.boolVar(binary);
 				numvariablemap.put(binary, var);
-				cplex.addGe(var, 0);
 			}
+			for (String key : keys) {
+				IloNumVar var = null;
+				if(numvariablemap.get(key) != null) {
+					var = numvariablemap.get(key);
+				} else {
+					var = cplex.numVar(0, Double.MAX_VALUE, key);
+				numvariablemap.put(key, var);
+					cplex.addGe(var, 0);
+				}
+				_vars.add(var);			
+				BigDecimal coeff = formatDecimalValue(variables.get(key));
+				expr.addTerm(coeff.doubleValue(), var);
+				
+			}
+			
+
+
 			cplex.addMaximize(expr);
 
 			List<Constraint> constraints = context.getConstraints();
@@ -96,7 +106,6 @@ public class CplexSolver implements ISolver {
 				List<BigDecimal> coefficients = constraint.getCoefficients();
 				IloLinearNumExpr constraint_expr = cplex.linearNumExpr();
 				for (int i = 0; i < vars.size(); i++) {
-					//IloNumVar var = cplex.numVar(0, Double.MAX_VALUE, vars.get(i));
 					IloNumVar var = numvariablemap.get(vars.get(i));
 					if(var == null) {
 						continue;
@@ -251,7 +260,7 @@ public class CplexSolver implements ISolver {
 		if(bd == null){
 			return new BigDecimal(0);
 		}
-		BigDecimal a =  bd.setScale(DECIMAL_POINT , BigDecimal.ROUND_FLOOR);
+		BigDecimal a =  bd.setScale(DECIMAL_POINT , BigDecimal.ROUND_DOWN);
 		return a;
 	}
 	
@@ -274,4 +283,7 @@ public class CplexSolver implements ISolver {
 		this.context = context;
 	}
 
+	public void setMIPGAP(float gap) {
+		this.mip_gap = gap;
+	}
 }

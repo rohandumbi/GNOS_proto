@@ -21,18 +21,25 @@ public class ReportEndpoint {
 		public ReportEndpoint() {
 			controller = new ReportController();
 
-			get("/project/:id/scenario/:sid/report/csv", new Route() {
+			post("/project/:id/report/csv", new Route() {
 				
 				@Override
 				public Object handle(Request req, Response res) throws Exception {
+					JsonElement requestObject = new JsonParser().parse(req.body());
+					if(requestObject.isJsonObject()) {
+						JsonObject jsonObject = requestObject.getAsJsonObject();
 						try {
 							res.type("text/csv");
 							res.header("Content-Disposition", "attachment; filename=\"report.csv\"");
-							return controller.getReportCSV(req.params(":id"), req.params(":sid"));
+							return controller.getReportCSV(jsonObject, req.params(":id"));
 						} catch (Exception e) {
 							res.status(400);
 							return new ResponseError("Could not fetch report data. "+e.getMessage());
-						}					
+						}
+					}
+					res.status(400);				
+					return new ResponseError("Field creation failed due to improper input");
+					
 				}
 			});
 			
@@ -46,8 +53,9 @@ public class ReportEndpoint {
 						try {
 							return controller.getReport(jsonObject, req.params(":id"));
 						} catch (Exception e) {
+							e.printStackTrace();
 							res.status(400);
-							return new ResponseError("Field creation failed. "+e.getMessage());
+							return new ResponseError("Could not fetch report data. "+e.getMessage());
 						}					
 					}
 					res.status(400);				
