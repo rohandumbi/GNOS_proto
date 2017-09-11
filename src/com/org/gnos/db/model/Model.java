@@ -71,5 +71,11 @@ public class Model {
 
 	public void setUnitType(short unitType) {
 		this.unitType = unitType;
+	}
+
+	@Override
+	public String toString() {
+		return name + "|" + unitType + "|" + fieldId + "|" + expressionId + "|" + condition;
 	}	
+
 }

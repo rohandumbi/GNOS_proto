@@ -59,7 +59,8 @@ public class Field {
 	public void setWeightedUnit(String weightedUnit) {
 		this.weightedUnit = weightedUnit;
 	}
-	
-	
-	
+	@Override
+	public String toString() {
+		return name + "|" + dataType + "|" + weightedUnit;
+	}
 }

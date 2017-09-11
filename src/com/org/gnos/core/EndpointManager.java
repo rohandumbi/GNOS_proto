@@ -37,7 +37,7 @@ import com.org.gnos.services.endpoints.TruckParameterPayloadEndpoint;
 
 public class EndpointManager {
 
-	public static final boolean DEV_MODE = false;
+	public static final boolean DEV_MODE = true;
 	
 	public static void start() {
 		new ProjectEndpoint();

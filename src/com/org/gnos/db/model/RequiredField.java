@@ -18,5 +18,8 @@ public class RequiredField {
 		this.mappedFieldname = mappedFieldname;
 	}
 	
-	
+	@Override
+	public String toString() {
+		return fieldName + "|" + mappedFieldname;
+	}	
 }
