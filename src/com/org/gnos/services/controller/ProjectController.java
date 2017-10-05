@@ -10,7 +10,7 @@ import com.org.gnos.db.dao.ProjectDAO;
 import com.org.gnos.db.model.Project;
 import com.org.gnos.services.PitBenchProcessor;
 import com.org.gnos.services.util.FileUploadHelper;
-import com.org.gnos.services.util.ProjectHelper;
+import com.org.gnos.services.util.ProjectExportHelper;
 
 public class ProjectController {
 	
@@ -108,7 +108,7 @@ public class ProjectController {
 	}
 
 	public String export(String projectIdStr) {
-		ProjectHelper helper = new ProjectHelper();
+		ProjectExportHelper helper = new ProjectExportHelper();
 		return helper.export(Integer.parseInt(projectIdStr));
 	}
 }

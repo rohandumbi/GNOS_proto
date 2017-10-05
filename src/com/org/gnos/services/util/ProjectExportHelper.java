@@ -15,7 +15,7 @@ import com.org.gnos.db.model.Project;
 import com.org.gnos.db.model.RequiredField;
 import com.org.gnos.db.model.Scenario;
 
-public class ProjectHelper {
+public class ProjectExportHelper {
 
 	private static final int PROJECT_IND = 1;
 	private static final int SCENARIO_IND = 2;
