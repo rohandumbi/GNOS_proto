@@ -7,12 +7,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ProjectImportHelper {
+import com.org.gnos.db.dao.ProjectDAO;
+import com.org.gnos.db.model.Project;
+
+public class ProjectImportHelper implements ProjectTypes {
 	
 	private BufferedReader br = null;
 	
 	public void importProject(String fileName) {
 		Map<Integer, List<String[]>> projectData = new HashMap<Integer, List<String[]>>();
+
 		try {
 			br = new BufferedReader(new FileReader(fileName));
 			String line = null;
@@ -28,15 +32,29 @@ public class ProjectImportHelper {
 					}
 					data.add(linedataArr);
 				}
-			}		
-			process(projectData);
+			}
+			if(projectData.get(PROJECT_IND) == null) {
+				throw new Exception("Uploaded data file is not valid");
+			}
+			processData(projectData);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	private void process(Map<Integer, List<String[]>> projectData) {
-		
+	private void processData(Map<Integer, List<String[]>> projectData) {
+		Project project = createProject(projectData.get(PROJECT_IND).get(0));
+	}
+
+	private Project createProject(String[] list) {
+		Project project = new Project();
+		project.setName(list[1]);
+		project.setDesc(list[2]);
+		for(int i = 3; i<list.length; i++) {
+			project.addFile(list[i]);
+		}
+		new ProjectDAO().create(project);
+		return project;
 	}
 	
 }

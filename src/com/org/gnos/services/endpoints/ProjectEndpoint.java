@@ -82,5 +82,25 @@ public class ProjectEndpoint {
 		
 		/* DELETE exisitng project */
 		delete("/projects/:id", (req, res) -> controller.delete(req.params(":id")), json());
+		
+		/* Import a project */
+		post("/projects/import", new Route() {
+			
+			@Override
+			public Object handle(Request req, Response res) throws Exception {
+				JsonElement requestObject = new JsonParser().parse(req.body());
+				if(requestObject.isJsonObject()) {
+					JsonObject jsonObject = requestObject.getAsJsonObject();
+					try {
+						return controller.importProject(jsonObject);
+					} catch (Exception e) {
+						res.status(400);
+						return new ResponseError("Project creation failed. "+e.getMessage());
+					}					
+				}
+				res.status(400);				
+				return new ResponseError("Project creation failed due to improper input");
+			}
+		}, json());
 	}
 }

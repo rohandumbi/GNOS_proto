@@ -68,7 +68,7 @@ public class Project {
 	public String toString() {
 		String str = name + "|" + desc ;
 		for(String fileName: files) {
-			str += fileName +"|";
+			str += "|" +fileName;
 		}
 		return str;
 	}

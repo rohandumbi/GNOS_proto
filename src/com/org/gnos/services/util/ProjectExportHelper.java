@@ -15,14 +15,7 @@ import com.org.gnos.db.model.Project;
 import com.org.gnos.db.model.RequiredField;
 import com.org.gnos.db.model.Scenario;
 
-public class ProjectExportHelper {
-
-	private static final int PROJECT_IND = 1;
-	private static final int SCENARIO_IND = 2;
-	private static final int FIELD_IND = 11;
-	private static final int REQ_FIELD_IND = 12;
-	private static final int MODEL_IND = 13;
-	private static final int EXPRESSION_IND = 14;
+public class ProjectExportHelper implements ProjectTypes {
 	
 	public String export(int projectId) {
 		StringBuilder output = new StringBuilder("");

@@ -11,6 +11,7 @@ import com.org.gnos.db.model.Project;
 import com.org.gnos.services.PitBenchProcessor;
 import com.org.gnos.services.util.FileUploadHelper;
 import com.org.gnos.services.util.ProjectExportHelper;
+import com.org.gnos.services.util.ProjectImportHelper;
 
 public class ProjectController {
 	
@@ -110,5 +111,12 @@ public class ProjectController {
 	public String export(String projectIdStr) {
 		ProjectExportHelper helper = new ProjectExportHelper();
 		return helper.export(Integer.parseInt(projectIdStr));
+	}
+	
+	public boolean importProject(JsonObject jsonObject) {
+		String filename = jsonObject.get("filename").getAsString();
+		ProjectImportHelper helper = new ProjectImportHelper();
+		helper.importProject(filename);
+		return true;
 	}
 }
