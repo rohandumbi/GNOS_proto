@@ -132,13 +132,21 @@ public class CycletTimeDataProcessor {
 		} 
 		
 	}
-	
-	public String[] getHeaderColumns() {
-		return columns;
-	}
-	
+
 	public List<String[]> getData() {
 		return data;
+	}
+
+	public String[] getColumns() {
+		return columns;
+	}
+
+	public void setColumns(String[] columns) {
+		this.columns = columns;
+	}
+
+	public void setData(List<String[]> data) {
+		this.data = data;
 	}
 
 	public static CycletTimeDataProcessor getInstance() {

@@ -61,6 +61,6 @@ public class Field {
 	}
 	@Override
 	public String toString() {
-		return name + "|" + dataType + "|" + weightedUnit;
+		return id +"|"+ name + "|" + dataType + "|" + weightedUnit;
 	}
 }

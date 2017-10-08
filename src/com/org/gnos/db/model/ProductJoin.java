@@ -1,8 +1,6 @@
 package com.org.gnos.db.model;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class ProductJoin {
@@ -13,12 +11,11 @@ public class ProductJoin {
 	private String name;
 	private Set<String> productList;
 	private Set<String> productJoinList;
-	private List<String> gradeNames;
+
 
 	public ProductJoin(){
 		this.productList = new HashSet<String>();
 		this.productJoinList = new HashSet<String>();
-		this.gradeNames = new ArrayList<String>();
 	}
 	
 	public String getName() {
@@ -45,15 +42,20 @@ public class ProductJoin {
 		this.productJoinList = productJoinList;
 	}
 
-	public List<String> getGradeNames() {
-		return gradeNames;
+	@Override
+	public String toString() {
+		String str = name ;
+		str += "|";
+		for (String child: productList) {
+			str += child +",";
+		}
+		str += "|";
+		for (String child: productJoinList) {
+			str += child +",";
+		}
+		
+		return str;
 	}
 
-	public void setGradeNames(List<String> gradeNames) {
-		this.gradeNames = gradeNames;
-	}
-	public void addGradeName(String gradeName) {
-		this.gradeNames.add(gradeName);
-	}
 	
 }

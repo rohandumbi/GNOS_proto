@@ -3,6 +3,7 @@ package com.org.gnos.db.model;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Set;
 
 public class FixedOpexCost {
 	
@@ -38,6 +39,17 @@ public class FixedOpexCost {
 	
 	public void addCostData(int year, BigDecimal value) {
 		this.costData.put(year, value);
+	}
+
+
+	@Override
+	public String toString() {
+		String str = String.valueOf(costHead);
+		Set<Integer> keys= costData.keySet();
+		for(int year: keys) {
+			str += "|"+year+","+costData.get(year);
+		}
+		return str;
 	}
 	
 }

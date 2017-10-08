@@ -67,6 +67,11 @@ public class CapexInstance {
 	public void setExpansionCapacity(long expansionCapacity) {
 		this.expansionCapacity = expansionCapacity;
 	}
+
+	@Override
+	public String toString() {
+		return name + "," + groupingName + "," + groupingType + "," + capexAmount + "," + expansionCapacity;
+	}
 	
 	
 }

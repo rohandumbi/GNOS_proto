@@ -1,6 +1,7 @@
 package com.org.gnos.db.model;
 
 import java.util.LinkedHashMap;
+import java.util.Set;
 
 public class GradeConstraintData {
 
@@ -94,5 +95,18 @@ public class GradeConstraintData {
 	public void addYear(int year, float value) {
 		this.constraintData.put(year, value);
 	}
+
+	@Override
+	public String toString() {
+		String str = inUse + "|" + productJoinName + "|" + selectedGradeName + "|" + isMax + "|" + selectionType + "|"
+				+ selectorName;
+		Set<Integer> keys= constraintData.keySet();
+		for(int year: keys) {
+			str += "|"+year+","+constraintData.get(year);
+		}
+		
+		return str;
+	}
+	
 	
 }

@@ -17,6 +17,9 @@ public class TruckParameterPayload {
 	public void setPayload(int payload) {
 		this.payload = payload;
 	}
-	
-	
+	@Override
+	public String toString() {
+		return materialName + "|" + payload;
+	}
+
 }

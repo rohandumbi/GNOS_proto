@@ -52,4 +52,18 @@ public class PitGroup {
 		this.pitGroupNumber = pitGroupNumber;
 	}
 	
+	@Override
+	public String toString() {
+		String str = name ;
+		str += "|";
+		for (String child: listChildPits) {
+			str += child +",";
+		}
+		str += "|";
+		for (String child: listChildPitGroups) {
+			str += child +",";
+		}
+		
+		return str;
+	}
 }

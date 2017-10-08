@@ -30,6 +30,16 @@ public class ProcessJoin {
 	public void setChildProcessList(Set<Integer> childProcessList) {
 		this.childProcessList = childProcessList;
 	}
+
+	@Override
+	public String toString() {
+		String str = name ;
+		
+		for(Integer childProcess: childProcessList) {
+			str += "|" +childProcess;
+		}
+		return str;
+	}
 	
 
 }

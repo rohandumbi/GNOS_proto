@@ -81,6 +81,11 @@ public class PitDependencyData {
 	public void setMaxLead(int maxLead) {
 		this.maxLead = maxLead;
 	}
-	
+
+	@Override
+	public String toString() {
+		return inUse + "|" + firstPitName + "|" + firstPitAssociatedBench + "|" + dependentPitName + "|"
+				+ dependentPitAssociatedBench + "|" + minLead + "|" + maxLead;
+	}
 	
 }

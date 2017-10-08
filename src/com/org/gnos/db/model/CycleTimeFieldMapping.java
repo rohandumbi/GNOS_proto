@@ -29,7 +29,8 @@ public class CycleTimeFieldMapping {
 	public void setMappedFieldName(String mappedFieldName) {
 		this.mappedFieldName = mappedFieldName;
 	}
-	
-	
-	
+	@Override
+	public String toString() {
+		return fieldName + "|" + mappingType + "|" + mappedFieldName;
+	}	
 }

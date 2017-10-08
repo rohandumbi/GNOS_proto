@@ -23,6 +23,10 @@ public class CSVDataProcessor {
 	}
 
 
+	public CSVDataProcessor() {
+
+	}
+	
 	public boolean processCsv(){
 		CSVReader reader = null;
 		
@@ -190,4 +194,14 @@ public class CSVDataProcessor {
 	public List<String[]> getData() {
 		return data;
 	}
+
+
+	public void setColumns(String[] columns) {
+		this.columns = columns;
+	}
+
+	public void setData(List<String[]> data) {
+		this.data = data;
+	}
+		
 }

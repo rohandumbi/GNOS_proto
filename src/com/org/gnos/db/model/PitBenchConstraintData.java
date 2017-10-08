@@ -1,6 +1,7 @@
 package com.org.gnos.db.model;
 
 import java.util.LinkedHashMap;
+import java.util.Set;
 
 public class PitBenchConstraintData {
 	private int id;
@@ -48,6 +49,18 @@ public class PitBenchConstraintData {
 
 	public void addYear(int year, float value) {
 		this.constraintData.put(year, value);
+	}
+
+	@Override
+	public String toString() {
+		String str = inUse + "|" + pitName;
+		
+		Set<Integer> keys= constraintData.keySet();
+		for(int year: keys) {
+			str += "|"+year+","+constraintData.get(year);
+		}
+		
+		return str;
 	}
 	
 }

@@ -66,6 +66,9 @@ public class Project {
 
 	@Override
 	public String toString() {
+		if(desc == null) {
+			desc= "";
+		}
 		String str = name + "|" + desc ;
 		for(String fileName: files) {
 			str += "|" +fileName;

@@ -27,7 +27,7 @@ public class CycleTimeController {
 		processor.processCsv(fileName);
 		processor.dumpToDB(projectId);
 		List<Field> cycletimefields = new ArrayList<Field>();
-		for(String column: processor.getHeaderColumns()){
+		for(String column: processor.getColumns()){
 			Field field = new Field(column);
 			cycletimefields.add(field);
 		}

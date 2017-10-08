@@ -3,6 +3,7 @@ package com.org.gnos.db.model;
 import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class OpexData {
 
@@ -91,5 +92,18 @@ public class OpexData {
 	public void setFieldId(int fieldId) {
 		this.fieldId = fieldId;
 	}
+
+	@Override
+	public String toString() {
+		if(productJoinName == null) productJoinName = "";
+		String str =  modelId + "|" + productJoinName + "|" + unitType + "|" + fieldId + "|" + expressionId + "|" + inUse + "|"
+				+ isRevenue ;
+		Set<Integer> keys= costData.keySet();
+		for(int year: keys) {
+			str += "|"+year+","+costData.get(year);
+		}
+		return str;
+	}
+	
 	
 }

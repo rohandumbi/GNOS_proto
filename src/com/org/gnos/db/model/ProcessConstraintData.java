@@ -1,6 +1,7 @@
 package com.org.gnos.db.model;
 
 import java.util.LinkedHashMap;
+import java.util.Set;
 
 public class ProcessConstraintData {
 	
@@ -100,5 +101,19 @@ public class ProcessConstraintData {
 	public void addYear(int year, float value) {
 		this.constraintData.put(year, value);
 	}
+
+	@Override
+	public String toString() {
+		String str =  coefficient_name + "|" + selector_name + "|" + inUse + "|" + isMax + "|" + coefficientType + "|"
+				+ selectionType;
+		
+		Set<Integer> keys= constraintData.keySet();
+		for(int year: keys) {
+			str += "|"+year+","+constraintData.get(year);
+		}
+		
+		return str;
+	}
+	
 	
 }

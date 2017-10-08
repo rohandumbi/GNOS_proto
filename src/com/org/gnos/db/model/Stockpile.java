@@ -117,4 +117,12 @@ public class Stockpile {
 	public void addBlock(Block block) {
 		this.blocks.add(block);
 	}
+
+	@Override
+	public String toString() {
+		return type + "|" + name + "|" + mappedTo + "|" + mappingType + "|" + hasCapacity + "|" + condition + "|"
+				+ capacity + "|" + isReclaim;
+	}
+	
+	
 }

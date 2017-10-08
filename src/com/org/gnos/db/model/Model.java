@@ -75,7 +75,8 @@ public class Model {
 
 	@Override
 	public String toString() {
-		return name + "|" + unitType + "|" + fieldId + "|" + expressionId + "|" + condition;
+		if(condition == null) condition = "";
+		return name + "|" + unitType + "|" + fieldId + "|" + expressionId + "|" + condition + "|" + id;
 	}	
 
 }

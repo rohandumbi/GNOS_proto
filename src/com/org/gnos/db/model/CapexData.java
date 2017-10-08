@@ -50,4 +50,16 @@ public class CapexData {
 	public void addCapexInstance(CapexInstance capexInstance){
 		this.listOfCapexInstances.add(capexInstance);
 	}
+
+	@Override
+	public String toString() {
+		String str =  name;
+		for(CapexInstance ci : listOfCapexInstances) {
+			str += "|"+ci.toString();
+		}
+		return str;
+	}
+	
+	
+	
 }

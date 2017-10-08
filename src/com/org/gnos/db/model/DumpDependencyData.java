@@ -63,6 +63,9 @@ public class DumpDependencyData {
 		this.dependentDumpName = dependentDumpName;
 	}
 
-	
+	@Override
+	public String toString() {
+		return inUse + "|" + firstPitName + "|" + firstPitGroupName + "|" + firstDumpName + "|" + dependentDumpName;
+	}
 	
 }

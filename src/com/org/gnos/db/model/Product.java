@@ -50,4 +50,17 @@ public class Product {
 		this.fieldIdList = fieldIdList;
 	}
 
+	@Override
+	public String toString() {
+		String str = name + "|" + modelId;
+		if(fieldIdList.size() > 0) {
+			str += "|"+UNIT_FIELD +"|"+fieldIdList.iterator().next();
+		} else if(expressionIdList.size() > 0) {
+			str += "|"+UNIT_EXPRESSION +"|"+expressionIdList.iterator().next();
+		}
+		
+		return str;
+	}
+
+	
 }

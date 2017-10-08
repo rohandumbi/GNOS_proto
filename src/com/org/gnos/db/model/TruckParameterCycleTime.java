@@ -2,6 +2,7 @@ package com.org.gnos.db.model;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.Set;
 
 public class TruckParameterCycleTime {
 	private HashMap<String, BigDecimal> processData;
@@ -24,6 +25,16 @@ public class TruckParameterCycleTime {
 	}
 	public void setStockPileName(String stockPileName) {
 		this.stockPileName = stockPileName;
+	}
+
+	@Override
+	public String toString() {
+		String str = stockPileName;
+		Set<String> keys= processData.keySet();
+		for(String key: keys) {
+			str += "|"+key+","+processData.get(key);
+		}
+		return str;
 	}
 	
 	

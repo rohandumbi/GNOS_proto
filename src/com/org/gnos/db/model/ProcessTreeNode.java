@@ -16,6 +16,9 @@ public class ProcessTreeNode {
 	}
 	public void setParentModelId(int parentModelId) {
 		this.parentModelId = parentModelId;
+	}
+	@Override
+	public String toString() {
+		return modelId + "|" + parentModelId;
 	}	
-
 }

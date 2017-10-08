@@ -94,7 +94,7 @@ public class Expression {
 	@Override
 	public String toString() {
 		return name + "|" + isGrade + "|" + isComplex + "|" + exprvalue + "|" + filter + "|" + weightedField + "|"
-				+ weightedFieldType;
+				+ weightedFieldType + "|"+ id;
 	}
 
 }
