@@ -208,7 +208,7 @@ public class ProjectImportHelper implements ProjectTypes {
 		
 		// store process joins
 		List<String[]> processeJoins = projectData.get(PROCESS_JOIN_IND);
-		for(int i= 0; i < processeJoins.size(); i++) {
+		for(int i= 0; processeJoins !=null && i < processeJoins.size(); i++) {
 			String[] processJoinValues = processeJoins.get(i);
 			ProcessJoin processJoin = new ProcessJoin();
 			processJoin.setName(processJoinValues[1]);
@@ -219,7 +219,7 @@ public class ProjectImportHelper implements ProjectTypes {
 		}
 		// store products 
 		List<String[]> products = projectData.get(PRODUCT_IND);
-		for(int i= 0; i < products.size(); i++) {
+		for(int i= 0; products!= null && i < products.size(); i++) {
 			String[] productvalues = products.get(i);
 			short childUnitType = Short.parseShort(productvalues[3]);
 			Product product = new Product();
@@ -235,7 +235,7 @@ public class ProjectImportHelper implements ProjectTypes {
 		
 		// store product joins
 		List<String[]> procductJoins = projectData.get(PRODUCT_JOIN_IND);
-		for(int i= 0; i < procductJoins.size(); i++) {
+		for(int i= 0; procductJoins != null && i < procductJoins.size(); i++) {
 			String[] productJoinValues = procductJoins.get(i);
 			ProductJoin productJoin = new ProductJoin();
 			productJoin.setName(productJoinValues[1]);
@@ -403,9 +403,16 @@ public class ProjectImportHelper implements ProjectTypes {
 			od.setProductJoinName(values[1]);
 			od.setUnitType(Short.parseShort(values[2]));
 			if(od.getUnitType() == OpexData.UNIT_FIELD) {
-				od.setFieldId(fieldOldNewIdMapping.get(values[3]));
+				Integer newFieldId = fieldOldNewIdMapping.get(values[3]);
+				if(newFieldId != null) {
+					od.setFieldId(newFieldId);
+				}
+				
 			} else if(od.getUnitType() == OpexData.UNIT_EXPRESSION) {
-				od.setExpressionId(expressionOldNewIdMapping.get(values[4]));
+				Integer newExpressionId = expressionOldNewIdMapping.get(values[4]);
+				if(newExpressionId != null) {
+					od.setExpressionId(newExpressionId);
+				}
 			}
 			od.setInUse(Boolean.parseBoolean(values[5]));
 			od.setRevenue(Boolean.parseBoolean(values[6]));

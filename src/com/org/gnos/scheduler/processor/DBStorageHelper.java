@@ -189,6 +189,7 @@ public class DBStorageHelper implements IStorageHelper {
 							if(associatedFieldName == null || associatedFieldName.trim().length() == 0) {
 								ips.setString(index, "0");
 							} else {
+								System.out.println("Value :"+b.getField(associatedFieldName)+" Block :"+b.getBlockNo()+" associatedFieldName :"+associatedFieldName+" field Name:"+f.getName());
 								BigDecimal value = new BigDecimal(b.getField(f.getName())).multiply(new BigDecimal(b.getField(associatedFieldName)));
 								value = value.multiply(new BigDecimal(ratio));
 								ips.setString(index, value.toString());
