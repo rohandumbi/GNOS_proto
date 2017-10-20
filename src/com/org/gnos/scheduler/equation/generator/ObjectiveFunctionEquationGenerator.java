@@ -35,7 +35,7 @@ import com.org.gnos.scheduler.equation.SlidingWindowExecutionContext;
 
 public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 	
-	private float discount_rate = 0; //this has to be made an input variable later
+	private double discount_rate = 0; //this has to be made an input variable later
 	
 	private Set<Integer> processedBlocks;
 	
@@ -105,8 +105,8 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 					}
 				}
 				BigDecimal processValue = getProcessValue(block, process.getModel(), year);
-				BigDecimal value = processValue.subtract(cost);
-				value = (value.multiply(new BigDecimal(1 / Math.pow ((1 + discount_rate), i))));
+				BigDecimal value = processValue.subtract(cost);				
+				value = (value.multiply(new BigDecimal(1 / Math.pow ((1 + discount_rate), i))));			
 				String variable = "p"+block.getPitNo()+"x"+block.getBlockNo()+"p"+processNumber+"t"+i; 
 				context.addVariable(variable, value);
 				context.addVariable(block, variable);

@@ -154,7 +154,7 @@ public class ScenarioDAO {
 		scenario.setName(rs.getString("name"));
 		scenario.setStartYear(rs.getInt("start_year"));
 		scenario.setTimePeriod(rs.getInt("time_period"));
-		scenario.setDiscount(rs.getFloat("discount"));
+		scenario.setDiscount(rs.getDouble("discount"));
 		return scenario;
 	}
 }

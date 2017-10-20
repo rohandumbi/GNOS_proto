@@ -4,7 +4,7 @@ public class Scenario {
 
 	private int id = -1;
 	private String name;
-	private float discount;
+	private double discount;
 	private int startYear;
 	private int timePeriod;
 	
@@ -20,10 +20,10 @@ public class Scenario {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public float getDiscount() {
+	public double getDiscount() {
 		return discount;
 	}
-	public void setDiscount(float discount) {
+	public void setDiscount(double discount) {
 		this.discount = discount;
 	}
 	public int getStartYear() {
