@@ -43,5 +43,10 @@ public class FileStorageHelper implements IStorageHelper {
 		// TODO Auto-generated method stub
 		
 	}
+	@Override
+	public void storeCapex(List<CapexRecord> capexRecords) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

@@ -10,6 +10,8 @@ public interface IStorageHelper {
 	
 	public void store(List<Record> records);
 	
+	public void storeCapex(List<CapexRecord> capexRecords);
+	
 	public void stop();
 	
 	public void setContext(ExecutionContext context);

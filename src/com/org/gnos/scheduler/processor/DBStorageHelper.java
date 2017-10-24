@@ -17,6 +17,8 @@ import com.org.gnos.core.Node;
 import com.org.gnos.core.Pit;
 import com.org.gnos.core.Tree;
 import com.org.gnos.db.DBManager;
+import com.org.gnos.db.model.CapexData;
+import com.org.gnos.db.model.CapexInstance;
 import com.org.gnos.db.model.Dump;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Field;
@@ -39,6 +41,7 @@ public class DBStorageHelper implements IStorageHelper {
 	protected ExecutionContext context;
 	
 	protected static String report_insert_sql ="";
+	protected static String capex_report_insert_sql ="";
 	
 	@Override
 	public void store(List<Record> records) {
@@ -565,6 +568,55 @@ public class DBStorageHelper implements IStorageHelper {
 		}
 	}
 	
+	@Override
+	public void storeCapex(List<CapexRecord> capexRecords) {
+		if(capexRecords == null || capexRecords.size() == 0) return;
+		try ( PreparedStatement ips = conn.prepareStatement(capex_report_insert_sql); ){
+			boolean autoCommit = conn.getAutoCommit();
+			conn.setAutoCommit(false);
+			List<CapexData> cdList = context.getCapexDataList();
+			
+			for(CapexRecord cr: capexRecords) {
+				int index = 1;
+				int year = context.getScenario().getStartYear() + cr.getYear() - 1;
+				ips.setInt(index++, year);
+				List<Double> capexCosts = new ArrayList<Double>();
+				double total_capex = 0;
+				int ccount = 1;
+				for(CapexData cd : cdList) {
+					List<CapexInstance> ciList = cd.getListOfCapexInstances();
+					int cicount = 1;
+					for(CapexInstance ci : ciList) {
+						double cost =0;
+						if(ccount == cr.getCapexNo() && cicount == cr.getInstanceNo()) {
+							ips.setInt(index++, cr.getValue());
+							cost =  -cr.getValue() * ci.getCapexAmount();
+						} else {
+							ips.setInt(index++, 0);
+						}
+						total_capex += cost;
+						capexCosts.add(cost);
+						cicount++;
+					}
+					ccount++;
+				}
+				
+				for(Double capexValue : capexCosts) {
+					ips.setDouble(index++, capexValue);
+				}
+				ips.setDouble(index++, total_capex);
+				double dcf = total_capex * (1 / Math.pow ((1 + context.getScenario().getDiscount()), cr.getYear()));
+				ips.setDouble(index++, dcf);
+				
+				ips.executeUpdate();
+			}	
+			conn.commit();
+			conn.setAutoCommit(autoCommit);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} 
+	}
+	
 	public void processRecord(Record record){
 		
 	}
@@ -600,6 +652,75 @@ public class DBStorageHelper implements IStorageHelper {
 		
 	}
 	
+	private void createCapexTable() throws SQLException {
+		int projectId = context.getProjectId();
+		int scenarioId = context.getScenarioId();
+		dropCapexTable(projectId, scenarioId);
+		StringBuffer sbuff_sql = new StringBuffer("insert into gnos_capex_report_"+projectId+"_"+scenarioId+" (period ");
+		StringBuffer sbuff = new StringBuffer(" ( ?");
+		String  data_sql = "CREATE TABLE gnos_capex_report_"+projectId+"_"+scenarioId+" ( period INT ";
+
+		List<CapexData> cdList = context.getCapexDataList();
+		List<String> columns = new ArrayList<String>();
+		int ccount = 1;
+		for(CapexData cd : cdList) {
+			List<CapexInstance> ciList = cd.getListOfCapexInstances();
+			int cicount = 1;
+			for(CapexInstance ci : ciList) {
+				String name = "capex"+ccount+"_int"+cicount;
+				columns.add(name);
+				data_sql +=  ","+ name +" int ";			
+				sbuff_sql.append("," + name);
+				sbuff.append(", ?");
+				cicount++;
+			}
+			ccount++;
+		}
+		for(String column: columns) {
+			String name = column +"_cost";
+			data_sql +=  ","+ name +" double ";			
+			sbuff_sql.append("," + name);
+			sbuff.append(", ?");
+		}
+		
+		String[] capex_heads = {"total_capex", "capex_dcf"};
+		for(int i= 0; i< capex_heads.length; i ++){
+			data_sql +=  ","+ capex_heads[i] +" double ";			
+			sbuff_sql.append("," + capex_heads[i]);
+			sbuff.append(", ?");
+		}
+
+
+		
+		data_sql += " ); ";
+		
+		sbuff_sql.append(")");
+		sbuff.append(")");
+		capex_report_insert_sql = sbuff_sql.toString() + " values " + sbuff.toString();
+		
+		System.out.println("Sql =>"+data_sql);
+		try (
+				Statement stmt = conn.createStatement();
+			)
+		{			
+			stmt.executeUpdate(data_sql);
+		} 
+		
+	}
+	
+	private void dropCapexTable(int projectId, int scenarioId) throws SQLException {
+		String  data_table_sql = "DROP TABLE IF EXISTS gnos_capex_report_"+projectId+"_"+scenarioId+"; ";
+
+		try (
+				Statement stmt = conn.createStatement();
+			)
+		{
+			stmt.executeUpdate(data_table_sql);
+		} 
+		
+		
+	}
+
 	private void createReportTable() throws SQLException {
 		int projectId = context.getProjectId();
 		int scenarioId = context.getScenarioId();
@@ -831,6 +952,7 @@ public class DBStorageHelper implements IStorageHelper {
 		try {
 			createTable();
 			createReportTable();
+			createCapexTable();
 			createStockpileInventory();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block

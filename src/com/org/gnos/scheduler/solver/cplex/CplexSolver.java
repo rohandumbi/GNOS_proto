@@ -13,6 +13,7 @@ import com.org.gnos.core.GNOSConfig;
 import com.org.gnos.core.LogManager;
 import com.org.gnos.scheduler.equation.Constraint;
 import com.org.gnos.scheduler.equation.ExecutionContext;
+import com.org.gnos.scheduler.processor.CapexRecord;
 import com.org.gnos.scheduler.processor.FileStorageHelper;
 import com.org.gnos.scheduler.processor.IStorageHelper;
 import com.org.gnos.scheduler.processor.Record;
@@ -139,6 +140,7 @@ public class CplexSolver implements ISolver {
 				System.out.println("Obj = " + npv);
 				cplex.writeSolution("temp_" + timePeiod + ".sol");
 				List<Record> records = new ArrayList<Record>();
+				List<CapexRecord> capexRecords = new ArrayList<CapexRecord>();
 				for (int i = 0; i < _vars.size(); i++) {
 					String ccc = String.valueOf(_vars.get(i));
 					if (ccc.indexOf("x") != -1 && cplex.getValue(_vars.get(i)) > 0) {
@@ -147,9 +149,21 @@ public class CplexSolver implements ISolver {
 							continue;
 						record.setValue(cplex.getValue(_vars.get(i)));
 						records.add(record);
+					} else if(ccc.startsWith("c")) {
+						CapexRecord cr = parseCapex(ccc, timePeiod);
+						if (cr == null)
+							continue;
+						double value = cplex.getValue(_vars.get(i));
+						if(value > 0) {
+							cr.setValue(1);
+						} else {
+							cr.setValue(0);
+						}
+						capexRecords.add(cr);
 					}
 				} // for int
 				helper.store(records);
+				helper.storeCapex(capexRecords);
 			} // if solve
 			else {
 				LogManager.log("Model not solved");
@@ -161,7 +175,30 @@ public class CplexSolver implements ISolver {
 		} // catch cplex
 	}
 
-	public static Record parse(String x, int timePeiod) {
+	private CapexRecord parseCapex(String x, int timePeiod) {
+
+		CapexRecord crec = new CapexRecord();
+		int cpos = x.indexOf("c");
+		int ipos = x.indexOf("i");
+		int tpos = x.indexOf("t");
+		int capexNo, capexInstanceNo;
+		int period = Integer.parseInt(x.substring(tpos + 1));
+
+		if (timePeiod > 0 && timePeiod != period) {
+			return null;
+		}
+		if (cpos != -1) {
+
+			capexNo = Integer.parseInt(x.substring(cpos + 1, ipos));
+			capexInstanceNo = Integer.parseInt(x.substring(ipos + 1, tpos));
+			crec.setCapexNo(capexNo);
+			crec.setInstanceNo(capexInstanceNo);
+			crec.setYear(period);
+		}
+		return crec;
+	}
+
+	public Record parse(String x, int timePeiod) {
 
 		Record rec = new Record();
 		String block, pit, process;

@@ -71,7 +71,7 @@ public class TestApplication {
 		LogManager.initialize();
 		DBManager.initializePool();
 		LogManager.log("This is test");
-		short period = 15;
+		short period = 10;
 		short window = 2;
 		short stepsize = 1;
 		RunConfig runconfig = new RunConfig();
