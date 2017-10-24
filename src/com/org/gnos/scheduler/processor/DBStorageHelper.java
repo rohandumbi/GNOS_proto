@@ -15,11 +15,15 @@ import java.util.Set;
 import com.org.gnos.core.Block;
 import com.org.gnos.core.Node;
 import com.org.gnos.core.Pit;
+import com.org.gnos.core.Tree;
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.model.Dump;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Field;
+import com.org.gnos.db.model.FixedOpexCost;
 import com.org.gnos.db.model.Grade;
+import com.org.gnos.db.model.Model;
+import com.org.gnos.db.model.OpexData;
 import com.org.gnos.db.model.PitGroup;
 import com.org.gnos.db.model.Process;
 import com.org.gnos.db.model.ProcessJoin;
@@ -137,6 +141,7 @@ public class DBStorageHelper implements IStorageHelper {
 					double tonnesWt = context.getTonnesWtForBlock(b);				
 					double quantityMined = context.getUnScaledValue(record.getValue());
 					double ratio = quantityMined/tonnesWt;
+					int year = context.getScenario().getStartYear() + record.getTimePeriod() - 1;
 					BigDecimal total_TH = new BigDecimal(0);
 					int index = 1;
 					ips.setString(index++, context.getScenario().getName());
@@ -427,6 +432,115 @@ public class DBStorageHelper implements IStorageHelper {
 						ips.setString(index, processName);
 						index ++;
 					}
+					// Financial fields 
+					
+					double total_cost = 0;
+					double total_revenue = 0;
+					// Ore mining 
+					double oreMiningCost = 0;
+					if(record.getDestinationType() != Record.DESTINATION_WASTE) {
+						for(FixedOpexCost foc: context.getFixedOpexCostList()) {
+							if(foc.getCostHead() == FixedOpexCost.ORE_MINING_COST) {
+								oreMiningCost = quantityMined * foc.getCostData().get(year).doubleValue();								
+								break;
+							}
+						}				
+					} 
+					ips.setDouble(index++, -oreMiningCost);
+					total_cost += oreMiningCost;
+					// Waste mining
+					double wasteMiningCost = 0;
+					if(record.getDestinationType() == Record.DESTINATION_WASTE) {
+						for(FixedOpexCost foc: context.getFixedOpexCostList()) {
+							if(foc.getCostHead() == FixedOpexCost.WASTE_MINING_COST) {
+								wasteMiningCost = quantityMined * foc.getCostData().get(year).doubleValue();								
+								break;
+							}
+						}				
+					} 
+					ips.setDouble(index++, -wasteMiningCost);
+					total_cost += wasteMiningCost;
+					// Stockpile cost
+					double stockpilingCost = 0;
+					if(record.getDestinationType() == Record.DESTINATION_SP) {
+						for(FixedOpexCost foc: context.getFixedOpexCostList()) {
+							if(foc.getCostHead() == FixedOpexCost.STOCKPILING_COST) {
+								stockpilingCost = quantityMined * foc.getCostData().get(year).doubleValue();								
+								break;
+							}
+						}				
+					} 
+					ips.setDouble(index++, -stockpilingCost);
+					total_cost += stockpilingCost;
+
+					// Stockpile Reclaim 
+					double stockpileReclaimingCost = 0;
+					if(record.getOriginType() == Record.ORIGIN_SP) {
+						for(FixedOpexCost foc: context.getFixedOpexCostList()) {
+							if(foc.getCostHead() == FixedOpexCost.STOCKPILE_RECLAIMING_COST) {
+								stockpileReclaimingCost = quantityMined * foc.getCostData().get(year).doubleValue();								
+								break;
+							}
+						}				
+					}
+					ips.setDouble(index++, -stockpileReclaimingCost);
+					total_cost += stockpileReclaimingCost;
+					//Truckhour cost
+					double truckHourCost = 0;
+					for(FixedOpexCost foc: context.getFixedOpexCostList()) {
+						if(foc.getCostHead() == FixedOpexCost.TRUCK_HOUR_COST) {
+							truckHourCost = total_TH.doubleValue() * foc.getCostData().get(year).doubleValue();								
+							break;
+						}
+					}
+					ips.setDouble(index++, -truckHourCost);
+					total_cost += truckHourCost;
+					
+					List<OpexData> opexDataList = context.getOpexDataList();
+					for (OpexData opexData: opexDataList) {
+						if(!opexData.isInUse()) continue;						
+						if(opexData.isRevenue()) {
+							double revenue = 0;	
+							if(record.getDestinationType() == Record.DESTINATION_PROCESS) {
+								boolean calRev = true;
+								if(opexData.getModelId() != -1 && (opexData.getModelId() != process.getModel().getId())) {
+									calRev = false;
+
+								} else if(opexData.getProductJoinName() != null  && opexData.getProductJoinName().trim().length() > 0) {
+									if(!isProcessAssociatedToProductJoin(process.getModel(), opexData.getProductJoinName())){
+										calRev = false;
+									}
+								}
+								if(calRev) {
+									int unitId;
+									if(opexData.getUnitType() == OpexData.UNIT_FIELD) {
+										unitId = opexData.getFieldId();
+									} else {
+										unitId = opexData.getExpressionId();
+									}
+									BigDecimal expr_value = context.getUnitValueforBlock(b, unitId, opexData.getUnitType());
+									revenue = expr_value.doubleValue()* quantityMined * opexData.getCostData().get(year).doubleValue();
+								}
+								
+							}
+							ips.setDouble(index++, revenue);
+						} else {
+							double pcost = 0;
+							if(record.getDestinationType() == Record.DESTINATION_PROCESS) {
+								if(opexData.getModelId() != -1 && (process.getModel().getId() == opexData.getModelId() || isChild(opexData.getModelId(), process.getModel()))) {
+									pcost = opexData.getCostData().get(year).doubleValue() * quantityMined;									
+								}
+							}
+							
+							ips.setDouble(index++, -pcost);
+						}
+					}
+
+					ips.setDouble(index++, -total_cost);
+					ips.setDouble(index++, total_revenue);
+					ips.setDouble(index++, (total_revenue - total_cost));
+					double dcf = (total_revenue - total_cost) * (1 / Math.pow ((1 + context.getScenario().getDiscount()), year));
+					ips.setDouble(index++, dcf);
 					
 					ips.executeUpdate();
 				} catch (SQLException e) {
@@ -591,6 +705,42 @@ public class DBStorageHelper implements IStorageHelper {
 			sbuff_sql.append("," + name);
 			sbuff.append(", ?");
 		}
+		String[]  cost_heads =  { "ore_mining","waste_mining", "stockpile_cost", "stockpile_reclaim", "truckhour_cost" };
+		
+		for (int i = 0; i< cost_heads.length; i++) {
+			data_sql +=  ","+ cost_heads[i] +"  double ";			
+			sbuff_sql.append("," + cost_heads[i]);
+			sbuff.append(", ?");
+		}
+		
+		List<OpexData> opexDataList = context.getOpexDataList();
+		for (OpexData opexData: opexDataList) {
+			if(!opexData.isInUse()) continue;
+			String name = opexData.isRevenue() ? "rev_" : "pcost_";
+			if(opexData.getModelId() != -1) {
+				name += context.getModelById(opexData.getModelId()).getName().toLowerCase();
+			} else {
+				name += opexData.getProductJoinName();
+			}
+			if(opexData.getUnitType() == OpexData.UNIT_FIELD) {
+				name += "_"+ context.getFieldById(opexData.getFieldId()).getName().toLowerCase();
+			} else if(opexData.getUnitType() == OpexData.UNIT_EXPRESSION) {
+				name += "_"+ context.getExpressionById(opexData.getExpressionId()).getName().toLowerCase();
+			}
+			data_sql +=  ","+ name +"  double ";			
+			sbuff_sql.append("," + name);
+			sbuff.append(", ?");
+		}
+		
+		String[] financial_heads = {"total_cost", "total_revenue", "cashflow", "dcf"};
+		
+		for (int i = 0; i< financial_heads.length; i++) {
+			data_sql +=  ","+ financial_heads[i] +"  double ";			
+			sbuff_sql.append("," + financial_heads[i]);
+			sbuff.append(", ?");
+		}
+
+		
 		data_sql += " ); ";
 		
 		sbuff_sql.append(")");
@@ -632,6 +782,42 @@ public class DBStorageHelper implements IStorageHelper {
 			stmt.executeUpdate(data_table_sql);
 		} 
 		
+	}
+	
+	protected boolean isChild(int modelId, Model model) {
+		Tree processTree = context.getProcessTree();
+		Node processNode = processTree.getNodeByName(model.getName());
+		
+		return isChild(modelId, processNode);
+	}
+	
+	protected boolean isChild(int modelId, Node node) {
+		Node parent = node.getParent();
+		if(parent == null) return false;
+		if(parent.getData().getId() == modelId) {
+			return true;
+		}
+		
+		return isChild(modelId, parent);
+	}
+	
+	
+	protected boolean isProcessAssociatedToProductJoin(Model model, String productJoinName) {
+		ProductJoin pj = context.getProductJoinFromName(productJoinName);
+		Set<String> products = pj.getProductList();
+		for(String productName: products) {
+			Product p = context.getProductFromName(productName);
+			if(p.getModelId() == model.getId()) {
+				return true;
+			}
+		}
+		Set<String> productJoins = pj.getProductJoinList();
+		for(String pjName: productJoins) {
+			if(isProcessAssociatedToProductJoin(model, pjName)) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	@Override
