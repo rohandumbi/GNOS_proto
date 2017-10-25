@@ -43,6 +43,28 @@ public class ReportEndpoint {
 				}
 			});
 			
+			post("/project/:id/report/capex/csv", new Route() {
+				
+				@Override
+				public Object handle(Request req, Response res) throws Exception {
+					JsonElement requestObject = new JsonParser().parse(req.body());
+					if(requestObject.isJsonObject()) {
+						JsonObject jsonObject = requestObject.getAsJsonObject();
+						try {
+							res.type("text/csv");
+							res.header("Content-Disposition", "attachment; filename=\"capex-report.csv\"");
+							return controller.getCapexReportCSV(jsonObject, req.params(":id"));
+						} catch (Exception e) {
+							res.status(400);
+							return new ResponseError("Could not fetch report data. "+e.getMessage());
+						}
+					}
+					res.status(400);				
+					return new ResponseError("Field creation failed due to improper input");
+					
+				}
+			});
+
 			post("/project/:id/report", new Route() {
 				
 				@Override
