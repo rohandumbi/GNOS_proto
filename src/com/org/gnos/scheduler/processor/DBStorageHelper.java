@@ -441,7 +441,7 @@ public class DBStorageHelper implements IStorageHelper {
 					double total_revenue = 0;
 					// Ore mining 
 					double oreMiningCost = 0;
-					if(record.getDestinationType() != Record.DESTINATION_WASTE) {
+					if(record.getDestinationType() != Record.DESTINATION_WASTE && record.getOriginType() == Record.ORIGIN_PIT) {
 						for(FixedOpexCost foc: context.getFixedOpexCostList()) {
 							if(foc.getCostHead() == FixedOpexCost.ORE_MINING_COST) {
 								oreMiningCost = quantityMined * foc.getCostData().get(year).doubleValue();								
@@ -527,6 +527,7 @@ public class DBStorageHelper implements IStorageHelper {
 								
 							}
 							ips.setDouble(index++, revenue);
+							total_revenue += revenue;
 						} else {
 							double pcost = 0;
 							if(record.getDestinationType() == Record.DESTINATION_PROCESS) {
@@ -536,13 +537,14 @@ public class DBStorageHelper implements IStorageHelper {
 							}
 							
 							ips.setDouble(index++, -pcost);
+							total_cost += pcost;
 						}
 					}
 
 					ips.setDouble(index++, -total_cost);
 					ips.setDouble(index++, total_revenue);
 					ips.setDouble(index++, (total_revenue - total_cost));
-					double dcf = (total_revenue - total_cost) * (1 / Math.pow ((1 + context.getScenario().getDiscount()), year));
+					double dcf = (total_revenue - total_cost) * (1 / Math.pow ((1 + context.getScenario().getDiscount()), record.getTimePeriod()));
 					ips.setDouble(index++, dcf);
 					
 					ips.executeUpdate();
