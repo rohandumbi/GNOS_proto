@@ -156,7 +156,9 @@ public class DBStorageHelper implements IStorageHelper {
 					ips.setInt(index++, record.getDestinationType());
 					if(record.getDestinationType() == Record.DESTINATION_PROCESS) {
 						Process process = context.getProcessByNumber(record.getProcessNo());
-						total_TH = total_TH.add(context.getTruckHourRatio(b, process.getModel().getName()));
+						if(record.getOriginType() == Record.ORIGIN_PIT ) {
+							total_TH = total_TH.add(context.getTruckHourRatio(b, process.getModel().getName()));
+						}						
 						ips.setString(index++, process.getModel().getName());
 					} else if(record.getDestinationType() == Record.DESTINATION_SP) {
 						Stockpile sp = context.getStockpileFromNo(record.getDestSpNo());
@@ -544,7 +546,8 @@ public class DBStorageHelper implements IStorageHelper {
 					ips.setDouble(index++, -total_cost);
 					ips.setDouble(index++, total_revenue);
 					ips.setDouble(index++, (total_revenue - total_cost));
-					double dcf = (total_revenue - total_cost) * (1 / Math.pow ((1 + context.getScenario().getDiscount()), record.getTimePeriod()));
+					double discount_rate = context.getScenario().getDiscount()/100;
+					double dcf = (total_revenue - total_cost) * (1 / Math.pow ((1 + discount_rate), record.getTimePeriod()));
 					ips.setDouble(index++, dcf);
 					
 					ips.executeUpdate();
@@ -607,7 +610,8 @@ public class DBStorageHelper implements IStorageHelper {
 					ips.setDouble(index++, capexValue);
 				}
 				ips.setDouble(index++, total_capex);
-				double dcf = total_capex * (1 / Math.pow ((1 + context.getScenario().getDiscount()), cr.getYear()));
+				double discount_rate = context.getScenario().getDiscount()/100;
+				double dcf = total_capex * (1 / Math.pow ((1 + discount_rate), cr.getYear()));
 				ips.setDouble(index++, dcf);
 				
 				ips.executeUpdate();
