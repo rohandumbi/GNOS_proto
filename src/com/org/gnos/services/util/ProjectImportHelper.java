@@ -427,7 +427,7 @@ public class ProjectImportHelper implements ProjectTypes {
 		for(int i= 0; fixedCostList!= null && i < fixedCostList.size(); i++) {
 			String[] values = fixedCostList.get(i);
 			FixedOpexCost foc = new FixedOpexCost();
-			foc.setCostHead(Integer.parseInt(values[0]));
+			foc.setCostType(Integer.parseInt(values[0]));
 			for(int j= 1; j< values.length; j++) {
 				String[] costData = values[j].split(",");
 				foc.addCostData(Integer.parseInt(costData[0]), new BigDecimal(costData[1]));

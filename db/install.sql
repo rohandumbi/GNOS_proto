@@ -161,14 +161,26 @@ CREATE TABLE process_constraint_year_mapping(
    unique key( process_constraint_id, year)
 );
 
+DROP TABLE IF EXISTS fixedcost_defn;
+
+CREATE TABLE fixedcost_defn(
+   id INT NOT NULL AUTO_INCREMENT,
+   scenario_id INT NOT NULL,
+   cost_type TINYINT NOT NULL,
+   selector_name VARCHAR(50),
+   selector_type TINYINT,
+   in_use TINYINT NOT NULL default 1,
+   is_default TINYINT NOT NULL default 0,
+   PRIMARY KEY ( id )
+);
+
 DROP TABLE IF EXISTS fixedcost_year_mapping; 
 
 CREATE TABLE fixedcost_year_mapping(
-   scenario_id INT NOT NULL,
-   cost_head float NOT NULL,
+   fixedcost_id INT NOT NULL,
    year INT NOT NULL,
    value FLOAT NOT NULL,
-   unique key(scenario_id, cost_head, year)
+   unique key(fixedcost_id, year)
 );
 
 DROP TABLE IF EXISTS product_defn; 

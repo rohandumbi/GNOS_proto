@@ -445,7 +445,7 @@ public class DBStorageHelper implements IStorageHelper {
 					double oreMiningCost = 0;
 					if(record.getDestinationType() != Record.DESTINATION_WASTE && record.getOriginType() == Record.ORIGIN_PIT) {
 						for(FixedOpexCost foc: context.getFixedOpexCostList()) {
-							if(foc.getCostHead() == FixedOpexCost.ORE_MINING_COST) {
+							if(foc.getCostType() == FixedOpexCost.ORE_MINING_COST) {
 								oreMiningCost = quantityMined * foc.getCostData().get(year).doubleValue();								
 								break;
 							}
@@ -457,7 +457,7 @@ public class DBStorageHelper implements IStorageHelper {
 					double wasteMiningCost = 0;
 					if(record.getDestinationType() == Record.DESTINATION_WASTE) {
 						for(FixedOpexCost foc: context.getFixedOpexCostList()) {
-							if(foc.getCostHead() == FixedOpexCost.WASTE_MINING_COST) {
+							if(foc.getCostType() == FixedOpexCost.WASTE_MINING_COST) {
 								wasteMiningCost = quantityMined * foc.getCostData().get(year).doubleValue();								
 								break;
 							}
@@ -469,7 +469,7 @@ public class DBStorageHelper implements IStorageHelper {
 					double stockpilingCost = 0;
 					if(record.getDestinationType() == Record.DESTINATION_SP) {
 						for(FixedOpexCost foc: context.getFixedOpexCostList()) {
-							if(foc.getCostHead() == FixedOpexCost.STOCKPILING_COST) {
+							if(foc.getCostType() == FixedOpexCost.STOCKPILING_COST) {
 								stockpilingCost = quantityMined * foc.getCostData().get(year).doubleValue();								
 								break;
 							}
@@ -482,7 +482,7 @@ public class DBStorageHelper implements IStorageHelper {
 					double stockpileReclaimingCost = 0;
 					if(record.getOriginType() == Record.ORIGIN_SP) {
 						for(FixedOpexCost foc: context.getFixedOpexCostList()) {
-							if(foc.getCostHead() == FixedOpexCost.STOCKPILE_RECLAIMING_COST) {
+							if(foc.getCostType() == FixedOpexCost.STOCKPILE_RECLAIMING_COST) {
 								stockpileReclaimingCost = quantityMined * foc.getCostData().get(year).doubleValue();								
 								break;
 							}
@@ -493,7 +493,7 @@ public class DBStorageHelper implements IStorageHelper {
 					//Truckhour cost
 					double truckHourCost = 0;
 					for(FixedOpexCost foc: context.getFixedOpexCostList()) {
-						if(foc.getCostHead() == FixedOpexCost.TRUCK_HOUR_COST) {
+						if(foc.getCostType() == FixedOpexCost.TRUCK_HOUR_COST) {
 							truckHourCost = total_TH.doubleValue() * foc.getCostData().get(year).doubleValue();								
 							break;
 						}
