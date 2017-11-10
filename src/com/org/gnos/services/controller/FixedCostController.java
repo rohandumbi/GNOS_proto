@@ -46,17 +46,24 @@ public class FixedCostController {
 	
 	
 	public FixedOpexCost update(JsonObject jsonObject, String scenarioIdStr) throws Exception {		
+		int id = jsonObject.get("id").getAsInt();
 		int costType = jsonObject.get("costType").getAsInt();
 		boolean inUse = jsonObject.get("inUse").getAsBoolean();
+		boolean isDefault = jsonObject.get("isDefault").getAsBoolean();
 		int selectionType = jsonObject.get("selectionType").getAsInt();
-		String selectorName = jsonObject.get("selectorName").getAsString();
+		String selectorName = null;//since this value can be null for default cost types
+		if(jsonObject.get("selectorName") != null){
+			selectorName = jsonObject.get("selectorName").getAsString();
+		}
 		JsonObject costDataObj = jsonObject.get("costData").getAsJsonObject();
 		
 		FixedOpexCost obj = new FixedOpexCost();
+		obj.setId(id);
 		obj.setCostType(costType);
 		obj.setSelectionType(selectionType);
 		obj.setSelectorName(selectorName);
 		obj.setInUse(inUse);
+		obj.setDefault(isDefault);
 		
 		for (Entry<String, JsonElement> costData : costDataObj.entrySet()) {
 			obj.addCostData(Integer.parseInt(costData.getKey()), costData.getValue().getAsBigDecimal());
