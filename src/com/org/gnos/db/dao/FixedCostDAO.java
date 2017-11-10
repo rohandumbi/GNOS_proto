@@ -18,8 +18,8 @@ import com.org.gnos.db.model.FixedOpexCost;
 
 public class FixedCostDAO {
 
-	private static final String SQL_LIST_ORDER_BY_ID = "select a.id, cost_type, selector_name, selector_type, in_use, is_default, year, value from fixedcost_defn a, fixedcost_year_mapping b " +
-			" where b.fixedcost_id = a.id and scenario_id = ? order by id, year";
+	private static final String SQL_LIST_ORDER_BY_ID = "select a.id, cost_type, selector_name, selector_type, in_use, is_default, year, value from fixedcost_defn a left join fixedcost_year_mapping b " +
+			" on b.fixedcost_id = a.id where scenario_id = ? order by id, year";
 	private static final String SQL_INSERT = "insert into fixedcost_defn (scenario_id, cost_type, selector_name, selector_type, in_use, is_default) values (?, ?, ?, ?, ?, ?)";
 	private static final String SQL_INSERT_MAPPING = "insert into fixedcost_year_mapping (fixedcost_id, year, value) values (?, ?, ?)";
 	private static final String SQL_DELETE_BY_ID = "delete from fixedcost_defn where id = ?";
@@ -43,11 +43,11 @@ public class FixedCostDAO {
 			ResultSet resultSet = statement.executeQuery();
 		){
 			while(resultSet.next()){
-				int costHead = resultSet.getInt("cost_head");
-				FixedOpexCost fixedOpexCost = fixedCostMap.get(costHead);
+				int costType = resultSet.getInt("cost_type");
+				FixedOpexCost fixedOpexCost = fixedCostMap.get(costType);
 				if(fixedOpexCost == null){
 					fixedOpexCost = map(resultSet, fixedOpexCost);
-					fixedCostMap.put(costHead, fixedOpexCost);
+					fixedCostMap.put(costType, fixedOpexCost);
 					fixedCosts.add(fixedOpexCost);
 				} else {
 					map(resultSet, fixedOpexCost);
