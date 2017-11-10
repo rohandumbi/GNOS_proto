@@ -245,6 +245,7 @@ public class FixedCostDAO {
 	private FixedOpexCost map(ResultSet rs, FixedOpexCost foc) throws SQLException {
 		if (foc == null) {
 			foc = new FixedOpexCost();
+			foc.setId(rs.getInt("id"));
 			foc.setCostType(rs.getInt("cost_type"));
 			foc.setSelectorName(rs.getString("selector_name"));
 			foc.setSelectionType(rs.getInt("selector_type"));
