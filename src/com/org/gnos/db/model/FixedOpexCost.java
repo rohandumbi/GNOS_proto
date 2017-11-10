@@ -26,6 +26,7 @@ public class FixedOpexCost {
 	protected HashMap<Integer, BigDecimal> costData;
 	
 	public FixedOpexCost() {
+		this.id = -1;
 		this.costData = new LinkedHashMap<Integer, BigDecimal>();
 	}
 	

@@ -65,7 +65,7 @@ public class FixedCostDAO {
 
 
 		if (foc.getId() != -1) {
-            throw new IllegalArgumentException("ProcessConstraint is already created.");
+            throw new IllegalArgumentException("Fixed Cost is already created.");
         }
 		Object[] values = {
 				scenarioId, 
