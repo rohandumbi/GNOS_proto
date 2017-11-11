@@ -96,7 +96,14 @@ public class FixedCostController {
 		dao.delete(Integer.parseInt(scenarioIdStr));
 		return true;	
 	}
-	
+
+	public boolean deleteById(String costIdStr) {
+		int id = Integer.parseInt(costIdStr);
+		FixedOpexCost obj = new FixedOpexCost();
+		obj.setId(id);
+		dao.delete(obj);
+		return true;	
+	}
 	
 	private boolean checkDuplicate(int scenarioId, int costType, int selectionType, String selectorName) {
 		boolean isDuplicate = false;

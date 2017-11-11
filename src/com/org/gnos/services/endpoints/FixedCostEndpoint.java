@@ -63,8 +63,11 @@ public class FixedCostEndpoint {
 				}
 			}, json());
 
-			/* DELETE exisitng opexdata */
+			/* DELETE existing fixedcosts for scenario */
 			delete("/scenario/:id/fixedcosts", (req, res) -> controller.delete(req.params(":id")), json());
+			
+			/* DELETE fixedcosts by id */
+			delete("/fixedcost/:id", (req, res) -> controller.deleteById(req.params(":id")), json());
 		}
 		
 }
