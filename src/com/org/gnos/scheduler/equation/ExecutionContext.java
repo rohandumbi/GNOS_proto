@@ -111,7 +111,6 @@ public class ExecutionContext {
 
 	private Scenario scenario;
 	private List<OpexData> opexDataList;
-	private List<FixedOpexCost> fixedOpexCostList;
 	private List<ProcessConstraintData> processConstraintDataList;
 	private List<GradeConstraintData> gradeConstraintDataList;
 	private List<PitBenchConstraintData> pitBenchConstraintDataList;
@@ -120,6 +119,11 @@ public class ExecutionContext {
 	private List<CapexData> capexDataList;
 
 	private Map<String, List<Grade>> productGradeMap;
+	private Map<Integer, Map<Integer, BigDecimal>> pitOreMiningCostMap;
+	private Map<Integer, Map<Integer, BigDecimal>> pitWasteMiningCostMap;
+	private Map<Integer, Map<Integer, BigDecimal>> spStockpilingCostMap;
+	private Map<Integer, Map<Integer, BigDecimal>> spStockpileReclaimingCostMap;
+	private Map<Integer, BigDecimal> truckhourCostMap;
 	
 	private int projectId;
 	private int scenarioId;
@@ -361,7 +365,96 @@ public class ExecutionContext {
 	}
 
 	private void loadFixedCost() {
-		fixedOpexCostList = new FixedCostDAO().getAll(scenarioId);
+		pitOreMiningCostMap = new HashMap<Integer, Map<Integer, BigDecimal>>();
+		pitWasteMiningCostMap = new HashMap<Integer, Map<Integer, BigDecimal>>();
+		spStockpilingCostMap = new HashMap<Integer, Map<Integer, BigDecimal>>();
+		spStockpileReclaimingCostMap = new HashMap<Integer, Map<Integer, BigDecimal>>();
+		truckhourCostMap =  new HashMap<Integer, BigDecimal>();
+		List<FixedOpexCost> fixedOpexCostList = new FixedCostDAO().getAll(scenarioId);
+		for(FixedOpexCost foc: fixedOpexCostList) {
+			if(!foc.isInUse()) continue;
+			if(foc.getCostType() == FixedOpexCost.ORE_MINING_COST) {
+				if(foc.isDefault()) {
+					Set<Integer> pitNos = pits.keySet();
+					for(Integer pitNo:pitNos) {
+						if(!pitOreMiningCostMap.containsKey(pitNo)) {
+							pitOreMiningCostMap.put(pitNo, foc.getCostData());
+						}
+					}					
+				} else {
+					if(foc.getSelectionType() == FixedOpexCost.SELECTOR_PIT) {
+						Pit pit = getPitNameMap().get(foc.getSelectorName());
+						if(pit == null) continue;
+						pitOreMiningCostMap.put(pit.getPitNo(), foc.getCostData());
+					} else if(foc.getSelectionType() == FixedOpexCost.SELECTOR_PIT_GROUP) {
+						PitGroup pitGroup = getPitGroupfromName(foc.getSelectorName());
+						if(pitGroup == null) continue;
+						Set<String> pitNames = flattenPitGroup(pitGroup);
+						for(String pitName: pitNames) {
+							Pit pit = getPitNameMap().get(pitName);
+							if(pit == null) continue;
+							pitOreMiningCostMap.put(pit.getPitNo(), foc.getCostData());
+						}
+					}
+				}
+			} else if(foc.getCostType() == FixedOpexCost.WASTE_MINING_COST) {
+				if(foc.isDefault()) {
+					Set<Integer> pitNos = pits.keySet();
+					for(Integer pitNo:pitNos) {
+						if(!pitWasteMiningCostMap.containsKey(pitNo)) {
+							pitWasteMiningCostMap.put(pitNo, foc.getCostData());
+						}
+					}
+				} else {
+					if(foc.getSelectionType() == FixedOpexCost.SELECTOR_PIT) {
+						Pit pit = getPitNameMap().get(foc.getSelectorName());
+						if(pit == null) continue;
+						pitWasteMiningCostMap.put(pit.getPitNo(), foc.getCostData());
+					} else if(foc.getSelectionType() == FixedOpexCost.SELECTOR_PIT_GROUP) {
+						PitGroup pitGroup = getPitGroupfromName(foc.getSelectorName());
+						if(pitGroup == null) continue;
+						Set<String> pitNames = flattenPitGroup(pitGroup);
+						for(String pitName: pitNames) {
+							Pit pit = getPitNameMap().get(pitName);
+							if(pit == null) continue;
+							pitWasteMiningCostMap.put(pit.getPitNo(), foc.getCostData());
+						}
+					}
+				}
+			} else if(foc.getCostType() == FixedOpexCost.STOCKPILING_COST) {
+				if(foc.isDefault()) {
+					for(Stockpile sp: stockpiles) {
+						if(!spStockpilingCostMap.containsKey(sp.getStockpileNumber())) {
+							spStockpilingCostMap.put(sp.getStockpileNumber(), foc.getCostData());
+						}
+					}
+				} else {
+					for(Stockpile sp: stockpiles) {
+						if(sp.getName().equals(foc.getSelectorName())) {
+							spStockpilingCostMap.put(sp.getStockpileNumber(), foc.getCostData());
+							break;
+						}
+					}
+				}
+			} else if(foc.getCostType() == FixedOpexCost.STOCKPILE_RECLAIMING_COST) {
+				if(foc.isDefault()) {
+					for(Stockpile sp: stockpiles) {
+						if(!spStockpileReclaimingCostMap.containsKey(sp.getStockpileNumber())) {
+							spStockpileReclaimingCostMap.put(sp.getStockpileNumber(), foc.getCostData());
+						}
+					}
+				} else {
+					for(Stockpile sp: stockpiles) {
+						if(sp.getName().equals(foc.getSelectorName())) {
+							spStockpileReclaimingCostMap.put(sp.getStockpileNumber(), foc.getCostData());
+							break;
+						}
+					}
+				}
+			} else if(foc.getCostType() == FixedOpexCost.TRUCK_HOUR_COST) {
+				truckhourCostMap = foc.getCostData();
+			}
+		}
 	}
 
 	private void loadProcessConstraintData() {
@@ -913,6 +1006,50 @@ public class ExecutionContext {
 		processBlocks.add(b);
 	}
 
+	public BigDecimal getOreMinigCost(int pitNo, int year) {
+		BigDecimal cost = new BigDecimal(0);
+		Map<Integer, BigDecimal> costData = pitOreMiningCostMap.get(pitNo);
+		if(costData != null && costData.get(year) != null) {
+			cost = costData.get(year);
+		}
+		return cost;
+	}
+	
+	public BigDecimal getWasteMinigCost(int pitNo, int year) {
+		BigDecimal cost = new BigDecimal(0);
+		Map<Integer, BigDecimal> costData = pitWasteMiningCostMap.get(pitNo);
+		if(costData != null && costData.get(year) != null) {
+			cost = costData.get(year);
+		}
+		return cost;
+	}
+	
+	public BigDecimal getStockpilingCost(int spNo, int year) {
+		BigDecimal cost = new BigDecimal(0);
+		Map<Integer, BigDecimal> costData = spStockpilingCostMap.get(spNo);
+		if(costData != null && costData.get(year) != null) {
+			cost = costData.get(year);
+		}
+		return cost;
+	}
+	
+	public BigDecimal getStockpileReclaimingCost(int spNo, int year) {
+		BigDecimal cost = new BigDecimal(0);
+		Map<Integer, BigDecimal> costData = spStockpileReclaimingCostMap.get(spNo);
+		if(costData != null && costData.get(year) != null) {
+			cost = costData.get(year);
+		}
+		return cost;
+	}
+	
+	public BigDecimal getTruckHourCost(int year) {
+		BigDecimal cost = new BigDecimal(0);
+		if(truckhourCostMap != null && truckhourCostMap.get(year) != null) {
+			cost = truckhourCostMap.get(year);
+		}
+		return cost;
+	}
+	
 	public Map<Integer, Integer> getBlockPayloadMapping() {
 		return blockPayloadMapping;
 	}
@@ -1043,14 +1180,6 @@ public class ExecutionContext {
 
 	public void setOpexDataList(List<OpexData> opexDataList) {
 		this.opexDataList = opexDataList;
-	}
-
-	public List<FixedOpexCost> getFixedOpexCostList() {
-		return fixedOpexCostList;
-	}
-
-	public void setFixedOpexCostList(List<FixedOpexCost> fixedOpexCostList) {
-		this.fixedOpexCostList = fixedOpexCostList;
 	}
 
 	public List<ProcessConstraintData> getProcessConstraintDataList() {

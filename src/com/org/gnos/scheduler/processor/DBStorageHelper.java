@@ -444,36 +444,21 @@ public class DBStorageHelper implements IStorageHelper {
 					// Ore mining 
 					double oreMiningCost = 0;
 					if(record.getDestinationType() != Record.DESTINATION_WASTE && record.getOriginType() == Record.ORIGIN_PIT) {
-						for(FixedOpexCost foc: context.getFixedOpexCostList()) {
-							if(foc.getCostType() == FixedOpexCost.ORE_MINING_COST) {
-								oreMiningCost = quantityMined * foc.getCostData().get(year).doubleValue();								
-								break;
-							}
-						}				
+						oreMiningCost = quantityMined * context.getOreMinigCost(record.getPitNo(), year).doubleValue();			
 					} 
 					ips.setDouble(index++, -oreMiningCost);
 					total_cost += oreMiningCost;
 					// Waste mining
 					double wasteMiningCost = 0;
 					if(record.getDestinationType() == Record.DESTINATION_WASTE) {
-						for(FixedOpexCost foc: context.getFixedOpexCostList()) {
-							if(foc.getCostType() == FixedOpexCost.WASTE_MINING_COST) {
-								wasteMiningCost = quantityMined * foc.getCostData().get(year).doubleValue();								
-								break;
-							}
-						}				
+						wasteMiningCost = quantityMined * context.getWasteMinigCost(record.getPitNo(), year).doubleValue();						
 					} 
 					ips.setDouble(index++, -wasteMiningCost);
 					total_cost += wasteMiningCost;
 					// Stockpile cost
 					double stockpilingCost = 0;
 					if(record.getDestinationType() == Record.DESTINATION_SP) {
-						for(FixedOpexCost foc: context.getFixedOpexCostList()) {
-							if(foc.getCostType() == FixedOpexCost.STOCKPILING_COST) {
-								stockpilingCost = quantityMined * foc.getCostData().get(year).doubleValue();								
-								break;
-							}
-						}				
+						stockpilingCost = quantityMined * context.getStockpilingCost(record.getDestSpNo(), year).doubleValue();			
 					} 
 					ips.setDouble(index++, -stockpilingCost);
 					total_cost += stockpilingCost;
@@ -481,23 +466,13 @@ public class DBStorageHelper implements IStorageHelper {
 					// Stockpile Reclaim 
 					double stockpileReclaimingCost = 0;
 					if(record.getOriginType() == Record.ORIGIN_SP) {
-						for(FixedOpexCost foc: context.getFixedOpexCostList()) {
-							if(foc.getCostType() == FixedOpexCost.STOCKPILE_RECLAIMING_COST) {
-								stockpileReclaimingCost = quantityMined * foc.getCostData().get(year).doubleValue();								
-								break;
-							}
-						}				
+						stockpileReclaimingCost = quantityMined * context.getStockpileReclaimingCost(record.getDestSpNo(), year).doubleValue();			
 					}
 					ips.setDouble(index++, -stockpileReclaimingCost);
 					total_cost += stockpileReclaimingCost;
 					//Truckhour cost
-					double truckHourCost = 0;
-					for(FixedOpexCost foc: context.getFixedOpexCostList()) {
-						if(foc.getCostType() == FixedOpexCost.TRUCK_HOUR_COST) {
-							truckHourCost = total_TH.doubleValue() * foc.getCostData().get(year).doubleValue();								
-							break;
-						}
-					}
+					double truckHourCost = total_TH.doubleValue() * context.getTruckHourCost(year).doubleValue();	
+					
 					ips.setDouble(index++, -truckHourCost);
 					total_cost += truckHourCost;
 					

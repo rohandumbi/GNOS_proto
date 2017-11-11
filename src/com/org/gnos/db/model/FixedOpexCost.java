@@ -7,15 +7,15 @@ import java.util.Set;
 
 public class FixedOpexCost {
 	
-	public static int ORE_MINING_COST = 0;
-	public static int WASTE_MINING_COST = 1;
-	public static int STOCKPILING_COST = 2;
-	public static int STOCKPILE_RECLAIMING_COST = 3;
-	public static int TRUCK_HOUR_COST = 4;
+	public static final int ORE_MINING_COST = 0;
+	public static final int WASTE_MINING_COST = 1;
+	public static final int STOCKPILING_COST = 2;
+	public static final int STOCKPILE_RECLAIMING_COST = 3;
+	public static final int TRUCK_HOUR_COST = 4;
 	
-	public static int SELECTOR_PIT = 1;
-	public static int SELECTOR_PIT_GROUP = 2;
-	public static int SELECTOR_STOCKPILE = 3;
+	public static final int SELECTOR_PIT = 1;
+	public static final int SELECTOR_PIT_GROUP = 2;
+	public static final int SELECTOR_STOCKPILE = 3;
 	
 	private int id;
 	private int costType;
