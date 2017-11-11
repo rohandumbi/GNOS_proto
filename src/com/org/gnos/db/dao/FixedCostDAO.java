@@ -43,11 +43,11 @@ public class FixedCostDAO {
 			ResultSet resultSet = statement.executeQuery();
 		){
 			while(resultSet.next()){
-				int costType = resultSet.getInt("cost_type");
-				FixedOpexCost fixedOpexCost = fixedCostMap.get(costType);
+				int id = resultSet.getInt("id");
+				FixedOpexCost fixedOpexCost = fixedCostMap.get(id);
 				if(fixedOpexCost == null){
 					fixedOpexCost = map(resultSet, fixedOpexCost);
-					fixedCostMap.put(costType, fixedOpexCost);
+					fixedCostMap.put(id, fixedOpexCost);
 					fixedCosts.add(fixedOpexCost);
 				} else {
 					map(resultSet, fixedOpexCost);

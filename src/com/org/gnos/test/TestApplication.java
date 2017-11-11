@@ -6,6 +6,7 @@ import com.org.gnos.core.GNOSConfig;
 import com.org.gnos.core.LogManager;
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.dao.ExpressionDAO;
+import com.org.gnos.db.dao.FixedCostDAO;
 import com.org.gnos.db.dao.ProjectDAO;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Project;
@@ -71,7 +72,7 @@ public class TestApplication {
 		LogManager.initialize();
 		DBManager.initializePool();
 		LogManager.log("This is test");
-		short period = 8;
+		/*short period = 8;
 		short window = 2;
 		short stepsize = 1;
 		RunConfig runconfig = new RunConfig();
@@ -85,7 +86,9 @@ public class TestApplication {
 		runconfig.setScenarioId(8);
 		SchedulerService service = new SchedulerService();
 		service.setRunconfig(runconfig);
-		service.execute();
+		service.execute();*/
+		FixedCostDAO dao = new FixedCostDAO();
+		dao.getAll(13);
 	}
 
 }
