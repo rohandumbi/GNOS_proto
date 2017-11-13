@@ -71,7 +71,7 @@ public class FixedCostController {
 		}
 		JsonObject costDataObj = jsonObject.get("costData").getAsJsonObject();
 		FixedOpexCost oldObj = dao.get(id);
-		if(oldObj.getSelectionType() != selectionType || !oldObj.getSelectorName().equals(selectorName)) {
+		if(!oldObj.isDefault() && (oldObj.getSelectionType() != selectionType || !oldObj.getSelectorName().equals(selectorName))) {
 			boolean isDuplicate = checkDuplicate(Integer.parseInt(scenarioIdStr), costType, selectionType, selectorName);
 			if(isDuplicate) {
 				throw new Exception("Can not create as you have duplicate configuration");
