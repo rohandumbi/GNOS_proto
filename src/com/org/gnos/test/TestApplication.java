@@ -72,7 +72,7 @@ public class TestApplication {
 		LogManager.initialize();
 		DBManager.initializePool();
 		LogManager.log("This is test");
-		/*short period = 8;
+		short period = 8;
 		short window = 2;
 		short stepsize = 1;
 		RunConfig runconfig = new RunConfig();
@@ -82,13 +82,12 @@ public class TestApplication {
 		//runconfig.setWindow(window);
 		//runconfig.setStepSize(stepsize);
 		runconfig.setMIPGAP((float)0.15);
-		runconfig.setProjectId(8);
-		runconfig.setScenarioId(8);
+		runconfig.setProjectId(1);
+		runconfig.setScenarioId(3);
 		SchedulerService service = new SchedulerService();
 		service.setRunconfig(runconfig);
-		service.execute();*/
-		FixedCostDAO dao = new FixedCostDAO();
-		dao.getAll(13);
+		service.execute();
+
 	}
 
 }

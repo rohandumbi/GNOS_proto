@@ -466,7 +466,7 @@ public class DBStorageHelper implements IStorageHelper {
 					// Stockpile Reclaim 
 					double stockpileReclaimingCost = 0;
 					if(record.getOriginType() == Record.ORIGIN_SP) {
-						stockpileReclaimingCost = quantityMined * context.getStockpileReclaimingCost(record.getDestSpNo(), year).doubleValue();			
+						stockpileReclaimingCost = quantityMined * context.getStockpileReclaimingCost(record.getOriginSpNo(), year).doubleValue();			
 					}
 					ips.setDouble(index++, -stockpileReclaimingCost);
 					total_cost += stockpileReclaimingCost;
