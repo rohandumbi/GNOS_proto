@@ -9,7 +9,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import com.org.gnos.core.Block;
@@ -21,7 +20,6 @@ import com.org.gnos.db.model.CapexData;
 import com.org.gnos.db.model.CapexInstance;
 import com.org.gnos.db.model.Dump;
 import com.org.gnos.db.model.Expression;
-import com.org.gnos.db.model.FixedOpexCost;
 import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.OpexData;
 import com.org.gnos.db.model.Process;
@@ -75,17 +73,12 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 	}
 	
 	private void buildProcessVariables(Process process, List<Block> blocks, int processNumber) {
-		List<FixedOpexCost> fixedOpexCost = context.getFixedOpexCostList();
-		if(fixedOpexCost == null || fixedOpexCost.size() < 5) return;
-		Map<Integer, BigDecimal> oreMiningCostMap = fixedOpexCost.get(0).getCostData();
-		Map<Integer, BigDecimal> truckHourCostMap = fixedOpexCost.get(4).getCostData();
 		int timePeriodStart = context.getTimePeriodStart();
 		int timePeriodEnd = context.getTimePeriodEnd();
 		int startYear = context.getStartYear();
 		for(int i=timePeriodStart; i<= timePeriodEnd; i++ ){
-			int year = startYear + i -1;
-			BigDecimal miningcost = oreMiningCostMap.get(year) ;
-			BigDecimal truckHourCost = truckHourCostMap.get(year);
+			int year = startYear + i -1;			
+			BigDecimal truckHourCost = context.getTruckHourCost(year);
 			for(Block block: blocks) {
 				if(!context.isGlobalMode()) {
 					if(!context.hasRemainingTonnage(block)){
@@ -93,6 +86,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 					}
 				}
 				BigDecimal cost = new BigDecimal(0);
+				BigDecimal miningcost = context.getOreMinigCost(block.getPitNo(), year) ;
 				cost = cost.add(miningcost);
 				processedBlocks.add(block.getId());
 				block.addProcess(process);
@@ -116,11 +110,6 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 	
 	private void buildStockpileVariables() {
 		
-		List<FixedOpexCost> fixedOpexCost = context.getFixedOpexCostList();
-		if(fixedOpexCost == null || fixedOpexCost.size() < 5) return;
-		Map<Integer, BigDecimal> oreMiningCostMap = fixedOpexCost.get(0).getCostData();
-		Map<Integer, BigDecimal> stockPilingCostMap = fixedOpexCost.get(2).getCostData();
-		Map<Integer, BigDecimal> truckHourCostMap = fixedOpexCost.get(4).getCostData();
 		String pitNameField = context.getPitFieldName();
 		List<Stockpile> stockpileList = context.getStockpiles();
 		int startYear = context.getStartYear();
@@ -149,8 +138,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 			List<Block> blocks = findBlocks(condition);
 			for(int i=timePeriodStart; i<= timePeriodEnd; i++ ){
 				int year = startYear + i -1;
-				BigDecimal miningcost = stockPilingCostMap.get(year).add(oreMiningCostMap.get(year));
-				BigDecimal truckHourCost = truckHourCostMap.get(year);
+				BigDecimal truckHourCost = context.getTruckHourCost(year);
 				for(Block block: blocks) {
 					if(!context.isGlobalMode()) {
 						if(!context.hasRemainingTonnage(block)){
@@ -158,6 +146,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 						}
 					}
 					BigDecimal cost = new BigDecimal(0);
+					BigDecimal miningcost = context.getStockpilingCost(sp.getStockpileNumber(), year).add(context.getOreMinigCost(block.getPitNo(), year));
 					cost = cost.add(miningcost);
 					if(!processedBlocks.contains(block.getId())) continue;
 					sp.addBlock(block);
@@ -193,10 +182,6 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 	
 	private void buildWasteBlockVariables() throws IOException {
 		Set<Block> wasteBlocks = new HashSet<Block>();
-		List<FixedOpexCost> fixedOpexCost = context.getFixedOpexCostList();
-		if(fixedOpexCost == null || fixedOpexCost.size() < 5) return;
-		Map<Integer, BigDecimal> wasteMiningCostMap = fixedOpexCost.get(1).getCostData();
-		Map<Integer, BigDecimal> truckHourCostMap = fixedOpexCost.get(4).getCostData();
 		String pitNameField = context.getPitFieldName();
 		List<Dump> dumpList = context.getDumps();
 		
@@ -226,8 +211,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 			
 			for(int i=timePeriodStart; i<= timePeriodEnd; i++ ){
 				int year = startYear + i -1;
-				BigDecimal wasteminingcost = wasteMiningCostMap.get(year);	
-				BigDecimal truckHourCost = truckHourCostMap.get(year);
+				BigDecimal truckHourCost = context.getTruckHourCost(year);
 				for(Block block: blocks) {
 					if(!context.isGlobalMode()) {
 						if(!context.hasRemainingTonnage(block)){
@@ -235,6 +219,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 						}
 					}
 					BigDecimal cost = new BigDecimal(0);
+					BigDecimal wasteminingcost = context.getWasteMinigCost(block.getPitNo(), year);
 					cost = cost.add(wasteminingcost);
 					if(processedBlocks.contains(block.getId())) continue;
 					int payload = context.getBlockPayloadMapping().get(block.getId());
@@ -281,13 +266,9 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 	
 	private void buildSPReclaimVariable(Block b, Stockpile sp, int year) {
 		int startYear = context.getStartYear();
-		List<FixedOpexCost> fixedOpexCost = context.getFixedOpexCostList();
-		if(fixedOpexCost == null || fixedOpexCost.size() < 4) return;
-		Map<Integer, BigDecimal> stockPilingReclaimingCostMap = fixedOpexCost.get(3).getCostData();
-		Map<Integer, BigDecimal> truckHourCostMap = fixedOpexCost.get(4).getCostData();
 		
-		BigDecimal cost = stockPilingReclaimingCostMap.get(year);
-		BigDecimal truckHourCost = truckHourCostMap.get(year);
+		BigDecimal cost = context.getStockpileReclaimingCost(sp.getStockpileNumber(), year);
+		BigDecimal truckHourCost = context.getTruckHourCost(year);
 		
 		int timeperiod = year - startYear + 1;
 		
@@ -320,13 +301,9 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 	}
 	private void buildSWSPReclaimVariable(Stockpile sp, int year) {
 		int startYear = context.getStartYear();
-		List<FixedOpexCost> fixedOpexCost = context.getFixedOpexCostList();
-		if(fixedOpexCost == null || fixedOpexCost.size() < 4) return;
-		Map<Integer, BigDecimal> stockPilingReclaimingCostMap = fixedOpexCost.get(3).getCostData();
-		Map<Integer, BigDecimal> truckHourCostMap = fixedOpexCost.get(4).getCostData();
 		
-		BigDecimal cost = stockPilingReclaimingCostMap.get(year);
-		BigDecimal truckHourCost = truckHourCostMap.get(year);
+		BigDecimal cost = context.getStockpileReclaimingCost(sp.getStockpileNumber(), year);
+		BigDecimal truckHourCost = context.getTruckHourCost(year);
 		
 		int timeperiod = year - startYear + 1;
 		SPBlock spb = ((SlidingWindowExecutionContext)context).getSPBlock(sp.getStockpileNumber());

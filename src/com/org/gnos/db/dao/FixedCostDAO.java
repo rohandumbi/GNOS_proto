@@ -12,18 +12,26 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.model.FixedOpexCost;
+import com.org.gnos.db.model.Scenario;
 
 public class FixedCostDAO {
 
-	private static final String SQL_LIST_ORDER_BY_ID = "select cost_head, year, value from fixedcost_year_mapping where scenario_id = ? order by cost_head asc";
-	private static final String SQL_INSERT = "insert into fixedcost_year_mapping (scenario_id, cost_head, year, value) values (?, ?, ?, ?)";
-	private static final String SQL_DELETE = "delete from fixedcost_year_mapping where scenario_id = ?";
-	private static final String SQL_DELETE_YEAR = "delete from fixedcost_year_mapping where scenario_id = ? and year > ?";
-	private static final String SQL_UPDATE = "update fixedcost_year_mapping set value = ? where scenario_id = ? and cost_head = ? and year = ? ";
+	private static final String SQL_LIST_ORDER_BY_ID = "select a.id, cost_type, selector_name, selector_type, in_use, is_default, year, value from fixedcost_defn a left join fixedcost_year_mapping b " +
+			" on b.fixedcost_id = a.id where scenario_id = ? order by id, year";
+	private static final String SQL_GET_BY_ID = "select a.id, cost_type, selector_name, selector_type, in_use, is_default, year, value from fixedcost_defn a left join fixedcost_year_mapping b " +
+			" on b.fixedcost_id = a.id where id = ? order by id, year";
+	private static final String SQL_INSERT = "insert into fixedcost_defn (scenario_id, cost_type, selector_name, selector_type, in_use, is_default) values (?, ?, ?, ?, ?, ?)";
+	private static final String SQL_INSERT_MAPPING = "insert into fixedcost_year_mapping (fixedcost_id, year, value) values (?, ?, ?)";
+	private static final String SQL_DELETE_BY_ID = "delete from fixedcost_defn where id = ?";
+	private static final String SQL_DELETE_MAPPING_BY_ID = "delete from fixedcost_year_mapping where fixedcost_id = ?";
+	private static final String SQL_DELETE_MAPPING_BY_ID_YEAR = "delete from fixedcost_year_mapping where fixedcost_id = ? and year > ? ";
+	private static final String SQL_DELETE_BY_SCENARIOID = "delete from fixedcost_defn where scenario_id = ?";
+	private static final String SQL_DELETE_MAPPING_BY_SCENARIOID = "delete from fixedcost_year_mapping where fixedcost_id in (select id from fixedcost_defn where scenario_id = ? )";
+	private static final String SQL_UPDATE = "update fixedcost_defn set cost_type= ?, selector_name = ?, selector_type = ?, in_use= ?, is_default = ? where id = ?";
+	private static final String SQL_UPDATE_MAPPING = "update fixedcost_year_mapping set value = ? where fixedcost_id = ? and year = ? ";
 	
 	public List<FixedOpexCost> getAll(int scenarioId) {
 
@@ -38,11 +46,11 @@ public class FixedCostDAO {
 			ResultSet resultSet = statement.executeQuery();
 		){
 			while(resultSet.next()){
-				int costHead = resultSet.getInt("cost_head");
-				FixedOpexCost fixedOpexCost = fixedCostMap.get(costHead);
+				int id = resultSet.getInt("id");
+				FixedOpexCost fixedOpexCost = fixedCostMap.get(id);
 				if(fixedOpexCost == null){
 					fixedOpexCost = map(resultSet, fixedOpexCost);
-					fixedCostMap.put(costHead, fixedOpexCost);
+					fixedCostMap.put(id, fixedOpexCost);
 					fixedCosts.add(fixedOpexCost);
 				} else {
 					map(resultSet, fixedOpexCost);
@@ -56,47 +64,76 @@ public class FixedCostDAO {
 		return fixedCosts;
 	}
 
-	public boolean create(FixedOpexCost fixedOpexCost, int scenarioId){
+	public FixedOpexCost get(int id) {
 
-
-		try ( Connection connection = DBManager.getConnection();
-				PreparedStatement statement = connection.prepareStatement(SQL_INSERT);
+		FixedOpexCost fixedOpexCost = null;
+		Object[] values = { 
+				id
+		};
+		try (
+				Connection connection = DBManager.getConnection();
+				PreparedStatement statement = prepareStatement(connection, SQL_GET_BY_ID, false, values);
+				ResultSet resultSet = statement.executeQuery();
 				){
-
-			Map<Integer, BigDecimal> costData = fixedOpexCost.getCostData();
-			Set<Integer> costYears = costData.keySet();
-			for(int costYear: costYears) {
-				Object[] values = {
-						scenarioId,
-						fixedOpexCost.getCostHead(),
-						costYear,
-						costData.get(costYear)
-				};
-				setValues(statement, values);
-				statement.executeUpdate();
+			while(resultSet.next()){
+				fixedOpexCost = map(resultSet, fixedOpexCost);				
 			}
+
 		} catch(SQLException e){
 			e.printStackTrace();
 		}
-		return true;
-	}
 
-	public boolean addYears(FixedOpexCost fixedOpexCost, int scenarioId, int startYear, int endYear){
+		return fixedOpexCost;
+	}
+	
+	public boolean create(FixedOpexCost foc, int scenarioId){
+
+
+		if (foc.getId() != -1) {
+            throw new IllegalArgumentException("Fixed Cost is already created.");
+        }
+		Object[] values = {
+				scenarioId, 
+				foc.getCostType(),
+				foc.getSelectorName(),
+				foc.getSelectionType(),
+				foc.isInUse(),
+				foc.isDefault()
+	   };
 
 		try ( Connection connection = DBManager.getConnection();
-				PreparedStatement statement = connection.prepareStatement(SQL_INSERT);
-				){
-				for(int i=startYear; i<= endYear; i++) {
-					Object[] values = {
-							scenarioId,
-							fixedOpexCost.getCostHead(),
-							i,
-							0
-					};
-					setValues(statement, values);
-					statement.executeUpdate();
-				}
+	            PreparedStatement statement = prepareStatement(connection, SQL_INSERT, true, values);
+				PreparedStatement mappingstatement = prepareStatement(connection, SQL_INSERT_MAPPING, false);
+			){
 			
+			int affectedRows = statement.executeUpdate();
+            if (affectedRows == 0) {
+                //throw new DAOException("Creating user failed, no rows affected.");
+            }
+            
+            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    foc.setId(generatedKeys.getInt(1));                   
+                } else {
+                    //throw new DAOException("Creating user failed, no generated key obtained.");
+                }
+            }
+            if(foc.getId() > 0) {
+            	Map<Integer, BigDecimal> yearValueMapping = foc.getCostData();
+            	for(Integer year: yearValueMapping.keySet()){
+            		try {
+            			Object[] yearvalues = {
+            					foc.getId(), 
+            					year,
+            					yearValueMapping.get(year)
+            		   };
+            			setValues(mappingstatement, yearvalues);
+            			mappingstatement.executeUpdate();
+            		} catch(SQLException e){
+            			e.printStackTrace();
+            		}
+            	}
+            }
 		} catch(SQLException e){
 			e.printStackTrace();
 		}
@@ -104,39 +141,107 @@ public class FixedCostDAO {
 		return true;
 	}
 
-	public boolean update(FixedOpexCost fixedOpexCost, int scenarioId){
+	public boolean addYears(int id, int startYear, int endYear){
 
 		try ( Connection connection = DBManager.getConnection();
-				PreparedStatement statement = connection.prepareStatement(SQL_UPDATE);
+				PreparedStatement statement = connection.prepareStatement(SQL_INSERT_MAPPING);
 				){
-			Map<Integer, BigDecimal> costData = fixedOpexCost.getCostData();
-			Set<Integer> costYears = costData.keySet();
-			for(int costYear: costYears) {
-				Object[] values = {
-						costData.get(costYear),
-						scenarioId,
-						fixedOpexCost.getCostHead(),
-						costYear
-				};
-				setValues(statement, values);
-				statement.executeUpdate();
-			}
-			statement.executeUpdate();        
 
+			if(id != -1) {
+				for(int i=startYear; i<= endYear; i++) {
+					Object[] costValues = { id, i, 0 };
+					setValues(statement, costValues);
+					statement.executeUpdate();
+				}
+			}
 		} catch(SQLException e){
 			e.printStackTrace();
 		}
 		return true;
 	}
 
+	public boolean update(FixedOpexCost foc, int scenarioId){
+
+		if (foc.getId() == -1) {
+            throw new IllegalArgumentException("Expression is not created.");
+        }
+		
+		Object[] values = {
+				foc.getCostType(),
+				foc.getSelectorName(),
+				foc.getSelectionType(),
+				foc.isInUse(),
+				foc.isDefault(),
+				foc.getId()
+	   };
+
+		try ( Connection connection = DBManager.getConnection();
+	            PreparedStatement statement = prepareStatement(connection, SQL_UPDATE, true, values);
+				PreparedStatement mappingstatement = prepareStatement(connection, SQL_UPDATE_MAPPING, false);
+			){
+			
+			statement.executeUpdate();        
+			if(foc.getId() > 0) {
+            	Map<Integer, BigDecimal> yearValueMapping = foc.getCostData();
+            	for(Integer year: yearValueMapping.keySet()){
+            		try {
+            			Object[] yearvalues = {
+            					yearValueMapping.get(year),
+            					foc.getId(), 
+            					year    					
+            		   };
+            			setValues(mappingstatement, yearvalues);
+            			int affectedRows = mappingstatement.executeUpdate();
+            			if(affectedRows == 0){
+            				Object[] newValues = {
+            						foc.getId(),
+            						year,
+            						yearValueMapping.get(year)
+            			   };
+            				PreparedStatement pstmt = prepareStatement(connection, SQL_INSERT_MAPPING, false, newValues);
+            				pstmt.executeUpdate();
+            				pstmt.close();
+            			}
+            		} catch(SQLException e){
+            			e.printStackTrace();
+            		}
+            	}
+            }
+		} catch(SQLException e){
+			e.printStackTrace();
+		}
+		return true;
+	}
+
+	public void delete(FixedOpexCost foc){
+		
+		Object[] values = { 
+				foc.getId()
+	        };
+
+	        try (
+	            Connection connection = DBManager.getConnection();
+	            PreparedStatement statement = prepareStatement(connection, SQL_DELETE_BY_ID, false, values);
+	        	PreparedStatement mappingstatement = prepareStatement(connection, SQL_DELETE_MAPPING_BY_ID, false, values);
+	        ) {
+	        	mappingstatement.executeUpdate();
+	        	statement.executeUpdate();	           
+	            foc.setId(-1);
+	        } catch (SQLException e) {
+	            //throw new DAOException(e);
+	        }
+	}
+	
 	public void delete(int scenarioId){
 
 		Object[] values = { scenarioId };
 
 		try (
 				Connection connection = DBManager.getConnection();
-				PreparedStatement statement = prepareStatement(connection, SQL_DELETE, false, values);
+				PreparedStatement statement = prepareStatement(connection, SQL_DELETE_BY_SCENARIOID, false, values);
+				PreparedStatement mappingstatement = prepareStatement(connection, SQL_DELETE_MAPPING_BY_SCENARIOID, false, values);
 				) {
+			mappingstatement.executeUpdate();
 			statement.executeUpdate();
 			
 		} catch (SQLException e) {
@@ -151,7 +256,7 @@ public class FixedCostDAO {
 				endYear
 		};
 		try ( Connection connection = DBManager.getConnection();
-				PreparedStatement statement = prepareStatement(connection, SQL_DELETE_YEAR, true, values);
+				PreparedStatement statement = prepareStatement(connection, SQL_DELETE_MAPPING_BY_ID_YEAR, true, values);
 				){
 
 				statement.executeUpdate();
@@ -162,13 +267,18 @@ public class FixedCostDAO {
 		return true;
 	}
 	
-	private FixedOpexCost map(ResultSet rs, FixedOpexCost fixedOpexCost) throws SQLException {
-		if (fixedOpexCost == null) {
-			fixedOpexCost = new FixedOpexCost();
-			fixedOpexCost.setCostHead(rs.getInt("cost_head"));
+	private FixedOpexCost map(ResultSet rs, FixedOpexCost foc) throws SQLException {
+		if (foc == null) {
+			foc = new FixedOpexCost();
+			foc.setId(rs.getInt("id"));
+			foc.setCostType(rs.getInt("cost_type"));
+			foc.setSelectorName(rs.getString("selector_name"));
+			foc.setSelectionType(rs.getInt("selector_type"));
+			foc.setInUse(rs.getBoolean("in_use"));
+			foc.setDefault(rs.getBoolean("is_default"));
 		}
-		fixedOpexCost.addCostData(rs.getInt("year"), rs.getBigDecimal("value"));
+		foc.addCostData(rs.getInt("year"), rs.getBigDecimal("value"));
 		
-		return fixedOpexCost;
+		return foc;
 	}
 }

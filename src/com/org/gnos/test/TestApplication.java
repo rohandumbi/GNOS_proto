@@ -6,6 +6,7 @@ import com.org.gnos.core.GNOSConfig;
 import com.org.gnos.core.LogManager;
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.dao.ExpressionDAO;
+import com.org.gnos.db.dao.FixedCostDAO;
 import com.org.gnos.db.dao.ProjectDAO;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Project;
@@ -81,11 +82,12 @@ public class TestApplication {
 		//runconfig.setWindow(window);
 		//runconfig.setStepSize(stepsize);
 		runconfig.setMIPGAP((float)0.15);
-		runconfig.setProjectId(8);
-		runconfig.setScenarioId(8);
+		runconfig.setProjectId(1);
+		runconfig.setScenarioId(3);
 		SchedulerService service = new SchedulerService();
 		service.setRunconfig(runconfig);
 		service.execute();
+
 	}
 
 }

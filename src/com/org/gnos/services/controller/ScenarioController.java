@@ -46,7 +46,20 @@ public class ScenarioController {
 		obj.setTimePeriod(timePeriod);
 		obj.setDiscount(discount);
 		boolean created = dao.create(obj, Integer.parseInt(pid));
-		if(created) return obj;
+		if(created) {
+			// Add fixed Cost entries here 
+			FixedCostDAO fcdao = new FixedCostDAO();
+			for (int i= 0; i < 5; i++) {
+				FixedOpexCost foc = new FixedOpexCost();
+				foc.setCostType(i);
+				foc.setSelectionType(-1);
+				foc.setDefault(true);
+				foc.setInUse(true);
+				fcdao.create(foc, obj.getId());
+				fcdao.addYears(foc.getId(),  obj.getStartYear(),  obj.getStartYear()+obj.getTimePeriod());
+			}
+			return obj;
+		}
 		throw new Exception();
 	}
 	
@@ -236,7 +249,7 @@ public class ScenarioController {
 		FixedCostDAO fixedCostDao = new FixedCostDAO();
 		List<FixedOpexCost> fixedCostList = fixedCostDao.getAll(scenarioId);
 		for(FixedOpexCost foc : fixedCostList) {
-			fixedCostDao.addYears(foc, scenarioId, startYear, endYear);
+			fixedCostDao.addYears(foc.getId(), startYear, endYear);
 		}
 		//Process Constraints 
 		ProcessConstraintDAO processConstraintDao = new ProcessConstraintDAO();
