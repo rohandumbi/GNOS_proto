@@ -190,7 +190,8 @@ CREATE TABLE product_defn(
   name  VARCHAR(100) NOT NULL,
   associated_model_id INT,
   child_unit_type TINYINT,
-  child_unit_id INT
+  child_unit_id INT,
+  base_product VARCHAR(100)
 );
 
 DROP TABLE IF EXISTS product_join_defn; 

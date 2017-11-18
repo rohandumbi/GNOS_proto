@@ -17,9 +17,9 @@ import com.org.gnos.db.model.Product;
 
 public class ProductDAO {
 
-	private static final String SQL_LIST_ORDER_BY_ID = "select name, associated_model_id, child_unit_type, child_unit_id from product_defn where project_id = ? ";
-	private static final String SQL_GET_PRODUCT_BY_NAME = "select name, associated_model_id, child_unit_type, child_unit_id from product_defn where project_id = ? and name = ?";
-	private static final String SQL_INSERT = "insert into product_defn (project_id, name, associated_model_id, child_unit_type, child_unit_id) values (?, ?, ?, ?, ?)";
+	private static final String SQL_LIST_ORDER_BY_ID = "select name, associated_model_id, child_unit_type, child_unit_id, base_product from product_defn where project_id = ? ";
+	private static final String SQL_GET_PRODUCT_BY_NAME = "select name, associated_model_id, child_unit_type, child_unit_id, base_product from product_defn where project_id = ? and name = ?";
+	private static final String SQL_INSERT = "insert into product_defn (project_id, name, associated_model_id, child_unit_type, child_unit_id, base_product) values (?, ?, ?, ?, ?, ?)";
 	private static final String SQL_DELETE = "delete from product_defn where project_id = ?";
 	private static final String SQL_DELETE_PRODUCT = "delete from product_defn where project_id = ? and name = ?";
 	private static final String SQL_DELETE_UNIT = "delete from product_defn where project_id = ? and name = ? and child_unit_type = ? , child_unit_id = ?";
@@ -90,7 +90,8 @@ public class ProductDAO {
 						product.getName(),
 						product.getModelId(),
 						Product.UNIT_EXPRESSION,
-						expressionId	
+						expressionId,
+						product.getBaseProduct()
 				};
 				setValues(statement, values);
 				statement.executeUpdate();
@@ -102,7 +103,8 @@ public class ProductDAO {
 						product.getName(),
 						product.getModelId(),
 						Product.UNIT_FIELD,
-						fieldId	
+						fieldId,
+						product.getBaseProduct()
 				};
 				setValues(statement, values);
 				statement.executeUpdate();
@@ -170,6 +172,7 @@ public class ProductDAO {
 			product = new Product();
 			product.setName(rs.getString("name"));
 			product.setModelId(rs.getInt("associated_model_id"));
+			product.setBaseProduct(rs.getString("base_product"));
 			
 		}
 		short unitType = rs.getShort("child_unit_type");

@@ -105,7 +105,7 @@ public class FixedOpexCost {
 
 	@Override
 	public String toString() {
-		
+		if(selectorName == null) selectorName = "";
 		String str =  String.valueOf(costType) + "|" + selectorName + "|" + selectionType + "|" + inUse + "|" + isDefault ;
 		Set<Integer> keys= costData.keySet();
 		for(int year: keys) {

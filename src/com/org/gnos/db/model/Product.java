@@ -9,6 +9,7 @@ public class Product {
 	public static final short UNIT_EXPRESSION = 2;
 	
 	private String name;
+	private String baseProduct;
 	private int modelId;
 	private Set<Integer> fieldIdList;
 	private Set<Integer> expressionIdList;
@@ -48,6 +49,14 @@ public class Product {
 
 	public void setFieldIdList(Set<Integer> fieldIdList) {
 		this.fieldIdList = fieldIdList;
+	}
+	
+	public String getBaseProduct() {
+		return baseProduct;
+	}
+
+	public void setBaseProduct(String baseProduct) {
+		this.baseProduct = baseProduct;
 	}
 
 	@Override
