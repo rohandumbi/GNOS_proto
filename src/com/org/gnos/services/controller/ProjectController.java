@@ -108,9 +108,9 @@ public class ProjectController {
 		}	
 	}
 
-	public String export(String projectIdStr) {
+	public String export(String projectIdStr, String exportedProjName) {
 		ProjectExportHelper helper = new ProjectExportHelper();
-		return helper.export(Integer.parseInt(projectIdStr));
+		return helper.export(Integer.parseInt(projectIdStr), exportedProjName);
 	}
 	
 	public boolean importProject(JsonObject jsonObject) {

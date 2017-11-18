@@ -63,9 +63,12 @@ import com.org.gnos.db.model.TruckParameterPayload;
 
 public class ProjectExportHelper implements ProjectTypes {
 	
-	public String export(int projectId) {
+	public String export(int projectId, String exportedProjName) {
 		StringBuilder output = new StringBuilder("");
 		Project project = new ProjectDAO().get(projectId);
+		if(exportedProjName != null) {
+			project.setName(exportedProjName);
+		}
 		if(project != null) {
 			output.append(PROJECT_IND+"|"+project.toString()+"\n");
 			//get Fields

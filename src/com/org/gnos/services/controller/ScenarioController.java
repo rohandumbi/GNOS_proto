@@ -1,7 +1,6 @@
 package com.org.gnos.services.controller;
 
 import java.util.List;
-import java.util.Random;
 
 import com.google.gson.JsonObject;
 import com.org.gnos.db.dao.BenchConstraintDAO;
@@ -94,15 +93,15 @@ public class ScenarioController {
 	}
 	
 
-	public Scenario copy(String pid, String sid) throws Exception{
+	public Scenario copy(String pid, String sid, String scenarioName) throws Exception{
 		if((sid == null) || (sid.isEmpty())){
 			throw new Exception("Please select a scenario");
 		}else{
 			int scenarioId = Integer.parseInt(sid);
-			int random = new Random().nextInt(1000);
+			//int random = new Random().nextInt(1000);
 			Scenario obj = dao.get(scenarioId);
 			obj.setId(-1);
-			obj.setName(obj.getName()+"-Copy-"+random);
+			obj.setName(scenarioName);
 			boolean created = dao.create(obj, Integer.parseInt(pid));
 			if(!created) {
 				throw new Exception("Could not copy scenario. Please contact your administrator.");

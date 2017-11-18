@@ -49,7 +49,17 @@ public class ScenarioEndpoint {
 			@Override
 			public Object handle(Request req, Response res) throws Exception {		
 				try {
-					return controller.copy(req.params(":pid"), req.params(":sid"));
+					String scenarioName = null;
+					JsonElement requestObject = new JsonParser().parse(req.body());
+					if(requestObject.isJsonObject()) {
+						JsonObject jsonObject = requestObject.getAsJsonObject();
+						scenarioName = jsonObject.get("name").getAsString();
+					}
+					if(scenarioName == null) {
+						res.status(400);
+						return new ResponseError("Please provide a scenario name.");
+					}
+					return controller.copy(req.params(":pid"), req.params(":sid"), scenarioName);
 				} catch (Exception e) {
 					res.status(400);
 					return new ResponseError(e.getMessage());

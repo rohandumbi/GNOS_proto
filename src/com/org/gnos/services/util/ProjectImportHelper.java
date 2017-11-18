@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 
 import com.org.gnos.db.DBManager;
@@ -116,9 +115,9 @@ public class ProjectImportHelper implements ProjectTypes {
 	}
 
 	private Project createProject(String[] list) {
-		int random = new Random().nextInt(1000);
+		//int random = new Random().nextInt(1000);
 		Project project = new Project();
-		project.setName(list[1]+"-Copy-"+random);
+		project.setName(list[1]);
 		project.setDesc(list[2]);
 		for(int i = 3; i<list.length; i++) {
 			project.addFile(list[i]);

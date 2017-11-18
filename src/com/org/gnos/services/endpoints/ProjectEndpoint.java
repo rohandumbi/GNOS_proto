@@ -30,9 +30,14 @@ public class ProjectEndpoint {
 			@Override
 			public Object handle(Request req, Response res) throws Exception {
 					try {
+						String exportedName = req.queryParams("exportedname");
+						if (exportedName == null || exportedName.trim().length() == 0) {
+							exportedName = null;
+						}
 						res.type("application/octet-stream");
 						res.header("Content-Disposition", "attachment; filename=\"project.data\"");
-						return controller.export(req.params(":id"));
+						
+						return controller.export(req.params(":id"), exportedName);
 					} catch (Exception e) {
 						res.status(400);
 						return new ResponseError("Could not fetch report data. "+e.getMessage());
