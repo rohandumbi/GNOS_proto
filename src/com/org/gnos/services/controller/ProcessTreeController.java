@@ -43,7 +43,7 @@ public class ProcessTreeController {
 	}
 	
 	public boolean saveState(JsonObject jsonObject, String projectId) throws Exception {
-		JsonArray elmArray = jsonObject.getAsJsonArray();
+		JsonArray elmArray = jsonObject.get("nodes").getAsJsonArray();
 		if(elmArray.size() == 0) {
 			throw new Exception("Nothing to save");
 		}
