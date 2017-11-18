@@ -37,9 +37,10 @@ import com.org.gnos.services.endpoints.TruckParameterPayloadEndpoint;
 
 public class EndpointManager {
 
-	public static final boolean DEV_MODE = true;
+	
 	
 	public static void start() {
+		
 		new ProjectEndpoint();
 		new FieldEndpoint();
 		new RequiredFieldEndpoint();
@@ -74,7 +75,8 @@ public class EndpointManager {
 		new ReserveEndpoint();
 		
 		before((request, response) -> {
-			if(DEV_MODE) return;
+			boolean skipCheck = !request.pathInfo().endsWith("/runscheduler");
+			if(skipCheck) return;
 		    try {
 		    	boolean isValid = GNOSLicense.isValid();
 		    	if(!isValid) {
