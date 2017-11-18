@@ -33,6 +33,7 @@ import com.org.gnos.db.dao.PitGroupDAO;
 import com.org.gnos.db.dao.ProcessConstraintDAO;
 import com.org.gnos.db.dao.ProcessJoinDAO;
 import com.org.gnos.db.dao.ProcessTreeDAO;
+import com.org.gnos.db.dao.ProcessTreeStateDAO;
 import com.org.gnos.db.dao.ProductDAO;
 import com.org.gnos.db.dao.ProductJoinDAO;
 import com.org.gnos.db.dao.ProjectDAO;
@@ -58,6 +59,7 @@ import com.org.gnos.db.model.PitGroup;
 import com.org.gnos.db.model.ProcessConstraintData;
 import com.org.gnos.db.model.ProcessJoin;
 import com.org.gnos.db.model.ProcessTreeNode;
+import com.org.gnos.db.model.ProcessTreeNodeState;
 import com.org.gnos.db.model.Product;
 import com.org.gnos.db.model.ProductJoin;
 import com.org.gnos.db.model.Project;
@@ -206,6 +208,21 @@ public class ProjectImportHelper implements ProjectTypes {
 			new ProcessTreeDAO().create(processTreeNode, projectId);
 		}
 		
+		// Store processes
+		List<String[]> processTreeStates = projectData.get(PROCESS_TREE_STATE_IND);
+		for(int i= 0; i < processTreeStates.size(); i++) {
+			String[] processTreeStateValues = processTreeStates.get(i);
+			String nodeName = processTreeStateValues[1];
+			float xLoc = Float.parseFloat(processTreeStateValues[2]);
+			float yLoc = Float.parseFloat(processTreeStateValues[3]);
+			
+			ProcessTreeNodeState processTreeNodeState = new ProcessTreeNodeState();
+			processTreeNodeState.setNodeName(nodeName);
+			processTreeNodeState.setxLoc(xLoc);
+			processTreeNodeState.setyLoc(yLoc);
+			new ProcessTreeStateDAO().create(processTreeNodeState, projectId);
+		}
+		
 		// store process joins
 		List<String[]> processeJoins = projectData.get(PROCESS_JOIN_IND);
 		for(int i= 0; processeJoins !=null && i < processeJoins.size(); i++) {
@@ -221,14 +238,15 @@ public class ProjectImportHelper implements ProjectTypes {
 		List<String[]> products = projectData.get(PRODUCT_IND);
 		for(int i= 0; products!= null && i < products.size(); i++) {
 			String[] productvalues = products.get(i);
-			short childUnitType = Short.parseShort(productvalues[3]);
+			short childUnitType = Short.parseShort(productvalues[4]);
 			Product product = new Product();
 			product.setName(productvalues[1]);
 			product.setModelId(modelOldNewIdMapping.get(productvalues[2]));
+			product.setBaseProduct(productvalues[3]);
 			if(childUnitType == Product.UNIT_FIELD) {
-				product.getFieldIdList().add(fieldOldNewIdMapping.get(productvalues[4]));
+				product.getFieldIdList().add(fieldOldNewIdMapping.get(productvalues[5]));
 			} else if (childUnitType == Product.UNIT_EXPRESSION) {
-				product.getExpressionIdList().add(expressionOldNewIdMapping.get(productvalues[4]));
+				product.getExpressionIdList().add(expressionOldNewIdMapping.get(productvalues[5]));
 			}
 			new ProductDAO().create(product, projectId);
 		}

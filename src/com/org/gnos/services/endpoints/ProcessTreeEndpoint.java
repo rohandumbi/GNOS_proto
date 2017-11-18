@@ -25,6 +25,8 @@ public class ProcessTreeEndpoint {
 		
 		get("/project/:id/processtreenodes", (req, res) -> controller.getAll(req.params(":id")), json());
 		
+		get("/project/:id/processtreenodes/uistate", (req, res) -> controller.getAllState(req.params(":id")), json());
+		
 		post("/project/:id/processtreenodes", new Route() {
 			
 			@Override
@@ -44,6 +46,24 @@ public class ProcessTreeEndpoint {
 			}
 		}, json());
 		
+		post("/project/:id/processtreenodes/uistate", new Route() {
+			
+			@Override
+			public Object handle(Request req, Response res) throws Exception {
+				JsonElement requestObject = new JsonParser().parse(req.body());
+				if(requestObject.isJsonObject()) {
+					JsonObject jsonObject = requestObject.getAsJsonObject();
+					try {
+						return controller.saveState(jsonObject, req.params(":id"));
+					} catch (Exception e) {
+						res.status(400);
+						return new ResponseError("Field creation failed. "+e.getMessage());
+					}					
+				}
+				res.status(400);				
+				return new ResponseError("UI State save failed due to improper input");
+			}
+		}, json());
 
 		/* DELETE exisitng expression */
 		delete("/project/:id/processtreenodes", (req, res) -> controller.deleteAll(req.params(":id")), json());

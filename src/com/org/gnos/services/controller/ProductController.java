@@ -94,14 +94,14 @@ public class ProductController {
 
 	public Product create(JsonObject jsonObject, String projectId) throws Exception {
 		String name = jsonObject.get("name").getAsString();
-		String baseProduct = jsonObject.get("baseProduct").getAsString();
+		//String baseProduct = jsonObject.get("baseProduct").getAsString();
 		int modelId = jsonObject.get("modelId").getAsInt();
 		short unitType = jsonObject.get("unitType").getAsShort();
 		int unitId =  jsonObject.get("unitId").getAsInt();
 		Product obj = new Product();
 		obj.setName(name);
 		obj.setModelId(modelId);
-		obj.setBaseProduct(baseProduct);
+		//obj.setBaseProduct(baseProduct);
 		if(unitType == Product.UNIT_FIELD) {
 			obj.getFieldIdList().add(unitId);
 		} else {

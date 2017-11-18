@@ -22,6 +22,7 @@ public interface ProjectTypes {
 	final int TRUCKPARAM_CYCLE_TIME = 23;
 	final int CYCLE_FIXED_TIME = 24;
 	final int CYCLE_TIME_FIELD_MAPPING = 25;
+	final int PROCESS_TREE_STATE_IND = 26;
 	
 	final int SCN_OPEX = 201;
 	final int SCN_FIXED_COST = 202;

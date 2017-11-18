@@ -17,6 +17,7 @@ public class Product {
 	public Product(){
 		this.expressionIdList = new HashSet<Integer>();
 		this.fieldIdList = new HashSet<Integer>();
+		this.baseProduct = "";
 	}
 
 	public String getName() {
@@ -61,7 +62,7 @@ public class Product {
 
 	@Override
 	public String toString() {
-		String str = name + "|" + modelId;
+		String str = name + "|" + modelId +  "|" + baseProduct;
 		if(fieldIdList.size() > 0) {
 			str += "|"+UNIT_FIELD +"|"+fieldIdList.iterator().next();
 		} else if(expressionIdList.size() > 0) {

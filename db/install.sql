@@ -106,6 +106,16 @@ CREATE TABLE process_route_defn(
    parent_model_id INT
 );
 
+DROP TABLE IF EXISTS process_tree_state; 
+
+CREATE TABLE process_tree_state(
+   project_id INT NOT NULL,
+   node_name VARCHAR(50) NOT NULL,
+   xlocation FLOAT,
+   ylocation FLOAT,
+   unique key(project_id, node_name)
+);
+
 DROP TABLE IF EXISTS process_join_defn; 
 
 CREATE TABLE process_join_defn(

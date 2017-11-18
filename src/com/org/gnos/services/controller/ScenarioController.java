@@ -119,6 +119,7 @@ public class ScenarioController {
 			FixedCostDAO fixedCostDao = new FixedCostDAO();
 			List<FixedOpexCost> fixedCostList = fixedCostDao.getAll(scenarioId);
 			for(FixedOpexCost foc : fixedCostList) {
+				foc.setId(-1);
 				fixedCostDao.create(foc, obj.getId());
 			}
 			//Process Constraints 
@@ -215,7 +216,7 @@ public class ScenarioController {
 		FixedCostDAO fixedCostDao = new FixedCostDAO();
 		List<FixedOpexCost> fixedCostList = fixedCostDao.getAll(scenarioId);
 		for(FixedOpexCost foc : fixedCostList) {
-			fixedCostDao.deleteYears(scenarioId, endYear);
+			fixedCostDao.deleteYears(foc.getId(), endYear);
 		}
 		//Process Constraints 
 		ProcessConstraintDAO processConstraintDao = new ProcessConstraintDAO();

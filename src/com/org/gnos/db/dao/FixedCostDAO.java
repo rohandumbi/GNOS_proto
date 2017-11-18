@@ -15,7 +15,6 @@ import java.util.Map;
 
 import com.org.gnos.db.DBManager;
 import com.org.gnos.db.model.FixedOpexCost;
-import com.org.gnos.db.model.Scenario;
 
 public class FixedCostDAO {
 
@@ -249,10 +248,10 @@ public class FixedCostDAO {
 		}
 	}
 
-	public boolean deleteYears(int scenarioId, int endYear){
+	public boolean deleteYears(int id, int endYear){
 
 		Object[] values = {
-				scenarioId,
+				id,
 				endYear
 		};
 		try ( Connection connection = DBManager.getConnection();

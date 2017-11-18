@@ -26,6 +26,7 @@ import com.org.gnos.db.dao.PitGroupDAO;
 import com.org.gnos.db.dao.ProcessConstraintDAO;
 import com.org.gnos.db.dao.ProcessJoinDAO;
 import com.org.gnos.db.dao.ProcessTreeDAO;
+import com.org.gnos.db.dao.ProcessTreeStateDAO;
 import com.org.gnos.db.dao.ProductDAO;
 import com.org.gnos.db.dao.ProductJoinDAO;
 import com.org.gnos.db.dao.ProjectDAO;
@@ -50,6 +51,7 @@ import com.org.gnos.db.model.PitGroup;
 import com.org.gnos.db.model.ProcessConstraintData;
 import com.org.gnos.db.model.ProcessJoin;
 import com.org.gnos.db.model.ProcessTreeNode;
+import com.org.gnos.db.model.ProcessTreeNodeState;
 import com.org.gnos.db.model.Product;
 import com.org.gnos.db.model.ProductJoin;
 import com.org.gnos.db.model.Project;
@@ -90,6 +92,12 @@ public class ProjectExportHelper implements ProjectTypes {
 			List<ProcessTreeNode> processTreeNodes = new ProcessTreeDAO().getAll(projectId);
 			for(ProcessTreeNode node: processTreeNodes) {
 				output.append(PROCESS_IND+"|"+ node.toString()+"\n");
+			}
+			
+			//get process tree states
+			List<ProcessTreeNodeState> processTreeNodeStates = new ProcessTreeStateDAO().getAll(projectId);
+			for(ProcessTreeNodeState node: processTreeNodeStates) {
+				output.append(PROCESS_TREE_STATE_IND+"|"+ node.toString()+"\n");
 			}
 			//get process joins
 			List<ProcessJoin> processJoins = new ProcessJoinDAO().getAll(projectId);
