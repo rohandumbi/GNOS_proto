@@ -45,13 +45,15 @@ public class ProductJoinEndpoint {
 		
 
 		/* DELETE exisitng expression */
-		delete("/project/:id/productjoins/:name", (req, res) -> controller.deleteAll(req.params(":id"), req.params(":name")), json());
+		delete("/project/:id/productjoins", (req, res) -> controller.deleteAll(req.params(":id")), json());
+		
+		delete("/project/:id/productjoins/:name", (req, res) -> controller.deleteProductJoin(req.params(":id"), req.params(":name")), json());
 		
 		delete("/project/:id/productjoins/:name/product/:pname", 
-				(req, res) -> controller.deleteProduct(req.params(":id"),req.params(":name"), req.params(":pname")), json());
+				(req, res) -> controller.deleteProductFromProductJoin(req.params(":id"),req.params(":name"), req.params(":pname")), json());
 		
 		delete("/project/:id/productjoins/:name/productjoin/:pjname", 
-				(req, res) -> controller.deleteProductJoin(req.params(":id"),req.params(":name"), req.params(":pjname")), json());
+				(req, res) -> controller.deleteProductJoinFromProductJoin(req.params(":id"),req.params(":name"), req.params(":pjname")), json());
 	}
 	
 }

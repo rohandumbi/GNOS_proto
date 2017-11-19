@@ -36,18 +36,23 @@ public class ProductJoinController {
 	}
 	
 	
-	public boolean deleteAll(String projectId, String name) {
-		dao.deleteAll(Integer.parseInt(projectId), name);
+	public boolean deleteAll(String projectId) {
+		dao.deleteAll(Integer.parseInt(projectId));
 		return true;
 	}
 	
-	public boolean deleteProduct(String projectId, String name, String productName) {	
-		dao.deleteProduct(Integer.parseInt(projectId), name, productName);;
+	public boolean deleteProductJoin(String projectId, String name) {
+		dao.deleteProductJoin(Integer.parseInt(projectId), name);
 		return true;
 	}
 	
-	public boolean deleteProductJoin(String projectId, String name, String productJoinName) {
-		dao.deleteProductJoin(Integer.parseInt(projectId), name, productJoinName);
+	public boolean deleteProductFromProductJoin(String projectId, String name, String productName) {	
+		dao.deleteProductFromProductJoin(Integer.parseInt(projectId), name, productName);;
+		return true;
+	}
+	
+	public boolean deleteProductJoinFromProductJoin(String projectId, String name, String productJoinName) {
+		dao.deleteProductJoinFromProductJoin(Integer.parseInt(projectId), name, productJoinName);
 		return true;
 	}
 }

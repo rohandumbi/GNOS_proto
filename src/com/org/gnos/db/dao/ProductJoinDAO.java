@@ -21,6 +21,7 @@ public class ProductJoinDAO {
 	private static final String SQL_INSERT = "insert into product_join_defn ( project_id , name, child_type, child ) values ( ? , ?, ?, ?) ";
 	private static final String SQL_INSERT_EMPTY = "insert into product_join_defn ( project_id , name) values ( ? , ?) ";
 	private static final String SQL_DELETE_ALL = "delete from product_join_defn where project_id = ?";
+	private static final String SQL_DELETE_PRODUCT_JOIN = "delete from product_join_defn where project_id = ? and name = ? ";
 	private static final String SQL_DELETE = "delete from product_join_defn where project_id = ? and name = ? and child_type = ? and child = ? ";
 	
 	public List<ProductJoin> getAll(int projectId) {
@@ -109,10 +110,7 @@ public class ProductJoinDAO {
 		return true;
 	}
 	
-	
-
-	
-	public void deleteAll(int projectId, String productJoinName){
+	public void deleteAll(int projectId){
 		
 		Object[] values = { 
 				projectId
@@ -128,8 +126,26 @@ public class ProductJoinDAO {
 	            //throw new DAOException(e);
 	        }
 	}
+
 	
-	public void deleteProduct(int projectId, String name, String productName){
+	public void deleteProductJoin(int projectId, String productJoinName){
+		
+		Object[] values = { 
+				projectId,
+				productJoinName
+		};
+
+	        try (
+	            Connection connection = DBManager.getConnection();
+	            PreparedStatement statement = prepareStatement(connection, SQL_DELETE_PRODUCT_JOIN, false, values);
+	        ) {
+	            statement.executeUpdate();
+	        } catch (SQLException e) {
+	            //throw new DAOException(e);
+	        }
+	}
+	
+	public void deleteProductFromProductJoin(int projectId, String name, String productName){
 		
 		Object[] values = { 
 				projectId,
@@ -148,7 +164,7 @@ public class ProductJoinDAO {
         }
 	}
 	
-	public void deleteProductJoin(int projectId, String name, String productJoinName){
+	public void deleteProductJoinFromProductJoin(int projectId, String name, String productJoinName){
 		
 		Object[] values = { 
 				projectId,
