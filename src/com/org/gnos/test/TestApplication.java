@@ -82,8 +82,8 @@ public class TestApplication {
 		//runconfig.setWindow(window);
 		//runconfig.setStepSize(stepsize);
 		runconfig.setMIPGAP((float)0.15);
-		runconfig.setProjectId(1);
-		runconfig.setScenarioId(3);
+		runconfig.setProjectId(3);
+		runconfig.setScenarioId(15);
 		SchedulerService service = new SchedulerService();
 		service.setRunconfig(runconfig);
 		service.execute();

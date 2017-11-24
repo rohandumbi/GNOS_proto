@@ -138,8 +138,9 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 				constraint.addVariable("p"+pit.getPitNo()+"b"+bench.getBenchNo()+"t"+(timeperiod-1), new BigDecimal(1).negate());
 			}			
 		}
+		float value = yearvalue == 1 ? yearvalue : yearvalue - 1;
 		constraint.setType(Constraint.LESS_EQUAL);
-		constraint.setValue(new BigDecimal(yearvalue-1));
+		constraint.setValue(new BigDecimal(value));
 		context.getConstraints().add(constraint);		
 	}
 	
