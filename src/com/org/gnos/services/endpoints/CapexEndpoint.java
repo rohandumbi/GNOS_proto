@@ -36,11 +36,11 @@ public class CapexEndpoint {
 							return controller.create(jsonObject, req.params(":id"));
 						} catch (Exception e) {
 							res.status(400);
-							return new ResponseError("Field creation failed. "+e.getMessage());
+							return new ResponseError("Capex creation failed. "+e.getMessage());
 						}					
 					}
 					res.status(400);				
-					return new ResponseError("Field creation failed due to improper input");
+					return new ResponseError("Capex creation failed due to improper input");
 				}
 			}, json());
 			
@@ -55,11 +55,11 @@ public class CapexEndpoint {
 							return controller.update(jsonObject, req.params(":id"));
 						} catch (Exception e) {
 							res.status(400);
-							return new ResponseError("Field update failed. "+e.getMessage());
+							return new ResponseError("Capex update failed. "+e.getMessage());
 						}					
 					}
 					res.status(400);				
-					return new ResponseError("Field update failed due to improper input");
+					return new ResponseError("Capex update failed due to improper input");
 				}
 			}, json());
 

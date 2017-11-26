@@ -38,7 +38,7 @@ public class ReportEndpoint {
 						}
 					}
 					res.status(400);				
-					return new ResponseError("Field creation failed due to improper input");
+					return new ResponseError("Could not fetch report data due to improper input");
 					
 				}
 			});
@@ -60,7 +60,7 @@ public class ReportEndpoint {
 						}
 					}
 					res.status(400);				
-					return new ResponseError("Field creation failed due to improper input");
+					return new ResponseError("Could not fetch report data due to improper input");
 					
 				}
 			});
@@ -81,7 +81,7 @@ public class ReportEndpoint {
 						}					
 					}
 					res.status(400);				
-					return new ResponseError("Field creation failed due to improper input");
+					return new ResponseError("Could not fetch report data due to improper input");
 				}
 			}, json());
 		}

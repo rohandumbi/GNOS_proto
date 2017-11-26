@@ -38,11 +38,11 @@ public class ProductEndpoint {
 						return controller.create(jsonObject, req.params(":id"));
 					} catch (Exception e) {
 						res.status(400);
-						return new ResponseError("Field creation failed. "+e.getMessage());
+						return new ResponseError("Product join creation failed. "+e.getMessage());
 					}					
 				}
 				res.status(400);				
-				return new ResponseError("Field creation failed due to improper input");
+				return new ResponseError("Product join creation failed due to improper input");
 			}
 		}, json());
 		
@@ -63,11 +63,11 @@ public class ProductEndpoint {
 						return controller.deleteUnit(jsonObject, req.params(":id"), req.params(":name"));
 					} catch (Exception e) {
 						res.status(400);
-						return new ResponseError("Field creation failed. "+e.getMessage());
+						return new ResponseError("Delete products failed. "+e.getMessage());
 					}					
 				}
 				res.status(400);				
-				return new ResponseError("Field creation failed due to improper input");
+				return new ResponseError("Delete products failed failed due to improper input");
 			}
 		}, json());
 

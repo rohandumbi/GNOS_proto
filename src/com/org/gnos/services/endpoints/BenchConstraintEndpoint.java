@@ -36,11 +36,11 @@ public class BenchConstraintEndpoint {
 							return controller.create(jsonObject, req.params(":id"));
 						} catch (Exception e) {
 							res.status(400);
-							return new ResponseError("Field creation failed. "+e.getMessage());
+							return new ResponseError("Bench constraint creation failed. "+e.getMessage());
 						}					
 					}
 					res.status(400);				
-					return new ResponseError("Field creation failed due to improper input");
+					return new ResponseError("Could not create bench constraint due to improper input");
 				}
 			}, json());
 			
@@ -55,11 +55,11 @@ public class BenchConstraintEndpoint {
 							return controller.update(jsonObject, req.params(":id"));
 						} catch (Exception e) {
 							res.status(400);
-							return new ResponseError("Field update failed. "+e.getMessage());
+							return new ResponseError("Bench constraint update failed. "+e.getMessage());
 						}					
 					}
 					res.status(400);				
-					return new ResponseError("Field update failed due to improper input");
+					return new ResponseError("Bench constraint update failed due to improper input");
 				}
 			}, json());
 

@@ -36,11 +36,11 @@ public class DumpDependencyEndpoint {
 							return controller.create(jsonObject, req.params(":id"));
 						} catch (Exception e) {
 							res.status(400);
-							return new ResponseError("Field creation failed. "+e.getMessage());
+							return new ResponseError("Dump dependency creation failed. "+e.getMessage());
 						}					
 					}
 					res.status(400);				
-					return new ResponseError("Field creation failed due to improper input");
+					return new ResponseError("Dump dependency creation failed due to improper input");
 				}
 			}, json());
 			
@@ -55,11 +55,11 @@ public class DumpDependencyEndpoint {
 							return controller.update(jsonObject, req.params(":id"));
 						} catch (Exception e) {
 							res.status(400);
-							return new ResponseError("Field update failed. "+e.getMessage());
+							return new ResponseError("Dump dependency update failed. "+e.getMessage());
 						}					
 					}
 					res.status(400);				
-					return new ResponseError("Field update failed due to improper input");
+					return new ResponseError("Dump dependency update failed due to improper input");
 				}
 			}, json());
 

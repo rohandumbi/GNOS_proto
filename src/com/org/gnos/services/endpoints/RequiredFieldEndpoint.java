@@ -34,11 +34,11 @@ public class RequiredFieldEndpoint {
 						return controller.create(jsonObject, req.params(":id"));
 					} catch (Exception e) {
 						res.status(400);
-						return new ResponseError("Field creation failed. "+e.getMessage());
+						return new ResponseError("Required field mapping creation failed. "+e.getMessage());
 					}					
 				}
 				res.status(400);				
-				return new ResponseError("Field creation failed due to improper input");
+				return new ResponseError("Required field mapping creation failed due to improper input");
 			}
 		}, json());
 		
@@ -53,11 +53,11 @@ public class RequiredFieldEndpoint {
 						return controller.update(jsonObject, req.params(":id"));
 					} catch (Exception e) {
 						res.status(400);
-						return new ResponseError("Field update failed. "+e.getMessage());
+						return new ResponseError("Required field mapping update failed. "+e.getMessage());
 					}					
 				}
 				res.status(400);				
-				return new ResponseError("Field update failed due to improper input");
+				return new ResponseError("Required field mapping update failed due to improper input");
 			}
 		}, json());
 

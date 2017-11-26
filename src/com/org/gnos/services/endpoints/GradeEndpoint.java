@@ -36,11 +36,11 @@ public class GradeEndpoint {
 						return controller.create(jsonObject, req.params(":id"));
 					} catch (Exception e) {
 						res.status(400);
-						return new ResponseError("Field creation failed. "+e.getMessage());
+						return new ResponseError("Grade creation failed. "+e.getMessage());
 					}					
 				}
 				res.status(400);				
-				return new ResponseError("Field creation failed due to improper input");
+				return new ResponseError("Grade creation failed due to improper input");
 			}
 		}, json());
 		
