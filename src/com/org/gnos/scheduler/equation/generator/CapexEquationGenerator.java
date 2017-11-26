@@ -103,20 +103,18 @@ public class CapexEquationGenerator extends EquationGenerator{
 		List<CapexInstance> capexInstanceList = cd.getListOfCapexInstances();
 		int capexInstanceCount = capexInstanceList.size();
 		
-		for(int j=1; j<capexInstanceCount; j++){			
+		for(int j=1; j<capexInstanceCount; j++) {
+			if(!context.isGlobalMode()) {
+				SlidingWindowExecutionContext swctx = (SlidingWindowExecutionContext)context;
+				if(swctx.isCapacityUsed(capexNumber, j)){
+					continue;
+				}
+			}
 			for(int i=timePeriodStart; i<= timePeriodEnd; i++){
 				Constraint c = new Constraint();
-				StringBuffer sb = new StringBuffer("");
 				for(int ii=timePeriodStart; ii<=i; ii++){
-					if(ii > 1){
-						sb.append(" + ");
-					}
-					sb.append("c"+capexNumber+"i"+j+"t"+ii);
 					c.addVariable("c"+capexNumber+"i"+j+"t"+ii, new BigDecimal(1));
 				}
-				
-				
-				sb.append(" - "+"c"+capexNumber+"i"+(j+1)+"t"+i+" >= 0 ");
 				c.addVariable("c"+capexNumber+"i"+(j+1)+"t"+i, new BigDecimal(1).negate());
 				c.setType(Constraint.GREATER_EQUAL);
 				c.setValue(new BigDecimal(0));
@@ -130,16 +128,16 @@ public class CapexEquationGenerator extends EquationGenerator{
 		int timePeriodEnd = context.getTimePeriodEnd();
 		List<CapexInstance> capexInstanceList = cd.getListOfCapexInstances();
 		for(int j=1; j<= capexInstanceList.size(); j++){
-			StringBuffer sb = new StringBuffer("");
+			if(!context.isGlobalMode()) {
+				SlidingWindowExecutionContext swctx = (SlidingWindowExecutionContext)context;
+				if(swctx.isCapacityUsed(capexNumber, j)){
+					continue;
+				}
+			}
 			Constraint c = new Constraint();
 			for(int i=timePeriodStart; i<= timePeriodEnd; i++){
-				if(i > 1){
-					sb.append(" + ");
-				}
-				sb.append("c"+capexNumber+"i"+j+"t"+i);	
 				c.addVariable("c"+capexNumber+"i"+j+"t"+i, new BigDecimal(1));			
 			}
-			sb.append(" <= 1 ");
 			c.setType(Constraint.LESS_EQUAL);
 			c.setValue(new BigDecimal(1));
 			context.getConstraints().add(c);
@@ -191,16 +189,24 @@ public class CapexEquationGenerator extends EquationGenerator{
 				
 			}
 			int instanceNumber=0;
+			double value = 0;
 			for(CapexInstance ci: capexInstanceList){
 				instanceNumber++;
+				if(!context.isGlobalMode()) {
+					SlidingWindowExecutionContext swctx = (SlidingWindowExecutionContext)context;
+					if(swctx.isCapacityUsed(capexNumber, instanceNumber)){
+						value += context.getScaledValue(ci.getExpansionCapacity());
+						continue;
+					}
+				}
 				for(int ii=timePeriodStart; ii<=i; ii++){
 					c.addVariable("c"+capexNumber+"i"+instanceNumber+"t"+ii, context.getScaledValue(new BigDecimal(ci.getExpansionCapacity())).negate());
 				}				
 			}
 			if(processConstraintData != null){
-				c.setValue(context.getScaledValue(new BigDecimal(processConstraintData.get(startyear + i -1))));
+				c.setValue(context.getScaledValue(new BigDecimal(processConstraintData.get(startyear + i -1))).add(new BigDecimal(value)));
 			} else {
-				c.setValue(new BigDecimal(0));
+				c.setValue(new BigDecimal(value));
 			}
 			c.setType(Constraint.LESS_EQUAL);
 			context.getConstraints().add(c);
@@ -266,16 +272,24 @@ public class CapexEquationGenerator extends EquationGenerator{
 				
 			}
 			int instanceNumber=0;
+			double value = 0;
 			for(CapexInstance ci: capexInstanceList){
 				instanceNumber++;
+				if(!context.isGlobalMode()) {
+					SlidingWindowExecutionContext swctx = (SlidingWindowExecutionContext)context;
+					if(swctx.isCapacityUsed(capexNumber, instanceNumber)){
+						value += context.getScaledValue(ci.getExpansionCapacity());
+						continue;
+					}
+				}
 				for(int ii=timePeriodStart; ii<=i; ii++){
 					c.addVariable("c"+capexNumber+"i"+instanceNumber+"t"+ii, context.getScaledValue(new BigDecimal(ci.getExpansionCapacity())).negate());
 				}				
 			}
 			if(processConstraintData != null){
-				c.setValue(context.getScaledValue(new BigDecimal(processConstraintData.get(startyear + i -1))));
+				c.setValue(context.getScaledValue(new BigDecimal(processConstraintData.get(startyear + i -1))).add(new BigDecimal(value)));
 			} else {
-				c.setValue(new BigDecimal(0));
+				c.setValue(new BigDecimal(value));
 			}
 			c.setType(Constraint.LESS_EQUAL);
 			context.getConstraints().add(c);

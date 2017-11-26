@@ -255,6 +255,12 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 			int capexInstanceCount = 0;
 			for(CapexInstance ci: capexInstanceList){
 				capexInstanceCount++;
+				if(!context.isGlobalMode()) {
+					SlidingWindowExecutionContext swctx = (SlidingWindowExecutionContext)context;
+					if(swctx.isCapacityUsed(capexCount, capexInstanceCount)){
+						continue;
+					}
+				}
 				for(int i= timePeriodStart; i <= timePeriodEnd ; i++){
 					String cv = "c"+capexCount+"i"+capexInstanceCount+"t"+i;
 					BigDecimal value = new BigDecimal(context.getScaledValue(ci.getCapexAmount()) * (1 / Math.pow ((1 + discount_rate), i)));

@@ -22,7 +22,6 @@ import com.org.gnos.db.model.CapexInstance;
 import com.org.gnos.db.model.Dump;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Field;
-import com.org.gnos.db.model.FixedOpexCost;
 import com.org.gnos.db.model.Grade;
 import com.org.gnos.db.model.Model;
 import com.org.gnos.db.model.OpexData;
@@ -42,6 +41,8 @@ public class DBStorageHelper implements IStorageHelper {
 	
 	protected static String report_insert_sql ="";
 	protected static String capex_report_insert_sql ="";
+	
+	protected List<CapexRecord> capexRecordList;
 	
 	@Override
 	public void store(List<Record> records) {
@@ -551,6 +552,7 @@ public class DBStorageHelper implements IStorageHelper {
 	@Override
 	public void storeCapex(List<CapexRecord> capexRecords) {
 		if(capexRecords == null || capexRecords.size() == 0) return;
+		capexRecordList = capexRecords;
 		try ( PreparedStatement ips = conn.prepareStatement(capex_report_insert_sql); ){
 			boolean autoCommit = conn.getAutoCommit();
 			conn.setAutoCommit(false);

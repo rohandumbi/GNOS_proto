@@ -12,7 +12,7 @@ public class SlidingWindowModeScheduler extends BaseScheduler{
 		((SlidingWindowExecutionContext)context).setPeriod(runConfig.getPeriod());
 		((SlidingWindowExecutionContext)context).setWindow(runConfig.getWindow());
 		((SlidingWindowExecutionContext)context).setStepsize(runConfig.getStepSize());
-
+		context.setSpReclaimEnabled(runConfig.isReclaim());
 		
 		helper = new SlidingWindowModeDBStorageHelper();
 		helper.setContext(context);

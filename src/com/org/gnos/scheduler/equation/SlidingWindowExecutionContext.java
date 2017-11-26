@@ -14,6 +14,7 @@ import com.org.gnos.db.model.Field;
 import com.org.gnos.db.model.Product;
 import com.org.gnos.db.model.ProductJoin;
 import com.org.gnos.db.model.TruckParameterCycleTime;
+import com.org.gnos.scheduler.processor.CapexRecord;
 import com.org.gnos.scheduler.processor.SlidingWindowModeDBStorageHelper;
 
 public class SlidingWindowExecutionContext extends ExecutionContext {
@@ -30,6 +31,8 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 	private Map<Integer, Map<Integer, Double>> spTonnesWigthMapping = new HashMap<Integer,  Map<Integer, Double>>();
 	
 	private Map<Integer, SPBlock> spBlockMapping = new HashMap<Integer, SPBlock>();
+	
+	private Set<CapexRecord> capexCapacityUsedList = new HashSet<CapexRecord>();
 	
 	private List<Expression> gradeExpressions;
 	//private Set<String> gradeFields;
@@ -358,6 +361,16 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 			}		
 		}
 	}
+	
+	public void finalizeCapex(List<CapexRecord> capexBinaryList) {
+		if(capexBinaryList == null || capexBinaryList.size() == 0) return;
+		for(CapexRecord cr: capexBinaryList) {
+			if(cr.getValue() == 1) {
+				capexCapacityUsedList.add(cr);
+			}
+			
+		}
+	}
 	private void processGrades(SPBlock spb, Set<String> gradeExprs) {
 		for(String exprName: gradeExprs) {
 			Expression expr = getExpressionByName(exprName);
@@ -456,5 +469,17 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 		
 		return th_ratio;
 		
+	}
+
+	public boolean isCapacityUsed(int capexNo, int instanceNo) {
+		
+		for(CapexRecord cr: capexCapacityUsedList) {
+			if(cr.getCapexNo() == capexNo && cr.getInstanceNo() == instanceNo) {
+				return true;
+			}
+		}
+			
+		
+		return false;
 	}
 }

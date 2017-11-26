@@ -2,7 +2,7 @@ package com.org.gnos.licensing;
 
 public class GNOSLicense {
 
-	static final boolean DEV_MODE = true;
+	public static final boolean DEV_MODE = true;
 	static Keylok lock = new Keylok();
 	
 	public static void initialize() throws Exception {

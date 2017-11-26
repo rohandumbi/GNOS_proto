@@ -18,6 +18,7 @@ import com.org.gnos.db.model.Dump;
 import com.org.gnos.db.model.Expression;
 import com.org.gnos.db.model.Field;
 import com.org.gnos.db.model.Grade;
+import com.org.gnos.db.model.OpexData;
 import com.org.gnos.db.model.PitGroup;
 import com.org.gnos.db.model.Process;
 import com.org.gnos.db.model.ProcessJoin;
@@ -50,6 +51,7 @@ public class SlidingWindowModeDBStorageHelper extends DBStorageHelper {
 		SlidingWindowExecutionContext swctx = (SlidingWindowExecutionContext)context;
 		swctx.processStockpiles();
 		swctx.finalizeStockpiles(this);
+		swctx.finalizeCapex(capexRecordList);
 	}
 	
 	@Override
@@ -67,6 +69,8 @@ public class SlidingWindowModeDBStorageHelper extends DBStorageHelper {
 				try {
 					int index = 1;
 					BigDecimal total_TH = new BigDecimal(0);
+					int year = context.getScenario().getStartYear() + record.getTimePeriod() - 1;
+					double quantityMined = context.getUnScaledValue(record.getValue());
 					ips.setString(index++, context.getScenario().getName());
 					ips.setInt(index++, 2); // 1- Global mode, 2 - SW mode
 					ips.setInt(index++, record.getOriginType());
@@ -86,10 +90,8 @@ public class SlidingWindowModeDBStorageHelper extends DBStorageHelper {
 					}
 					ips.setInt(index++, record.getTimePeriod());
 					if(record.getOriginType() == Record.ORIGIN_PIT) {
-						//System.out.println("Block No"+record.getBlockNo());
 						Block b = context.getBlockByNumber(record.getBlockNo());
-						double tonnesWt = context.getTonnesWtForBlock(b);
-						double quantityMined = context.getUnScaledValue(record.getValue());
+						double tonnesWt = context.getTonnesWtForBlock(b);						
 						double ratio = quantityMined/tonnesWt;
 						ips.setDouble(index++, quantityMined);
 						ips.setDouble(index++, ratio);
@@ -341,7 +343,6 @@ public class SlidingWindowModeDBStorageHelper extends DBStorageHelper {
 						SPBlock spb = swctx.getSPBlock(record.getOriginSpNo());
 						Stockpile sp = context.getStockpileFromNo(record.getOriginSpNo());
 						double ratio = 0;
-						double quantityMined = context.getUnScaledValue(record.getValue());
 						if(spb.getLasttonnesWt() > 0) {
 							ratio = quantityMined/spb.getLasttonnesWt();
 						}
@@ -608,6 +609,102 @@ public class SlidingWindowModeDBStorageHelper extends DBStorageHelper {
 						ips.setString(index, processName);
 						index ++;
 					}
+					
+					
+					// Financial fields 
+					
+					double total_cost = 0;
+					double total_revenue = 0;
+					// Ore mining 
+					double oreMiningCost = 0;
+					if(record.getDestinationType() != Record.DESTINATION_WASTE && record.getOriginType() == Record.ORIGIN_PIT) {
+						oreMiningCost = quantityMined * context.getOreMinigCost(record.getPitNo(), year).doubleValue();			
+					} 
+					ips.setDouble(index++, -oreMiningCost);
+					total_cost += oreMiningCost;
+					// Waste mining
+					double wasteMiningCost = 0;
+					if(record.getDestinationType() == Record.DESTINATION_WASTE) {
+						wasteMiningCost = quantityMined * context.getWasteMinigCost(record.getPitNo(), year).doubleValue();						
+					} 
+					ips.setDouble(index++, -wasteMiningCost);
+					total_cost += wasteMiningCost;
+					// Stockpile cost
+					double stockpilingCost = 0;
+					if(record.getDestinationType() == Record.DESTINATION_SP) {
+						stockpilingCost = quantityMined * context.getStockpilingCost(record.getDestSpNo(), year).doubleValue();			
+					} 
+					ips.setDouble(index++, -stockpilingCost);
+					total_cost += stockpilingCost;
+
+					// Stockpile Reclaim 
+					double stockpileReclaimingCost = 0;
+					if(record.getOriginType() == Record.ORIGIN_SP) {
+						stockpileReclaimingCost = quantityMined * context.getStockpileReclaimingCost(record.getOriginSpNo(), year).doubleValue();			
+					}
+					ips.setDouble(index++, -stockpileReclaimingCost);
+					total_cost += stockpileReclaimingCost;
+					//Truckhour cost
+					double truckHourCost = total_TH.doubleValue() * context.getTruckHourCost(year).doubleValue();	
+					
+					ips.setDouble(index++, -truckHourCost);
+					total_cost += truckHourCost;
+					
+					List<OpexData> opexDataList = context.getOpexDataList();
+					for (OpexData opexData: opexDataList) {
+						if(!opexData.isInUse()) continue;						
+						if(opexData.isRevenue()) {
+							double revenue = 0;	
+							if(record.getDestinationType() == Record.DESTINATION_PROCESS) {
+								boolean calRev = true;
+								if(opexData.getModelId() != -1 && (opexData.getModelId() != process.getModel().getId())) {
+									calRev = false;
+
+								} else if(opexData.getProductJoinName() != null  && opexData.getProductJoinName().trim().length() > 0) {
+									if(!isProcessAssociatedToProductJoin(process.getModel(), opexData.getProductJoinName())){
+										calRev = false;
+									}
+								}
+								if(calRev) {
+									int unitId;
+									if(opexData.getUnitType() == OpexData.UNIT_FIELD) {
+										unitId = opexData.getFieldId();
+									} else {
+										unitId = opexData.getExpressionId();
+									}
+									BigDecimal expr_value;
+									if(record.getOriginType() == Record.ORIGIN_PIT) {
+										Block b = context.getBlockByNumber(record.getBlockNo());
+										expr_value = context.getUnitValueforBlock(b, unitId, opexData.getUnitType());
+									} else  {
+										SPBlock spb = swctx.getSPBlock(record.getOriginSpNo());
+										expr_value = ((SlidingWindowExecutionContext)context).getUnitValueforBlock(spb, unitId, opexData.getUnitType());
+									}
+									revenue = expr_value.doubleValue()* quantityMined * opexData.getCostData().get(year).doubleValue();
+								}
+								
+							}
+							ips.setDouble(index++, revenue);
+							total_revenue += revenue;
+						} else {
+							double pcost = 0;
+							if(record.getDestinationType() == Record.DESTINATION_PROCESS) {
+								if(opexData.getModelId() != -1 && (process.getModel().getId() == opexData.getModelId() || isChild(opexData.getModelId(), process.getModel()))) {
+									pcost = opexData.getCostData().get(year).doubleValue() * quantityMined;									
+								}
+							}
+							
+							ips.setDouble(index++, -pcost);
+							total_cost += pcost;
+						}
+					}
+
+					ips.setDouble(index++, -total_cost);
+					ips.setDouble(index++, total_revenue);
+					ips.setDouble(index++, (total_revenue - total_cost));
+					double discount_rate = context.getScenario().getDiscount()/100;
+					double dcf = (total_revenue - total_cost) * (1 / Math.pow ((1 + discount_rate), record.getTimePeriod()));
+					ips.setDouble(index++, dcf);
 					
 					ips.executeUpdate();
 				} catch (SQLException e) {

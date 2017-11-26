@@ -11,6 +11,7 @@ import java.util.Set;
 
 import com.org.gnos.core.GNOSConfig;
 import com.org.gnos.core.LogManager;
+import com.org.gnos.licensing.GNOSLicense;
 import com.org.gnos.scheduler.equation.Constraint;
 import com.org.gnos.scheduler.equation.ExecutionContext;
 import com.org.gnos.scheduler.processor.CapexRecord;
@@ -46,7 +47,7 @@ public class CplexSolver implements ISolver {
 	}
 	
 	public void solve(String fileName, int timePeiod) {
-		context.writeCSV();
+		//context.writeCSV();
 		long startTime = 0;
 		long endTime = 0;
 		double npv = 0;
@@ -129,8 +130,10 @@ public class CplexSolver implements ISolver {
 				}
 
 			}
-
-			cplex.exportModel(fileName);
+			if(GNOSLicense.DEV_MODE) {
+				cplex.exportModel(fileName);
+			}
+			
 
 			// solve
 			startTime = System.currentTimeMillis();
@@ -138,7 +141,9 @@ public class CplexSolver implements ISolver {
 				endTime = System.currentTimeMillis();
 				npv = cplex.getObjValue();
 				System.out.println("Obj = " + npv);
-				cplex.writeSolution("temp_" + timePeiod + ".sol");
+				if(GNOSLicense.DEV_MODE) {
+					cplex.writeSolution("temp_" + timePeiod + ".sol");
+				}				
 				List<Record> records = new ArrayList<Record>();
 				List<CapexRecord> capexRecords = new ArrayList<CapexRecord>();
 				for (int i = 0; i < _vars.size(); i++) {
@@ -162,8 +167,9 @@ public class CplexSolver implements ISolver {
 						capexRecords.add(cr);
 					}
 				} // for int
-				helper.store(records);
 				helper.storeCapex(capexRecords);
+				helper.store(records);
+
 			} // if solve
 			else {
 				LogManager.log("Model not solved");

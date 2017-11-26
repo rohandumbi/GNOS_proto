@@ -11,6 +11,7 @@ public class GLobalModeScheduler extends BaseScheduler {
 		super();
 		context = new GlobalModeExecutionContext(runConfig.getProjectId(), runConfig.getScenarioId());
 		context.setTimePeriodEnd(runConfig.getPeriod());
+		context.setSpReclaimEnabled(runConfig.isReclaim());
 		helper = new DBStorageHelper();
 		helper.setContext(context);
 	}

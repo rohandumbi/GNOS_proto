@@ -1070,6 +1070,10 @@ public class ExecutionContext {
 		return spReclaimEnabled;
 	}
 
+	public void setSpReclaimEnabled(boolean spReclaimEnabled) {
+		this.spReclaimEnabled = spReclaimEnabled;
+	}
+
 	public Map<String, Boolean> getEquationEnableMap() {
 		return equationEnableMap;
 	}
