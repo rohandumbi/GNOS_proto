@@ -150,6 +150,10 @@ public class SlidingWindowExecutionContext extends ExecutionContext {
 		return (getTonnesWtForBlock(b) > TONNAGE_TOLERANCE); //0.01 is the tolerance
 	}
 	
+	public double getOriginalTonnesWtForBlock(Block b){
+		return super.getTonnesWtForBlock(b);
+	}
+	
 	@Override
 	public double getTonnesWtForBlock(Block b){
 		double tonnage = Double.valueOf(b.getField(tonnesWtFieldName));

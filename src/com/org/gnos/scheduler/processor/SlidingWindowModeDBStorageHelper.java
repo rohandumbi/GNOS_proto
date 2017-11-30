@@ -91,7 +91,7 @@ public class SlidingWindowModeDBStorageHelper extends DBStorageHelper {
 					ips.setInt(index++, record.getTimePeriod());
 					if(record.getOriginType() == Record.ORIGIN_PIT) {
 						Block b = context.getBlockByNumber(record.getBlockNo());
-						double tonnesWt = context.getTonnesWtForBlock(b);						
+						double tonnesWt = ((SlidingWindowExecutionContext)context).getOriginalTonnesWtForBlock(b);						
 						double ratio = quantityMined/tonnesWt;
 						ips.setDouble(index++, quantityMined);
 						ips.setDouble(index++, ratio);

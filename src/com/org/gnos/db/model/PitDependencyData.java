@@ -84,8 +84,16 @@ public class PitDependencyData {
 
 	@Override
 	public String toString() {
-		return inUse + "|" + firstPitName + "|" + firstPitAssociatedBench + "|" + dependentPitName + "|"
-				+ dependentPitAssociatedBench + "|" + minLead + "|" + maxLead;
+		
+		return inUse + "|" + escapeNull(firstPitName) + "|" + escapeNull(firstPitAssociatedBench) + "|" + escapeNull(dependentPitName) + "|"
+				+ escapeNull(dependentPitAssociatedBench) + "|" + minLead + "|" + maxLead;
+	}
+	
+	private String escapeNull(String s) {
+		if(s == null) {
+			return "";
+		}
+		return s;
 	}
 	
 }

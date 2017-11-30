@@ -90,7 +90,7 @@ public class ExpressionProcessor {
 					resetstmt.executeUpdate(reset_sql);
 					sql = sql+ " AND ( "+expr.getFilter() +" )";
 				}
-				System.out.println("sql :"+sql);
+				//System.out.println("sql :"+sql);
 				stmt.executeUpdate(sql);
 			}
 			
