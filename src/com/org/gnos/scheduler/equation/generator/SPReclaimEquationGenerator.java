@@ -24,11 +24,14 @@ public class SPReclaimEquationGenerator extends EquationGenerator{
 	public void generate() {
 
 		try {
-			if(context.isSpReclaimEnabled() && context.isGlobalMode()) {
-				buildStockpileEquations();
-			} else {
-				buildSWStockpileEquations();
+			if(context.isSpReclaimEnabled()) {
+				if(context.isGlobalMode()) {
+					buildStockpileEquations();
+				} else {
+					buildSWStockpileEquations();
+				}
 			}
+
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
