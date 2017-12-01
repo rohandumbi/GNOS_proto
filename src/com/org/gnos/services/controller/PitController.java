@@ -15,6 +15,8 @@ public class PitController {
 	
 	public List<Pit> getAll(String projectId) {
 		List<Pit> pits = new ArrayList<Pit>();
+		RequiredFieldDAO rdo = new RequiredFieldDAO();
+		List<RequiredField> requiredFields = rdo.getAll(Integer.parseInt(projectId));
 		String sql_required_mapping = "select mapped_field_name from required_field_mapping where field_name = 'pit_name' and project_id = "+projectId;
 		try(
 				Connection connection = DBManager.getConnection();
@@ -76,6 +78,7 @@ public class PitController {
 	class Pit {
 		String pitName;
 		int pitNo;
+		List<Bench> benches;
 	}
 	
 	class Bench {

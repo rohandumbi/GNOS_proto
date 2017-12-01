@@ -49,6 +49,8 @@ public class BinaryVariableGenerator extends EquationGenerator{
 			capexCount++;
 			List<CapexInstance> capexInstanceList = cd.getListOfCapexInstances();
 			for (int j = 1; j <= capexInstanceList.size(); j++) {
+				CapexInstance ci = capexInstanceList.get(j);
+				if(!ci.isInUse()) continue;
 				for(int i= timePeriodStart; i <= timePeriodEnd ; i++){
 					context.getBinaries().add("c"+capexCount+"i"+j+"t"+i);
 				}
