@@ -20,16 +20,16 @@ import com.org.gnos.db.model.CapexInstance;
 public class CapexDAO {
 
 
-	private static final String SQL_LIST_ORDER_BY_ID = "select a.id as id, a.scenario_id, a.name as name, b.id as instance_id, b.name as instance_name, b.capex_id, b.group_name, b.group_type, b.capex, b.expansion_capacity "
+	private static final String SQL_LIST_ORDER_BY_ID = "select a.id as id, a.scenario_id, a.name as name, b.id as instance_id, b.name as instance_name, b.in_use, b.capex_id, b.group_name, b.group_type, b.capex, b.expansion_capacity "
 			+ "from capex_data a left join capex_instance b on  a.id = b.capex_id where a.scenario_id= ? ";
 	private static final String SQL_INSERT = "insert into capex_data (scenario_id, name) values (?, ?)";
-	private static final String SQL_INSERT_INSTANCE = "insert into capex_instance (capex_id, name, group_name, group_type, capex, expansion_capacity) values (?, ?, ?, ?, ?, ?)";
+	private static final String SQL_INSERT_INSTANCE = "insert into capex_instance (capex_id, name, in_use, group_name, group_type, capex, expansion_capacity) values (?, ?, ?, ?, ?, ?, ?)";
 	private static final String SQL_DELETE = "delete from capex_data where id = ?";
 	private static final String SQL_DELETE_INSTANCE_ALL = "delete from capex_instance where capex_id = ?";
 	private static final String SQL_DELETE_BY_SCENARIOID = "delete from capex_data where scenario_id = ?";
 	private static final String SQL_DELETE_INSTANCE_ALL_BY_SCENARIOID = "delete from capex_instance where capex_id in (select id from capex_data where scenario_id = ? )";
 	private static final String SQL_DELETE_INSTANCE = "delete from capex_instance where id = ? ";
-	private static final String SQL_UPDATE = "update capex_instance set group_name = ? , group_type = ?, capex = ?, expansion_capacity = ?  where id = ?";
+	private static final String SQL_UPDATE = "update capex_instance set in_use = ?, group_name = ? , group_type = ?, capex = ?, expansion_capacity = ?  where id = ?";
 	
 	public List<CapexData> getAll(int scenarioId) {
 
@@ -95,6 +95,7 @@ public class CapexDAO {
 				Object[] civalues = {
 						capexData.getId(),
 						capexInstance.getName(),
+						capexInstance.isInUse(),
 						capexInstance.getGroupingName(),
 						capexInstance.getGroupingType(),
 						capexInstance.getCapexAmount(),
@@ -134,6 +135,7 @@ public class CapexDAO {
 					Object[] civalues = {
 							capexData.getId(),
 							capexInstance.getName(),
+							capexInstance.isInUse(),
 							capexInstance.getGroupingName(),
 							capexInstance.getGroupingType(),
 							capexInstance.getCapexAmount(),
@@ -151,7 +153,7 @@ public class CapexDAO {
 				}else{
 					Object[] civalues = {
 							
-							/*capexInstance.getName(),*/
+							capexInstance.isInUse(),
 							capexInstance.getGroupingName(),
 							capexInstance.getGroupingType(),
 							capexInstance.getCapexAmount(),
@@ -235,6 +237,7 @@ public class CapexDAO {
 		CapexInstance capexInstance = new CapexInstance();
 		capexInstance.setId(rs.getInt("instance_id"));
 		capexInstance.setName(rs.getString("instance_name"));
+		capexInstance.setInUse(rs.getBoolean("in_use"));
 		capexInstance.setCapexId(rs.getInt("capex_id"));
 		capexInstance.setGroupingName(rs.getString("group_name"));
 		capexInstance.setGroupingType(rs.getInt("group_type"));

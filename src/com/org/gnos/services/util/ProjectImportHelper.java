@@ -546,6 +546,7 @@ public class ProjectImportHelper implements ProjectTypes {
 				ci.setGroupingType(Integer.parseInt(capexInstanceData[2]));
 				ci.setCapexAmount(Long.parseLong(capexInstanceData[3]));
 				ci.setExpansionCapacity(Long.parseLong(capexInstanceData[4]));
+				ci.setInUse(Boolean.parseBoolean(capexInstanceData[5]));
 				cd.addCapexInstance(ci);
 			}
 			new CapexDAO().create(cd, scenarioId);			

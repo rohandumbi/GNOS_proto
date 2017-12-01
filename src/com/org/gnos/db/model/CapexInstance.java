@@ -4,6 +4,7 @@ public class CapexInstance {
 	private int id;
 	private int capexId;
 	private String name;
+	private boolean inUse;
 	private String groupingName;
 	private int groupingType;
 	private long capexAmount;
@@ -18,6 +19,7 @@ public class CapexInstance {
 	public CapexInstance(){
 		super();
 		this.id = -1;
+		this.inUse = true;
 		this.capexId = -1;
 		this.groupingType = -1;
 		this.capexAmount = -1;
@@ -42,6 +44,12 @@ public class CapexInstance {
 
 	public void setName(String name) {
 		this.name = name;
+	}	
+	public boolean isInUse() {
+		return inUse;
+	}
+	public void setInUse(boolean inUse) {
+		this.inUse = inUse;
 	}
 	public String getGroupingName() {
 		return groupingName;
@@ -70,7 +78,7 @@ public class CapexInstance {
 
 	@Override
 	public String toString() {
-		return name + "," + groupingName + "," + groupingType + "," + capexAmount + "," + expansionCapacity;
+		return name + "," + groupingName + "," + groupingType + "," + capexAmount + "," + expansionCapacity + "," + inUse;
 	}
 	
 	

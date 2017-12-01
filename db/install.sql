@@ -369,6 +369,7 @@ DROP TABLE IF EXISTS capex_instance;
 CREATE TABLE capex_instance(
    id INT NOT NULL AUTO_INCREMENT,
    name VARCHAR(50) NOT NULL,
+   in_use TINYINT NOT NULL default 1,
    capex_id INT NOT NULL,
    group_name VARCHAR(50),
    group_type INT NOT NULL,

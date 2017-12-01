@@ -31,6 +31,7 @@ public class CapexController {
 			CapexInstance ci = new CapexInstance();
 			JsonObject instanceObj = elm.getAsJsonObject();
 			ci.setName(instanceObj.get("name").getAsString());
+			ci.setInUse(instanceObj.get("inUse").getAsBoolean());
 			ci.setGroupingName(instanceObj.get("groupingName").getAsString());
 			ci.setGroupingType(instanceObj.get("groupingType").getAsInt());
 			ci.setCapexAmount(instanceObj.get("capexAmount").getAsLong());
@@ -55,6 +56,7 @@ public class CapexController {
 			JsonObject instanceObj = elm.getAsJsonObject();
 			ci.setId(instanceObj.get("id").getAsInt());
 			ci.setName(instanceObj.get("name").getAsString());
+			ci.setInUse(instanceObj.get("inUse").getAsBoolean());
 			ci.setGroupingName(instanceObj.get("groupingName").getAsString());
 			ci.setGroupingType(instanceObj.get("groupingType").getAsInt());
 			ci.setCapexAmount(instanceObj.get("capexAmount").getAsLong());
