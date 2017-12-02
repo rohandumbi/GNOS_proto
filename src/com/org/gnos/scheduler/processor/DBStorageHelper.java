@@ -557,23 +557,40 @@ public class DBStorageHelper implements IStorageHelper {
 			boolean autoCommit = conn.getAutoCommit();
 			conn.setAutoCommit(false);
 			List<CapexData> cdList = context.getCapexDataList();
-			
+			Map<Integer, List<CapexRecord>> yearCapexRecordMapping = new HashMap<Integer, List<CapexRecord>>();
 			for(CapexRecord cr: capexRecords) {
+				List<CapexRecord> crlist = yearCapexRecordMapping.get(cr.getYear());
+				if(crlist == null) {
+					crlist = new ArrayList<CapexRecord>();
+					yearCapexRecordMapping.put(cr.getYear(), crlist);
+				}
+				crlist.add(cr);
+			}
+			Set<Integer> years = yearCapexRecordMapping.keySet();
+			for(Integer capexyear: years) {
 				int index = 1;
-				int year = context.getScenario().getStartYear() + cr.getYear() - 1;
+				int year = context.getScenario().getStartYear() + capexyear - 1;
+				ips.setString(index++, context.getScenario().getName());
 				ips.setInt(index++, year);
 				List<Double> capexCosts = new ArrayList<Double>();
 				double total_capex = 0;
 				int ccount = 1;
+				List<CapexRecord> crlist = yearCapexRecordMapping.get(capexyear);
 				for(CapexData cd : cdList) {
 					List<CapexInstance> ciList = cd.getListOfCapexInstances();
 					int cicount = 1;
 					for(CapexInstance ci : ciList) {
-						double cost =0;
-						if(ccount == cr.getCapexNo() && cicount == cr.getInstanceNo()) {
-							ips.setInt(index++, cr.getValue());
-							cost =  -cr.getValue() * ci.getCapexAmount();
-						} else {
+						double cost = 0;
+						boolean usedCapex = false;
+						for(CapexRecord cr : crlist) {
+							if(ccount == cr.getCapexNo() && cicount == cr.getInstanceNo()) {
+								ips.setInt(index++, cr.getValue());
+								cost =  -cr.getValue() * ci.getCapexAmount();
+								usedCapex = true;
+								break;
+							}
+						}
+						if (!usedCapex) {
 							ips.setInt(index++, 0);
 						}
 						total_capex += cost;
@@ -588,7 +605,7 @@ public class DBStorageHelper implements IStorageHelper {
 				}
 				ips.setDouble(index++, total_capex);
 				double discount_rate = context.getScenario().getDiscount()/100;
-				double dcf = total_capex * (1 / Math.pow ((1 + discount_rate), cr.getYear()));
+				double dcf = total_capex * (1 / Math.pow ((1 + discount_rate), capexyear));
 				ips.setDouble(index++, dcf);
 				
 				ips.executeUpdate();
@@ -625,7 +642,7 @@ public class DBStorageHelper implements IStorageHelper {
 		}
 		data_sql += "  UNIQUE KEY (origin_type, pit_no, block_no, sp_no, destination_type, destination) );";
 		
-		System.out.println("Sql =>"+data_sql);
+		//System.out.println("Sql =>"+data_sql);
 		try (
 				Statement stmt = conn.createStatement();
 			)
@@ -639,9 +656,9 @@ public class DBStorageHelper implements IStorageHelper {
 		int projectId = context.getProjectId();
 		int scenarioId = context.getScenarioId();
 		dropCapexTable(projectId, scenarioId);
-		StringBuffer sbuff_sql = new StringBuffer("insert into gnos_capex_report_"+projectId+"_"+scenarioId+" (period ");
-		StringBuffer sbuff = new StringBuffer(" ( ?");
-		String  data_sql = "CREATE TABLE gnos_capex_report_"+projectId+"_"+scenarioId+" ( period INT ";
+		StringBuffer sbuff_sql = new StringBuffer("insert into gnos_capex_report_"+projectId+"_"+scenarioId+" (scenario_name, period ");
+		StringBuffer sbuff = new StringBuffer(" ( ?, ?");
+		String  data_sql = "CREATE TABLE gnos_capex_report_"+projectId+"_"+scenarioId+" ( scenario_name VARCHAR(50), period INT ";
 
 		List<CapexData> cdList = context.getCapexDataList();
 		List<String> columns = new ArrayList<String>();
@@ -681,7 +698,7 @@ public class DBStorageHelper implements IStorageHelper {
 		sbuff.append(")");
 		capex_report_insert_sql = sbuff_sql.toString() + " values " + sbuff.toString();
 		
-		System.out.println("Sql =>"+data_sql);
+		//System.out.println("Sql =>"+data_sql);
 		try (
 				Statement stmt = conn.createStatement();
 			)
@@ -850,7 +867,7 @@ public class DBStorageHelper implements IStorageHelper {
 		sbuff_sql.append(")");
 		sbuff.append(")");
 		report_insert_sql = sbuff_sql.toString() + " values " + sbuff.toString();
-		System.out.println("Sql =>"+data_sql);
+		//System.out.println("Sql =>"+data_sql);
 		try (
 				Statement stmt = conn.createStatement();
 			)

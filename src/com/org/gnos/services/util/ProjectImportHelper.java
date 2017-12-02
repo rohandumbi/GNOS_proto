@@ -657,7 +657,7 @@ public class ProjectImportHelper implements ProjectTypes {
 		data_sql += " PRIMARY KEY ( id ) );";
 		
 		String  computed_data_sql = "CREATE TABLE gnos_computed_data_"+projectId+" (row_id INT NOT NULL, block_no INT, pit_no INT, bench_no INT, PRIMARY KEY ( row_id )) ";
-		System.out.println("Sql =>"+data_sql);
+		//System.out.println("Sql =>"+data_sql);
 		try (
 				Statement stmt = conn.createStatement();
 			)

@@ -61,7 +61,6 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 		List<Process> porcesses = context.getProcessList();
 		Set<Block> processBlocks = new HashSet<Block>();
 		for(Process process: porcesses) {
-			System.out.println("Equation Generation: process name - "+process.getModel().getName());
 			String condition = buildCondition(process) ;
 			List<Block> blocks = findBlocks(condition);
 			process.setBlocks(blocks);
@@ -134,7 +133,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 				condition = condition.substring(0, condition.length() -1);
 			}
 			condition += ")";
-			System.out.format(" Stockpile No: %d  Condition %s : \n", sp.getStockpileNumber(), condition);
+			//System.out.format(" Stockpile No: %d  Condition %s : \n", sp.getStockpileNumber(), condition);
 			List<Block> blocks = findBlocks(condition);
 			for(int i=timePeriodStart; i<= timePeriodEnd; i++ ){
 				int year = startYear + i -1;
@@ -206,7 +205,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 				condition = condition.substring(0, condition.length() -1);
 			}
 			condition += ")";
-			System.out.println(" Dump Condition :"+condition);
+			//System.out.println(" Dump Condition :"+condition);
 			List<Block> blocks = findBlocks(condition);
 			
 			for(int i=timePeriodStart; i<= timePeriodEnd; i++ ){
@@ -391,7 +390,7 @@ public class ObjectiveFunctionEquationGenerator extends EquationGenerator{
 			currNode = parent;
 		}
 		while(continueLoop);
-		System.out.println("Condition :"+condition);
+		//System.out.println("Condition :"+condition);
 		return condition;
 	}
 	
