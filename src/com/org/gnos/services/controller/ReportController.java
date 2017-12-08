@@ -227,7 +227,7 @@ public class ReportController {
 			
 			for (int i = 0; i < columns.size(); i++) {
 				String columnName = columns.get(i);
-				if(!columnName.equals("period") && !columnName.equals("total_capex") && !columnName.equals("capex_dcf") && !columnName.endsWith("_cost")) {
+				if(!columnName.equals("period") && !columnName.equals("scenario_name") && !columnName.equals("total_capex") && !columnName.equals("capex_dcf") && !columnName.endsWith("_cost")) {
 					exclusionIdxList.add(i);
 					continue;
 				}
