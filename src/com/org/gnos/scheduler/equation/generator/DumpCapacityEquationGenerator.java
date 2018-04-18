@@ -32,7 +32,7 @@ public class DumpCapacityEquationGenerator extends EquationGenerator{
 		int timePeriodEnd = context.getTimePeriodEnd();
 		for(Dump d:dumpList){
 			if(!d.isHasCapacity()) continue;
-			Constraint constraint  = new Constraint();
+			Constraint constraint  = new Constraint(Constraint.DUMP_CAPACITY);
 			Set<Block> dumpblocks = d.getBlocks();
 			List<Pit> pits = new ArrayList<Pit>();
 			if(d.getMappingType() == 0){
@@ -58,7 +58,7 @@ public class DumpCapacityEquationGenerator extends EquationGenerator{
 				}
 			}
 			if(constraint.getVariables().size() > 0){
-				constraint.setType(Constraint.LESS_EQUAL);
+				constraint.setEqualityType(Constraint.LESS_EQUAL);
 				constraint.setValue(context.getScaledValue(new BigDecimal(d.getCapacity())));
 				context.getConstraints().add(constraint);
 			}

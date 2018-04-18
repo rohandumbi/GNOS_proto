@@ -54,7 +54,7 @@ public class BenchProportionEquationGenerator extends EquationGenerator{
 						double tonnage1 = context.getTonnesWtForBlock(lastBlock);
 						double tonnage2 = context.getTonnesWtForBlock(block);
 						for(int i=timePeriodStart; i<= timePeriodEnd; i++){
-							Constraint constraint = new Constraint();
+							Constraint constraint = new Constraint(Constraint.BENCH_PROPORTIONS);
 							for(String variable : blockvariables1) {
 								if(variable.startsWith("sp")) continue;
 								Matcher matcher = lastIntPattern.matcher(variable);
@@ -76,7 +76,7 @@ public class BenchProportionEquationGenerator extends EquationGenerator{
 								}
 							}
 							if(constraint.getVariables().size() > 0){
-								constraint.setType(Constraint.EQUAL);
+								constraint.setEqualityType(Constraint.EQUAL);
 								constraint.setValue(new BigDecimal(0));
 								context.getConstraints().add(constraint);
 							}

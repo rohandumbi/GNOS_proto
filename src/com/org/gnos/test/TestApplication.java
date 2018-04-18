@@ -67,11 +67,12 @@ public class TestApplication {
 		
 		//Application.start();
 		//new TestApplication().reloadData(1);
-
+		
 		GNOSConfig.load();
 		LogManager.initialize();
 		DBManager.initializePool();
 		LogManager.log("This is test");
+		System.out.println(System.currentTimeMillis());
 		short period = 8;
 		short window = 2;
 		short stepsize = 1;
@@ -82,11 +83,12 @@ public class TestApplication {
 		//runconfig.setWindow(window);
 		//runconfig.setStepSize(stepsize);
 		runconfig.setMIPGAP((float)0.15);
-		runconfig.setProjectId(3);
-		runconfig.setScenarioId(15);
+		runconfig.setProjectId(12);
+		runconfig.setScenarioId(38);
 		SchedulerService service = new SchedulerService();
 		service.setRunconfig(runconfig);
 		service.execute();
+		System.out.println(System.currentTimeMillis());
 
 	}
 

@@ -51,8 +51,8 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 				BigDecimal tonnesWt = getBenchTonnesWt(bench);
 				if(variables.size() == 0) continue;
 				for(int i=timePeriodStart; i<= timePeriodEnd; i++){
-					Constraint c1 = new Constraint();
-					Constraint c2 = new Constraint();
+					Constraint c1 = new Constraint(Constraint.BENCH_CONSTRAINT);
+					Constraint c2 = new Constraint(Constraint.BENCH_CONSTRAINT);
 					String benchVariable = "p"+pitNo+"b"+bench.getBenchNo()+"t"+i;
 					c1.addVariable(benchVariable, tonnesWt);
 					for(String variable: variables){
@@ -72,13 +72,10 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 						String lastBenchVariable = "p"+pitNo+"b"+lastBench.getBenchNo()+"t"+i;
 						c2.addVariable(lastBenchVariable, tonnesWt.negate());
 						c2.setValue(new BigDecimal(0));
-						c2.setType(Constraint.LESS_EQUAL);
+						c2.setEqualityType(Constraint.LESS_EQUAL);
 					}
 					c1.setValue(new BigDecimal(0));
-					c1.setType(Constraint.LESS_EQUAL);
-					if(lastBench != null){
-						//write(sb2.toString().substring(2));
-					}
+					c1.setEqualityType(Constraint.LESS_EQUAL);
 					context.getConstraints().add(c1);
 					context.getConstraints().add(c2);
 				}		
@@ -97,7 +94,6 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 		PitBenchConstraintData defaultConstraint = null;
 		for(PitBenchConstraintData pitBenchConstraintData:pitBenchConstraintDataList){
 			if(!pitBenchConstraintData.isInUse()) continue;
-			System.out.println("PitBenchConstraint:"+ pitBenchConstraintData.getPitName());
 			if(pitBenchConstraintData.getPitName().equals("Default")){
 				hasDefaultConstraint = true;
 				defaultConstraint = pitBenchConstraintData;
@@ -113,7 +109,6 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 			
 		}
 		if(hasDefaultConstraint){
-			System.out.println("PitBenchConstraint: Inside default constraint");
 			Map<Integer, Pit> pits = context.getPits();
 			Set<Integer> pitNos = pits.keySet();
 			for(Integer pitNo: pitNos){
@@ -131,7 +126,7 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 	private void buildEquationForPit(Pit pit, int timeperiod, float yearvalue){
 		Set<Bench> benches = pit.getBenches();
 		int timePeriodStart = context.getTimePeriodStart();
-		Constraint constraint = new Constraint();
+		Constraint constraint = new Constraint(Constraint.BENCH_CONSTRAINT);
 		for(Bench bench:benches){
 			constraint.addVariable("p"+pit.getPitNo()+"b"+bench.getBenchNo()+"t"+timeperiod, new BigDecimal(1));
 			if(timeperiod > timePeriodStart){
@@ -139,7 +134,7 @@ public class BenchConstraintEquationGenerator extends EquationGenerator{
 			}			
 		}
 		float value = yearvalue == 1 ? yearvalue : yearvalue - 1;
-		constraint.setType(Constraint.LESS_EQUAL);
+		constraint.setEqualityType(Constraint.LESS_EQUAL);
 		constraint.setValue(new BigDecimal(value));
 		context.getConstraints().add(constraint);		
 	}

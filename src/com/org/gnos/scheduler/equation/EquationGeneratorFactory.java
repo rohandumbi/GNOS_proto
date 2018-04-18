@@ -1,7 +1,5 @@
 package com.org.gnos.scheduler.equation;
 
-import java.io.BufferedOutputStream;
-
 import com.org.gnos.scheduler.equation.generator.BenchConstraintEquationGenerator;
 import com.org.gnos.scheduler.equation.generator.BenchProportionEquationGenerator;
 import com.org.gnos.scheduler.equation.generator.BinaryVariableGenerator;

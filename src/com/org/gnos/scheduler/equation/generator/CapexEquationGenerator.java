@@ -111,12 +111,12 @@ public class CapexEquationGenerator extends EquationGenerator{
 				}
 			}
 			for(int i=timePeriodStart; i<= timePeriodEnd; i++){
-				Constraint c = new Constraint();
+				Constraint c = new Constraint(Constraint.CAPEX);
 				for(int ii=timePeriodStart; ii<=i; ii++){
 					c.addVariable("c"+capexNumber+"i"+j+"t"+ii, new BigDecimal(1));
 				}
 				c.addVariable("c"+capexNumber+"i"+(j+1)+"t"+i, new BigDecimal(1).negate());
-				c.setType(Constraint.GREATER_EQUAL);
+				c.setEqualityType(Constraint.GREATER_EQUAL);
 				c.setValue(new BigDecimal(0));
 				context.getConstraints().add(c);
 			}			
@@ -134,11 +134,11 @@ public class CapexEquationGenerator extends EquationGenerator{
 					continue;
 				}
 			}
-			Constraint c = new Constraint();
+			Constraint c = new Constraint(Constraint.CAPEX);
 			for(int i=timePeriodStart; i<= timePeriodEnd; i++){
 				c.addVariable("c"+capexNumber+"i"+j+"t"+i, new BigDecimal(1));			
 			}
-			c.setType(Constraint.LESS_EQUAL);
+			c.setEqualityType(Constraint.LESS_EQUAL);
 			c.setValue(new BigDecimal(1));
 			context.getConstraints().add(c);
 		}
@@ -151,7 +151,7 @@ public class CapexEquationGenerator extends EquationGenerator{
 		int startyear = context.getStartYear();
 		
 		for(int i= timePeriodStart; i <= timePeriodEnd; i++ ){
-			Constraint c = new Constraint();
+			Constraint c = new Constraint(Constraint.CAPEX);
 			for(Process p: processList){
 				List<Block> blocks = p.getBlocks();
 				int unitId;
@@ -208,7 +208,7 @@ public class CapexEquationGenerator extends EquationGenerator{
 			} else {
 				c.setValue(new BigDecimal(value));
 			}
-			c.setType(Constraint.LESS_EQUAL);
+			c.setEqualityType(Constraint.LESS_EQUAL);
 			context.getConstraints().add(c);
 		}
 	}
@@ -221,7 +221,7 @@ public class CapexEquationGenerator extends EquationGenerator{
 		int startyear = context.getStartYear();
 		
 		for(int i= timePeriodStart; i <= timePeriodEnd; i++ ){
-			Constraint c = new Constraint();
+			Constraint c = new Constraint(Constraint.CAPEX);
 			for( Process p: processList){
 				List<Block> blocks = p.getBlocks();
 				int unitId;
@@ -291,7 +291,7 @@ public class CapexEquationGenerator extends EquationGenerator{
 			} else {
 				c.setValue(new BigDecimal(value));
 			}
-			c.setType(Constraint.LESS_EQUAL);
+			c.setEqualityType(Constraint.LESS_EQUAL);
 			context.getConstraints().add(c);
 		}
 	}

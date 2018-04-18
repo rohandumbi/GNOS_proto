@@ -15,12 +15,13 @@ public abstract class BaseScheduler {
 	protected void generateEquations(int period) {
 			
 		EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.OBJECTIVE_FUNCTION, context).generate();
+		
 		if(context.getEquationEnableMap().get("BOUNDARY_VARIABLES")) {
 			EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.BOUNDARY_VARIABLE, context).generate();
 		}
 		if(context.getEquationEnableMap().get("PROCESS_CONSTRAINT")) {
 			EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.PROCESS_CONSTRAINT, context).generate();
-		}			
+		}
 		if(context.getEquationEnableMap().get("BENCH_CONSTRAINT")) {
 			EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.BENCH_CONSTRAINT, context).generate();				
 		}
@@ -31,7 +32,6 @@ public abstract class BaseScheduler {
 			EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.DUMP_CAPACITY, context).generate();
 		}
 		EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.SP_RECLAIM, context).generate();
-		
 		if(context.getEquationEnableMap().get("CAPEX")) {
 			EquationGeneratorFactory.getGenerator(EquationGeneratorFactory.CAPEX, context).generate();
 		}

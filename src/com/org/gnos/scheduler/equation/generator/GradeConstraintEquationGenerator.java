@@ -104,7 +104,7 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 			}
 			
 			for(int i=timePeriodStart; i<= timePeriodEnd; i++){
-				Constraint c = new Constraint();
+				Constraint c = new Constraint(Constraint.GRADE_CONSTRAINT);
 				BigDecimal targetGrade = new BigDecimal(gradeConstraintData.getConstraintData().get(startYear+i -1));
 				if(selectorType == GradeConstraintData.SELECTION_PROCESS_JOIN) {
 					ProcessJoin processJoin = context.getProcessJoinByName(gradeConstraintData.getSelectorName());
@@ -191,9 +191,9 @@ public class GradeConstraintEquationGenerator extends EquationGenerator{
 				
 				if(c.getVariables().size() > 0) {
 					if(!gradeConstraintData.isMax()){
-						c.setType(Constraint.LESS_EQUAL);
+						c.setEqualityType(Constraint.LESS_EQUAL);
 					} else {
-						c.setType(Constraint.GREATER_EQUAL);
+						c.setEqualityType(Constraint.GREATER_EQUAL);
 					}
 					c.setValue(new BigDecimal(0));
 					context.getConstraints().add(c);

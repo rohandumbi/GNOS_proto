@@ -72,7 +72,26 @@ public class CplexSolver implements ISolver {
 
 			Map<String, BigDecimal> variables = context.getVariables();
 			List<String> binaries = context.getBinaries();
-
+			List<Constraint> constraints = context.getConstraints();
+			
+			Map<String, Boolean> variablesStatusMap = new HashMap<String, Boolean>();
+			// Identify variable exclusion list
+			for (Constraint constraint : constraints) {
+				if(constraint.getType() != Constraint.PROCESS_CONSTRAINT) continue;
+				List<String> cvariables = constraint.getVariables();
+				boolean ignore = constraint.isIgnore();
+				for(String var: cvariables) {
+					Boolean existingValue = variablesStatusMap.get(var);
+					if(existingValue!= null) {
+						if(existingValue && !ignore) {
+							variablesStatusMap.put(var, ignore);
+						} 
+					} else {
+						variablesStatusMap.put(var, ignore);
+					}
+				}
+			}
+			
 			Set<String> keys = variables.keySet();
 			List<IloNumVar> _vars = new ArrayList<IloNumVar>();
 			IloLinearNumExpr expr = cplex.linearNumExpr();
@@ -83,6 +102,10 @@ public class CplexSolver implements ISolver {
 				numvariablemap.put(binary, var);
 			}
 			for (String key : keys) {
+				if(variablesStatusMap.get(key) != null && variablesStatusMap.get(key)) {
+					System.out.println(" Ignored variable :"+key);
+					continue;
+				}
 				IloNumVar var = null;
 				if(numvariablemap.get(key) != null) {
 					var = numvariablemap.get(key);
@@ -96,14 +119,13 @@ public class CplexSolver implements ISolver {
 				expr.addTerm(coeff.doubleValue(), var);
 				
 			}
-			
-
 
 			cplex.addMaximize(expr);
 
-			List<Constraint> constraints = context.getConstraints();
+			
 
 			for (Constraint constraint : constraints) {
+				if(constraint.isIgnore()) continue;
 				List<String> vars = constraint.getVariables();
 				List<BigDecimal> coefficients = constraint.getCoefficients();
 				IloLinearNumExpr constraint_expr = cplex.linearNumExpr();
@@ -116,7 +138,7 @@ public class CplexSolver implements ISolver {
 					constraint_expr.addTerm(coeff.doubleValue(), var);
 				}
 
-				switch (constraint.getType()) {
+				switch (constraint.getEqualityType()) {
 				case Constraint.GREATER_EQUAL:
 					cplex.addGe(constraint_expr, formatDecimalValue(constraint.getValue()).doubleValue());
 					break;

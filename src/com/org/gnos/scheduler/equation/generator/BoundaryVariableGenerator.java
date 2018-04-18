@@ -37,7 +37,7 @@ public class BoundaryVariableGenerator extends EquationGenerator{
 		Map<Integer, List<String>> blockVariableMapping = context.getBlockVariableMapping();
 		Set<Integer> blockIds = blockVariableMapping.keySet();
 		for(int blockId: blockIds){
-			Constraint c = new Constraint();
+			Constraint c = new Constraint(Constraint.BOUNDARY_VARIABLE);
 			List<String> variables = blockVariableMapping.get(blockId);
 			Block b = allBlocks.get(blockId);
 			for(String variable: variables){
@@ -45,7 +45,7 @@ public class BoundaryVariableGenerator extends EquationGenerator{
 					c.addVariable(variable, new BigDecimal(1));
 				}					
 			}			
-			c.setType(Constraint.LESS_EQUAL);
+			c.setEqualityType(Constraint.LESS_EQUAL);
 			c.setValue(context.getScaledValue(new BigDecimal(context.getTonnesWtForBlock(b))));
 			context.getConstraints().add(c);
 		}
@@ -58,7 +58,7 @@ public class BoundaryVariableGenerator extends EquationGenerator{
 		for(int spNo: spNos){
 			Stockpile sp = context.getStockpileFromNo(spNo);			
 			if(sp == null) continue;
-			Constraint c = new Constraint();
+			Constraint c = new Constraint(Constraint.BOUNDARY_VARIABLE);
 			SPBlock spb = swctx.getSPBlock(spNo);
 			if(spb == null || spb.getTonnesWt() == 0) continue;
 			double capacity = spb.getTonnesWt();
@@ -66,7 +66,7 @@ public class BoundaryVariableGenerator extends EquationGenerator{
 			for(String variable: variables){
 				c.addVariable(variable, new BigDecimal(1));
 			}
-			c.setType(Constraint.LESS_EQUAL);
+			c.setEqualityType(Constraint.LESS_EQUAL);
 			c.setValue(new BigDecimal(capacity));
 			context.getConstraints().add(c);
 		}

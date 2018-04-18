@@ -46,9 +46,9 @@ public class SPReclaimEquationGenerator extends EquationGenerator{
 			if(!sp.isReclaim()) continue;
 			Set<Block> blocks = sp.getBlocks();
 			for(int i= timePeriodStart; i <= timePeriodEnd; i++) {
-				Constraint c1 = new Constraint();
+				Constraint c1 = new Constraint(Constraint.SP_RECLAIM);
 				for(Block b: blocks){
-					Constraint c2 = new Constraint();
+					Constraint c2 = new Constraint(Constraint.SP_RECLAIM);
 					c1.addVariable("p"+b.getPitNo()+"x"+b.getBlockNo()+"s"+sp.getStockpileNumber()+"t1", new BigDecimal(1));
 					for(int j=2; j<=i; j++){
 						c1.addVariable("p"+b.getPitNo()+"x"+b.getBlockNo()+"s"+sp.getStockpileNumber()+"t"+(j-1), new BigDecimal(1));
@@ -60,13 +60,13 @@ public class SPReclaimEquationGenerator extends EquationGenerator{
 						}						
 					}
 					if(c2.getVariables().size() > 0){
-						c2.setType(Constraint.GREATER_EQUAL);
+						c2.setEqualityType(Constraint.GREATER_EQUAL);
 						c2.setValue(new BigDecimal(0));
 						context.getConstraints().add(c2);
 					}
 				}
 				if(sp.getCapacity() > 0 && c1.getVariables().size() > 0){
-					c1.setType(Constraint.LESS_EQUAL);
+					c1.setEqualityType(Constraint.LESS_EQUAL);
 					c1.setValue(context.getScaledValue(new BigDecimal(sp.getCapacity())));
 					context.getConstraints().add(c1);
 				}
@@ -96,7 +96,7 @@ public class SPReclaimEquationGenerator extends EquationGenerator{
 				StringBuilder sbc_sp = new StringBuilder("");
 				StringBuilder sbc_spr = new StringBuilder("");
 				
-				Constraint c = new Constraint();
+				Constraint c = new Constraint(Constraint.SP_RECLAIM);
 				
 				for(Block b: blocks){
 					StringBuilder sb_sp = new StringBuilder("");					
@@ -116,7 +116,7 @@ public class SPReclaimEquationGenerator extends EquationGenerator{
 				}
 				 
 				if(capacity > 0 && (sbc_sp.length() > 0 || sbc_spr.length() > 0)){
-					c.setType(Constraint.LESS_EQUAL);
+					c.setEqualityType(Constraint.LESS_EQUAL);
 					c.setValue(context.getScaledValue(new BigDecimal(capacity)));
 					context.getConstraints().add(c);
 				}

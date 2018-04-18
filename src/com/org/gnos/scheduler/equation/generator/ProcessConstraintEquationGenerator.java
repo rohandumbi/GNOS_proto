@@ -102,7 +102,7 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 			}
 			
 			for(int i=timePeriodStart; i<= timePeriodEnd; i++){
-				Constraint constraint = new Constraint();
+				Constraint constraint = new Constraint(Constraint.PROCESS_CONSTRAINT);
 				if(selectorType == ProcessConstraintData.SELECTION_PROCESS_JOIN) {
 					ProcessJoin processJoin = context.getProcessJoinByName(processConstraintData.getSelector_name());
 					if(processJoin != null) {
@@ -287,10 +287,14 @@ public class ProcessConstraintEquationGenerator extends EquationGenerator{
 				
 				if(constraint.getVariables().size() > 0) {
 					if(processConstraintData.isMax()){
-						constraint.setType(Constraint.LESS_EQUAL);
-						constraint.setValue(context.getScaledValue(new BigDecimal(processConstraintData.getConstraintData().get(startYear+i -1))));
+						constraint.setEqualityType(Constraint.LESS_EQUAL);
+						BigDecimal value = context.getScaledValue(new BigDecimal(processConstraintData.getConstraintData().get(startYear+i -1)));
+						if(value.doubleValue() == 0) {
+							constraint.setIgnore(true);
+						}
+						constraint.setValue(value);
 					} else {
-						constraint.setType(Constraint.GREATER_EQUAL);
+						constraint.setEqualityType(Constraint.GREATER_EQUAL);
 						constraint.setValue(context.getScaledValue(new BigDecimal(processConstraintData.getConstraintData().get(startYear+i -1))));
 					}
 				}
