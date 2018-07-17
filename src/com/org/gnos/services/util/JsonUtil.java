@@ -1,4 +1,4 @@
-package com.org.gnos.services;
+package com.org.gnos.services.util;
 
 import spark.ResponseTransformer;
 

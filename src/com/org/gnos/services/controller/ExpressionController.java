@@ -6,7 +6,7 @@ import java.util.List;
 import com.google.gson.JsonObject;
 import com.org.gnos.db.dao.ExpressionDAO;
 import com.org.gnos.db.model.Expression;
-import com.org.gnos.services.ExpressionProcessor;
+import com.org.gnos.services.util.ExpressionProcessor;
 
 public class ExpressionController {
 

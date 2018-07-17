@@ -1,6 +1,7 @@
 package com.org.gnos.services.endpoints;
 
-import static com.org.gnos.services.JsonUtil.json;
+import static com.org.gnos.services.util.JsonUtil.json;
+
 import static spark.Spark.delete;
 import static spark.Spark.get;
 import static spark.Spark.post;
@@ -11,7 +12,7 @@ import spark.Route;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.org.gnos.services.ResponseError;
+import com.org.gnos.services.common.ResponseError;
 import com.org.gnos.services.controller.PitGroupController;
 public class PitGroupEndpoint {
 

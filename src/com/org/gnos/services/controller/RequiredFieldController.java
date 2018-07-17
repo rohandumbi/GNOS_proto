@@ -5,7 +5,7 @@ import java.util.List;
 import com.google.gson.JsonObject;
 import com.org.gnos.db.dao.RequiredFieldDAO;
 import com.org.gnos.db.model.RequiredField;
-import com.org.gnos.services.PitBenchProcessor;
+import com.org.gnos.services.util.PitBenchProcessor;
 
 public class RequiredFieldController {
 
