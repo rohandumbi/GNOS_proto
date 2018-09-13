@@ -47,6 +47,9 @@ public class DBStorageHelper implements IStorageHelper {
 	@Override
 	public void store(List<Record> records) {
 		
+		if(conn == null ) {
+			conn = DBManager.getConnection();
+		}
 		// Store for reports 
 		storeInReports(records);
 		int projectId = context.getProjectId();
@@ -111,7 +114,9 @@ public class DBStorageHelper implements IStorageHelper {
 			}
 			conn.commit();
 			conn.setAutoCommit(autoCommit);
-			postProcess();			
+			postProcess();
+			DBManager.releaseConnection(conn);
+			conn = null;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -551,6 +556,9 @@ public class DBStorageHelper implements IStorageHelper {
 	
 	@Override
 	public void storeCapex(List<CapexRecord> capexRecords) {
+		if(conn == null ) {
+			conn = DBManager.getConnection();
+		}
 		if(capexRecords == null || capexRecords.size() == 0) return;
 		capexRecordList = capexRecords;
 		try ( PreparedStatement ips = conn.prepareStatement(capex_report_insert_sql); ){
@@ -612,6 +620,8 @@ public class DBStorageHelper implements IStorageHelper {
 			}	
 			conn.commit();
 			conn.setAutoCommit(autoCommit);
+			DBManager.releaseConnection(conn);
+			conn = null;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} 
@@ -954,6 +964,8 @@ public class DBStorageHelper implements IStorageHelper {
 			createReportTable();
 			createCapexTable();
 			createStockpileInventory();
+			DBManager.releaseConnection(conn);
+			conn = null;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

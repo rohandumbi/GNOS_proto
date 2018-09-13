@@ -1,6 +1,6 @@
 package com.org.gnos.services.endpoints;
 
-import static com.org.gnos.services.JsonUtil.json;
+import static com.org.gnos.services.util.JsonUtil.json;
 import static spark.Spark.get;
 
 import com.org.gnos.services.controller.ReserveDataController;

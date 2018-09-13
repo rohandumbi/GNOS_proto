@@ -1,5 +1,7 @@
 package com.org.gnos.services.endpoints;
 
+import static com.org.gnos.services.util.JsonUtil.json;
+
 import static spark.Spark.delete;
 import static spark.Spark.get;
 import static spark.Spark.post;
