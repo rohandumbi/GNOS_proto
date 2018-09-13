@@ -3,6 +3,7 @@ package com.org.gnos.db;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,9 +50,14 @@ public class DBConnectionPool implements IConnectionPool {
 	public synchronized Connection getConnection() {
 		Connection conn = null;
 		for(int i=0; i < connections.size(); i++) {
-			if(!((DBConnection)connections.get(i)).isInUse()) {
-				conn = connections.get(i);
-			}
+			conn = connections.get(i);
+			if(isValid(conn)) {
+				if(!((DBConnection)conn).isInUse()) {
+					break;
+				}
+			} 
+			conn = null;
+			
 		} 
 		
 		if(conn == null && connections.size() < max_connections){
@@ -61,6 +67,8 @@ public class DBConnectionPool implements IConnectionPool {
 		return conn;
 	}
 	
+
+
 	@Override
 	public synchronized void releaseConnection(Connection conn) {		
 		((DBConnection)conn).setInUse(false);
@@ -80,6 +88,25 @@ public class DBConnectionPool implements IConnectionPool {
 		return dbconnection;
 	}
 
-
+	private boolean isValid(Connection conn) {
+		boolean isValid = true;
+		try {
+			if(conn == null || conn.isClosed()) {
+				isValid = false;
+			} else {
+				final String CHECK_SQL_QUERY = "SELECT 1";
+				try {
+			        final Statement statement = conn.createStatement();
+			        statement.executeQuery(CHECK_SQL_QUERY);
+			    } catch (SQLException | NullPointerException e) {
+			        isValid = false;
+			    }
+			}
+		} catch (SQLException e) {
+			isValid = false;
+		}
+		
+		return isValid;
+	}
 
 }
