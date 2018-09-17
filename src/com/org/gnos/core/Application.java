@@ -6,6 +6,8 @@ import com.org.gnos.licensing.GNOSLicense;
 
 public class Application {
 	
+	private static final String version = "1.0.2";
+	
 	public static void start() {
 		
 		try {

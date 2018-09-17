@@ -12,7 +12,7 @@ public class DBManager {
 	}
 	
 	public static void releaseConnection(Connection conn){
-		if(pool != null){
+		if(pool != null && conn != null){
 			pool.releaseConnection(conn);
 		}	
 	}

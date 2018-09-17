@@ -25,7 +25,7 @@ public class SchedulerController {
 			runconfig.setReclaim(isReclaim);
 			runconfig.setPeriod(period);			
 			
-			if(gap > 0 && gap <= 100) {
+			if(gap > 0 ) { // removing gap <= 100 condition
 				runconfig.setMIPGAP(gap/100);
 			}
 			if(mode == 2) {				

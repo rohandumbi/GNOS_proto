@@ -51,11 +51,11 @@ public class DBConnectionPool implements IConnectionPool {
 		Connection conn = null;
 		for(int i=0; i < connections.size(); i++) {
 			conn = connections.get(i);
-			if(isValid(conn)) {
-				if(!((DBConnection)conn).isInUse()) {
+			if(conn != null && !((DBConnection)conn).isInUse()) {
+				if(isValid(conn)) {
 					break;
-				}
-			} 
+				} 
+			}
 			conn = null;
 			
 		} 
